@@ -49,52 +49,89 @@
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
 
-package frc.robot.subsystems.Dashboard;
-
-import edu.wpi.first.math.trajectory.Trajectory;
+package frc.robot.subsystems.runtimeState;
+import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.RobotContainer;
 
-/**
- * Dashboard subsystem that provides tabs on a Shuffleboard GUI
- */
-public class DashboardSubsystem extends SubsystemBase {
-  /** Main driver station tab */
-  private AutoDashboard m_autoTab;
-  /** Drive train parameter tab */
-  //private DriveTrainDashboardTab m_driveTrainTab;
+public class BotStateSubsystem extends SubsystemBase {
 
-  /** Creates a new Dashboard. */
-  public DashboardSubsystem(RobotContainer botContainer) {
-    m_autoTab = new AutoDashboard(botContainer);
-    //m_driveTrainTab = new DriveTrainDashboardTab(botContainer.driveBaseSubsystem);
-  }
 
-  public void initialize(RobotContainer botContainer) {
-    m_autoTab.initialize(botContainer);
-    //m_driveTrainTab.initialize(botContainer);
-  }
+
+  /** true when manual control is active; else false */
+  private boolean m_manualControl = false;
+  /** true when the robot is shooting; else false */
+  private boolean m_robotIsShooting = false;
+  /** true when motor current limiting is enabled; else false */
+  private boolean m_currentLimitingIsEnabled = false;
+
+  /** 
+   * Creates an instance of the object
+  */
+  public BotStateSubsystem() 
+  {}
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    m_autoTab.update();
-    //m_driveTrainTab.update();
+  }  
 
-   // String selectedAutoName = getSelectedAutoRoutine();
-   // Trajectory trajectory = RobotContainer.pathweaverFactory.getTrajectory(selectedAutoName);
-    //setCurrentTrajectory(trajectory);
+  /** Gets the current manual control enablement 
+   * @return true if manual control is enabled
+  */
+  public boolean manualControlIsEnabled() {
+    return m_manualControl;
   }
 
-  /** Returns the present selected autonomous routine 
-   * @return A String containing the name of the selected autonomous routine
+  /** Enables/disables manual control 
+   * @param enable  true to enable manual control; else false
   */
-  //public String getSelectedAutoRoutine() {
-  //  return m_showtimeTab.getSelectedAutoName();
-  //}
+  public void enableManualControl(boolean enable) {
+    m_manualControl = enable;
+  }
 
-  /** Sets the current trajectory displayed by the Field2d widget */
-  //public void setCurrentTrajectory(Trajectory trajectory) {
-  //  m_showtimeTab.setCurrentTrajectory(trajectory);
-  //}
+
+  /** Returns whether the robot is shooting or not 
+   * @return true if the robot is presently shooting; else false
+  */
+  public boolean robotIsShooting() {
+    return m_robotIsShooting;
+  }
+
+  /** Returns whether the present alliance is the Red alliance
+   * @return true if the present alliance is Red; else false
+   */
+  public boolean isRedAlliance() {
+    return DriverStation.Alliance.Red == DriverStation.getAlliance();
+  }
+
+  /** Returns whether the present alliance is the Blue alliance
+   * @return true if the present alliance is Blue; else false
+   */
+  public boolean isBlueAlliance() {
+    return DriverStation.Alliance.Blue == DriverStation.getAlliance();
+  }
+
+  /** Sets whether the  */
+  /**
+   * Returns true if the robot is being driven in Manual, tele-operated mode
+   */
+  public boolean robotIsInManualTeleOpMode() {
+    return (RobotState.isEnabled() && RobotState.isTeleop() && m_manualControl);
+  }
+
+  /** Gets the enablement of motor current limiting
+   * @return true if motor current limiting is enabled; else false
+   */
+  public boolean getCurrentLimitEnabled() {
+    return m_currentLimitingIsEnabled;
+  }
+
+  /** Sets motor current limiting enablement
+   * @param enabled  true to enable motor current limiting; else false to disable
+   */
+  public void setCurrentLimitEnabled(boolean enabled) {
+    m_currentLimitingIsEnabled = enabled;
+  }
+
 }
