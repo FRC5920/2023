@@ -4,11 +4,13 @@
 
 package frc.robot;
 
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.Constants.DriverConstants;
+import frc.robot.Constants.*;
 import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.Dashboard.DriveTab;
+import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -39,6 +41,9 @@ public class RobotContainer {
   
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
+    public final BotStateSubsystem s_BotState = new BotStateSubsystem();
+    /* Dashboard Subsystems */
+    public final DriveTab s_DriveTab = new DriveTab();
   
   // The robot's subsystems and commands are defined here...
 private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
@@ -51,7 +56,7 @@ private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   public RobotContainer() {
     boolean fieldRelative = true;
     boolean openLoop = true;
-    s_Swerve.setDefaultCommand(new TeleopSwerve(s_Swerve, driver, translationAxis, strafeAxis, rotationAxis, fieldRelative, openLoop));
+    s_Swerve.setDefaultCommand(new TeleopSwerve(s_Swerve, driver, translationAxis, strafeAxis, rotationAxis, fieldRelative, openLoop, s_BotState));
 
     // Configure the trigger bindings
     configureBindings();

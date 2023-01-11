@@ -11,7 +11,7 @@
         "vgap": 16.0,
         "titleType": 0,
         "tiles": {}
-      } 
+      }
     },
     {
       "title": "LiveWindow",
@@ -45,8 +45,8 @@
             "content": {
               "_type": "Grid Layout",
               "_title": "Grid Selector",
-              "_glyph": 62,
-              "_showGlyph": true,
+              "_glyph": 149,
+              "_showGlyph": false,
               "Layout/Number of columns": 3,
               "Layout/Number of rows": 3,
               "Layout/Label position": "BOTTOM",
