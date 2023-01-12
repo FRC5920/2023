@@ -21,12 +21,10 @@ public class TeleopSwerve extends CommandBase {
     private int strafeAxis;
     private int rotationAxis;
 
-    private BotStateSubsystem BotState;
-
     /**
      * Driver control
      */
-    public TeleopSwerve(Swerve s_Swerve, Joystick controller, int translationAxis, int strafeAxis, int rotationAxis, boolean fieldRelative, boolean openLoop, BotStateSubsystem m_BotStateSubsystem) {
+    public TeleopSwerve(Swerve s_Swerve, Joystick controller, int translationAxis, int strafeAxis, int rotationAxis, boolean fieldRelative, boolean openLoop) {
         this.s_Swerve = s_Swerve;
         addRequirements(s_Swerve);
 
@@ -36,7 +34,6 @@ public class TeleopSwerve extends CommandBase {
         this.rotationAxis = rotationAxis;
         this.fieldRelative = fieldRelative;
         this.openLoop = openLoop;
-        this.BotState = m_BotStateSubsystem;
     }
 
     @Override
@@ -50,8 +47,8 @@ public class TeleopSwerve extends CommandBase {
         xAxis = (Math.abs(xAxis) < Constants.DriverConstants.stickDeadband) ? 0 : xAxis;
         rAxis = (Math.abs(rAxis) < Constants.DriverConstants.stickDeadband) ? 0 : rAxis;
 
-        translation = new Translation2d(yAxis, xAxis).times(BotState.MaxSpeed);
-        rotation = rAxis * BotState.MaxRotate;
+        translation = new Translation2d(yAxis, xAxis).times(BotStateSubsystem.MaxSpeed);
+        rotation = rAxis * BotStateSubsystem.MaxRotate;
         s_Swerve.drive(translation, rotation, fieldRelative, openLoop);
     }
 }

@@ -5,29 +5,33 @@
 package frc.robot.subsystems.Dashboard;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import java.util.Map;
+
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.shuffleboard.*;
-import edu.wpi.first.wpilibj.smartdashboard.*;;
+import frc.robot.subsystems.runtimeState.BotStateSubsystem;
+import frc.robot.Constants;
 
 public class DriveTab extends SubsystemBase {
   /** Creates a new DriveTab. */
-  public DriveTab() {
-    ShuffleboardTab tab = Shuffleboard.getTab("Drive");
-    SendableChooser<Double> m_driveSpeed = new SendableChooser<>();
-    m_driveSpeed.addOption("Full Speed", 1.0);
-    m_driveSpeed.addOption("90 %", 0.9);
-    m_driveSpeed.addOption("80 %", 0.8);
-    m_driveSpeed.addOption("70 %", 0.7);
-    m_driveSpeed.addOption("60 %", 0.6);
-    m_driveSpeed.addOption("50 %", 0.5);
-    m_driveSpeed.addOption("40 %", 0.4);
-    m_driveSpeed.addOption("30 %", 0.3);
-    m_driveSpeed.setDefaultOption("20 %", .2);
-    m_driveSpeed.addOption("10 %", 0.1);
-    tab.add("Speed Limit", m_driveSpeed);
-  }
+  private ShuffleboardTab tab = Shuffleboard.getTab("Drive");
+  private GenericEntry maxSpeed =
+      tab.add("Max Speed", 0.75)
+      .withWidget(BuiltInWidgets.kNumberSlider) // specify the widget here
+      .withProperties(Map.of("min", 0, "max", 1)) // specify widget properties here
+         .getEntry();
+         
+
+
+  public DriveTab() {}
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    if (RobotState.isDisabled()){
+      BotStateSubsystem.MaxSpeed = Constants.Swerve.maxSpeed * maxSpeed.getDouble(0);
+      BotStateSubsystem.MaxRotate = Constants.Swerve.maxAngularVelocity * maxSpeed.getDouble(0);
+    }
   }
 }

@@ -4,7 +4,7 @@
 
 package frc.robot;
 
-import frc.robot.Constants.*;
+import frc.robot.Constants;
 import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
@@ -56,7 +56,7 @@ private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   public RobotContainer() {
     boolean fieldRelative = true;
     boolean openLoop = true;
-    s_Swerve.setDefaultCommand(new TeleopSwerve(s_Swerve, driver, translationAxis, strafeAxis, rotationAxis, fieldRelative, openLoop, s_BotState));
+    s_Swerve.setDefaultCommand(new TeleopSwerve(s_Swerve, driver, translationAxis, strafeAxis, rotationAxis, fieldRelative, openLoop));
 
     // Configure the trigger bindings
     configureBindings();

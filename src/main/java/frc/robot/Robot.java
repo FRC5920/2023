@@ -5,16 +5,9 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
-import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.DoubleSubscriber;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -27,11 +20,11 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
-  DoublePublisher xPub;
-  DoubleSubscriber xSub;
-  double x = 0;
-  double y = 0;
+  //DoublePublisher xPub;
+  //DoubleSubscriber xSub;
+  //double x = 0;
 
+  //GenericEntry maxSpeed = tab.add("Speed Limit", 1).getEntry();
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -42,19 +35,7 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-
-    NetworkTableInstance inst = NetworkTableInstance.getDefault();
-
-    // Get the table within that instance that contains the data. There can
-    // be as many tables as you like and exist to make it easier to organize
-    // your data. In this case, it's a table called datatable.
-    NetworkTable table = inst.getTable("Shuffleboard");
-
-    // Start publishing topics within that table that correspond to the X and Y values
-    // for some operation in your program.
-    // The topic names are actually "/datatable/x" and "/datatable/y".
-    xPub = table.getDoubleTopic("Drive/Speed Limit/active").publish();
-    xSub = table.getDoubleTopic("Shuffleboard/Drive/Speed Limit/selected").subscribe(1);
+    
   }
 
   /**
@@ -74,7 +55,7 @@ public class Robot extends TimedRobot {
         //xPub.set(x);
           //      x += 0.05;
 
-                SmartDashboard.putNumber("speed modifier", xSub.get());
+               // SmartDashboard.putNumber("speed modifier", maxSpeed.getDouble(1.0));
     CommandScheduler.getInstance().run();
   }
 
