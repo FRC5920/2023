@@ -65,8 +65,8 @@ public class BotStateSubsystem extends SubsystemBase {
   /** true when motor current limiting is enabled; else false */
   private boolean m_currentLimitingIsEnabled = false;
   /** speeds based on Shuffleboard */
-  public double MaxSpeed = 1.0;
-  public double MaxRotate = 1.0;
+  public double MaxSpeed = 14.97;
+  public double MaxRotate = 10.0;
 
   /** 
    * Creates an instance of the object
