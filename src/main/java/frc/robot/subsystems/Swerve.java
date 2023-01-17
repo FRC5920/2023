@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 
@@ -37,6 +38,8 @@ public class Swerve extends SubsystemBase {
             new SwerveModule(2, Constants.Swerve.Mod2.constants),
             new SwerveModule(3, Constants.Swerve.Mod3.constants)
         };
+        Timer.delay(1.0);
+        resetModulesToAbsolute();
 
         swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.swerveKinematics, getYaw(), getModulePositions());
     }
@@ -95,14 +98,20 @@ public class Swerve extends SubsystemBase {
         return positions;
     }
 
-  public void zeroGyro(){
-      gyro.setYaw(0);
-  }
+    public void zeroGyro(){
+        gyro.setYaw(0);
+    }
 
-  public Rotation2d getYaw() {
-    return (Constants.Swerve.invertGyro) ? Rotation2d.fromDegrees(360 - gyro.getYaw()) : Rotation2d.fromDegrees(gyro.getYaw());
-}
+    public Rotation2d getYaw() {
+        return (Constants.Swerve.invertGyro) ? Rotation2d.fromDegrees(360 - gyro.getYaw()) : Rotation2d.fromDegrees(gyro.getYaw());
+    }
 
+    public void resetModulesToAbsolute(){
+        for(SwerveModule mod : mSwerveMods){
+            mod.resetToAbsolute();
+        }
+    }
+    
 @Override
 public void periodic(){
     swerveOdometry.update(getYaw(), getModulePositions());  
