@@ -10,6 +10,7 @@ import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Dashboard.DriveTab;
+import frc.robot.subsystems.Heimdall.PVCore;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import org.photonvision.PhotonCamera;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -36,12 +38,17 @@ public class RobotContainer {
     private final int strafeAxis = XboxController.Axis.kLeftX.value;
     private final int rotationAxis = XboxController.Axis.kRightX.value;
   
+    /*Photonvision */
+    private final PhotonCamera HeimdalCam = new PhotonCamera("Heimdal1");
+
     /* Driver Buttons */
     private final JoystickButton zeroGyro = new JoystickButton(driver, XboxController.Button.kY.value);
   
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
     public final BotStateSubsystem s_BotState = new BotStateSubsystem();
+    /* Vision */ 
+    //public final PVCore s_Vision = new PVCore(HeimdalCam, s_Swerve);
     /* Dashboard Subsystems */
     public final DriveTab s_DriveTab = new DriveTab();
   

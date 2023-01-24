@@ -36,6 +36,7 @@ public class PVCore extends SubsystemBase {
 
   private final PhotonCamera photonCamera;
   private final AprilTagFieldLayout aprilTagFieldLayout;
+  private final Swerve s_Swerve;
 
 
     // Kalman Filter Configuration. These can be "tuned-to-taste" based on how much
@@ -63,8 +64,10 @@ public class PVCore extends SubsystemBase {
  
    private double previousPipelineTimestamp = 0;
 
-  public PVCore(PhotonCamera photonCamera, Swerve drivetrainSubsystem) {
+  public PVCore(PhotonCamera photonCamera, Swerve s_Swerve) {
     this.photonCamera = photonCamera;
+    this.s_Swerve = s_Swerve;
+
     AprilTagFieldLayout layout;
     try {
       layout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2023ChargedUp.m_resourceFile);
