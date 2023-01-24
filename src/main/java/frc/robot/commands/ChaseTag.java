@@ -21,9 +21,9 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.DrivetrainSubsystem;
+import frc.robot.subsystems.Swerve;
 
-public class ChaseTagCommand extends CommandBase {
+public class ChaseTag extends CommandBase {
   
   private static final TrapezoidProfile.Constraints X_CONSTRAINTS = new TrapezoidProfile.Constraints(3, 2);
   private static final TrapezoidProfile.Constraints Y_CONSTRAINTS = new TrapezoidProfile.Constraints(3, 2);
@@ -36,7 +36,7 @@ public class ChaseTagCommand extends CommandBase {
           new Rotation3d(0.0, 0.0, Math.PI));
 
   private final PhotonCamera photonCamera;
-  private final DrivetrainSubsystem drivetrainSubsystem;
+  private final Swerve drivetrainSubsystem;
   private final Supplier<Pose2d> poseProvider;
 
   private final ProfiledPIDController xController = new ProfiledPIDController(3, 0, 0, X_CONSTRAINTS);
@@ -45,9 +45,9 @@ public class ChaseTagCommand extends CommandBase {
 
   private PhotonTrackedTarget lastTarget;
 
-  public ChaseTagCommand(
+  public ChaseTag(
         PhotonCamera photonCamera, 
-        DrivetrainSubsystem drivetrainSubsystem,
+        Swerve drivetrainSubsystem,
         Supplier<Pose2d> poseProvider) {
     this.photonCamera = photonCamera;
     this.drivetrainSubsystem = drivetrainSubsystem;
@@ -111,7 +111,7 @@ public class ChaseTagCommand extends CommandBase {
     
     if (lastTarget == null) {
       // No target has been visible
-      drivetrainSubsystem.stop();
+      //drivetrainSubsystem.stop();
     } else {
       // Drive to the target
       var xSpeed = xController.calculate(robotPose.getX());
@@ -129,14 +129,14 @@ public class ChaseTagCommand extends CommandBase {
         omegaSpeed = 0;
       }
 
-      drivetrainSubsystem.drive(
-        ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, omegaSpeed, robotPose2d.getRotation()));
+      //drivetrainSubsystem.drive(
+      //  ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, omegaSpeed, robotPose2d.getRotation()));
     }
   }
 
   @Override
   public void end(boolean interrupted) {
-    drivetrainSubsystem.stop();
+    //drivetrainSubsystem.stop();
   }
 
 }

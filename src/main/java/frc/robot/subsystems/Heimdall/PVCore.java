@@ -29,13 +29,12 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import frc.robot.Constants.DrivetrainConstants;
+import frc.robot.Constants.Swerve;
 
 public class PVCore extends SubsystemBase {
   /** Creates a new PVCore. */
 
   private final PhotonCamera photonCamera;
-  private final DrivetrainSubsystem drivetrainSubsystem;
   private final AprilTagFieldLayout aprilTagFieldLayout;
 
 
@@ -64,9 +63,8 @@ public class PVCore extends SubsystemBase {
  
    private double previousPipelineTimestamp = 0;
 
-  public PVCore(PhotonCamera photonCamera, DrivetrainSubsystem drivetrainSubsystem) {
+  public PVCore(PhotonCamera photonCamera, Swerve drivetrainSubsystem) {
     this.photonCamera = photonCamera;
-    this.drivetrainSubsystem = drivetrainSubsystem;
     AprilTagFieldLayout layout;
     try {
       layout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2023ChargedUp.m_resourceFile);
@@ -81,13 +79,14 @@ public class PVCore extends SubsystemBase {
 
     ShuffleboardTab tab = Shuffleboard.getTab("Vision");
 
-    poseEstimator =  new SwerveDrivePoseEstimator(
-        DrivetrainConstants.KINEMATICS,
-        drivetrainSubsystem.getGyroscopeRotation(),
-        drivetrainSubsystem.getModulePositions(),
+    poseEstimator =  new SwerveDrivePoseEstimator(null, null, null, null);
+      /*s_swerveSubsystem.KINEMATICS, 
+      s_swerveSubsystem.getGyroscopeRotation(),
+      s_swerveSubsystem.getModulePositions(),
+      s_swerveSubsystem.
         new Pose2d(),
         stateStdDevs,
-        visionMeasurementStdDevs);
+        visionMeasurementStdDevs); */
     
     tab.addString("Pose", this::getFomattedPose).withPosition(0, 0).withSize(2, 0);
     tab.add("Field", field2d).withPosition(2, 0).withSize(6, 4);
@@ -119,9 +118,9 @@ public class PVCore extends SubsystemBase {
       }
     }
     // Update pose estimator with drivetrain sensors
-    poseEstimator.update(
-      drivetrainSubsystem.getGyroscopeRotation(),
-      drivetrainSubsystem.getModulePositions());
+   // poseEstimator.update(
+      //s_swerveSubsystem.getGyroscopeRotation(),
+      //s_swerveSubsystem.SwerveModuleState());
 
     field2d.setRobotPose(getCurrentPose());
   }
@@ -145,10 +144,10 @@ public class PVCore extends SubsystemBase {
    * @param newPose new pose
    */
   public void setCurrentPose(Pose2d newPose) {
-    poseEstimator.resetPosition(
-      drivetrainSubsystem.getGyroscopeRotation(),
-      drivetrainSubsystem.getModulePositions(),
-      newPose);
+    //poseEstimator.resetPosition(
+      //s_swerveSubsystem.getGyroscopeRotation(),
+      //s_swerveSubsystem.getModulePositions(),
+    //  newPose);
   }
 
   /**
