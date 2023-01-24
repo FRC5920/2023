@@ -6,12 +6,12 @@ package frc.robot.subsystems.Heimdall;
 
 import static frc.robot.Constants.VisionConstants.CAMERA_TO_ROBOT;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import java.io.IOException;
 import java.util.Optional;
 
 import org.photonvision.PhotonCamera;
+
+import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
@@ -21,6 +21,7 @@ import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
@@ -29,14 +30,15 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Swerve;
 
 public class PVCore extends SubsystemBase {
   /** Creates a new PVCore. */
 
   private final PhotonCamera photonCamera;
+  private final Swerve drivetrainSubsystem;
   private final AprilTagFieldLayout aprilTagFieldLayout;
-  private final Swerve s_Swerve;
 
 
     // Kalman Filter Configuration. These can be "tuned-to-taste" based on how much
@@ -56,13 +58,13 @@ public class PVCore extends SubsystemBase {
     * Standard deviations of the vision measurements. Increase these numbers to trust global measurements from vision
     * less. This matrix is in the form [x, y, theta]ᵀ, with units in meters and radians.
     */
-   private static final Vector<N3> visionMeasurementStdDevs = VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(10));
- 
-   private final SwerveDrivePoseEstimator poseEstimator;
- 
-   private final Field2d field2d = new Field2d();
- 
-   private double previousPipelineTimestamp = 0;
+    private static final Vector<N3> visionMeasurementStdDevs = VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(10));
+
+    private final SwerveDrivePoseEstimator poseEstimator;
+  
+    private final Field2d field2d = new Field2d();
+  
+    private double previousPipelineTimestamp = 0;
 
   public PVCore(PhotonCamera photonCamera, Swerve s_Swerve) {
     this.photonCamera = photonCamera;
