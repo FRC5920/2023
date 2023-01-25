@@ -73,6 +73,7 @@ public class Swerve extends SubsystemBase {
 
   public Swerve() {
     gyro = new WPI_Pigeon2(Constants.SwerveDrivebaseConstants.pigeonID, "SwerveCAN");
+    gyro = new WPI_Pigeon2(Constants.SwerveDrivebaseConstants.pigeonID, "SwerveCAN");
     gyro.configFactoryDefault();
     zeroGyro();
 
@@ -82,23 +83,26 @@ public class Swerve extends SubsystemBase {
           new SwerveModule(1, Constants.SwerveDrivebaseConstants.Mod1.constants),
           new SwerveModule(2, Constants.SwerveDrivebaseConstants.Mod2.constants),
           new SwerveModule(3, Constants.SwerveDrivebaseConstants.Mod3.constants)
+          new SwerveModule(0, Constants.SwerveDrivebaseConstants.Mod0.constants),
+          new SwerveModule(1, Constants.SwerveDrivebaseConstants.Mod1.constants),
+          new SwerveModule(2, Constants.SwerveDrivebaseConstants.Mod2.constants),
+          new SwerveModule(3, Constants.SwerveDrivebaseConstants.Mod3.constants)
         };
 
     swerveOdometry =
-        new SwerveDriveOdometry(
-            Constants.SwerveDrivebaseConstants.swerveKinematics, getYaw(), getModulePositions());
+        new SwerveDriveOdometry(Constants.SwerveDrivebaseConstants.swerveKinematics, getYaw(), getModulePositions());
   }
 
   public void drive(
       Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
     SwerveModuleState[] swerveModuleStates =
         Constants.SwerveDrivebaseConstants.swerveKinematics.toSwerveModuleStates(
+        Constants.SwerveDrivebaseConstants.swerveKinematics.toSwerveModuleStates(
             fieldRelative
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(
                     translation.getX(), translation.getY(), rotation, getYaw())
                 : new ChassisSpeeds(translation.getX(), translation.getY(), rotation));
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        swerveModuleStates, Constants.SwerveDrivebaseConstants.maxSpeed);
+    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.SwerveDrivebaseConstants.maxSpeed);
 
     for (SwerveModule mod : mSwerveMods) {
       mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
@@ -147,6 +151,7 @@ public class Swerve extends SubsystemBase {
   }
 
   public Rotation2d getYaw() {
+    return (Constants.SwerveDrivebaseConstants.invertGyro)
     return (Constants.SwerveDrivebaseConstants.invertGyro)
         ? Rotation2d.fromDegrees(360 - gyro.getYaw())
         : Rotation2d.fromDegrees(gyro.getYaw());
