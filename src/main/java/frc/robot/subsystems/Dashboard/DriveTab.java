@@ -12,7 +12,7 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.shuffleboard.*;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
-import frc.lib.SwerveDrive.Constants;
+import frc.robot.Constants;
 
 public class DriveTab extends SubsystemBase {
   /** Creates a new DriveTab. */
