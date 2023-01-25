@@ -27,13 +27,12 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.DrivetrainConstants;
-import frc.robot.util.FieldConstants;
+import frc.robot.Constants.Swerve;
 
 public class PoseEstimatorSubsystem extends SubsystemBase {
 
   private final PhotonCamera photonCamera;
-  private final DrivetrainSubsystem drivetrainSubsystem;
+  private final Swerve s_swerveSubsystem;
   private final AprilTagFieldLayout aprilTagFieldLayout;
   
   // Kalman Filter Configuration. These can be "tuned-to-taste" based on how much
@@ -60,9 +59,9 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
 
   private double previousPipelineTimestamp = 0;
 
-  public PoseEstimatorSubsystem(PhotonCamera photonCamera, DrivetrainSubsystem drivetrainSubsystem) {
+  public PoseEstimatorSubsystem(PhotonCamera photonCamera, Swerve s_swerveSubsystem) {
     this.photonCamera = photonCamera;
-    this.drivetrainSubsystem = drivetrainSubsystem;
+    this.s_swerveSubsystem = s_swerveSubsystem;
     AprilTagFieldLayout layout;
     try {
       layout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2023ChargedUp.m_resourceFile);
@@ -79,9 +78,9 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
     ShuffleboardTab tab = Shuffleboard.getTab("Vision");
 
     poseEstimator =  new SwerveDrivePoseEstimator(
-        DrivetrainConstants.KINEMATICS,
-        drivetrainSubsystem.getGyroscopeRotation(),
-        drivetrainSubsystem.getModulePositions(),
+        Swerve.swerveKinematics,
+        s_swerveSubsystem.getGyroscopeRotation(),
+        s_swerveSubsystem.getModulePositions(),
         new Pose2d(),
         stateStdDevs,
         visionMeasurementStdDevs);
@@ -112,8 +111,8 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
     }
     // Update pose estimator with drivetrain sensors
     poseEstimator.update(
-      drivetrainSubsystem.getGyroscopeRotation(),
-      drivetrainSubsystem.getModulePositions());
+      s_swerveSubsystem.getGyroscopeRotation(),
+      s_swerveSubsystem.getModulePositions());
 
     field2d.setRobotPose(getCurrentPose());
     if (DriverStation.getAlliance() == Alliance.Red) {
@@ -143,8 +142,8 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
    */
   public void setCurrentPose(Pose2d newPose) {
     poseEstimator.resetPosition(
-      drivetrainSubsystem.getGyroscopeRotation(),
-      drivetrainSubsystem.getModulePositions(),
+      s_swerveSubsystem.getGyroscopeRotation(),
+      s_swerveSubsystem.getModulePositions(),
       newPose);
   }
 
