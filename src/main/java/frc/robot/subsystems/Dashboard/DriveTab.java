@@ -64,7 +64,7 @@ public class DriveTab extends SubsystemBase {
   private ShuffleboardTab tab = Shuffleboard.getTab("Drive");
 
   private GenericEntry maxSpeed =
-      tab.add("Max Speed", 0.75)
+      tab.add("Max Speed", 0.85)
           .withWidget(BuiltInWidgets.kNumberSlider) // specify the widget here
           .withProperties(Map.of("min", 0, "max", 1)) // specify widget properties here
           .getEntry();
