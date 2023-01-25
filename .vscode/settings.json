@@ -1,0 +1,20 @@
+{
+  "editor.rulers": [80,100],
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "bin/": true,
+    "**/.classpath": true,
+    "**/.project": true,
+    "**/.settings": true,
+    "**/.factorypath": true,
+    "**/*~": true
+  },
+  "java.format.settings.url": ".vscode/java-formatter.xml",
+  "java.format.settings.profile": "",
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false
+}
