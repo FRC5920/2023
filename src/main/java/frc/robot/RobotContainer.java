@@ -62,8 +62,10 @@ import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Dashboard.DriveTab;
+import frc.robot.subsystems.Heimdall.*;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
+import org.photonvision.PhotonCamera;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -86,10 +88,16 @@ public class RobotContainer {
   private final JoystickButton zeroGyro =
       new JoystickButton(driver, XboxController.Button.kY.value);
 
+  /* Cameras */
+  private final PhotonCamera photonCamera = new PhotonCamera("Heimdal1");
+
   // --------------------- Robot Subsystems ----------------------------
   public final JoystickSubsystem joystickSubsystem = new JoystickSubsystem();
   public final Swerve swerveSubsystem = new Swerve();
   public final BotStateSubsystem s_BotState = new BotStateSubsystem();
+  private final PoseEstimatorSubsystem s_poseEstimator =
+      new PoseEstimatorSubsystem(photonCamera, swerveSubsystem);
+
   /* Dashboard Subsystems */
   public final DriveTab s_DriveTab = new DriveTab();
 

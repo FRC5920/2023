@@ -110,10 +110,10 @@ public class Swerve extends SubsystemBase {
       mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
     }
   }
-public void stop()
-{
-  drive(new Translation2d(0,0).times(0), 0, true, true);
-}
+
+  public void stop() {
+    drive(new Translation2d(0, 0).times(0), 0, true, true);
+  }
   /* Used by SwerveControllerCommand in Auto */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
@@ -160,12 +160,15 @@ public void stop()
         ? Rotation2d.fromDegrees(360 - gyro.getYaw())
         : Rotation2d.fromDegrees(gyro.getYaw());
   }
+
   public double getRoll() {
     return gyro.getRoll();
   }
+
   public double getPitch() {
     return gyro.getPitch();
   }
+
   public Rotation2d getGyroscopeRotation() {
     return gyro.getRotation2d();
   }

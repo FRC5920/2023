@@ -3,14 +3,29 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/Shuffleboard/Drive/SendableChooser[0]": "String Chooser",
-      "/Shuffleboard/Drive/Speed Limit": "String Chooser"
+      "/Shuffleboard/Drive/Speed Limit": "String Chooser",
+      "/Shuffleboard/Vision/Field": "Field2d"
     }
   },
   "NetworkTables": {
     "transitory": {
       "Shuffleboard": {
+        ".metadata": {
+          "Drive": {
+            "Max Speed": {
+              "open": true
+            },
+            "open": true
+          }
+        },
         "Drive": {
           "Speed Limit": {
+            "open": true
+          },
+          "open": true
+        },
+        "Vision": {
+          "Field": {
             "open": true
           },
           "open": true
