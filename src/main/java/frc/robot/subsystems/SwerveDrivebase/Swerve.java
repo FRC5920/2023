@@ -97,7 +97,8 @@ public class Swerve extends SubsystemBase {
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(
                     translation.getX(), translation.getY(), rotation, getYaw())
                 : new ChassisSpeeds(translation.getX(), translation.getY(), rotation));
-    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        swerveModuleStates, Constants.SwerveDrivebaseConstants.maxSpeed);
 
     for (SwerveModule mod : mSwerveMods) {
       mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
@@ -109,8 +110,6 @@ public class Swerve extends SubsystemBase {
   }
   /* Used by SwerveControllerCommand in Auto */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        desiredStates, Constants.SwerveDrivebaseConstants.maxSpeed);
     SwerveDriveKinematics.desaturateWheelSpeeds(
         desiredStates, Constants.SwerveDrivebaseConstants.maxSpeed);
 
@@ -153,15 +152,7 @@ public class Swerve extends SubsystemBase {
         : Rotation2d.fromDegrees(gyro.getYaw());
   }
 
-  public double getRoll() {
-    return gyro.getRoll();
-  }
-
-  public double getPitch() {
-    return gyro.getPitch();
-  }
-
-  public Rotation2d getGyroscopeRotation() {
+  public Rotation2d getGyroscopeRotation(){
     return gyro.getRotation2d();
   }
 
