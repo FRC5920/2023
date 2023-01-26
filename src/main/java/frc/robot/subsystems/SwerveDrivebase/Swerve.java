@@ -97,7 +97,8 @@ public class Swerve extends SubsystemBase {
     resetModulesToAbsolute();
 
     swerveOdometry =
-        new SwerveDriveOdometry(Constants.SwerveDrivebaseConstants.swerveKinematics, getYaw(), getModulePositions());
+        new SwerveDriveOdometry(
+            Constants.SwerveDrivebaseConstants.swerveKinematics, getYaw(), getModulePositions());
   }
 
   public void drive(
@@ -109,7 +110,8 @@ public class Swerve extends SubsystemBase {
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(
                     translation.getX(), translation.getY(), rotation, getYaw())
                 : new ChassisSpeeds(translation.getX(), translation.getY(), rotation));
-    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.SwerveDrivebaseConstants.maxSpeed);
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        swerveModuleStates, Constants.SwerveDrivebaseConstants.maxSpeed);
 
     for (SwerveModule mod : mSwerveMods) {
       mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
