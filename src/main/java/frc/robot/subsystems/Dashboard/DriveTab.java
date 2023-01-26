@@ -74,8 +74,10 @@ public class DriveTab extends SubsystemBase {
   @Override
   public void periodic() {
     if (RobotState.isDisabled()) {
-      BotStateSubsystem.MaxSpeed = Constants.SwerveDrivebaseConstants.maxSpeed * maxSpeed.getDouble(0);
-      BotStateSubsystem.MaxRotate = Constants.SwerveDrivebaseConstants.maxAngularVelocity * maxSpeed.getDouble(0);
+      BotStateSubsystem.MaxSpeed =
+          Constants.SwerveDrivebaseConstants.maxSpeed * maxSpeed.getDouble(0);
+      BotStateSubsystem.MaxRotate =
+          Constants.SwerveDrivebaseConstants.maxAngularVelocity * maxSpeed.getDouble(0);
     }
   }
 }
