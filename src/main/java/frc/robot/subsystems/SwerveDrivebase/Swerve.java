@@ -73,7 +73,6 @@ public class Swerve extends SubsystemBase {
 
   public Swerve() {
     gyro = new WPI_Pigeon2(Constants.SwerveDrivebaseConstants.pigeonID, "SwerveCAN");
-    gyro = new WPI_Pigeon2(Constants.SwerveDrivebaseConstants.pigeonID, "SwerveCAN");
     gyro.configFactoryDefault();
     zeroGyro();
 
@@ -83,7 +82,6 @@ public class Swerve extends SubsystemBase {
           new SwerveModule(1, Constants.SwerveDrivebaseConstants.Mod1.constants),
           new SwerveModule(2, Constants.SwerveDrivebaseConstants.Mod2.constants),
           new SwerveModule(3, Constants.SwerveDrivebaseConstants.Mod3.constants)
-          new SwerveModule(0, Constants.SwerveDrivebaseConstants.Mod0.constants)
         };
 
     swerveOdometry =
