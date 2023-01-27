@@ -89,7 +89,9 @@ public class RobotContainer {
       new JoystickButton(driver, XboxController.Button.kY.value);
 
   /* Cameras */
-  private final PhotonCamera photonCamera = new PhotonCamera("Heimdal1");
+  private final PhotonCamera TagCamera = new PhotonCamera("Tag_Camera");
+  private final PhotonCamera BackCamera = new PhotonCamera("Back_Camera");
+  private final PhotonCamera ArmCamera = new PhotonCamera("Arm_Camera");
 
   // --------------------- Robot Subsystems ----------------------------
   public final JoystickSubsystem joystickSubsystem = new JoystickSubsystem();
