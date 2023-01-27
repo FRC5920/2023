@@ -84,10 +84,7 @@ public class Swerve extends SubsystemBase {
           new SwerveModule(1, Constants.SwerveDrivebaseConstants.Mod1.constants),
           new SwerveModule(2, Constants.SwerveDrivebaseConstants.Mod2.constants),
           new SwerveModule(3, Constants.SwerveDrivebaseConstants.Mod3.constants)
-          new SwerveModule(0, Constants.SwerveDrivebaseConstants.Mod0.constants),
-          new SwerveModule(1, Constants.SwerveDrivebaseConstants.Mod1.constants),
-          new SwerveModule(2, Constants.SwerveDrivebaseConstants.Mod2.constants),
-          new SwerveModule(3, Constants.SwerveDrivebaseConstants.Mod3.constants)
+          new SwerveModule(0, Constants.SwerveDrivebaseConstants.Mod0.constants)
         };
 
     /* By pausing init for a second before setting module offsets, we avoid a bug with inverting motors.
@@ -104,7 +101,6 @@ public class Swerve extends SubsystemBase {
   public void drive(
       Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
     SwerveModuleState[] swerveModuleStates =
-        Constants.SwerveDrivebaseConstants.swerveKinematics.toSwerveModuleStates(
         Constants.SwerveDrivebaseConstants.swerveKinematics.toSwerveModuleStates(
             fieldRelative
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -162,7 +158,6 @@ public class Swerve extends SubsystemBase {
   }
 
   public Rotation2d getYaw() {
-    return (Constants.SwerveDrivebaseConstants.invertGyro)
     return (Constants.SwerveDrivebaseConstants.invertGyro)
         ? Rotation2d.fromDegrees(360 - gyro.getYaw())
         : Rotation2d.fromDegrees(gyro.getYaw());
