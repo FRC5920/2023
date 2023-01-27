@@ -217,9 +217,12 @@ public final class Constants {
 
     public static final double fiducialAmbiguityLimit = 0.2;
     /** Physical location of the camera on the robot, relative to the center of the robot. */
+    //TODO: get the actual location of the tag camera to the robot transform
     public static final Transform3d CAMERA_TO_ROBOT =
-        new Transform3d(new Translation3d(-0.3425, 0.0, -0.233), new Rotation3d());
+    new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0,0,0)); //Cam mounted facing forward, half a meter forward of center, half a meter up from center.
+
 
     public static final Transform3d ROBOT_TO_CAMERA = CAMERA_TO_ROBOT.inverse();
+
   }
 }
