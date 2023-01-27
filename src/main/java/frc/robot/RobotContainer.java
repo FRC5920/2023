@@ -89,13 +89,15 @@ public class RobotContainer {
       new JoystickButton(driver, XboxController.Button.kY.value);
 
   /* Cameras */
-  private final PhotonCamera photonCamera = new PhotonCamera("Heimdal1");
+  private final PhotonCamera TagCamera = new PhotonCamera("Tag_Camera");
+  private final PhotonCamera BackCamera = new PhotonCamera("Back_Camera");
+  private final PhotonCamera ArmCamera = new PhotonCamera("Arm_Camera");
 
   /* Subsystems */
   private final Swerve s_Swerve = new Swerve();
   public final BotStateSubsystem s_BotState = new BotStateSubsystem();
   private final PoseEstimatorSubsystem s_poseEstimator =
-      new PoseEstimatorSubsystem(photonCamera, s_Swerve);
+      new PoseEstimatorSubsystem(TagCamera, s_Swerve);
 
   /* Dashboard Subsystems */
   public final DriveTab s_DriveTab = new DriveTab();
