@@ -66,7 +66,6 @@ import frc.lib.SwerveDrive.SwerveModuleConstants;
 import java.util.Map;
 
 public final class Constants {
-
   /** Type of robot targeted by these constants */
   private static final RobotType s_robot = RobotType.PrototypeBot;
 
@@ -93,6 +92,28 @@ public final class Constants {
       default:
         return Mode.REAL;
     }
+  }
+
+  public static class PneumaticsConstants {
+    public static final int kPDHCAN = 10;
+    public static final int kArmLeftRotatorPort = 0;
+    public static final int kArmRightRotatorPort = 1;
+  }
+
+  public static class ArmConstants {
+    public static final int kArmYMotorMasterPort = 10;
+    public static final int kArmYMotorSlavePort = 11;
+    public static final int kHandBottomRollerPort = 1;
+    public static final int kHandTopFrontRollerPort = 2;
+    public static final int kHandTopBackRollerPort = 3;
+    public static final int kArmExtenderPort = 20;
+    public static final int kArmStoredPosition = 0;
+    public static final int kArmIntakePosition = 500;
+    public static final int kArmPlaceHighPosition = 2500;
+    public static final int kArmPlaceMiddlePosition = 2600;
+    public static final int kArmRetracted = 0;
+    public static final int kArmExtendedHigh = 4000;
+    public static final int kArmExtendedMiddle = 3000;
   }
 
   public static class DriverConstants {
