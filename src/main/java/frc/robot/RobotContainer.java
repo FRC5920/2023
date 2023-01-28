@@ -86,8 +86,9 @@ public class RobotContainer {
   private final JoystickButton zeroGyro =
       new JoystickButton(driver, XboxController.Button.kY.value);
 
-  /* Subsystems */
-  private final Swerve s_Swerve = new Swerve();
+  // --------------------- Robot Subsystems ----------------------------
+  public final JoystickSubsystem joystickSubsystem = new JoystickSubsystem();
+  public final Swerve swerveSubsystem = new Swerve();
   public final BotStateSubsystem s_BotState = new BotStateSubsystem();
   /* Dashboard Subsystems */
   public final DriveTab s_DriveTab = new DriveTab();
@@ -103,9 +104,15 @@ public class RobotContainer {
   public RobotContainer() {
     boolean fieldRelative = true;
     boolean openLoop = true;
-    s_Swerve.setDefaultCommand(
+    swerveSubsystem.setDefaultCommand(
         new TeleopSwerve(
-            s_Swerve, driver, translationAxis, strafeAxis, rotationAxis, fieldRelative, openLoop));
+            swerveSubsystem,
+            driver,
+            translationAxis,
+            strafeAxis,
+            rotationAxis,
+            fieldRelative,
+            openLoop));
 
     // Configure the trigger bindings
     configureBindings();
@@ -130,7 +137,7 @@ public class RobotContainer {
     // m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
     /* Driver Buttons */
 
-    zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
+    zeroGyro.onTrue(new InstantCommand(() -> swerveSubsystem.zeroGyro()));
   }
 
   /**
