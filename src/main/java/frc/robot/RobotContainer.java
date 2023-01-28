@@ -61,6 +61,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.Arm.Arm;
+import frc.robot.subsystems.Arm.Pneumatics;
 import frc.robot.subsystems.Dashboard.DriveTab;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
@@ -85,10 +87,29 @@ public class RobotContainer {
   /* Driver Buttons */
   private final JoystickButton zeroGyro =
       new JoystickButton(driver, XboxController.Button.kY.value);
+  /*  private final JoystickButton intakeCone =
+        new JoystickButton(Constants.OperatorConstants.kControllerPort, XboxController.Button.kA.value);
+    private final JoystickButton intakeCube =
+        new JoystickButton(Constants.OperatorConstants.kControllerPort, XboxController.Button.kB.value);
+    private final JoystickButton placeHigh =
+        new JoystickButton(Constants.OperatorConstants.kControllerPort, XboxController.Button.kX.value);
+    private final JoystickButton PlaceLow =
+        new JoystickButton(Constants.OperatorConstants.kControllerPort, XboxController.Button.kY.value);
+  */
+
+  private final JoystickButton intake =
+      new JoystickButton(driver, XboxController.Axis.kRightTrigger.value);
+  private final JoystickButton eject =
+      new JoystickButton(driver, XboxController.Axis.kLeftTrigger.value);
+  private final JoystickButton armforward =
+      new JoystickButton(driver, XboxController.Button.kX.value);
+  private final JoystickButton armback = new JoystickButton(driver, XboxController.Button.kA.value);
 
   /* Subsystems */
   private final Swerve s_Swerve = new Swerve();
   public final BotStateSubsystem s_BotState = new BotStateSubsystem();
+  private final Pneumatics s_Pneumatics = new Pneumatics();
+  private final Arm s_Arm = new Arm(s_Pneumatics);
   /* Dashboard Subsystems */
   public final DriveTab s_DriveTab = new DriveTab();
 
@@ -131,6 +152,10 @@ public class RobotContainer {
     /* Driver Buttons */
 
     zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
+    intake.onTrue(new InstantCommand(() -> s_Arm.intake()));
+    eject.onTrue(new InstantCommand(() -> s_Arm.place()));
+    armforward.onTrue(new InstantCommand(() -> s_Arm.armForward()));
+    armback.onTrue(new InstantCommand(() -> s_Arm.armBackward()));
   }
 
   /**

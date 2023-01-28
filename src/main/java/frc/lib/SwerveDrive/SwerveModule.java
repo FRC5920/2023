@@ -76,7 +76,9 @@ public class SwerveModule {
 
   SimpleMotorFeedforward feedforward =
       new SimpleMotorFeedforward(
-          Constants.SwerveDrivebaseConstants.driveKS, Constants.SwerveDrivebaseConstants.driveKV, Constants.SwerveDrivebaseConstants.driveKA);
+          Constants.SwerveDrivebaseConstants.driveKS,
+          Constants.SwerveDrivebaseConstants.driveKV,
+          Constants.SwerveDrivebaseConstants.driveKA);
 
   public SwerveModule(int moduleNumber, SwerveModuleConstants moduleConstants) {
     this.moduleNumber = moduleNumber;
@@ -106,7 +108,8 @@ public class SwerveModule {
 
   private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
     if (isOpenLoop) {
-      double percentOutput = desiredState.speedMetersPerSecond / Constants.SwerveDrivebaseConstants.maxSpeed;
+      double percentOutput =
+          desiredState.speedMetersPerSecond / Constants.SwerveDrivebaseConstants.maxSpeed;
       mDriveMotor.set(ControlMode.PercentOutput, percentOutput);
     } else {
       double velocity =
@@ -124,21 +127,24 @@ public class SwerveModule {
 
   private void setAngle(SwerveModuleState desiredState) {
     Rotation2d angle =
-        (Math.abs(desiredState.speedMetersPerSecond) <= (Constants.SwerveDrivebaseConstants.maxSpeed * 0.01))
+        (Math.abs(desiredState.speedMetersPerSecond)
+                <= (Constants.SwerveDrivebaseConstants.maxSpeed * 0.01))
             ? lastAngle
             : desiredState
                 .angle; // Prevent rotating module if speed is less then 1%. Prevents Jittering.
 
     mAngleMotor.set(
         ControlMode.Position,
-        Conversions.degreesToFalcon(angle.getDegrees(), Constants.SwerveDrivebaseConstants.angleGearRatio));
+        Conversions.degreesToFalcon(
+            angle.getDegrees(), Constants.SwerveDrivebaseConstants.angleGearRatio));
     lastAngle = angle;
   }
 
   private Rotation2d getAngle() {
     return Rotation2d.fromDegrees(
         Conversions.falconToDegrees(
-            mAngleMotor.getSelectedSensorPosition(), Constants.SwerveDrivebaseConstants.angleGearRatio));
+            mAngleMotor.getSelectedSensorPosition(),
+            Constants.SwerveDrivebaseConstants.angleGearRatio));
   }
 
   public Rotation2d getCanCoder() {
@@ -148,7 +154,8 @@ public class SwerveModule {
   private void resetToAbsolute() {
     double absolutePosition =
         Conversions.degreesToFalcon(
-            getCanCoder().getDegrees() - angleOffset.getDegrees(), Constants.SwerveDrivebaseConstants.angleGearRatio);
+            getCanCoder().getDegrees() - angleOffset.getDegrees(),
+            Constants.SwerveDrivebaseConstants.angleGearRatio);
     mAngleMotor.setSelectedSensorPosition(absolutePosition);
   }
 

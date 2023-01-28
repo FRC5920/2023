@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2023-5920 FIRST and other WPILib contributors.
+// Copyright (c) 2023 FIRST and other WPILib contributors.
 // http://github.com/FRC5920
 // Open Source Software; you can modify and/or share it under the terms of the
 // license given in WPILib-License.md in the root directory of this project.
@@ -49,35 +49,46 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.subsystems.Dashboard;
+package frc.robot.subsystems.Arm;
 
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.RobotState;
-import edu.wpi.first.wpilibj.shuffleboard.*;
+import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
+
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticHub;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.subsystems.runtimeState.BotStateSubsystem;
-import java.util.Map;
 
-public class DriveTab extends SubsystemBase {
-  /** Creates a new DriveTab. */
-  private ShuffleboardTab tab = Shuffleboard.getTab("Drive");
+public class Pneumatics extends SubsystemBase {
+  /** Creates a new Pneumatics. */
+  Compressor phCompressor = new Compressor(1, PneumaticsModuleType.REVPH);
 
-  private GenericEntry maxSpeed =
-      tab.add("Max Speed", 0.85)
-          .withWidget(BuiltInWidgets.kNumberSlider) // specify the widget here
-          .withProperties(Map.of("min", 0, "max", 1)) // specify widget properties here
-          .getEntry();
+  boolean enabled = phCompressor.enabled();
+  boolean pressureSwitch = phCompressor.getPressureSwitchValue();
+  // double currentCompressor = phCompressor.getCompressorCurrent();
+  PneumaticHub m_PHub = new PneumaticHub(Constants.PneumaticsConstants.kPDHCAN);
+  private final DoubleSolenoid m_PWrist =
+      new DoubleSolenoid(
+          PneumaticsModuleType.REVPH,
+          Constants.PneumaticsConstants.kArmLeftRotatorPort,
+          Constants.PneumaticsConstants.kArmRightRotatorPort);
 
-  public DriveTab() {}
+  public Pneumatics() {
+    phCompressor.enableDigital();
+    m_PWrist.set(kOff);
+  }
+
+  public void goingForward() {
+    m_PWrist.set(kForward);
+  }
+
+  public void goingBackward() {
+    m_PWrist.set(kReverse);
+  }
 
   @Override
   public void periodic() {
-    if (RobotState.isDisabled()) {
-      BotStateSubsystem.MaxSpeed =
-          Constants.SwerveDrivebaseConstants.maxSpeed * maxSpeed.getDouble(0);
-      BotStateSubsystem.MaxRotate =
-          Constants.SwerveDrivebaseConstants.maxAngularVelocity * maxSpeed.getDouble(0);
-    }
+    // This method will be called once per scheduler run
   }
 }

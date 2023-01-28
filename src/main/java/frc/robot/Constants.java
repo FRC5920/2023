@@ -64,6 +64,28 @@ import frc.lib.SwerveDrive.COTSFalconSwerveConstants;
 import frc.lib.SwerveDrive.SwerveModuleConstants;
 
 public final class Constants {
+  public static class PneumaticsConstants {
+    public static final int kPDHCAN = 10;
+    public static final int kArmLeftRotatorPort = 0;
+    public static final int kArmRightRotatorPort = 1;
+  }
+
+  public static class ArmConstants {
+    public static final int kArmYMotorMasterPort = 10;
+    public static final int kArmYMotorSlavePort = 11;
+    public static final int kHandBottomRollerPort = 1;
+    public static final int kHandTopFrontRollerPort = 2;
+    public static final int kHandTopBackRollerPort = 3;
+    public static final int kArmExtenderPort = 20;
+    public static final int kArmStoredPosition = 0;
+    public static final int kArmIntakePosition = 500;
+    public static final int kArmPlaceHighPosition = 2500;
+    public static final int kArmPlaceMiddlePosition = 2600;
+    public static final int kArmRetracted = 0;
+    public static final int kArmExtendedHigh = 4000;
+    public static final int kArmExtendedMiddle = 3000;
+  }
+
   public static class DriverConstants {
     public static final int kControllerPort = 0;
     public static final double stickDeadband = 0.1;
@@ -217,12 +239,15 @@ public final class Constants {
 
     public static final double fiducialAmbiguityLimit = 0.2;
     /** Physical location of the camera on the robot, relative to the center of the robot. */
-    //TODO: get the actual location of the tag camera to the robot transform
+    // TODO: get the actual location of the tag camera to the robot transform
     public static final Transform3d CAMERA_TO_ROBOT =
-    new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0,0,0)); //Cam mounted facing forward, half a meter forward of center, half a meter up from center.
-
+        new Transform3d(
+            new Translation3d(0.5, 0.0, 0.5),
+            new Rotation3d(
+                0, 0,
+                0)); // Cam mounted facing forward, half a meter forward of center, half a meter up
+    // from center.
 
     public static final Transform3d ROBOT_TO_CAMERA = CAMERA_TO_ROBOT.inverse();
-
   }
 }
