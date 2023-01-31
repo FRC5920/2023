@@ -51,10 +51,23 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot;
 
-import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Threads;
 import frc.lib.SwerveDrive.CTREConfigs;
+import frc.lib.utility.Alert;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiConsumer;
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -62,11 +75,30 @@ import frc.lib.SwerveDrive.CTREConfigs;
  * the package after creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class Robot extends TimedRobot {
+public class Robot extends LoggedRobot {
   public static CTREConfigs ctreConfigs;
+
+  /** Alert displayed when no log path is set up */
+  private static Alert s_logNoFileAlert =
+      new Alert(
+          "No log path set for current robot. Data will NOT be logged.", Alert.AlertType.WARNING);
+
+  /** Alert displayed when a logging error occurs */
+  private static Alert s_logReceiverQueueAlert =
+      new Alert("Logging queue exceeded capacity, data will NOT be logged.", Alert.AlertType.ERROR);
+
+  /** Container of subsystems and other components that make up the robot */
+  private RobotContainer m_robotContainer;
+
+  /** The present selected auto command */
   private Command m_autonomousCommand;
 
-  private RobotContainer m_robotContainer;
+  /** Time when the present auto command was started */
+  private double m_autoStartTime;
+  /** True after the autonomous command duration has been printed */
+  private boolean m_autoCompletionIsPrinted;
+
+
   // DoublePublisher xPub;
   // DoubleSubscriber xSub;
   // double x = 0;
@@ -79,6 +111,22 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     ctreConfigs = new CTREConfigs();
+
+    Logger logger = Logger.getInstance();
+
+    // Log git and build info
+    logBuildInfo(logger);
+
+    // Set up logging
+    configureLogging(logger);
+
+    // Start AdvantageKit logger
+    setUseTiming(Constants.getMode() != Constants.Mode.REPLAY);
+    logger.start();
+
+    // Set up logging of active commands in the scheduler
+    setupActiveCommandLogging(logger);
+
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
@@ -101,8 +149,28 @@ public class Robot extends TimedRobot {
     // xPub.set(x);
     //      x += 0.05;
 
-    // SmartDashboard.putNumber("speed modifier", maxSpeed.getDouble(1.0));
+    // Run the task scheduler
     CommandScheduler.getInstance().run();
+
+    // Check for logging faults
+    s_logReceiverQueueAlert.set(Logger.getInstance().getReceiverQueueFault());
+
+    // Print the duration of autonomous commands as they are executed
+    if (m_autonomousCommand != null) {
+      if (!m_autonomousCommand.isScheduled() && !m_autoCompletionIsPrinted) {
+        if (DriverStation.isAutonomousEnabled()) {
+          System.out.println(
+              String.format(
+                  "*** Auto finished in %.2f secs ***", Timer.getFPGATimestamp() - m_autoStartTime));
+        } else {
+          System.out.println(
+              String.format(
+                  "*** Auto cancelled in %.2f secs ***", Timer.getFPGATimestamp() - m_autoStartTime));
+        }
+        m_autoCompletionIsPrinted = true;
+      }
+    }
+
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -115,9 +183,11 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    m_autoStartTime = Timer.getFPGATimestamp();
+    m_autoCompletionIsPrinted = false;
 
-    // schedule the autonomous command (example)
+    // Schedule the selected autonomous command
+    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
@@ -159,4 +229,87 @@ public class Robot extends TimedRobot {
   /** This function is called periodically whilst in simulation. */
   @Override
   public void simulationPeriodic() {}
+
+  /** This helper method logs build info generated in GenBuildInfo.java */
+  private static void logBuildInfo(Logger logger) {
+    // Record metadata
+    logger.recordMetadata("Robot", Constants.getRobot().toString());
+    logger.recordMetadata("TuningMode", Boolean.toString(Constants.tuningMode));
+    logger.recordMetadata("RuntimeType", getRuntimeType().toString());
+    logger.recordMetadata("ProjectName", GenBuildInfo.MAVEN_NAME);
+    logger.recordMetadata("BuildDate", GenBuildInfo.BUILD_DATE);
+    logger.recordMetadata("GitSHA", GenBuildInfo.GIT_SHA);
+    logger.recordMetadata("GitDate", GenBuildInfo.GIT_DATE);
+    logger.recordMetadata("GitBranch", GenBuildInfo.GIT_BRANCH);
+    switch (GenBuildInfo.DIRTY) {
+      case 0:
+        logger.recordMetadata("GitDirty", "All changes committed");
+        break;
+      case 1:
+        logger.recordMetadata("GitDirty", "Uncomitted changes");
+        break;
+      default:
+        logger.recordMetadata("GitDirty", "Unknown");
+        break;
+    }
+  }
+
+  /** configureLogging configures the AdvantageKit logger */
+  private static void configureLogging(Logger logger) {
+    // Set up data receivers & replay source
+    switch (Constants.getMode()) {
+      case REAL:
+        String folder = Constants.logDirectories.get(Constants.getRobot());
+        if (folder != null) {
+          logger.addDataReceiver(new WPILOGWriter(folder));
+        } else {
+          s_logNoFileAlert.set(true);
+        }
+        logger.addDataReceiver(new NT4Publisher());
+        LoggedPowerDistribution.getInstance();
+        break;
+
+      case SIM:
+        logger.addDataReceiver(new NT4Publisher());
+        break;
+
+      case REPLAY:
+        String path = LogFileUtil.findReplayLog();
+        logger.setReplaySource(new WPILOGReader(path));
+        logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(path, "_sim")));
+        break;
+    }
+  }
+  
+  /** setupActiveCommandLogging sets up logging of active Commands in the scheduler  */
+  private void setupActiveCommandLogging(Logger logger) {
+
+    // Set up logging of active commands
+    Map<String, Integer> commandCounts = new HashMap<>();
+    BiConsumer<Command, Boolean> logCommandFunction =
+        (Command command, Boolean active) -> {
+          String name = command.getName();
+          int count = commandCounts.getOrDefault(name, 0) + (active ? 1 : -1);
+          commandCounts.put(name, count);
+          Logger.getInstance()
+              .recordOutput(
+                  "CommandsUnique/" + name + "_" + Integer.toHexString(command.hashCode()), active);
+          Logger.getInstance().recordOutput("CommandsAll/" + name, count > 0);
+        };
+    CommandScheduler.getInstance()
+        .onCommandInitialize(
+            (Command command) -> {
+              logCommandFunction.accept(command, true);
+            });
+    CommandScheduler.getInstance()
+        .onCommandFinish(
+            (Command command) -> {
+              logCommandFunction.accept(command, false);
+            });
+    CommandScheduler.getInstance()
+        .onCommandInterrupt(
+            (Command command) -> {
+              logCommandFunction.accept(command, false);
+            });
+  }
 }
