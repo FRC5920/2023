@@ -87,6 +87,8 @@ public class Swerve extends SubsystemBase {
     swerveOdometry =
         new SwerveDriveOdometry(
             Constants.SwerveDrivebaseConstants.swerveKinematics, getYaw(), getModulePositions());
+        new SwerveDriveOdometry(
+            Constants.SwerveDrivebaseConstants.swerveKinematics, getYaw(), getModulePositions());
   }
 
   public void drive(
@@ -97,6 +99,8 @@ public class Swerve extends SubsystemBase {
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(
                     translation.getX(), translation.getY(), rotation, getYaw())
                 : new ChassisSpeeds(translation.getX(), translation.getY(), rotation));
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        swerveModuleStates, Constants.SwerveDrivebaseConstants.maxSpeed);
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, Constants.SwerveDrivebaseConstants.maxSpeed);
 
@@ -110,6 +114,8 @@ public class Swerve extends SubsystemBase {
   }
   /* Used by SwerveControllerCommand in Auto */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        desiredStates, Constants.SwerveDrivebaseConstants.maxSpeed);
     SwerveDriveKinematics.desaturateWheelSpeeds(
         desiredStates, Constants.SwerveDrivebaseConstants.maxSpeed);
 
