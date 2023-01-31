@@ -60,10 +60,40 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotBase;
 import frc.lib.SwerveDrive.COTSFalconSwerveConstants;
 import frc.lib.SwerveDrive.SwerveModuleConstants;
 
 public final class Constants {
+
+  /** Type of robot targeted by these constants */
+  private static final RobotType s_robot = RobotType.PrototypeBot;
+
+  /** Set to true when tuning or characterizing the robot */
+  public static final boolean tuningMode = false;
+
+  public static RobotType getRobot() {
+    // Simulated robot type can only be used in desktop simulation mode; not with real hardware!
+    if (RobotBase.isReal() && (s_robot == RobotType.SimulatedRobot)) {
+      throw new UnsupportedOperationException(
+          "********* Simulation mode cannot be enabled for a real robot! **********");
+    }
+
+    return s_robot;
+  }
+
+  /** Returns the present robot mode */
+  public static Mode getMode() {
+    switch (getRobot()) {
+      case PrototypeBot:
+        return RobotBase.isReal() ? Mode.REAL : Mode.REPLAY;
+      case SimulatedRobot:
+        return Mode.SIM;
+      default:
+        return Mode.REAL;
+    }
+  }
+
   public static class DriverConstants {
     public static final int kControllerPort = 0;
     public static final double stickDeadband = 0.1;
@@ -217,12 +247,50 @@ public final class Constants {
 
     public static final double fiducialAmbiguityLimit = 0.2;
     /** Physical location of the camera on the robot, relative to the center of the robot. */
-    //TODO: get the actual location of the tag camera to the robot transform
+    // TODO: get the actual location of the tag camera to the robot transform
     public static final Transform3d CAMERA_TO_ROBOT =
-    new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0,0,0)); //Cam mounted facing forward, half a meter forward of center, half a meter up from center.
-
+        new Transform3d(
+            new Translation3d(0.5, 0.0, 0.5),
+            new Rotation3d(
+                0, 0,
+                0)); // Cam mounted facing forward, half a meter forward of center, half a meter up
+    // from center.
 
     public static final Transform3d ROBOT_TO_CAMERA = CAMERA_TO_ROBOT.inverse();
-
   }
+
+  /////////////////////////////////////////////////////////////////////////////
+  /** Robot types */
+  public enum RobotType {
+    /** Prototype robot */
+    PrototypeBot,
+
+    /** Simulated robot */
+    SimulatedRobot;
+
+    /** Get the human-readable name of the robot type */
+    @Override
+    public String toString() {
+      return this.name();
+    }
+  };
+
+  /////////////////////////////////////////////////////////////////////////////
+  /** Robot types */
+  public enum Mode {
+    /** Running on real robot hardware */
+    REAL,
+
+    /** Replaying data from a robot run */
+    REPLAY,
+
+    /** Running in a robot simulation */
+    SIM;
+
+    /** Get the human-readable name of the robot type */
+    @Override
+    public String toString() {
+      return this.name();
+    }
+  };
 }
