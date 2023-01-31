@@ -63,6 +63,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.lib.SwerveDrive.COTSFalconSwerveConstants;
 import frc.lib.SwerveDrive.SwerveModuleConstants;
+import java.util.Map;
 
 public final class Constants {
 
@@ -258,6 +259,10 @@ public final class Constants {
 
     public static final Transform3d ROBOT_TO_CAMERA = CAMERA_TO_ROBOT.inverse();
   }
+
+  /** A map of directories where log files should be stored */
+  public static final Map<RobotType, String> logDirectories =
+      Map.of(RobotType.PrototypeBot, "/media/sda2/");
 
   /////////////////////////////////////////////////////////////////////////////
   /** Robot types */
