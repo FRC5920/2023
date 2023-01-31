@@ -98,6 +98,10 @@ public class RobotContainer {
   private final Swerve swerveSubsystem = new Swerve();
   public final BotStateSubsystem s_BotState = new BotStateSubsystem();
   private final PoseEstimatorSubsystem s_poseEstimator =
+<<<<<<< HEAD
+=======
+      new PoseEstimatorSubsystem(TagCamera, s_Swerve);
+>>>>>>> 8582f89 (naming fixes)
       new PoseEstimatorSubsystem(TagCamera, swerveSubsystem);
 
   /* Dashboard Subsystems */
