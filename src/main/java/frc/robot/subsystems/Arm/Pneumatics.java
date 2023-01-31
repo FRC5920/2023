@@ -67,7 +67,7 @@ public class Pneumatics extends SubsystemBase {
   boolean enabled = phCompressor.enabled();
   boolean pressureSwitch = phCompressor.getPressureSwitchValue();
   // double currentCompressor = phCompressor.getCompressorCurrent();
-  PneumaticHub m_PHub = new PneumaticHub(Constants.PneumaticsConstants.kPDHCAN);
+  PneumaticHub m_PHub = new PneumaticHub(Constants.PneumaticsConstants.kPneumaticsHubCAN);
   private final DoubleSolenoid m_PWrist =
       new DoubleSolenoid(
           PneumaticsModuleType.REVPH,

@@ -52,6 +52,7 @@
 package frc.robot.subsystems.Arm;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -78,6 +79,12 @@ public class Arm extends SubsystemBase {
 
   public Arm(Pneumatics s_Pneumatics) {
     this.myPneumatics = s_Pneumatics;
+    HandTopBackRoller.setNeutralMode(NeutralMode.Brake);
+    HandTopFrontRoller.setNeutralMode(NeutralMode.Brake);
+    HandBottomRoller.setNeutralMode(NeutralMode.Brake);
+    ArmYMotorMaster.setNeutralMode(NeutralMode.Brake);
+    //  ArmYMotorSlave.setNeutralMode(NeutralMode.Brake);
+    //  ArmExtender.setNeutralMode(NeutralMode.Brake);
   }
 
   private void setArmPosition(int desiredPosition) {
@@ -97,23 +104,35 @@ public class Arm extends SubsystemBase {
   }
 
   public void armForward() {
-    ArmYMotorMaster.set(ControlMode.PercentOutput, 1);
+    ArmYMotorMaster.set(ControlMode.PercentOutput, 0.2);
   }
 
   public void armBackward() {
-    ArmYMotorMaster.set(ControlMode.PercentOutput, -1);
+    ArmYMotorMaster.set(ControlMode.PercentOutput, -0.2);
   }
 
-  public void intake() {
+  public void intakeOn() {
     HandBottomRoller.set(ControlMode.PercentOutput, 0.5);
     HandTopFrontRoller.set(ControlMode.PercentOutput, 0.5);
     HandTopBackRoller.set(ControlMode.PercentOutput, 0.5);
   }
 
-  public void place() {
+  public void intakeOff() {
+    HandBottomRoller.set(ControlMode.PercentOutput, 0);
+    HandTopFrontRoller.set(ControlMode.PercentOutput, 0);
+    HandTopBackRoller.set(ControlMode.PercentOutput, 0);
+  }
+
+  public void placeOn() {
     HandBottomRoller.set(ControlMode.PercentOutput, -0.5);
     HandTopFrontRoller.set(ControlMode.PercentOutput, -0.5);
     HandTopBackRoller.set(ControlMode.PercentOutput, -0.5);
+  }
+
+  public void placeOff() {
+    HandBottomRoller.set(ControlMode.PercentOutput, 0);
+    HandTopFrontRoller.set(ControlMode.PercentOutput, 0);
+    HandTopBackRoller.set(ControlMode.PercentOutput, 0);
   }
 
   @Override

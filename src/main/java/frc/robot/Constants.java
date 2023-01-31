@@ -64,8 +64,10 @@ import frc.lib.SwerveDrive.COTSFalconSwerveConstants;
 import frc.lib.SwerveDrive.SwerveModuleConstants;
 
 public final class Constants {
+  public static final int kPowerDistroHubCAN = 63;
+
   public static class PneumaticsConstants {
-    public static final int kPDHCAN = 10;
+    public static final int kPneumaticsHubCAN = 62;
     public static final int kArmLeftRotatorPort = 0;
     public static final int kArmRightRotatorPort = 1;
   }

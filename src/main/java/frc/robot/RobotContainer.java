@@ -104,7 +104,8 @@ public class RobotContainer {
   private final JoystickButton armforward =
       new JoystickButton(driver, XboxController.Button.kX.value);
   private final JoystickButton armback = new JoystickButton(driver, XboxController.Button.kA.value);
-
+  private final JoystickButton moveWrist = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
+  
   /* Subsystems */
   private final Swerve s_Swerve = new Swerve();
   public final BotStateSubsystem s_BotState = new BotStateSubsystem();
@@ -152,10 +153,14 @@ public class RobotContainer {
     /* Driver Buttons */
 
     zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
-    intake.onTrue(new InstantCommand(() -> s_Arm.intake()));
-    eject.onTrue(new InstantCommand(() -> s_Arm.place()));
+    intake.whileTrue(new InstantCommand(() -> s_Arm.intakeOn()));
+    intake.whileFalse(new InstantCommand(() -> s_Arm.intakeOff()));
+    eject.whileTrue(new InstantCommand(() -> s_Arm.placeOn()));
+    eject.whileFalse(new InstantCommand(() -> s_Arm.placeOff()));
     armforward.onTrue(new InstantCommand(() -> s_Arm.armForward()));
     armback.onTrue(new InstantCommand(() -> s_Arm.armBackward()));
+    moveWrist.whileTrue(new InstantCommand(() -> s_Pneumatics.goingBackward()));
+    moveWrist.whileFalse(new InstantCommand(() -> s_Pneumatics.goingForward()));
   }
 
   /**
