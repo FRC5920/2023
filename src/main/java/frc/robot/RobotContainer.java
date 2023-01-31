@@ -94,10 +94,10 @@ public class RobotContainer {
   private final PhotonCamera ArmCamera = new PhotonCamera("Arm_Camera");
 
   /* Subsystems */
-  private final Swerve s_Swerve = new Swerve();
+  private final Swerve swerveSubsystem = new Swerve();
   public final BotStateSubsystem s_BotState = new BotStateSubsystem();
   private final PoseEstimatorSubsystem s_poseEstimator =
-      new PoseEstimatorSubsystem(photonCamera, swerveSubsystem);
+      new PoseEstimatorSubsystem(TagCamera, swerveSubsystem);
 
   /* Dashboard Subsystems */
   public final DriveTab s_DriveTab = new DriveTab();
