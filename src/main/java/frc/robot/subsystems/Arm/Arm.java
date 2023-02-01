@@ -101,15 +101,15 @@ public class Arm extends SubsystemBase {
   }
 
   private void spinAllHandRollers(GamePieceType pickUpWhat, DoWhatWithGamePiece desiredHandAction) {
-    double currentIntendedHandBottomRollerSpeedPercent = 0.5;
-    double currentIntendedHandTopFrontRollerSpeedPercent = -0.5;
+    double currentIntendedHandBottomRollerSpeedPercent = HandRollerSpeed;
+    double currentIntendedHandTopFrontRollerSpeedPercent = -1*HandRollerSpeed;
     double  currentIntendedHandTopBackRollerSpeedPercent = 0.0;
     switch (pickUpWhat) {
       case Cone:
-      currentIntendedHandTopBackRollerSpeedPercent = 0.5;
+      currentIntendedHandTopBackRollerSpeedPercent = HandRollerSpeed;
         break;
       case Cube:
-      currentIntendedHandTopBackRollerSpeedPercent = -0.5;
+      currentIntendedHandTopBackRollerSpeedPercent = -1*HandRollerSpeed;
         break;
       default: 
         break;
