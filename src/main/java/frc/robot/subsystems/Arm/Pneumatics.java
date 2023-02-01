@@ -62,11 +62,12 @@ import frc.robot.Constants;
 
 public class Pneumatics extends SubsystemBase {
   /** Creates a new Pneumatics. */
-  Compressor phCompressor = new Compressor(1, PneumaticsModuleType.REVPH);
+  Compressor phCompressor =
+      new Compressor(Constants.PneumaticsConstants.kPneumaticsHubCAN, PneumaticsModuleType.REVPH);
 
-  boolean enabled = phCompressor.enabled();
+  boolean enabled = phCompressor.isEnabled();
   boolean pressureSwitch = phCompressor.getPressureSwitchValue();
-  // double currentCompressor = phCompressor.getCompressorCurrent();
+  double currentCompressor = phCompressor.getCurrent();
   PneumaticHub m_PHub = new PneumaticHub(Constants.PneumaticsConstants.kPneumaticsHubCAN);
   private final DoubleSolenoid m_PWrist =
       new DoubleSolenoid(

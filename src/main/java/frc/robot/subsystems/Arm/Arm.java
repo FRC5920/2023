@@ -111,6 +111,10 @@ public class Arm extends SubsystemBase {
     ArmYMotorMaster.set(ControlMode.PercentOutput, -0.2);
   }
 
+  public void armStop() {
+    ArmYMotorMaster.set(ControlMode.PercentOutput, 0);
+  }
+
   public void intakeOn() {
     HandBottomRoller.set(ControlMode.PercentOutput, 0.5);
     HandTopFrontRoller.set(ControlMode.PercentOutput, 0.5);
