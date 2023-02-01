@@ -71,8 +71,8 @@ public class Arm extends SubsystemBase {
       new WPI_TalonSRX(Constants.ArmConstants.kHandTopBackRollerPort);
   // private final WPI_TalonFX ArmYMotorSlave = new
   // WPI_TalonFX(Constants.ArmConstants.kArmYMotorSlavePort);
-  // private final WPI_TalonFX ArmExtender = new
-  // WPI_TalonFX(Constants.ArmConstants.kArmExtenderPort);
+  //private final WPI_TalonFX ArmExtender = new
+  //WPI_TalonFX(Constants.ArmConstants.kArmExtenderPort);
   private final Pneumatics myPneumatics;
   private final double HandRollerSpeed = 0.5;
   
@@ -88,6 +88,10 @@ public class Arm extends SubsystemBase {
 
   public Arm(Pneumatics s_Pneumatics) {
     this.myPneumatics = s_Pneumatics;
+  }
+
+  private void setArmExtension(int extensionEncoderValue)  {
+    //TODO: Set up PID control here
   }
 
   private void setArmPosition(int desiredPosition) {
