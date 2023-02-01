@@ -101,27 +101,27 @@ public class Arm extends SubsystemBase {
   }
 
   private void spinAllHandRollers(GamePieceType pickUpWhat, DoWhatWithGamePiece desiredHandAction) {
-    double currentIntendedHandBottomRollerSpeedPercent = HandRollerSpeed;
-    double currentIntendedHandTopFrontRollerSpeedPercent = -1*HandRollerSpeed;
-    double  currentIntendedHandTopBackRollerSpeedPercent = 0.0;
+    double HandBottomRollerSpeedPercent = HandRollerSpeed;
+    double HandTopFrontRollerSpeedPercent = -1*HandRollerSpeed;
+    double  HandTopBackRollerSpeedPercent = 0.0;
     switch (pickUpWhat) {
       case Cone:
-      currentIntendedHandTopBackRollerSpeedPercent = HandRollerSpeed;
+      HandTopBackRollerSpeedPercent = HandRollerSpeed;
         break;
       case Cube:
-      currentIntendedHandTopBackRollerSpeedPercent = -1*HandRollerSpeed;
+      HandTopBackRollerSpeedPercent = -1*HandRollerSpeed;
         break;
       default: 
         break;
     }
     if (desiredHandAction == DoWhatWithGamePiece.Out) {
-      currentIntendedHandBottomRollerSpeedPercent *= -1;
-      currentIntendedHandTopBackRollerSpeedPercent *= -1;
-      currentIntendedHandTopFrontRollerSpeedPercent *= -1;
+      HandBottomRollerSpeedPercent *= -1;
+      HandTopBackRollerSpeedPercent *= -1;
+      HandTopFrontRollerSpeedPercent *= -1;
     }
-    HandBottomRoller.set(ControlMode.PercentOutput, currentIntendedHandBottomRollerSpeedPercent);
-    HandTopFrontRoller.set(ControlMode.PercentOutput, currentIntendedHandTopFrontRollerSpeedPercent);
-    HandTopBackRoller.set(ControlMode.PercentOutput, currentIntendedHandTopBackRollerSpeedPercent);
+    HandBottomRoller.set(ControlMode.PercentOutput, HandBottomRollerSpeedPercent);
+    HandTopFrontRoller.set(ControlMode.PercentOutput, HandTopFrontRollerSpeedPercent);
+    HandTopBackRoller.set(ControlMode.PercentOutput, HandTopBackRollerSpeedPercent);
   }
 
   public void armForward() {
