@@ -75,9 +75,6 @@ public class Arm extends SubsystemBase {
   // WPI_TalonFX(Constants.ArmConstants.kArmExtenderPort);
   private final Pneumatics myPneumatics;
   private final double HandRollerSpeed = 0.5;
-  private double currentIntendedHandTopFrontRollerSpeedPercent;
-  private double currentIntendedHandTopBackRollerSpeedPercent;
-  private double currentIntendedHandBottomRollerSpeedPercent;
   
   enum GamePieceType {
     Cone,
@@ -104,8 +101,9 @@ public class Arm extends SubsystemBase {
   }
 
   private void spinAllHandRollers(GamePieceType pickUpWhat, DoWhatWithGamePiece desiredHandAction) {
-    currentIntendedHandBottomRollerSpeedPercent = 0.5;
-    currentIntendedHandTopFrontRollerSpeedPercent = -0.5;
+    double currentIntendedHandBottomRollerSpeedPercent = 0.5;
+    double currentIntendedHandTopFrontRollerSpeedPercent = -0.5;
+    double  currentIntendedHandTopBackRollerSpeedPercent = 0.0;
     switch (pickUpWhat) {
       case Cone:
       currentIntendedHandTopBackRollerSpeedPercent = 0.5;
@@ -113,11 +111,13 @@ public class Arm extends SubsystemBase {
       case Cube:
       currentIntendedHandTopBackRollerSpeedPercent = -0.5;
         break;
+      default: 
+        break;
     }
     if (desiredHandAction == DoWhatWithGamePiece.Out) {
-      currentIntendedHandBottomRollerSpeedPercent = currentIntendedHandBottomRollerSpeedPercent * -1;
-      currentIntendedHandTopBackRollerSpeedPercent = currentIntendedHandTopBackRollerSpeedPercent * -1;
-      currentIntendedHandTopFrontRollerSpeedPercent = currentIntendedHandTopFrontRollerSpeedPercent * -1;
+      currentIntendedHandBottomRollerSpeedPercent *= -1;
+      currentIntendedHandTopBackRollerSpeedPercent *= -1;
+      currentIntendedHandTopFrontRollerSpeedPercent *= -1;
     }
     HandBottomRoller.set(ControlMode.PercentOutput, currentIntendedHandBottomRollerSpeedPercent);
     HandTopFrontRoller.set(ControlMode.PercentOutput, currentIntendedHandTopFrontRollerSpeedPercent);
