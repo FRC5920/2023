@@ -75,6 +75,19 @@ public class Arm extends SubsystemBase {
   // WPI_TalonFX(Constants.ArmConstants.kArmExtenderPort);
   private final Pneumatics myPneumatics;
   private final double HandRollerSpeed = 0.5;
+  private double currentIntendedHandTopFrontRollerSpeedPercent;
+  private double currentIntendedHandTopBackRollerSpeedPercent;
+  private double currentIntendedHandBottomRollerSpeedPercent;
+  
+  enum GamePieceType {
+    Cone,
+    Cube
+  }
+
+  enum DoWhatWithGamePiece {
+    In,
+    Out
+  }
 
   public Arm(Pneumatics s_Pneumatics) {
     this.myPneumatics = s_Pneumatics;
@@ -90,10 +103,25 @@ public class Arm extends SubsystemBase {
     ArmYMotorMaster.setSelectedSensorPosition(desiredPosition);
   }
 
-  private void spinHandRollers(boolean wantsConeNotCube, boolean intakingNotPlacing) {
-    if (intakingNotPlacing == false) {}
-
-    if (wantsConeNotCube == true) {}
+  private void spinAllHandRollers(GamePieceType pickUpWhat, DoWhatWithGamePiece desiredHandAction) {
+    currentIntendedHandBottomRollerSpeedPercent = 0.5;
+    currentIntendedHandTopFrontRollerSpeedPercent = -0.5;
+    switch (pickUpWhat) {
+      case Cone:
+      currentIntendedHandTopBackRollerSpeedPercent = 0.5;
+        break;
+      case Cube:
+      currentIntendedHandTopBackRollerSpeedPercent = -0.5;
+        break;
+    }
+    if (desiredHandAction == DoWhatWithGamePiece.Out) {
+      currentIntendedHandBottomRollerSpeedPercent = currentIntendedHandBottomRollerSpeedPercent * -1;
+      currentIntendedHandTopBackRollerSpeedPercent = currentIntendedHandTopBackRollerSpeedPercent * -1;
+      currentIntendedHandTopFrontRollerSpeedPercent = currentIntendedHandTopFrontRollerSpeedPercent * -1;
+    }
+    HandBottomRoller.set(ControlMode.PercentOutput, currentIntendedHandBottomRollerSpeedPercent);
+    HandTopFrontRoller.set(ControlMode.PercentOutput, currentIntendedHandTopFrontRollerSpeedPercent);
+    HandTopBackRoller.set(ControlMode.PercentOutput, currentIntendedHandTopBackRollerSpeedPercent);
   }
 
   public void armForward() {
