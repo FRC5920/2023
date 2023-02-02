@@ -60,6 +60,8 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.autos.*;
 import frc.robot.commands.*;
+import frc.robot.commands.Arm.PickUpCone;
+import frc.robot.commands.Arm.PlaceCube;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Arm.Pneumatics;
@@ -77,7 +79,10 @@ public class RobotContainer {
   /* Controllers */
   // private final CommandXboxController driver = new
   // CommandXboxController(DriverConstants.kControllerPort);
-  private final Joystick driver = new Joystick(0);
+  private final Joystick driver = new Joystick(Constants.DriverConstants.kControllerPort);
+  private final Joystick operator = new Joystick(Constants.OperatorConstants.kControllerPort);
+  
+  
 
   /* Drive Controls */
   private final int translationAxis = XboxController.Axis.kLeftY.value;
@@ -87,24 +92,26 @@ public class RobotContainer {
   /* Driver Buttons */
   private final JoystickButton zeroGyro =
       new JoystickButton(driver, XboxController.Button.kY.value);
-  /*  private final JoystickButton intakeCone =
-        new JoystickButton(Constants.OperatorConstants.kControllerPort, XboxController.Button.kA.value);
-    private final JoystickButton intakeCube =
-        new JoystickButton(Constants.OperatorConstants.kControllerPort, XboxController.Button.kB.value);
-    private final JoystickButton placeHigh =
-        new JoystickButton(Constants.OperatorConstants.kControllerPort, XboxController.Button.kX.value);
-    private final JoystickButton PlaceLow =
-        new JoystickButton(Constants.OperatorConstants.kControllerPort, XboxController.Button.kY.value);
-  */
+  private final JoystickButton intakeCone =
+        new JoystickButton(operator, XboxController.Button.kA.value);
+  private final JoystickButton intakeCube =
+        new JoystickButton(operator, XboxController.Button.kB.value);
+  private final JoystickButton placeHigh =
+        new JoystickButton(operator, XboxController.Button.kX.value);
+  private final JoystickButton PlaceLow =
+        new JoystickButton(operator, XboxController.Button.kY.value);
+  
 
-  private final JoystickButton intake =
+  /*private final JoystickButton intake =
       new JoystickButton(driver, XboxController.Axis.kRightTrigger.value);
   private final JoystickButton eject =
       new JoystickButton(driver, XboxController.Axis.kLeftTrigger.value);
   private final JoystickButton armforward =
       new JoystickButton(driver, XboxController.Button.kX.value);
-  private final JoystickButton armback = new JoystickButton(driver, XboxController.Button.kA.value);
-
+  private final JoystickButton armback = 
+      new JoystickButton(driver, XboxController.Button.kA.value);
+  */
+  
   // --------------------- Robot Subsystems ----------------------------
   public final JoystickSubsystem joystickSubsystem = new JoystickSubsystem();
   public final Swerve swerveSubsystem = new Swerve();
@@ -159,10 +166,12 @@ public class RobotContainer {
     /* Driver Buttons */
 
     zeroGyro.onTrue(new InstantCommand(() -> swerveSubsystem.zeroGyro()));
-    intake.onTrue(new InstantCommand(() -> s_Arm.intake()));
+    intakeCube.onTrue(new PlaceCube(s_Arm));
+    
+    /*intake.onTrue(new InstantCommand(() -> s_Arm.intake()));
     eject.onTrue(new InstantCommand(() -> s_Arm.place()));
     armforward.onTrue(new InstantCommand(() -> s_Arm.armForward()));
-    armback.onTrue(new InstantCommand(() -> s_Arm.armBackward()));
+    armback.onTrue(new InstantCommand(() -> s_Arm.armBackward())); */
   }
 
   /**
