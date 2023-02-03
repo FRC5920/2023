@@ -51,6 +51,7 @@ public class Balance extends CommandBase {
   public void execute() {
     //https://www.instructables.com/Self-Balancing-Robot-Using-PID-Algorithm-STM-MC/
 //https://docs.wpilib.org/en/stable/docs/software/advanced-controls/controllers/pidcontroller.html
+//https://mcm-frc-docs.readthedocs.io/en/latest/docs/software/commandbased/profilepid-subsystems-commands.html
   }
 
   // Called once the command ends or is interrupted.
