@@ -87,6 +87,7 @@ public class RobotContainer {
   /* Driver Buttons */
   private final JoystickButton zeroGyro =
       new JoystickButton(driver, XboxController.Button.kY.value);
+  private final JoystickButton BalanceBot = new JoystickButton(driver, XboxController.Button.kStart.value);
 
   /* Cameras */
   private final PhotonCamera TagCamera = new PhotonCamera("Tag_Camera");
@@ -103,6 +104,7 @@ public class RobotContainer {
   public final DriveTab s_DriveTab = new DriveTab();
 
   // The robot's subsystems and commands are defined here...
+  //private final Balance m_Balance = new Balance(swerveSubsystem, s_poseEstimator);
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -147,6 +149,8 @@ public class RobotContainer {
     /* Driver Buttons */
 
     zeroGyro.onTrue(new InstantCommand(() -> swerveSubsystem.zeroGyro()));
+
+    BalanceBot.whileTrue(new Balance(swerveSubsystem));
   }
 
   /**
