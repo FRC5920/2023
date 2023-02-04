@@ -52,10 +52,9 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.Threads;
 import frc.lib.SwerveDrive.CTREConfigs;
 import frc.lib.utility.Alert;
 import java.util.HashMap;
@@ -97,7 +96,6 @@ public class Robot extends LoggedRobot {
   private double m_autoStartTime;
   /** True after the autonomous command duration has been printed */
   private boolean m_autoCompletionIsPrinted;
-
 
   // DoublePublisher xPub;
   // DoubleSubscriber xSub;
@@ -161,16 +159,17 @@ public class Robot extends LoggedRobot {
         if (DriverStation.isAutonomousEnabled()) {
           System.out.println(
               String.format(
-                  "*** Auto finished in %.2f secs ***", Timer.getFPGATimestamp() - m_autoStartTime));
+                  "*** Auto finished in %.2f secs ***",
+                  Timer.getFPGATimestamp() - m_autoStartTime));
         } else {
           System.out.println(
               String.format(
-                  "*** Auto cancelled in %.2f secs ***", Timer.getFPGATimestamp() - m_autoStartTime));
+                  "*** Auto cancelled in %.2f secs ***",
+                  Timer.getFPGATimestamp() - m_autoStartTime));
         }
         m_autoCompletionIsPrinted = true;
       }
     }
-
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -280,8 +279,8 @@ public class Robot extends LoggedRobot {
         break;
     }
   }
-  
-  /** setupActiveCommandLogging sets up logging of active Commands in the scheduler  */
+
+  /** setupActiveCommandLogging sets up logging of active Commands in the scheduler */
   private void setupActiveCommandLogging(Logger logger) {
 
     // Set up logging of active commands
