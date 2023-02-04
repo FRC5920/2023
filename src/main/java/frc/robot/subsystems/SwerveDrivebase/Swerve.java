@@ -60,6 +60,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 // import com.ctre.phoenix.sensors.PigeonIMU;
@@ -83,6 +84,12 @@ public class Swerve extends SubsystemBase {
           new SwerveModule(2, Constants.SwerveDrivebaseConstants.Mod2.constants),
           new SwerveModule(3, Constants.SwerveDrivebaseConstants.Mod3.constants)
         };
+
+    /* By pausing init for a second before setting module offsets, we avoid a bug with inverting motors.
+     * See https://github.com/Team364/BaseFalconSwerve/issues/8 for more info.
+     */
+    Timer.delay(1.0);
+    resetModulesToAbsolute();
 
     swerveOdometry =
         new SwerveDriveOdometry(
@@ -168,6 +175,12 @@ public class Swerve extends SubsystemBase {
 
   public Rotation2d getGyroscopeRotation() {
     return gyro.getRotation2d();
+  }
+
+  public void resetModulesToAbsolute() {
+    for (SwerveModule mod : mSwerveMods) {
+      mod.resetToAbsolute();
+    }
   }
 
   @Override
