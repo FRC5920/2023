@@ -53,6 +53,8 @@ package frc.robot.commands.Arm;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Arm.Arm;
+import frc.robot.commands.Arm.Intake;
+
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
@@ -63,6 +65,6 @@ public class PickUpCube extends SequentialCommandGroup {
     addRequirements(armSubsystem);
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
-    addCommands();
+    addCommands(new Reach(), new Intake(Arm.GamePieceType.Cube), new Retract());
   }
 }
