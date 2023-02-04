@@ -75,12 +75,12 @@ public class Arm extends SubsystemBase {
   private final Pneumatics myPneumatics;
   private final double HandRollerSpeed = 0.5;
 
-  enum GamePieceType {
+  public enum GamePieceType {
     Cone,
     Cube
   }
 
-  enum DoWhatWithGamePiece {
+  public enum DoWhatWithGamePiece {
     In,
     Out
   }

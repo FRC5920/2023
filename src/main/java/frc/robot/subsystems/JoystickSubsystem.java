@@ -62,6 +62,8 @@ import frc.robot.RobotContainer;
 import frc.robot.commands.Arm.PickUpCone;
 import frc.robot.commands.Arm.PickUpCube;
 import frc.robot.commands.Arm.PlaceObject;
+import frc.robot.subsystems.runtimeState.BotStateSubsystem;
+
 
 /** A subsystem providing/managing Xbox controllers for driving the robot manually */
 public class JoystickSubsystem extends SubsystemBase {
@@ -116,7 +118,6 @@ public class JoystickSubsystem extends SubsystemBase {
       new JoystickButton(driver, XboxController.Button.kA.value);
   */
 
-  /** Button */
   /** Creates a new JoystickSubsystem */
   public JoystickSubsystem() {
     // Configure driver controller stick and trigger processing
@@ -182,7 +183,7 @@ public class JoystickSubsystem extends SubsystemBase {
     driverController.A.onTrue(new InstantCommand(this::doNothing, this));
     driverController.B.onTrue(new InstantCommand(this::doNothing, this));
     driverController.X.onTrue(new InstantCommand(this::doNothing, this));
-    driverController.Y.onTrue(new InstantCommand(this::doNothing, this));
+    driverController.Y.onTrue(new InstantCommand(() -> botContainer.swerveSubsystem.zeroGyro()));
     driverController.leftBumper.whileTrue(new InstantCommand(this::doNothing, this));
     driverController.rightBumper.whileTrue(new InstantCommand(this::doNothing, this));
     driverController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
@@ -191,9 +192,9 @@ public class JoystickSubsystem extends SubsystemBase {
     driverController.start.onTrue(new InstantCommand(this::doNothing, this));
 
     // Map buttons on operator controller
-    operatorController.A.onTrue(new InstantCommand(this::doNothing, this));
-    operatorController.B.onTrue(new InstantCommand(this::doNothing, this));
-    operatorController.X.onTrue(new InstantCommand(this::doNothing, this));
+    operatorController.A.onTrue(new PickUpCone(botContainer.s_Arm));
+    operatorController.B.onTrue(new PickUpCube(botContainer.s_Arm));
+    operatorController.X.onTrue(new PlaceObject(botContainer.s_Arm, botContainer.s_BotState.storedGamePiece));
     operatorController.Y.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.leftBumper.whileTrue(new InstantCommand(this::doNothing, this));
     operatorController.rightBumper.whileTrue(new InstantCommand(this::doNothing, this));
@@ -201,12 +202,9 @@ public class JoystickSubsystem extends SubsystemBase {
     operatorController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.back.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.start.onTrue(new InstantCommand(this::doNothing, this));
-
-    m_zeroGyro.onTrue(new InstantCommand(() -> botContainer.swerveSubsystem.zeroGyro()));
+    operatorController.dPadUp.onTrue(new PlaceObject(botContainer.s_Arm, botContainer.s_BotState.storedGamePiece));
+    operatorController.dPadDown.onTrue(new PlaceObject(botContainer.s_Arm, botContainer.s_BotState.storedGamePiece));
     
-    m_intakeCube.onTrue(new PickUpCube(botContainer.s_Arm));
-    m_intakeCone.onTrue(new PickUpCone(botContainer.s_Arm));
-    m_placeHigh.onTrue(new PlaceObject(botContainer.s_Arm));
   }
 
   @Override
