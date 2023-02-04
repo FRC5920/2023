@@ -55,9 +55,13 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.lib.Joystick.AxisProcChain;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.RobotContainer;
+import frc.robot.commands.Arm.PickUpCone;
+import frc.robot.commands.Arm.PickUpCube;
+import frc.robot.commands.Arm.PlaceObject;
 
 /** A subsystem providing/managing Xbox controllers for driving the robot manually */
 public class JoystickSubsystem extends SubsystemBase {
@@ -94,6 +98,24 @@ public class JoystickSubsystem extends SubsystemBase {
   /** Xbox controller used by the robot operator */
   public ProcessedXboxController operatorController;
 
+  /* Driver Buttons */
+  private final JoystickButton m_zeroGyro;
+  private final JoystickButton m_intakeCone;
+  private final JoystickButton m_intakeCube;
+  private final JoystickButton m_placeHigh;
+  private final JoystickButton m_placeLow;
+  private int m_operatorDPadDegrees;
+
+  /*private final JoystickButton intake =
+      new JoystickButton(driver, XboxController.Axis.kRightTrigger.value);
+  private final JoystickButton eject =
+      new JoystickButton(driver, XboxController.Axis.kLeftTrigger.value);
+  private final JoystickButton armforward =
+      new JoystickButton(driver, XboxController.Button.kX.value);
+  private final JoystickButton armback =
+      new JoystickButton(driver, XboxController.Button.kA.value);
+  */
+
   /** Button */
   /** Creates a new JoystickSubsystem */
   public JoystickSubsystem() {
@@ -126,6 +148,25 @@ public class JoystickSubsystem extends SubsystemBase {
         new AxisProcChain.Config(kOperatorTriggerSensitivity, kOperatorTriggerDeadbands);
     driverController.getStickProcessing(XboxController.Axis.kLeftTrigger).configure(triggerConfig);
     driverController.getStickProcessing(XboxController.Axis.kRightTrigger).configure(triggerConfig);
+
+    /* Driver Buttons */
+    m_zeroGyro = new JoystickButton(driverController, XboxController.Button.kY.value);
+    m_intakeCone = new JoystickButton(operatorController, XboxController.Button.kA.value);
+    m_intakeCube = new JoystickButton(operatorController, XboxController.Button.kB.value);
+    m_placeHigh = new JoystickButton(operatorController, XboxController.Button.kX.value);
+    m_placeLow = new JoystickButton(operatorController, XboxController.Button.kY.value);
+    m_operatorDPadDegrees = operatorController.getPOV();
+
+    /*private final JoystickButton intake =
+        new JoystickButton(driverController, XboxController.Axis.kRightTrigger.value);
+    private final JoystickButton eject =
+        new JoystickButton(driverController, XboxController.Axis.kLeftTrigger.value);
+    private final JoystickButton armforward =
+        new JoystickButton(driverController, XboxController.Button.kX.value);
+    private final JoystickButton armback =
+        new JoystickButton(driverController, XboxController.Button.kA.value);
+    */
+
   }
 
   /**
@@ -160,6 +201,12 @@ public class JoystickSubsystem extends SubsystemBase {
     operatorController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.back.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.start.onTrue(new InstantCommand(this::doNothing, this));
+
+    m_zeroGyro.onTrue(new InstantCommand(() -> botContainer.swerveSubsystem.zeroGyro()));
+    
+    m_intakeCube.onTrue(new PickUpCube(botContainer.s_Arm));
+    m_intakeCone.onTrue(new PickUpCone(botContainer.s_Arm));
+    m_placeHigh.onTrue(new PlaceObject(botContainer.s_Arm));
   }
 
   @Override

@@ -71,11 +71,10 @@ public class Arm extends SubsystemBase {
       new WPI_TalonSRX(Constants.ArmConstants.kHandTopBackRollerPort);
   // private final WPI_TalonFX ArmYMotorSlave = new
   // WPI_TalonFX(Constants.ArmConstants.kArmYMotorSlavePort);
-  private final WPI_TalonFX ArmExtender = new
-  WPI_TalonFX(Constants.ArmConstants.kArmExtenderPort);
+  private final WPI_TalonFX ArmExtender = new WPI_TalonFX(Constants.ArmConstants.kArmExtenderPort);
   private final Pneumatics myPneumatics;
   private final double HandRollerSpeed = 0.5;
-  
+
   enum GamePieceType {
     Cone,
     Cube
@@ -93,19 +92,34 @@ public class Arm extends SubsystemBase {
 
   private void configurePID() {
     // set ArmExtender PID coefficients
-    ArmExtender.config_kF(Constants.ArmConstants.kPIDLoopIdx, Constants.ArmConstants.kFF, Constants.ArmConstants.kTimeoutMs);
-		ArmExtender.config_kP(Constants.ArmConstants.kPIDLoopIdx, Constants.ArmConstants.kP, Constants.ArmConstants.kTimeoutMs);
-		ArmExtender.config_kI(Constants.ArmConstants.kPIDLoopIdx, Constants.ArmConstants.kI, Constants.ArmConstants.kTimeoutMs);
-		ArmExtender.config_kD(Constants.ArmConstants.kPIDLoopIdx, Constants.ArmConstants.kD, Constants.ArmConstants.kTimeoutMs);
-    ArmExtender.config_IntegralZone(Constants.ArmConstants.kPIDLoopIdx, Constants.ArmConstants.kIz, Constants.ArmConstants.kTimeoutMs);
+    ArmExtender.config_kF(
+        Constants.ArmConstants.kPIDLoopIdx,
+        Constants.ArmConstants.kFF,
+        Constants.ArmConstants.kTimeoutMs);
+    ArmExtender.config_kP(
+        Constants.ArmConstants.kPIDLoopIdx,
+        Constants.ArmConstants.kP,
+        Constants.ArmConstants.kTimeoutMs);
+    ArmExtender.config_kI(
+        Constants.ArmConstants.kPIDLoopIdx,
+        Constants.ArmConstants.kI,
+        Constants.ArmConstants.kTimeoutMs);
+    ArmExtender.config_kD(
+        Constants.ArmConstants.kPIDLoopIdx,
+        Constants.ArmConstants.kD,
+        Constants.ArmConstants.kTimeoutMs);
+    ArmExtender.config_IntegralZone(
+        Constants.ArmConstants.kPIDLoopIdx,
+        Constants.ArmConstants.kIz,
+        Constants.ArmConstants.kTimeoutMs);
     ArmExtender.configNominalOutputForward(0, Constants.ArmConstants.kTimeoutMs);
     ArmExtender.configNominalOutputReverse(0, Constants.ArmConstants.kTimeoutMs);
-		ArmExtender.configPeakOutputForward(1, Constants.ArmConstants.kTimeoutMs);
-		ArmExtender.configPeakOutputReverse(-1, Constants.ArmConstants.kTimeoutMs);
+    ArmExtender.configPeakOutputForward(1, Constants.ArmConstants.kTimeoutMs);
+    ArmExtender.configPeakOutputReverse(-1, Constants.ArmConstants.kTimeoutMs);
   }
 
-  private void setArmExtension(int extensionEncoderValue)  {
-    //TODO: Set up PID control here
+  private void setArmExtension(int extensionEncoderValue) {
+    // TODO: Set up PID control here
   }
 
   private void setArmPosition(int desiredPosition) {
@@ -120,16 +134,16 @@ public class Arm extends SubsystemBase {
 
   private void spinAllHandRollers(GamePieceType pickUpWhat, DoWhatWithGamePiece desiredHandAction) {
     double HandBottomRollerSpeedPercent = HandRollerSpeed;
-    double HandTopFrontRollerSpeedPercent = -1*HandRollerSpeed;
-    double  HandTopBackRollerSpeedPercent = 0.0;
+    double HandTopFrontRollerSpeedPercent = -1 * HandRollerSpeed;
+    double HandTopBackRollerSpeedPercent = 0.0;
     switch (pickUpWhat) {
       case Cone:
-      HandTopBackRollerSpeedPercent = HandRollerSpeed;
+        HandTopBackRollerSpeedPercent = HandRollerSpeed;
         break;
       case Cube:
-      HandTopBackRollerSpeedPercent = -1*HandRollerSpeed;
+        HandTopBackRollerSpeedPercent = -1 * HandRollerSpeed;
         break;
-      default: 
+      default:
         break;
     }
     if (desiredHandAction == DoWhatWithGamePiece.Out) {

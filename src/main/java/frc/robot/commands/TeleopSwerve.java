@@ -52,8 +52,8 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.Constants;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
@@ -66,7 +66,7 @@ public class TeleopSwerve extends CommandBase {
   private boolean openLoop;
 
   private Swerve s_Swerve;
-  private Joystick controller;
+  private ProcessedXboxController controller;
   private int translationAxis;
   private int strafeAxis;
   private int rotationAxis;
@@ -74,7 +74,7 @@ public class TeleopSwerve extends CommandBase {
   /** Driver control */
   public TeleopSwerve(
       Swerve s_Swerve,
-      Joystick controller,
+      ProcessedXboxController controller,
       int translationAxis,
       int strafeAxis,
       int rotationAxis,
