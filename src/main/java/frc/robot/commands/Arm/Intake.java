@@ -6,6 +6,7 @@ package frc.robot.commands.Arm;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Arm.Arm;
+import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 
 public class Intake extends CommandBase {
   /** Creates a new Intake. */
@@ -23,7 +24,9 @@ public class Intake extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    
+  }
 
   // Returns true when the command should end.
   @Override
