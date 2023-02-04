@@ -61,7 +61,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.commands.Arm.PickUpCone;
-import frc.robot.commands.Arm.PlaceCube;
+import frc.robot.commands.Arm.PickUpCube;
+import frc.robot.commands.Arm.PlaceObject;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Arm.Pneumatics;
@@ -100,6 +101,8 @@ public class RobotContainer {
         new JoystickButton(operator, XboxController.Button.kX.value);
   private final JoystickButton PlaceLow =
         new JoystickButton(operator, XboxController.Button.kY.value);
+  private int OperatorDPadDegrees = operator.getPOV();
+  
   
 
   /*private final JoystickButton intake =
@@ -166,7 +169,10 @@ public class RobotContainer {
     /* Driver Buttons */
 
     zeroGyro.onTrue(new InstantCommand(() -> swerveSubsystem.zeroGyro()));
-    intakeCube.onTrue(new PlaceCube(s_Arm));
+    intakeCube.onTrue(new PickUpCube(s_Arm));
+    intakeCone.onTrue(new PickUpCone(s_Arm));
+    placeHigh.onTrue(new PlaceObject(s_Arm));
+
     
     /*intake.onTrue(new InstantCommand(() -> s_Arm.intake()));
     eject.onTrue(new InstantCommand(() -> s_Arm.place()));
