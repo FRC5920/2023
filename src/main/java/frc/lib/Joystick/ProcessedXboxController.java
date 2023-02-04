@@ -53,7 +53,7 @@ package frc.lib.Joystick;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import java.util.Map;
+import java.util.HashMap;
 
 /////////////////////////////////////////////////////////////////////////////
 /** This utility class wraps the functionality of a joystick controller for driving the robot */
@@ -72,7 +72,7 @@ public class ProcessedXboxController extends XboxController {
   private static final double kDefaultTriggerDeadbandUpper = 0.95;
 
   /** Processors applied to axis values from joysticks and triggers */
-  private Map<XboxController.Axis, AxisProcChain> m_axisProcessorMap;
+  private HashMap<XboxController.Axis, AxisProcChain> m_axisProcessorMap;
 
   /** Xbox controller 'A' button */
   public final JoystickButton A;
@@ -103,6 +103,8 @@ public class ProcessedXboxController extends XboxController {
    */
   public ProcessedXboxController(int port) {
     super(port);
+
+    m_axisProcessorMap = new HashMap<XboxController.Axis, AxisProcChain>();
 
     // Configure default stick processing
     AxisProcChain.Config defaultStickConfig =

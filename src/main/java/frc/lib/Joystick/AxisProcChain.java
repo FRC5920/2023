@@ -99,6 +99,7 @@ public class AxisProcChain implements AxisProcessor {
    * @param config Axis processing configuration to use
    */
   AxisProcChain(Config config) {
+    m_procChain = new ArrayList<AxisProcessor>();
     m_procChain.add(new AxisFeathering(config.sens));
     m_procChain.add(new AxisDeadband(config.dbLower, config.dbUpper));
   }

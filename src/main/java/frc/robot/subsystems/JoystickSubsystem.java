@@ -109,8 +109,12 @@ public class JoystickSubsystem extends SubsystemBase {
     driverController.getStickProcessing(XboxController.Axis.kRightY).configure(stickConfig);
     AxisProcChain.Config triggerConfig =
         new AxisProcChain.Config(kDriverTriggerSensitivity, kDriverTriggerDeadbands);
-    driverController.getStickProcessing(XboxController.Axis.kLeftTrigger).configure(triggerConfig);
-    driverController.getStickProcessing(XboxController.Axis.kRightTrigger).configure(triggerConfig);
+    driverController
+        .getTriggerProcessing(XboxController.Axis.kLeftTrigger)
+        .configure(triggerConfig);
+    driverController
+        .getTriggerProcessing(XboxController.Axis.kRightTrigger)
+        .configure(triggerConfig);
 
     // Configure operator controller stick and trigger processing
     operatorController = new ProcessedXboxController(ControllerId.kOperator.port);
@@ -124,8 +128,12 @@ public class JoystickSubsystem extends SubsystemBase {
     driverController.getStickProcessing(XboxController.Axis.kRightY).configure(stickConfig);
     triggerConfig =
         new AxisProcChain.Config(kOperatorTriggerSensitivity, kOperatorTriggerDeadbands);
-    driverController.getStickProcessing(XboxController.Axis.kLeftTrigger).configure(triggerConfig);
-    driverController.getStickProcessing(XboxController.Axis.kRightTrigger).configure(triggerConfig);
+    driverController
+        .getTriggerProcessing(XboxController.Axis.kLeftTrigger)
+        .configure(triggerConfig);
+    driverController
+        .getTriggerProcessing(XboxController.Axis.kRightTrigger)
+        .configure(triggerConfig);
   }
 
   /**
