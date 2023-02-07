@@ -63,8 +63,6 @@ import frc.robot.commands.Arm.PickUpCone;
 import frc.robot.commands.Arm.PickUpCube;
 import frc.robot.commands.Arm.PlaceObject;
 import frc.robot.subsystems.Arm.Arm;
-import frc.robot.subsystems.runtimeState.BotStateSubsystem;
-
 
 /** A subsystem providing/managing Xbox controllers for driving the robot manually */
 public class JoystickSubsystem extends SubsystemBase {
@@ -195,7 +193,9 @@ public class JoystickSubsystem extends SubsystemBase {
     // Map buttons on operator controller
     operatorController.A.onTrue(new PickUpCone(botContainer.s_Arm));
     operatorController.B.onTrue(new PickUpCube(botContainer.s_Arm));
-    operatorController.X.onTrue(new PlaceObject(botContainer.s_Arm, botContainer.s_BotState.storedGamePiece, Arm.Rank.Medium));
+    operatorController.X.onTrue(
+        new PlaceObject(
+            botContainer.s_Arm, botContainer.s_BotState.storedGamePiece, Arm.Rank.Medium));
     operatorController.Y.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.leftBumper.whileTrue(new InstantCommand(this::doNothing, this));
     operatorController.rightBumper.whileTrue(new InstantCommand(this::doNothing, this));
@@ -203,9 +203,11 @@ public class JoystickSubsystem extends SubsystemBase {
     operatorController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.back.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.start.onTrue(new InstantCommand(this::doNothing, this));
-    operatorController.dPadUp.onTrue(new PlaceObject(botContainer.s_Arm, botContainer.s_BotState.storedGamePiece, Arm.Rank.High));
-    operatorController.dPadDown.onTrue(new PlaceObject(botContainer.s_Arm, botContainer.s_BotState.storedGamePiece, Arm.Rank.Low));
-    
+    operatorController.dPadUp.onTrue(
+        new PlaceObject(
+            botContainer.s_Arm, botContainer.s_BotState.storedGamePiece, Arm.Rank.High));
+    operatorController.dPadDown.onTrue(
+        new PlaceObject(botContainer.s_Arm, botContainer.s_BotState.storedGamePiece, Arm.Rank.Low));
   }
 
   @Override

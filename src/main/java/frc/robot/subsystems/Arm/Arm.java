@@ -54,6 +54,9 @@ package frc.robot.subsystems.Arm;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -62,13 +65,12 @@ public class Arm extends SubsystemBase {
   /** Creates a new Arm. */
   private final WPI_TalonFX ArmYMotorMaster =
       new WPI_TalonFX(Constants.ArmConstants.kArmYMotorMasterPort);
-
-  private final WPI_TalonSRX HandBottomRoller =
-      new WPI_TalonSRX(Constants.ArmConstants.kHandBottomRollerPort);
-  private final WPI_TalonSRX HandTopFrontRoller =
-      new WPI_TalonSRX(Constants.ArmConstants.kHandTopFrontRollerPort);
-  private final WPI_TalonSRX HandTopBackRoller =
-      new WPI_TalonSRX(Constants.ArmConstants.kHandTopBackRollerPort);
+  private final CANSparkMax HandBottomRoller =
+      new CANSparkMax(Constants.ArmConstants.kHandBottomRollerPort, MotorType.kBrushless);
+  private final CANSparkMax HandTopFrontRoller =
+      new CANSparkMax(Constants.ArmConstants.kHandTopFrontRollerPort, MotorType.kBrushless);
+  private final CANSparkMax HandTopBackRoller =
+      new CANSparkMax(Constants.ArmConstants.kHandTopBackRollerPort, MotorType.kBrushless);
   // private final WPI_TalonFX ArmYMotorSlave = new
   // WPI_TalonFX(Constants.ArmConstants.kArmYMotorSlavePort);
   private final WPI_TalonFX ArmExtender = new WPI_TalonFX(Constants.ArmConstants.kArmExtenderPort);
@@ -87,7 +89,7 @@ public class Arm extends SubsystemBase {
 
   public enum Rank {
     PickUp,
-    Low, 
+    Low,
     Medium,
     High
   }
@@ -158,9 +160,9 @@ public class Arm extends SubsystemBase {
       HandTopBackRollerSpeedPercent *= -1;
       HandTopFrontRollerSpeedPercent *= -1;
     }
-    HandBottomRoller.set(ControlMode.PercentOutput, HandBottomRollerSpeedPercent);
-    HandTopFrontRoller.set(ControlMode.PercentOutput, HandTopFrontRollerSpeedPercent);
-    HandTopBackRoller.set(ControlMode.PercentOutput, HandTopBackRollerSpeedPercent);
+    HandBottomRoller.set(HandBottomRollerSpeedPercent);
+    HandTopFrontRoller.set(HandTopFrontRollerSpeedPercent);
+    HandTopBackRoller.set(HandTopBackRollerSpeedPercent);
   }
 
   public void armForward() {
@@ -172,15 +174,15 @@ public class Arm extends SubsystemBase {
   }
 
   public void intake() {
-    HandBottomRoller.set(ControlMode.PercentOutput, 0.5);
-    HandTopFrontRoller.set(ControlMode.PercentOutput, 0.5);
-    HandTopBackRoller.set(ControlMode.PercentOutput, 0.5);
+    HandBottomRoller.set(0.5);
+    HandTopFrontRoller.set(0.5);
+    HandTopBackRoller.set(0.5);
   }
 
   public void place() {
-    HandBottomRoller.set(ControlMode.PercentOutput, -0.5);
-    HandTopFrontRoller.set(ControlMode.PercentOutput, -0.5);
-    HandTopBackRoller.set(ControlMode.PercentOutput, -0.5);
+    HandBottomRoller.set(-0.5);
+    HandTopFrontRoller.set(-0.5);
+    HandTopBackRoller.set(-0.5);
   }
 
   @Override

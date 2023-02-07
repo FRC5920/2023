@@ -56,7 +56,6 @@ import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.Arm.Arm;
 
-
 public class BotStateSubsystem extends SubsystemBase {
 
   /** true when manual control is active; else false */

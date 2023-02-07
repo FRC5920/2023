@@ -56,7 +56,6 @@ import frc.robot.subsystems.Arm.Arm;
 
 public class Reach extends CommandBase {
   /** Creates a new ExtendArmToRank. */
-  
   public Reach(Arm.Rank ReachWhere) {
     // Use addRequirements() here to declare subsystem dependencies.
   }

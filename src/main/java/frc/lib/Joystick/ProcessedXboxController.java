@@ -54,7 +54,6 @@ package frc.lib.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
 import java.util.Map;
 
 /////////////////////////////////////////////////////////////////////////////
@@ -96,9 +95,9 @@ public class ProcessedXboxController extends XboxController {
   public final JoystickButton back;
   /** Xbox controller 'Start' button */
   public final JoystickButton start;
-  /** Xbox controller dPad 'Up' button*/
+  /** Xbox controller dPad 'Up' button */
   public final Trigger dPadUp;
-  /** Xbox controller dPad 'Down' button*/
+  /** Xbox controller dPad 'Down' button */
   public final Trigger dPadDown;
 
   /**
@@ -142,8 +141,8 @@ public class ProcessedXboxController extends XboxController {
     back = new JoystickButton(this, XboxController.Button.kBack.value);
     start = new JoystickButton(this, XboxController.Button.kStart.value);
 
-    dPadUp = new Trigger( () -> dpadValueIs(this.getPOV(), new int[] {0, 45, 315}) );
-    dPadDown = new Trigger( () -> dpadValueIs(this.getPOV(), new int[] {180, 135, 225}) );
+    dPadUp = new Trigger(() -> dpadValueIs(this.getPOV(), new int[] {0, 45, 315}));
+    dPadDown = new Trigger(() -> dpadValueIs(this.getPOV(), new int[] {180, 135, 225}));
   }
 
   private static boolean dpadValueIs(int value, int matches[]) {
