@@ -52,10 +52,12 @@
 package frc.robot.commands.Arm;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.Arm.Arm;
 
 public class Reach extends CommandBase {
   /** Creates a new ExtendArmToRank. */
-  public Reach() {
+  
+  public Reach(Arm.Rank ReachWhere) {
     // Use addRequirements() here to declare subsystem dependencies.
   }
 

@@ -85,6 +85,13 @@ public class Arm extends SubsystemBase {
     Out
   }
 
+  public enum Rank {
+    PickUp,
+    Low, 
+    Medium,
+    High
+  }
+
   public Arm(Pneumatics s_Pneumatics) {
     this.myPneumatics = s_Pneumatics;
     configurePID();
