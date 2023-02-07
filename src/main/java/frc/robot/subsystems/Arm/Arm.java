@@ -51,6 +51,8 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.subsystems.Arm;
 
+import java.util.Set;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -129,17 +131,16 @@ public class Arm extends SubsystemBase {
     // TODO: Set up PID control here
   }
 
-  private void setArmPosition(int desiredPosition) {
+  public void setArmPosition(int desiredPosition) {
     if (desiredPosition >= Constants.ArmConstants.kArmExtendedHigh) {
       myPneumatics.goingBackward();
     } else {
       myPneumatics.goingForward();
-    }
-    ;
+    };
     ArmYMotorMaster.setSelectedSensorPosition(desiredPosition);
   }
 
-  private void spinAllHandRollers(GamePieceType pickUpWhat, DoWhatWithGamePiece desiredHandAction) {
+  public void spinAllHandRollers(GamePieceType pickUpWhat, DoWhatWithGamePiece desiredHandAction) {
     double HandBottomRollerSpeedPercent = HandRollerSpeed;
     double HandTopBackRollerSpeedPercent = 0.0;
     switch (pickUpWhat) {
@@ -159,6 +160,11 @@ public class Arm extends SubsystemBase {
     HandBottomRoller.set(HandBottomRollerSpeedPercent);
     HandTopBackRoller.set(HandTopBackRollerSpeedPercent);
   }
+
+  public void zeroHandRollers() {
+    HandTopBackRoller.set(0);
+    HandBottomRoller.set(0);
+};
 
   public void armForward() {
     ArmYMotorMaster.set(ControlMode.PercentOutput, 1);
