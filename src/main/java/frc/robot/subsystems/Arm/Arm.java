@@ -67,8 +67,6 @@ public class Arm extends SubsystemBase {
       new WPI_TalonFX(Constants.ArmConstants.kArmYMotorMasterPort);
   private final CANSparkMax HandBottomRoller =
       new CANSparkMax(Constants.ArmConstants.kHandBottomRollerPort, MotorType.kBrushless);
-  private final CANSparkMax HandTopFrontRoller =
-      new CANSparkMax(Constants.ArmConstants.kHandTopFrontRollerPort, MotorType.kBrushless);
   private final CANSparkMax HandTopBackRoller =
       new CANSparkMax(Constants.ArmConstants.kHandTopBackRollerPort, MotorType.kBrushless);
   // private final WPI_TalonFX ArmYMotorSlave = new
@@ -143,7 +141,6 @@ public class Arm extends SubsystemBase {
 
   private void spinAllHandRollers(GamePieceType pickUpWhat, DoWhatWithGamePiece desiredHandAction) {
     double HandBottomRollerSpeedPercent = HandRollerSpeed;
-    double HandTopFrontRollerSpeedPercent = -1 * HandRollerSpeed;
     double HandTopBackRollerSpeedPercent = 0.0;
     switch (pickUpWhat) {
       case Cone:
@@ -158,10 +155,8 @@ public class Arm extends SubsystemBase {
     if (desiredHandAction == DoWhatWithGamePiece.Out) {
       HandBottomRollerSpeedPercent *= -1;
       HandTopBackRollerSpeedPercent *= -1;
-      HandTopFrontRollerSpeedPercent *= -1;
     }
     HandBottomRoller.set(HandBottomRollerSpeedPercent);
-    HandTopFrontRoller.set(HandTopFrontRollerSpeedPercent);
     HandTopBackRoller.set(HandTopBackRollerSpeedPercent);
   }
 
@@ -175,13 +170,11 @@ public class Arm extends SubsystemBase {
 
   public void intake() {
     HandBottomRoller.set(0.5);
-    HandTopFrontRoller.set(0.5);
     HandTopBackRoller.set(0.5);
   }
 
   public void place() {
     HandBottomRoller.set(-0.5);
-    HandTopFrontRoller.set(-0.5);
     HandTopBackRoller.set(-0.5);
   }
 
