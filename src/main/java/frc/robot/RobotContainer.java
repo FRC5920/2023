@@ -58,6 +58,10 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.SwerveDrive.Falcon500SwerveIO;
+import frc.lib.SwerveDrive.SimSwerveModuleIO;
+import frc.lib.SwerveDrive.SwerveModuleIO;
+import frc.robot.Constants.SwerveDrivebaseConstants.SwerveModuleID;
 import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
@@ -88,7 +92,7 @@ public class RobotContainer {
 
   // --------------------- Robot Subsystems ----------------------------
   public final JoystickSubsystem joystickSubsystem = new JoystickSubsystem();
-  public final Swerve swerveSubsystem = new Swerve();
+  public final Swerve swerveSubsystem;
   public final BotStateSubsystem s_BotState = new BotStateSubsystem();
   /* Dashboard Subsystems */
   public final DriveTab s_DriveTab = new DriveTab();
@@ -104,6 +108,60 @@ public class RobotContainer {
   public RobotContainer() {
     boolean fieldRelative = true;
     boolean openLoop = true;
+    SwerveModuleIO swerveModuleIO[];
+
+    // Instantiate active subsystems
+    switch (Constants.getMode()) {
+      case REAL:
+        swerveModuleIO =
+            new SwerveModuleIO[] {
+              new Falcon500SwerveIO(
+                  Constants.SwerveDrivebaseConstants.Mod0.driveMotorID,
+                  Constants.SwerveDrivebaseConstants.Mod0.angleMotorID,
+                  Constants.SwerveDrivebaseConstants.Mod0.canCoderID,
+                  Constants.SwerveDrivebaseConstants.Mod0.angleOffset,
+                  Robot.ctreConfigs),
+              new Falcon500SwerveIO(
+                  Constants.SwerveDrivebaseConstants.Mod1.driveMotorID,
+                  Constants.SwerveDrivebaseConstants.Mod1.angleMotorID,
+                  Constants.SwerveDrivebaseConstants.Mod1.canCoderID,
+                  Constants.SwerveDrivebaseConstants.Mod1.angleOffset,
+                  Robot.ctreConfigs),
+              new Falcon500SwerveIO(
+                  Constants.SwerveDrivebaseConstants.Mod2.driveMotorID,
+                  Constants.SwerveDrivebaseConstants.Mod2.angleMotorID,
+                  Constants.SwerveDrivebaseConstants.Mod2.canCoderID,
+                  Constants.SwerveDrivebaseConstants.Mod2.angleOffset,
+                  Robot.ctreConfigs),
+              new Falcon500SwerveIO(
+                  Constants.SwerveDrivebaseConstants.Mod3.driveMotorID,
+                  Constants.SwerveDrivebaseConstants.Mod3.angleMotorID,
+                  Constants.SwerveDrivebaseConstants.Mod3.canCoderID,
+                  Constants.SwerveDrivebaseConstants.Mod3.angleOffset,
+                  Robot.ctreConfigs)
+            };
+        break;
+
+      case SIM:
+      case REPLAY:
+      default:
+        swerveModuleIO =
+            new SwerveModuleIO[] {
+              new SimSwerveModuleIO(),
+              new SimSwerveModuleIO(),
+              new SimSwerveModuleIO(),
+              new SimSwerveModuleIO()
+            };
+        break;
+    }
+
+    swerveSubsystem =
+        new Swerve(
+            swerveModuleIO[SwerveModuleID.kFrontLeft.value],
+            swerveModuleIO[SwerveModuleID.kFrontRight.value],
+            swerveModuleIO[SwerveModuleID.kRearLeft.value],
+            swerveModuleIO[SwerveModuleID.kRearRight.value]);
+
     swerveSubsystem.setDefaultCommand(
         new TeleopSwerve(
             swerveSubsystem,

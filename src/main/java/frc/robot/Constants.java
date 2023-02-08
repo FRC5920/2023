@@ -64,8 +64,11 @@ import edu.wpi.first.wpilibj.RobotBase;
 import frc.lib.SwerveDrive.COTSFalconSwerveConstants;
 import frc.lib.SwerveDrive.SwerveModuleConstants;
 import java.util.Map;
+import org.littletonrobotics.junction.LoggedRobot;
 
 public final class Constants {
+
+  public static final double robotPeriodSec = LoggedRobot.defaultPeriodSecs;
 
   /** Type of robot targeted by these constants */
   private static final RobotType s_robot = RobotType.PrototypeBot;
@@ -183,6 +186,28 @@ public final class Constants {
     /* Neutral Modes */
     public static final NeutralMode angleNeutralMode = NeutralMode.Coast;
     public static final NeutralMode driveNeutralMode = NeutralMode.Brake;
+
+    /** Swerve module ID's */
+    public enum SwerveModuleID {
+      kFrontLeft(0),
+      kFrontRight(1),
+      kRearLeft(2),
+      kRearRight(3);
+
+      public final int value;
+
+      private SwerveModuleID(int id) {
+        value = id;
+      }
+
+      /**
+       * @return the human-readable name of the module ID
+       */
+      @Override
+      public String toString() {
+        return this.name();
+      }
+    };
 
     /* Module Specific Constants */
     /* Front Left Module - Module 0 */

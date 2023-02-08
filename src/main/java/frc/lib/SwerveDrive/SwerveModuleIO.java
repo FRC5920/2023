@@ -8,7 +8,7 @@
 /*-----------------------------------------------------------------------------\
 |                                                                              |
 |                       ================================                       |
-|                       **    TEAM 5920 - Vikotics    **                       |
+|                       **    TEAM 5290 - Vikotics    **                       |
 |                       ================================                       |
 |                                                                              |
 |                            °        #°                                       |
@@ -52,65 +52,72 @@
 package frc.lib.SwerveDrive;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import frc.robot.Constants;
+import org.littletonrobotics.junction.AutoLog;
 
-public class SwerveModule {
-  public int moduleNumber;
-  private Rotation2d m_lastAngle;
+/**
+ * SwerveModuleIO provides a common interface for the low-level I/O layer used by a swerve drive
+ * module
+ *
+ * @apiNote This interface is largely inspired by the ModuleIO interface used by FRC6328 Mechanical
+ *     Advantage (http://github.com/Mechanical-Advantage)
+ */
+public interface SwerveModuleIO {
 
-  private SwerveModuleIO m_moduleIO;
-  private SwerveModuleIOInputsAutoLogged m_loggedInputs = new SwerveModuleIOInputsAutoLogged();
+  @AutoLog
+  public static class SwerveModuleIOInputs {
+    public double driveSpeedMetersPerSecond = 0.0;
+    public double driveDistanceMeters = 0.0;
+    public double driveAppliedVolts = 0.0;
+    public double[] driveCurrentAmps = new double[] {};
+    public double[] driveTempCelcius = new double[] {};
 
-  public SwerveModule(
-      int moduleNumber, SwerveModuleIO moduleIO) { // SwerveModuleConstants moduleConstants) {
-    this.moduleNumber = moduleNumber;
-    this.m_moduleIO = moduleIO;
-    m_lastAngle = getState().angle;
+    public double angleAbsolutePositionRad = 0.0;
+    public double anglePositionRad = 0.0;
+    public double angleVelocityRadPerSec = 0.0;
+    public double angleAppliedVolts = 0.0;
+    public double[] angleCurrentAmps = new double[] {};
+    public double[] angleTempCelcius = new double[] {};
   }
 
-  public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
-    /* This is a custom optimize function, since default WPILib optimize assumes continuous controller which CTRE and Rev onboard is not */
-    desiredState = CTREModuleState.optimize(desiredState, getState().angle);
-    setAngle(desiredState);
-    setSpeed(desiredState, isOpenLoop);
-  }
+  /** Updates the set of loggable inputs */
+  public void updateLoggedInputs(SwerveModuleIOInputs inputs);
 
-  private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
-    m_moduleIO.setSpeed(desiredState.speedMetersPerSecond, isOpenLoop);
-  }
+  /**
+   * Set the desired speed of the module
+   *
+   * @param speedMetersPerSecond desired speed in meters per second
+   * @param isOpenLoop true to use open-loop control of speed; else false for closed-loop control
+   */
+  public void setSpeed(double speedMetersPerSecond, boolean isOpenLoop);
 
-  private void setAngle(SwerveModuleState desiredState) {
-    Rotation2d angle =
-        (Math.abs(desiredState.speedMetersPerSecond)
-                <= (Constants.SwerveDrivebaseConstants.maxSpeed * 0.01))
-            ? m_lastAngle
-            : desiredState
-                .angle; // Prevent rotating module if speed is less then 1%. Prevents Jittering.
+  /**
+   * Set the desired angle of the module
+   *
+   * @param angle angle as a Rotation2d object
+   */
+  public void setAngle(Rotation2d angle);
 
-    m_moduleIO.setAngle(angle);
-    m_lastAngle = angle;
-  }
+  /**
+   * Returns the current speed of the module
+   *
+   * @return the current speed of the module in meters per second
+   */
+  public double getSpeed();
 
-  public Rotation2d getAngle() {
-    return m_moduleIO.getAngle();
-  }
+  /**
+   * Returns the current angle of the module
+   *
+   * @return the current angle of the module as a Rotation2d object
+   */
+  public Rotation2d getAngle();
 
-  public void resetToAbsolute() {
-    m_moduleIO.resetToAbsolute();
-  }
+  /**
+   * Returns the current distance measurement from the module in meters
+   *
+   * @return the current distance measurement of the module in meters
+   */
+  public double getDistance();
 
-  public SwerveModuleState getState() {
-    return new SwerveModuleState(m_moduleIO.getSpeed(), m_moduleIO.getAngle());
-  }
-
-  public SwerveModulePosition getPosition() {
-    return new SwerveModulePosition(m_moduleIO.getDistance(), getAngle());
-  }
-
-  /** Update logged input values */
-  public void updateLoggedInputs() {
-    m_moduleIO.updateLoggedInputs(m_loggedInputs);
-  }
+  /** Reset the swerve module angle to its zero position */
+  public default void resetToAbsolute() {}
 }

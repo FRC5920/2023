@@ -63,8 +63,8 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-// import com.ctre.phoenix.sensors.PigeonIMU;
 import frc.lib.SwerveDrive.SwerveModule;
+import frc.lib.SwerveDrive.SwerveModuleIO;
 import frc.robot.Constants;
 
 public class Swerve extends SubsystemBase {
@@ -72,17 +72,21 @@ public class Swerve extends SubsystemBase {
   public SwerveModule[] mSwerveMods;
   public WPI_Pigeon2 gyro;
 
-  public Swerve() {
+  public Swerve(
+      SwerveModuleIO frontLeftIO,
+      SwerveModuleIO frontRightIO,
+      SwerveModuleIO rearLeftIO,
+      SwerveModuleIO rearRightIO) {
     gyro = new WPI_Pigeon2(Constants.SwerveDrivebaseConstants.pigeonID, "SwerveCAN");
     gyro.configFactoryDefault();
     zeroGyro();
 
     mSwerveMods =
         new SwerveModule[] {
-          new SwerveModule(0, Constants.SwerveDrivebaseConstants.Mod0.constants),
-          new SwerveModule(1, Constants.SwerveDrivebaseConstants.Mod1.constants),
-          new SwerveModule(2, Constants.SwerveDrivebaseConstants.Mod2.constants),
-          new SwerveModule(3, Constants.SwerveDrivebaseConstants.Mod3.constants)
+          new SwerveModule(0, frontLeftIO),
+          new SwerveModule(1, frontRightIO),
+          new SwerveModule(2, rearLeftIO),
+          new SwerveModule(3, rearRightIO)
         };
 
     /* By pausing init for a second before setting module offsets, we avoid a bug with inverting motors.
@@ -179,6 +183,10 @@ public class Swerve extends SubsystemBase {
 
   @Override
   public void periodic() {
+    for (SwerveModule module : mSwerveMods) {
+      module.updateLoggedInputs();
+    }
+
     swerveOdometry.update(getYaw(), getModulePositions());
 
     SmartDashboard.putNumber("Gyro", gyro.getYaw());
@@ -186,7 +194,7 @@ public class Swerve extends SubsystemBase {
     SmartDashboard.putNumber("Pitch", getPitch());
     for (SwerveModule mod : mSwerveMods) {
       SmartDashboard.putNumber(
-          "Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
+          "Mod " + mod.moduleNumber + " Cancoder", mod.getAngle().getDegrees());
       SmartDashboard.putNumber(
           "Mod " + mod.moduleNumber + " Integrated", mod.getPosition().angle.getDegrees());
       SmartDashboard.putNumber(
