@@ -116,29 +116,29 @@ public class Arm extends SubsystemBase {
   private void configurePID() {
     // set ArmExtender PID coefficients
     ArmExtender.config_kF(
-        Constants.ArmConstants.kPIDLoopIdx,
-        Constants.ArmConstants.kFF,
-        Constants.ArmConstants.kTimeoutMs);
+        Constants.ArmConstants.kArmExtenderPIDLoopIdx,
+        Constants.ArmConstants.kArmExtenderFF,
+        Constants.ArmConstants.kArmExtenderTimeoutMs);
     ArmExtender.config_kP(
-        Constants.ArmConstants.kPIDLoopIdx,
-        Constants.ArmConstants.kP,
-        Constants.ArmConstants.kTimeoutMs);
+        Constants.ArmConstants.kArmExtenderPIDLoopIdx,
+        Constants.ArmConstants.kArmExtenderP,
+        Constants.ArmConstants.kArmExtenderTimeoutMs);
     ArmExtender.config_kI(
-        Constants.ArmConstants.kPIDLoopIdx,
-        Constants.ArmConstants.kI,
-        Constants.ArmConstants.kTimeoutMs);
+        Constants.ArmConstants.kArmExtenderPIDLoopIdx,
+        Constants.ArmConstants.kArmExtenderI,
+        Constants.ArmConstants.kArmExtenderTimeoutMs);
     ArmExtender.config_kD(
-        Constants.ArmConstants.kPIDLoopIdx,
-        Constants.ArmConstants.kD,
-        Constants.ArmConstants.kTimeoutMs);
+        Constants.ArmConstants.kArmExtenderPIDLoopIdx,
+        Constants.ArmConstants.kArmExtenderD,
+        Constants.ArmConstants.kArmExtenderTimeoutMs);
     ArmExtender.config_IntegralZone(
-        Constants.ArmConstants.kPIDLoopIdx,
-        Constants.ArmConstants.kIz,
-        Constants.ArmConstants.kTimeoutMs);
-    ArmExtender.configNominalOutputForward(0, Constants.ArmConstants.kTimeoutMs);
-    ArmExtender.configNominalOutputReverse(0, Constants.ArmConstants.kTimeoutMs);
-    ArmExtender.configPeakOutputForward(1, Constants.ArmConstants.kTimeoutMs);
-    ArmExtender.configPeakOutputReverse(-1, Constants.ArmConstants.kTimeoutMs);
+        Constants.ArmConstants.kArmExtenderPIDLoopIdx,
+        Constants.ArmConstants.kArmExtenderIz,
+        Constants.ArmConstants.kArmExtenderTimeoutMs);
+    ArmExtender.configNominalOutputForward(0, Constants.ArmConstants.kArmExtenderTimeoutMs);
+    ArmExtender.configNominalOutputReverse(0, Constants.ArmConstants.kArmExtenderTimeoutMs);
+    ArmExtender.configPeakOutputForward(1, Constants.ArmConstants.kArmExtenderTimeoutMs);
+    ArmExtender.configPeakOutputReverse(-1, Constants.ArmConstants.kArmExtenderTimeoutMs);
   }
 
   private void setArmExtension(ArmExtenderPosition extensionEncoderValue) {
