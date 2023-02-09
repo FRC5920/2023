@@ -95,6 +95,19 @@ public class Arm extends SubsystemBase {
     High
   }
 
+  public enum ArmExtenderPosition {
+    //public static final int[] tRexPosition = new int []{0, 13629, 31880, 43589, 54841, 68187};
+    
+    StowedAway  (0),  /** Arm is fully retracted */
+    OnFloor     (1000), /** Arm is down on the floor */
+    MiddleRank  (2000), /** Arm is reaching to the middle rank */
+    TopRank     (3000); /** Arm is reaching to the top rank */
+
+    private final int encoderCount;
+    private ArmExtenderPosition(int count) {this.encoderCount = count;}
+    public int getEncoderCount() { return encoderCount; }
+  };
+
   public Arm(Pneumatics s_Pneumatics) {
     this.myPneumatics = s_Pneumatics;
     configurePID();
@@ -128,9 +141,8 @@ public class Arm extends SubsystemBase {
     ArmExtender.configPeakOutputReverse(-1, Constants.ArmConstants.kTimeoutMs);
   }
 
-  private void setArmExtension(int extensionEncoderValue) {
-    // TODO: Set up PID control here
-    ArmExtender.set(TalonFXControlMode.Position, extensionEncoderValue);
+  private void setArmExtension(ArmExtenderPosition extensionEncoderValue) {
+    ArmExtender.set(TalonFXControlMode.Position, extensionEncoderValue.encoderCount);
   }
 
   public void setArmPosition(int desiredPosition) {
