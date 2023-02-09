@@ -120,6 +120,7 @@ public final class Constants {
     public static final double kI = 0;
     public static final double kD = 0;
     public static final double kIz = 0;
+    public static final int kArmExtenderPIDIndex = 0;
   }
 
   public static class DriverConstants {

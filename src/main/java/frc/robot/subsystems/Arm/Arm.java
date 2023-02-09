@@ -54,6 +54,7 @@ package frc.robot.subsystems.Arm;
 import java.util.Set;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.revrobotics.CANSparkMax;
@@ -129,6 +130,7 @@ public class Arm extends SubsystemBase {
 
   private void setArmExtension(int extensionEncoderValue) {
     // TODO: Set up PID control here
+    ArmExtender.set(TalonFXControlMode.Position, extensionEncoderValue);
   }
 
   public void setArmPosition(int desiredPosition) {
