@@ -65,7 +65,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.SwerveDrivebase.*;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
-
 import java.util.function.Supplier;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonTrackedTarget;
@@ -183,12 +182,17 @@ public class ChaseTagCommand extends CommandBase {
         omegaSpeed = 0;
       }
       // https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/intro-and-chassis-speeds.html
-       drivetrainSubsystem.drive(new Translation2d(ySpeed, xSpeed).times(BotStateSubsystem.MaxSpeed), omegaSpeed, true, true);
-       
-        //Original drive command for chassisspeed class
-        //drivetrainSubsystem.drive(
-        //ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, omegaSpeed, robotPose2d.getRotation()));
-        //ChassisSpeeds.fromFieldRelativeSpeeds(, , omegaSpeed,
+      drivetrainSubsystem.drive(
+          new Translation2d(ySpeed, xSpeed).times(BotStateSubsystem.MaxSpeed),
+          omegaSpeed,
+          true,
+          true);
+
+      // Original drive command for chassisspeed class
+      // drivetrainSubsystem.drive(
+      // ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, omegaSpeed,
+      // robotPose2d.getRotation()));
+      // ChassisSpeeds.fromFieldRelativeSpeeds(, , omegaSpeed,
     }
   }
 
