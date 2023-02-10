@@ -70,32 +70,18 @@ public final class Constants {
 
   public static final double robotPeriodSec = LoggedRobot.defaultPeriodSecs;
 
-  /** Type of robot targeted by these constants */
-  private static final RobotType s_robot = RobotType.PrototypeBot;
+  /** Set the value of logPlaybackIsEnabled to true when replaying log files */
+  public static final boolean kLogPlaybackIsEnabled = false;
+
+  /** robotType indicates the type of bot this code applies to */
+  public static final RobotType kRobotType = RobotType.PrototypeBot;
 
   /** Set to true when tuning or characterizing the robot */
   public static final boolean tuningMode = false;
 
-  public static RobotType getRobot() {
-    // Simulated robot type can only be used in desktop simulation mode; not with real hardware!
-    if (RobotBase.isReal() && (s_robot == RobotType.SimulatedRobot)) {
-      throw new UnsupportedOperationException(
-          "********* Simulation mode cannot be enabled for a real robot! **********");
-    }
-
-    return s_robot;
-  }
-
   /** Returns the present robot mode */
   public static Mode getMode() {
-    switch (getRobot()) {
-      case PrototypeBot:
-        return RobotBase.isReal() ? Mode.REAL : Mode.REPLAY;
-      case SimulatedRobot:
-        return Mode.SIM;
-      default:
-        return Mode.REAL;
-    }
+    return RobotBase.isReal() ? Mode.REAL : (kLogPlaybackIsEnabled ? Mode.REPLAY : Mode.SIM);
   }
 
   public static class DriverConstants {
@@ -296,7 +282,7 @@ public final class Constants {
     PrototypeBot,
 
     /** Simulated robot */
-    SimulatedRobot;
+    CompetitionBot;
 
     /** Get the human-readable name of the robot type */
     @Override

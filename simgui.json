@@ -8,6 +8,12 @@
   },
   "NetworkTables": {
     "transitory": {
+      "AdvantageKit": {
+        "RealMetadata": {
+          "open": true
+        },
+        "open": true
+      },
       "Shuffleboard": {
         "Drive": {
           "Speed Limit": {
