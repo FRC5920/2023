@@ -65,7 +65,7 @@ import frc.robot.Constants.SwerveDrivebaseConstants.SwerveModuleID;
 import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.Dashboard.DriveTab;
+import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 
@@ -95,14 +95,7 @@ public class RobotContainer {
   public final Swerve swerveSubsystem;
   public final BotStateSubsystem s_BotState = new BotStateSubsystem();
   /* Dashboard Subsystems */
-  public final DriveTab s_DriveTab = new DriveTab();
-
-  // The robot's subsystems and commands are defined here...
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-
-  // Replace with CommandPS4Controller or CommandJoystick if needed
-  // private final CommandXboxController m_driverController =
-  //    new CommandXboxController(DriverConstants.kControllerPort);
+  public final DashboardSubsystem dashboardSubsystem;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -172,6 +165,9 @@ public class RobotContainer {
             fieldRelative,
             openLoop));
 
+    dashboardSubsystem = new DashboardSubsystem(this);
+    dashboardSubsystem.initialize(this);
+
     // Configure the trigger bindings
     configureBindings();
   }
@@ -205,6 +201,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return Autos.exampleAuto(m_exampleSubsystem);
+    return new InstantCommand();
   }
 }
