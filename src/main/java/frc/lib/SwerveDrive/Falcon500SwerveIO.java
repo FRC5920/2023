@@ -114,7 +114,7 @@ public class Falcon500SwerveIO implements SwerveModuleIO {
 
   /** Gather loggable values from the module */
   @Override
-  public void updateLoggedInputs(SwerveModuleIOInputs inputs) {
+  public void updateLoggedInputs(SwerveModuleIOTelemetry inputs) {
     inputs.driveDistanceMeters = getDistance();
     inputs.driveSpeedMetersPerSecond = getSpeed();
     inputs.driveAppliedVolts = m_driveMotor.getMotorOutputVoltage();

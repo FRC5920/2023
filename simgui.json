@@ -2,8 +2,10 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Drive Train/Field": "Field2d",
       "/Shuffleboard/Drive/SendableChooser[0]": "String Chooser",
-      "/Shuffleboard/Drive/Speed Limit": "String Chooser"
+      "/Shuffleboard/Drive/Speed Limit": "String Chooser",
+      "/Shuffleboard/SwerveDrive/Field": "Field2d"
     }
   },
   "NetworkTables": {

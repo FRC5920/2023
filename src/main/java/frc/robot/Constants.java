@@ -173,28 +173,6 @@ public final class Constants {
     public static final NeutralMode angleNeutralMode = NeutralMode.Coast;
     public static final NeutralMode driveNeutralMode = NeutralMode.Brake;
 
-    /** Swerve module ID's */
-    public enum SwerveModuleID {
-      kFrontLeft(0),
-      kFrontRight(1),
-      kRearLeft(2),
-      kRearRight(3);
-
-      public final int value;
-
-      private SwerveModuleID(int id) {
-        value = id;
-      }
-
-      /**
-       * @return the human-readable name of the module ID
-       */
-      @Override
-      public String toString() {
-        return this.name();
-      }
-    };
-
     /* Module Specific Constants */
     /* Front Left Module - Module 0 */
     public static final class Mod0 { // TODO: This must be tuned to specific robot

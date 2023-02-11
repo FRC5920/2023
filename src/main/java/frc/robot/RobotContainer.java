@@ -61,8 +61,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.SwerveDrive.Falcon500SwerveIO;
 import frc.lib.SwerveDrive.SimSwerveModuleIO;
 import frc.lib.SwerveDrive.SwerveModuleIO;
-import frc.robot.Constants.SwerveDrivebaseConstants.SwerveModuleID;
-import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
@@ -150,10 +148,10 @@ public class RobotContainer {
 
     swerveSubsystem =
         new Swerve(
-            swerveModuleIO[SwerveModuleID.kFrontLeft.value],
-            swerveModuleIO[SwerveModuleID.kFrontRight.value],
-            swerveModuleIO[SwerveModuleID.kRearLeft.value],
-            swerveModuleIO[SwerveModuleID.kRearRight.value]);
+            swerveModuleIO[Swerve.ModuleId.kFrontLeft.value],
+            swerveModuleIO[Swerve.ModuleId.kFrontRight.value],
+            swerveModuleIO[Swerve.ModuleId.kRearLeft.value],
+            swerveModuleIO[Swerve.ModuleId.kRearRight.value]);
 
     swerveSubsystem.setDefaultCommand(
         new TeleopSwerve(

@@ -61,7 +61,8 @@ public class SwerveModule {
   private Rotation2d m_lastAngle;
 
   private SwerveModuleIO m_moduleIO;
-  private SwerveModuleIOInputsAutoLogged m_loggedInputs = new SwerveModuleIOInputsAutoLogged();
+  private SwerveModuleIOTelemetryAutoLogged m_loggedTelemetry =
+      new SwerveModuleIOTelemetryAutoLogged();
 
   public SwerveModule(
       int moduleNumber, SwerveModuleIO moduleIO) { // SwerveModuleConstants moduleConstants) {
@@ -111,6 +112,15 @@ public class SwerveModule {
 
   /** Update logged input values */
   public void updateLoggedInputs() {
-    m_moduleIO.updateLoggedInputs(m_loggedInputs);
+    m_moduleIO.updateLoggedInputs(m_loggedTelemetry);
+  }
+
+  /**
+   * Returns the module's telemetry values
+   *
+   * @return A SwerveModuleIOInputs object containing the module's telemetry values
+   */
+  public SwerveModuleIO.SwerveModuleIOTelemetry getIOTelemetry() {
+    return m_loggedTelemetry;
   }
 }

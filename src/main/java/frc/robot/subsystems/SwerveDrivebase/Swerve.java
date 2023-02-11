@@ -68,6 +68,29 @@ import frc.lib.SwerveDrive.SwerveModuleIO;
 import frc.robot.Constants;
 
 public class Swerve extends SubsystemBase {
+
+  /** Swerve module ID's */
+  public enum ModuleId {
+    kFrontLeft(0),
+    kFrontRight(1),
+    kRearLeft(2),
+    kRearRight(3);
+
+    public final int value;
+
+    private ModuleId(int id) {
+      value = id;
+    }
+
+    /**
+     * @return the human-readable name of the module ID
+     */
+    @Override
+    public String toString() {
+      return this.name().substring(1); // Strip 'k' prefix from name
+    }
+  };
+
   public SwerveDriveOdometry swerveOdometry;
   public SwerveModule[] mSwerveMods;
   public WPI_Pigeon2 gyro;
@@ -200,5 +223,9 @@ public class Swerve extends SubsystemBase {
       SmartDashboard.putNumber(
           "Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
     }
+  }
+
+  public SwerveModuleIO.SwerveModuleIOTelemetry getIOTelemetry(ModuleId module) {
+    return mSwerveMods[module.value].getIOTelemetry();
   }
 }

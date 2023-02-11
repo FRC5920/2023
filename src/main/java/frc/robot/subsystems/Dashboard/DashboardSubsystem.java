@@ -56,12 +56,13 @@ import frc.robot.RobotContainer;
 
 /** Dashboard subsystem that provides tabs on a Shuffleboard GUI */
 public class DashboardSubsystem extends SubsystemBase {
-  /** Drive train parameter tab */
-  private DriveSubsystemDashboardTab m_driveTrainTab;
+
+  /** Swerve drive tab */
+  private SwerveDashboardTab m_driveTrainTab;
 
   /** Creates a new Dashboard. */
   public DashboardSubsystem(RobotContainer botContainer) {
-    m_driveTrainTab = new DriveSubsystemDashboardTab();
+    m_driveTrainTab = new SwerveDashboardTab();
   }
 
   public void initialize(RobotContainer botContainer) {

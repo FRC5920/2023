@@ -96,7 +96,7 @@ public class SimSwerveModuleIO implements SwerveModuleIO {
   private double m_angleMotorAppliedVolts = 0.0;
 
   /** Updates the set of loggable inputs */
-  public void updateLoggedInputs(SwerveModuleIOInputs inputs) {
+  public void updateLoggedInputs(SwerveModuleIOTelemetry inputs) {
     m_simDriveMotor.update(Constants.robotPeriodSec);
     m_simAngleMotor.update(Constants.robotPeriodSec);
 

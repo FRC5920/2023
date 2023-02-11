@@ -64,7 +64,7 @@ import org.littletonrobotics.junction.AutoLog;
 public interface SwerveModuleIO {
 
   @AutoLog
-  public static class SwerveModuleIOInputs {
+  public static class SwerveModuleIOTelemetry {
     public double driveSpeedMetersPerSecond = 0.0;
     public double driveDistanceMeters = 0.0;
     public double driveAppliedVolts = 0.0;
@@ -80,7 +80,7 @@ public interface SwerveModuleIO {
   }
 
   /** Updates the set of loggable inputs */
-  public void updateLoggedInputs(SwerveModuleIOInputs inputs);
+  public void updateLoggedInputs(SwerveModuleIOTelemetry inputs);
 
   /**
    * Set the desired speed of the module
