@@ -51,13 +51,8 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot;
 
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.SwerveDrive.Falcon500SwerveIO;
 import frc.lib.SwerveDrive.SimSwerveModuleIO;
 import frc.lib.SwerveDrive.SwerveModuleIO;
@@ -74,25 +69,10 @@ import frc.robot.subsystems.runtimeState.BotStateSubsystem;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  /* Controllers */
-  // private final CommandXboxController driver = new
-  // CommandXboxController(DriverConstants.kControllerPort);
-  private final Joystick driver = new Joystick(0);
-
-  /* Drive Controls */
-  private final int translationAxis = XboxController.Axis.kLeftY.value;
-  private final int strafeAxis = XboxController.Axis.kLeftX.value;
-  private final int rotationAxis = XboxController.Axis.kRightX.value;
-
-  /* Driver Buttons */
-  private final JoystickButton zeroGyro =
-      new JoystickButton(driver, XboxController.Button.kY.value);
-
   // --------------------- Robot Subsystems ----------------------------
   public final JoystickSubsystem joystickSubsystem = new JoystickSubsystem();
   public final Swerve swerveSubsystem;
   public final BotStateSubsystem s_BotState = new BotStateSubsystem();
-  /* Dashboard Subsystems */
   public final DashboardSubsystem dashboardSubsystem;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -154,42 +134,13 @@ public class RobotContainer {
             swerveModuleIO[Swerve.ModuleId.kRearRight.value]);
 
     swerveSubsystem.setDefaultCommand(
-        new TeleopSwerve(
-            swerveSubsystem,
-            driver,
-            translationAxis,
-            strafeAxis,
-            rotationAxis,
-            fieldRelative,
-            openLoop));
+        new TeleopSwerve(swerveSubsystem, joystickSubsystem, fieldRelative, openLoop));
 
     dashboardSubsystem = new DashboardSubsystem(this);
     dashboardSubsystem.initialize(this);
 
-    // Configure the trigger bindings
-    configureBindings();
-  }
-
-  /**
-   * Use this method to define your trigger->command mappings. Triggers can be created via the
-   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
-   * predicate, or via the named factories in {@link
-   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
-   * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-   * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-   * joysticks}.
-   */
-  private void configureBindings() {
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    // new Trigger(m_exampleSubsystem::exampleCondition)
-    //    .onTrue(new ExampleCommand(m_exampleSubsystem));
-
-    // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
-    // cancelling on release.
-    // m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
-    /* Driver Buttons */
-
-    zeroGyro.onTrue(new InstantCommand(() -> swerveSubsystem.zeroGyro()));
+    // Configure joystick button bindings
+    joystickSubsystem.configureButtonBindings(this);
   }
 
   /**

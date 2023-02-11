@@ -52,13 +52,18 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
+import frc.lib.Joystick.ProcessedXboxController;
+import frc.robot.subsystems.JoystickSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 
 public class TeleopSwerve extends CommandBase {
+  /* Drive Controls */
+  private final int translationAxis = XboxController.Axis.kLeftY.value;
+  private final int strafeAxis = XboxController.Axis.kLeftX.value;
+  private final int rotationAxis = XboxController.Axis.kRightX.value;
 
   private double rotation;
   private Translation2d translation;
@@ -66,27 +71,18 @@ public class TeleopSwerve extends CommandBase {
   private boolean openLoop;
 
   private Swerve s_Swerve;
-  private Joystick controller;
-  private int translationAxis;
-  private int strafeAxis;
-  private int rotationAxis;
+  private ProcessedXboxController controller;
 
   /** Driver control */
   public TeleopSwerve(
       Swerve s_Swerve,
-      Joystick controller,
-      int translationAxis,
-      int strafeAxis,
-      int rotationAxis,
+      JoystickSubsystem joystickSubsystem,
       boolean fieldRelative,
       boolean openLoop) {
     this.s_Swerve = s_Swerve;
     addRequirements(s_Swerve);
 
-    this.controller = controller;
-    this.translationAxis = translationAxis;
-    this.strafeAxis = strafeAxis;
-    this.rotationAxis = rotationAxis;
+    this.controller = joystickSubsystem.driverController;
     this.fieldRelative = fieldRelative;
     this.openLoop = openLoop;
   }
@@ -96,11 +92,6 @@ public class TeleopSwerve extends CommandBase {
     double yAxis = -controller.getRawAxis(translationAxis);
     double xAxis = -controller.getRawAxis(strafeAxis);
     double rAxis = -controller.getRawAxis(rotationAxis);
-
-    /* Deadbands */
-    yAxis = (Math.abs(yAxis) < Constants.DriverConstants.stickDeadband) ? 0 : yAxis;
-    xAxis = (Math.abs(xAxis) < Constants.DriverConstants.stickDeadband) ? 0 : xAxis;
-    rAxis = (Math.abs(rAxis) < Constants.DriverConstants.stickDeadband) ? 0 : rAxis;
 
     translation = new Translation2d(yAxis, xAxis).times(BotStateSubsystem.MaxSpeed);
     rotation = rAxis * BotStateSubsystem.MaxRotate;

@@ -145,11 +145,12 @@ public class JoystickSubsystem extends SubsystemBase {
    * @param botContainer Object providing access to robot subsystems
    */
   public void configureButtonBindings(RobotContainer botContainer) {
+
     // Map buttons on driver controller
     driverController.A.onTrue(new InstantCommand(this::doNothing, this));
     driverController.B.onTrue(new InstantCommand(this::doNothing, this));
     driverController.X.onTrue(new InstantCommand(this::doNothing, this));
-    driverController.Y.onTrue(new InstantCommand(this::doNothing, this));
+    driverController.Y.onTrue(new InstantCommand(() -> botContainer.swerveSubsystem.zeroGyro()));
     driverController.leftBumper.whileTrue(new InstantCommand(this::doNothing, this));
     driverController.rightBumper.whileTrue(new InstantCommand(this::doNothing, this));
     driverController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
