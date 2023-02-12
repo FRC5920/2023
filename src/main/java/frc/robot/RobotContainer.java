@@ -54,6 +54,9 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.lib.SwerveDrive.Falcon500SwerveIO;
+import frc.lib.SwerveDrive.GyroIO;
+import frc.lib.SwerveDrive.Pigeon2GyroIO;
+import frc.lib.SwerveDrive.SimGyroIO;
 import frc.lib.SwerveDrive.SimSwerveModuleIO;
 import frc.lib.SwerveDrive.SwerveModuleIO;
 import frc.robot.commands.*;
@@ -80,10 +83,12 @@ public class RobotContainer {
     boolean fieldRelative = true;
     boolean openLoop = true;
     SwerveModuleIO swerveModuleIO[];
+    GyroIO gyroIO;
 
     // Instantiate active subsystems
     switch (Constants.getMode()) {
       case REAL:
+        gyroIO = new Pigeon2GyroIO(Constants.SwerveDrivebaseConstants.pigeonID, "SwerveCAN");
         swerveModuleIO =
             new SwerveModuleIO[] {
               new Falcon500SwerveIO(
@@ -116,6 +121,7 @@ public class RobotContainer {
       case SIM:
       case REPLAY:
       default:
+        gyroIO = new SimGyroIO();
         swerveModuleIO =
             new SwerveModuleIO[] {
               new SimSwerveModuleIO(),
@@ -128,6 +134,9 @@ public class RobotContainer {
 
     swerveSubsystem =
         new Swerve(
+            Constants.SwerveDrivebaseConstants.trackWidth,
+            Constants.SwerveDrivebaseConstants.wheelBase,
+            gyroIO,
             swerveModuleIO[Swerve.ModuleId.kFrontLeft.value],
             swerveModuleIO[Swerve.ModuleId.kFrontRight.value],
             swerveModuleIO[Swerve.ModuleId.kRearLeft.value],
