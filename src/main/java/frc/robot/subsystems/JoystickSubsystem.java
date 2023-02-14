@@ -195,7 +195,7 @@ public class JoystickSubsystem extends SubsystemBase {
     operatorController.B.onTrue(new PickUpCube(botContainer.s_Arm));
     operatorController.X.onTrue(
         new PlaceObject(
-            botContainer.s_Arm, botContainer.s_BotState.storedGamePiece, Arm.Rank.Medium));
+            botContainer.s_Arm, botContainer.s_BotState.storedGamePiece, Arm.Rank.Medium, Arm.ArmExtenderPosition.MiddleRank));
     operatorController.Y.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.leftBumper.whileTrue(new InstantCommand(this::doNothing, this));
     operatorController.rightBumper.whileTrue(new InstantCommand(this::doNothing, this));
@@ -205,9 +205,9 @@ public class JoystickSubsystem extends SubsystemBase {
     operatorController.start.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.dPadUp.onTrue(
         new PlaceObject(
-            botContainer.s_Arm, botContainer.s_BotState.storedGamePiece, Arm.Rank.High));
+            botContainer.s_Arm, botContainer.s_BotState.storedGamePiece, Arm.Rank.High, Arm.ArmExtenderPosition.TopRank));
     operatorController.dPadDown.onTrue(
-        new PlaceObject(botContainer.s_Arm, botContainer.s_BotState.storedGamePiece, Arm.Rank.Low));
+        new PlaceObject(botContainer.s_Arm, botContainer.s_BotState.storedGamePiece, Arm.Rank.Low, Arm.ArmExtenderPosition.OnFloor));
   }
 
   @Override

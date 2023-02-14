@@ -57,7 +57,9 @@ import frc.robot.subsystems.Arm.Arm;
 public class Reach extends CommandBase {
   /** Creates a new ExtendArmToRank. */
   private Arm.Rank ReachTo;
-  public Reach(Arm.Rank ReachWhere) {
+  private Arm.ArmExtenderPosition ReachDistance;
+  Boolean isDone = false;
+  public Reach(Arm.Rank ReachWhere, Arm.ArmExtenderPosition ReachHowFar) {
     // Use addRequirements() here to declare subsystem dependencies.
     ReachTo = ReachWhere;
   }
@@ -65,12 +67,15 @@ public class Reach extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    Arm.setArmPosition(ReachTo.getEncoderCount());
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    Arm.setArmPosition(ReachTo.getEncoderCount());
+    Arm.setArmExtension(ReachDistance);
+    isDone = true;
+  }
 
   // Called once the command ends or is interrupted.
   @Override
@@ -79,6 +84,6 @@ public class Reach extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return isDone;
   }
 }

@@ -52,6 +52,7 @@
 package frc.robot.commands.Arm;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.Arm.Arm;
 
 public class Retract extends CommandBase {
   /** Creates a new Retract. */
@@ -65,7 +66,10 @@ public class Retract extends CommandBase {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    Arm.setArmPosition(Arm.Rank.InRobot.getEncoderCount());
+    Arm.setArmExtension(Arm.ArmExtenderPosition.StowedAway);
+  }
 
   // Called once the command ends or is interrupted.
   @Override

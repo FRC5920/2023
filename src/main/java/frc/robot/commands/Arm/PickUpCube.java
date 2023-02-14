@@ -63,6 +63,6 @@ public class PickUpCube extends SequentialCommandGroup {
     addRequirements(armSubsystem);
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
-    addCommands(new Reach(Arm.Rank.PickUp), new Intake(Arm.GamePieceType.Cube), new Retract());
+    addCommands(new Reach(Arm.Rank.PickUp, Arm.ArmExtenderPosition.OnFloor), new Intake(Arm.GamePieceType.Cube), new Retract());
   }
 }

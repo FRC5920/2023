@@ -59,10 +59,10 @@ import frc.robot.subsystems.Arm.Arm;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class PlaceObject extends SequentialCommandGroup {
   /** Creates a new PlaceCube. */
-  public PlaceObject(Arm armSubsystem, Arm.GamePieceType PlaceWhat, Arm.Rank PlaceWhere) {
+  public PlaceObject(Arm armSubsystem, Arm.GamePieceType PlaceWhat, Arm.Rank PlaceWhere, Arm.ArmExtenderPosition PlaceHowFar) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addRequirements(armSubsystem);
-    addCommands(new Reach(PlaceWhere), new Drop(PlaceWhat), new Retract());
+    addCommands(new Reach(PlaceWhere, PlaceHowFar), new Drop(PlaceWhat), new Retract());
   }
 }
