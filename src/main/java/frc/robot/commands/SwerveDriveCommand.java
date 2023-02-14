@@ -51,59 +51,83 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.commands;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
-import frc.robot.subsystems.SwerveDrivebase.Swerve;
-import frc.robot.subsystems.runtimeState.BotStateSubsystem;
+import frc.robot.subsystems.SwerveDrive.SwerveSubsystem;
+import java.util.function.Supplier;
 
-public class TeleopSwerve extends CommandBase {
+public class SwerveDriveCommand extends CommandBase {
 
-  private double rotation;
-  private Translation2d translation;
-  private boolean fieldRelative;
-  private boolean openLoop;
+  private final SwerveSubsystem swerveSubsystem;
+  private final Supplier<Double> strafeSpdFunction, forwardSpdFunction, turningSpdFunction;
+  private final Supplier<Boolean> fieldOrientedFunction;
 
-  private Swerve s_Swerve;
-  private Joystick controller;
-  private int translationAxis;
-  private int strafeAxis;
-  private int rotationAxis;
-
-  /** Driver control */
-  public TeleopSwerve(
-      Swerve s_Swerve,
-      Joystick controller,
-      int translationAxis,
-      int strafeAxis,
-      int rotationAxis,
-      boolean fieldRelative,
-      boolean openLoop) {
-    this.s_Swerve = s_Swerve;
-    addRequirements(s_Swerve);
-
-    this.controller = controller;
-    this.translationAxis = translationAxis;
-    this.strafeAxis = strafeAxis;
-    this.rotationAxis = rotationAxis;
-    this.fieldRelative = fieldRelative;
-    this.openLoop = openLoop;
+  public SwerveDriveCommand(
+      SwerveSubsystem swerveSubsystem,
+      Supplier<Double> strafeSpdFunction,
+      Supplier<Double> forwardSpdFunction,
+      Supplier<Double> turningSpdFunction,
+      Supplier<Boolean> fieldOrientedFunction) {
+    this.swerveSubsystem = swerveSubsystem;
+    this.strafeSpdFunction = strafeSpdFunction;
+    this.forwardSpdFunction = forwardSpdFunction;
+    this.turningSpdFunction = turningSpdFunction;
+    this.fieldOrientedFunction = fieldOrientedFunction;
+    addRequirements(swerveSubsystem);
   }
 
   @Override
+  public void initialize() {}
+
+  @Override
   public void execute() {
-    double yAxis = -controller.getRawAxis(translationAxis);
-    double xAxis = -controller.getRawAxis(strafeAxis);
-    double rAxis = -controller.getRawAxis(rotationAxis);
+    // 1. Get real-time joystick inputs
+    double strafe = strafeSpdFunction.get();
+    double forward = forwardSpdFunction.get();
+    double turningSpeed = turningSpdFunction.get();
 
-    /* Deadbands */
-    yAxis = (Math.abs(yAxis) < Constants.DriverConstants.stickDeadband) ? 0 : yAxis;
-    xAxis = (Math.abs(xAxis) < Constants.DriverConstants.stickDeadband) ? 0 : xAxis;
-    rAxis = (Math.abs(rAxis) < Constants.DriverConstants.stickDeadband) ? 0 : rAxis;
+    swerveSubsystem.drive(forward, strafe, turningSpeed, !fieldOrientedFunction.get());
+    /*
 
-    translation = new Translation2d(yAxis, xAxis).times(BotStateSubsystem.MaxSpeed);
-    rotation = rAxis * BotStateSubsystem.MaxRotate;
-    s_Swerve.drive(translation, rotation, fieldRelative, openLoop);
+
+    // 2. Apply deadband/Dead-Zone
+    xSpeed = Math.abs(xSpeed) > OIConstants.kDeadband ? xSpeed : 0.0;
+    ySpeed = Math.abs(ySpeed) > OIConstants.kDeadband ? ySpeed : 0.0;
+    turningSpeed = Math.abs(turningSpeed) > OIConstants.kDeadband ? turningSpeed : 0.0;
+
+    // 3. Make the driving smoother
+    xSpeed = xLimiter.calculate(xSpeed) * DriveConstants.kTeleDriveMaxSpeedMetersPerSecond;
+    ySpeed = yLimiter.calculate(ySpeed) * DriveConstants.kTeleDriveMaxSpeedMetersPerSecond;
+    turningSpeed = turningLimiter.calculate(turningSpeed) * DriveConstants.kTeleDriveMaxAngularSpeedRadiansPerSecond;
+
+    // 4. Construct desired chassis speeds
+    ChassisSpeeds chassisSpeeds;
+    if ()
+    {
+      // Relative to field
+      chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, turningSpeed,
+                                                            swerveSubsystem.getRotation2d());
+    } else
+    {
+      // Relative to robot
+      chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, turningSpeed);
+    }
+
+    // 5. Convert chassis speeds to individual module states
+    SwerveModuleState[] moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
+
+    // 6. Output each module states to wheels
+    swerveSubsystem.setModuleStates(moduleStates);
+
+     */
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+    swerveSubsystem.stop();
+  }
+
+  @Override
+  public boolean isFinished() {
+    return false;
   }
 }

@@ -75,6 +75,8 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  * project.
  */
 public class Robot extends LoggedRobot {
+  private static Robot s_instance;
+
   public static CTREConfigs ctreConfigs;
 
   /** Alert displayed when no log path is set up */
@@ -100,6 +102,20 @@ public class Robot extends LoggedRobot {
   // DoublePublisher xPub;
   // DoubleSubscriber xSub;
   // double x = 0;
+
+  /** Robot constructor */
+  public Robot() {
+    s_instance = this;
+  }
+
+  /**
+   * Robot getInstance(), should have been implemented in TimedRobot but isnt.
+   *
+   * @return Robot instance.
+   */
+  public static Robot getInstance() {
+    return s_instance;
+  }
 
   // GenericEntry maxSpeed = tab.add("Speed Limit", 1).getEntry();
   /**
