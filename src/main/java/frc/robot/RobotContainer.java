@@ -51,7 +51,6 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot;
 
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -71,10 +70,6 @@ import frc.robot.subsystems.runtimeState.BotStateSubsystem;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  /* Drive Controls */
-  private final int translationAxis = XboxController.Axis.kLeftY.value;
-  private final int strafeAxis = XboxController.Axis.kLeftX.value;
-  private final int rotationAxis = XboxController.Axis.kRightX.value;
 
   // --------------------- Robot Subsystems ----------------------------
   public final JoystickSubsystem joystickSubsystem = new JoystickSubsystem();
@@ -99,13 +94,7 @@ public class RobotContainer {
     boolean openLoop = true;
     swerveSubsystem.setDefaultCommand(
         new TeleopSwerve(
-            swerveSubsystem,
-            joystickSubsystem.driverController,
-            translationAxis,
-            strafeAxis,
-            rotationAxis,
-            fieldRelative,
-            openLoop));
+            swerveSubsystem, joystickSubsystem.driverController, fieldRelative, openLoop));
 
     // Configure the trigger bindings
     configureBindings();

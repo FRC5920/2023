@@ -52,6 +52,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.Constants;
@@ -67,26 +68,21 @@ public class TeleopSwerve extends CommandBase {
 
   private Swerve s_Swerve;
   private ProcessedXboxController controller;
-  private int translationAxis;
-  private int strafeAxis;
-  private int rotationAxis;
+  private final int translationAxis = XboxController.Axis.kLeftY.value;
+  private final int strafeAxis = XboxController.Axis.kLeftX.value;
+  private final int rotationAxis = XboxController.Axis.kRightX.value;
 
   /** Driver control */
   public TeleopSwerve(
       Swerve s_Swerve,
       ProcessedXboxController controller,
-      int translationAxis,
-      int strafeAxis,
-      int rotationAxis,
       boolean fieldRelative,
       boolean openLoop) {
+
     this.s_Swerve = s_Swerve;
     addRequirements(s_Swerve);
 
     this.controller = controller;
-    this.translationAxis = translationAxis;
-    this.strafeAxis = strafeAxis;
-    this.rotationAxis = rotationAxis;
     this.fieldRelative = fieldRelative;
     this.openLoop = openLoop;
   }

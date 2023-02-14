@@ -58,6 +58,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.Joystick.AxisProcChain;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.Arm.Arm;
 
 /** A subsystem providing/managing Xbox controllers for driving the robot manually */
 public class JoystickSubsystem extends SubsystemBase {
@@ -93,6 +94,9 @@ public class JoystickSubsystem extends SubsystemBase {
 
   /** Xbox controller used by the robot operator */
   public ProcessedXboxController operatorController;
+
+  /** Handle to the Arm subsystem */
+  Arm m_armSubsystem;
 
   /** Creates a new JoystickSubsystem */
   public JoystickSubsystem() {
@@ -144,6 +148,8 @@ public class JoystickSubsystem extends SubsystemBase {
    * @param botContainer Object providing access to robot subsystems
    */
   public void configureButtonBindings(RobotContainer botContainer) {
+    m_armSubsystem = botContainer.s_Arm;
+
     // Map buttons on driver controller
     driverController.A.onTrue(new InstantCommand(this::doNothing, this));
     driverController.B.onTrue(new InstantCommand(this::doNothing, this));
@@ -162,7 +168,11 @@ public class JoystickSubsystem extends SubsystemBase {
     operatorController.X.onTrue(new InstantCommand());
     operatorController.Y.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.leftBumper.whileTrue(new InstantCommand(this::doNothing, this));
-    operatorController.rightBumper.whileTrue(new InstantCommand(this::doNothing, this));
+    operatorController.rightBumper.whileTrue(
+        new InstantCommand(
+            () -> {
+              m_armSubsystem.toggleWristPosition();
+            }));
     operatorController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.back.onTrue(new InstantCommand(this::doNothing, this));
@@ -173,7 +183,18 @@ public class JoystickSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    m_armSubsystem.runAngleMotor(operatorController.getLeftY());
+    m_armSubsystem.runExtenderMotor(operatorController.getRightY());
+
+    // Run the intake motors
+    double intakePercent = 0.0;
+    if (operatorController.getLeftTriggerAxis() != 0) {
+      intakePercent = 1.0;
+    } else if (operatorController.getRightTriggerAxis() != 0) {
+      intakePercent = -1.0;
+    }
+
+    m_armSubsystem.runIntakeMotor(1.0);
   }
 
   /** Placeholder used for empty commands mapped to joystick */

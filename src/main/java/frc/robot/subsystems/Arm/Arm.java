@@ -167,6 +167,34 @@ public class Arm extends SubsystemBase {
     // TODO: Set up PID control here
   }
 
+  public void runAngleMotor(double percent) {
+    ArmYMotorMaster.set(percent * 0.2); // Set max output to 20% for slow motion
+  }
+
+  public void runExtenderMotor(double percent) {
+    ArmExtender.set(percent * 0.2); // Set max output to 20% for slow motion
+  }
+
+  public void runIntakeMotor(double percent) {
+    double motorSpeedPercent = 0.0;
+    if (percent > 0) {
+      motorSpeedPercent = m_dashboardInputs.intakeCargoMotorSpeed;
+    } else if (percent < 0) {
+      motorSpeedPercent = m_dashboardInputs.placeCargoMotorSpeed;
+    }
+
+    HandBottomRoller.set(motorSpeedPercent);
+    HandTopBackRoller.set(motorSpeedPercent);
+  }
+
+  public void toggleWristPosition() {
+    Pneumatics.WristPosition position =
+        myPneumatics.getWristPosition() == WristPosition.Normal
+            ? WristPosition.Inverted
+            : WristPosition.Normal;
+    myPneumatics.setWristPosition(position);
+  }
+
   public void setArmPosition(int desiredPosition) {
     if (desiredPosition >= Constants.ArmConstants.kArmExtendedHigh) {
       myPneumatics.goingBackward();
@@ -206,11 +234,11 @@ public class Arm extends SubsystemBase {
     HandBottomRoller.set(0);
   }
 
-  public void armForward() {
+  public void armForward(double percentOutput) {
     ArmYMotorMaster.set(ControlMode.PercentOutput, 1);
   }
 
-  public void armBackward() {
+  public void armBackward(double percentOutput) {
     ArmYMotorMaster.set(ControlMode.PercentOutput, -1);
   }
 
