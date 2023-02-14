@@ -194,7 +194,7 @@ public class JoystickSubsystem extends SubsystemBase {
       intakePercent = -1.0;
     }
 
-    m_armSubsystem.runIntakeMotor(1.0);
+    m_armSubsystem.runIntakeMotor(intakePercent);
   }
 
   /** Placeholder used for empty commands mapped to joystick */
