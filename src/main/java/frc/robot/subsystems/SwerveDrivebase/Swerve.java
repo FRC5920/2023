@@ -54,11 +54,13 @@ package frc.robot.subsystems.SwerveDrivebase;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.SwerveDrive.GyroIO;
@@ -79,6 +81,9 @@ public class Swerve extends SubsystemBase {
   private final SwerveModule[] mSwerveMods;
   private final GyroInputsAutoLogged m_gyroMeasurements;
   private final GyroIO m_gyroIO;
+
+  /** Pose used during simulation */
+  private Pose2d simOdometryPose = new Pose2d();
 
   /**
    * Creates an instance of the swerve module
@@ -172,7 +177,7 @@ public class Swerve extends SubsystemBase {
 
   /** Returns the present pose */
   public Pose2d getPose() {
-    return swerveOdometry.getPoseMeters();
+    return (RobotBase.isReal()) ? swerveOdometry.getPoseMeters() : simOdometryPose;
   }
 
   /** Resets odometry */
@@ -237,6 +242,23 @@ public class Swerve extends SubsystemBase {
     }
 
     swerveOdometry.update(getYaw(), getModulePositions());
+
+    if (RobotBase.isSimulation()) {
+      SwerveModuleState[] measuredStates =
+          new SwerveModuleState[] {
+            mSwerveMods[ModuleId.kFrontLeft.value].getState(),
+            mSwerveMods[ModuleId.kFrontRight.value].getState(),
+            mSwerveMods[ModuleId.kRearLeft.value].getState(),
+            mSwerveMods[ModuleId.kFrontLeft.value].getState()
+          };
+      ChassisSpeeds speeds = swerveKinematics.toChassisSpeeds(measuredStates);
+      simOdometryPose =
+          simOdometryPose.exp(
+              new Twist2d(
+                  speeds.vxMetersPerSecond * .02,
+                  speeds.vyMetersPerSecond * .02,
+                  speeds.omegaRadiansPerSecond * .02));
+    }
 
     /*
     SmartDashboard.putNumber("Gyro", getYaw());
