@@ -127,6 +127,7 @@ public final class Constants {
     public static final double kArmYI = 0;
     public static final double kArmYD = 0;
     public static final double kArmYIz = 0;
+    public static final long kDropRollerWaitTime = 5;
   }
 
   public static class DriverConstants {

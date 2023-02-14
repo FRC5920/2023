@@ -58,6 +58,8 @@ import frc.robot.subsystems.Arm.Arm.DoWhatWithGamePiece;
 public class Intake extends CommandBase {
   /** Creates a new Intake. */
   private Arm.GamePieceType gamePiece;
+  private boolean isDone = false;
+
   public Intake(Arm.GamePieceType IntakeWhat) {
     // Use addRequirements() here to declare subsystem dependencies.
     gamePiece = IntakeWhat;
@@ -82,6 +84,6 @@ public class Intake extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return isDone;
   }
 }
