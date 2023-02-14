@@ -51,76 +51,83 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.subsystems.Arm;
 
-import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import frc.robot.subsystems.Arm.Arm.ArmSubsystemDashboardInputs;
+import frc.robot.subsystems.Arm.Arm.ArmSubsystemDashboardOutputs;
 
-import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.PneumaticHub;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+/** Dashboard tab for tuning the Arm subsystem */
+public class ArmDashboardTab {
+  /** The dashboard tab */
+  private ShuffleboardTab m_tab;
 
-public class Pneumatics extends SubsystemBase {
+  /** Measurements populated by the subsystem */
+  private final ArmSubsystemDashboardOutputs m_measurements;
 
-  /** Double-valve positions */
-  public enum WristPosition {
-    /** Normal position */
-    Normal(DoubleSolenoid.Value.kForward),
+  /** NetworkTables entry used to reset the angle encoder */
+  private GenericEntry m_angleZero;
 
-    /** Wrist inverted */
-    Inverted(DoubleSolenoid.Value.kReverse);
+  /** Create an instance of the tab */
+  public ArmDashboardTab(ArmSubsystemDashboardOutputs measurements) {
+    m_measurements = measurements;
+  }
 
-    public DoubleSolenoid.Value value;
+  /** Called to initialize the dashboard tab */
+  public void initialize() {
+    m_tab = Shuffleboard.getTab("Arm Subsystem");
 
-    private WristPosition(DoubleSolenoid.Value val) {
-      value = val;
+    // Height of subpanels
+    final int kSubPanelHeight = 6;
+
+    // Width of subpanels
+    final int kSubPanelWidth = 6;
+
+    // Create Angle subpanel
+    ShuffleboardLayout angleLayout = m_tab.getLayout("Angle Motor", BuiltInLayouts.kGrid);
+    angleLayout.withSize(kSubPanelWidth, kSubPanelHeight).withPosition(0, 0);
+
+    try {
+      // Set up a widget to display the encoder count
+      angleLayout
+          .addDouble(
+              "Encoder",
+              () -> {
+                return m_measurements.angleEncoderCount;
+              })
+          .withWidget(BuiltInWidgets.kTextView)
+          .withPosition(0, 0);
+
+      // Set up a widget to display the angle in degrees
+      angleLayout
+          .addDouble(
+              "Degrees",
+              () -> {
+                return m_measurements.angleDegrees;
+              })
+          .withWidget(BuiltInWidgets.kTextView)
+          .withPosition(0, 0);
+
+      // Set up a widget for resetting the encoders
+      m_angleZero =
+          angleLayout
+              .add("Zero Encoder", false)
+              .withWidget(BuiltInWidgets.kBooleanBox)
+              .withPosition(0, 2)
+              .getEntry();
+
+    } catch (IllegalArgumentException e) {
+      DriverStation.reportError(
+          "Failed to configure Arm Subsystem angle panel: " + e.getMessage(), false);
     }
-
-    /** Get the human-readable name of the position */
-    @Override
-    public String toString() {
-      return this.name();
-    }
-  };
-
-  /** Creates a new Pneumatics. */
-  Compressor phCompressor = new Compressor(1, PneumaticsModuleType.REVPH);
-
-  boolean enabled = phCompressor.isEnabled();
-  boolean pressureSwitch = phCompressor.getPressureSwitchValue();
-  // double currentCompressor = phCompressor.getCompressorCurrent();
-  PneumaticHub m_PHub = new PneumaticHub(Constants.PneumaticsConstants.kPDHCAN);
-  private final DoubleSolenoid m_PWrist =
-      new DoubleSolenoid(
-          PneumaticsModuleType.REVPH,
-          Constants.PneumaticsConstants.kArmLeftRotatorPort,
-          Constants.PneumaticsConstants.kArmRightRotatorPort);
-
-  public Pneumatics() {
-    phCompressor.enableDigital();
-    m_PWrist.set(kOff);
   }
 
-  public void goingForward() {
-    m_PWrist.set(kForward);
-  }
-
-  public void goingBackward() {
-    m_PWrist.set(kReverse);
-  }
-
-  // Sets the desired wrist position
-  public void setWristPosition(WristPosition pos) {
-    m_PWrist.set(pos.value);
-  }
-
-  // Returns the present wrist position
-  public WristPosition getWristPosition() {
-    return (m_PWrist.get() == kForward) ? WristPosition.Normal : WristPosition.Inverted;
-  }
-
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
+  /** Updates dashboard widgets with subsystem measurements */
+  public void update(ArmSubsystemDashboardInputs inputs) {
+    inputs.zeroAngleEncoder = m_angleZero.getBoolean(false);
   }
 }
