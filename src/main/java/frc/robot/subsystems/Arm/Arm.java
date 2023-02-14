@@ -57,6 +57,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.Arm.Pneumatics.WristPosition;
 
 public class Arm extends SubsystemBase {
   /** Creates a new Arm. */
@@ -74,13 +75,12 @@ public class Arm extends SubsystemBase {
   private final double HandRollerSpeed = 0.5;
 
   /** Dashboard tab for the Arm subsystem */
-  private final ArmDashboardTab m_ArmDashboardTab;
+  private final ArmDashboardTab m_armDashboardTab;
   /** Output values displayed on the dashboard */
   private final ArmSubsystemDashboardOutputs m_dashboardOutputs =
       new ArmSubsystemDashboardOutputs();
   /** History of input values received from the dashboard: 0=current; 1=previous */
-  private final ArmSubsystemDashboardInputs m_dashboardInputHistory[] =
-      new ArmSubsystemDashboardInputs[2];
+  private final ArmSubsystemDashboardInputs m_dashboardInputs = new ArmSubsystemDashboardInputs();
 
   /** Measurements gathered in the Arm subsystem */
   public class ArmSubsystemDashboardOutputs {
@@ -95,7 +95,7 @@ public class Arm extends SubsystemBase {
     double extenderPositionMeters = 0.0;
 
     /** true when the wrist is in the inverted position; else false */
-    boolean wristIsInverted = false;
+    WristPosition wristPosition = WristPosition.Normal;
 
     /** Motor current measurement (Amperes) from the top intake motor */
     double upperIntakeCurrentAmps = 0.0;
@@ -105,12 +105,6 @@ public class Arm extends SubsystemBase {
   }
 
   public class ArmSubsystemDashboardInputs {
-    /** Dashboard sets this to true to signal that the angle encoder should be reset */
-    boolean zeroAngleEncoder = false;
-
-    /** Dashboard sets this to true to signal that the extender encoder should be reset */
-    boolean zeroExtenderEncoder = false;
-
     /** Gives the speed to run intake motors at when taking in cargo */
     double intakeCargoMotorSpeed = 0.0;
 
@@ -138,7 +132,7 @@ public class Arm extends SubsystemBase {
   public Arm(Pneumatics s_Pneumatics) {
     this.myPneumatics = s_Pneumatics;
     configurePID();
-    m_ArmDashboardTab = new ArmDashboardTab(m_dashboardOutputs);
+    m_armDashboardTab = new ArmDashboardTab(m_dashboardOutputs);
   }
 
   private void configurePID() {
@@ -184,22 +178,25 @@ public class Arm extends SubsystemBase {
   }
 
   public void spinAllHandRollers(GamePieceType pickUpWhat, DoWhatWithGamePiece desiredHandAction) {
-    double HandBottomRollerSpeedPercent = HandRollerSpeed;
+    double intakeSpeed = m_dashboardInputs.intakeCargoMotorSpeed;
+    double HandBottomRollerSpeedPercent = intakeSpeed;
     double HandTopBackRollerSpeedPercent = 0.0;
     switch (pickUpWhat) {
       case Cone:
-        HandTopBackRollerSpeedPercent = HandRollerSpeed;
+        HandTopBackRollerSpeedPercent = intakeSpeed;
         break;
       case Cube:
-        HandTopBackRollerSpeedPercent = -1 * HandRollerSpeed;
+        HandTopBackRollerSpeedPercent = -1 * intakeSpeed;
         break;
       default:
         break;
     }
     if (desiredHandAction == DoWhatWithGamePiece.Out) {
-      HandBottomRollerSpeedPercent *= -1;
-      HandTopBackRollerSpeedPercent *= -1;
+      double placementSpeed = m_dashboardInputs.placeCargoMotorSpeed;
+      HandBottomRollerSpeedPercent = -1 * placementSpeed;
+      HandTopBackRollerSpeedPercent = -1 * placementSpeed;
     }
+
     HandBottomRoller.set(HandBottomRollerSpeedPercent);
     HandTopBackRoller.set(HandTopBackRollerSpeedPercent);
   }
@@ -237,6 +234,10 @@ public class Arm extends SubsystemBase {
     return encoderCount;
   }
 
+  public void initDashboard() {
+    m_armDashboardTab.initialize();
+  }
+
   @Override
   public void periodic() {
     // Update measurements
@@ -245,24 +246,11 @@ public class Arm extends SubsystemBase {
     m_dashboardOutputs.extenderEncoderCount = ArmExtender.getSelectedSensorPosition();
     m_dashboardOutputs.extenderPositionMeters =
         extenderEncoderToDegrees(m_dashboardOutputs.extenderEncoderCount);
-    m_dashboardOutputs.wristIsInverted =
-        (myPneumatics.getWristPosition() == Pneumatics.WristPosition.Inverted);
+    m_dashboardOutputs.wristPosition = myPneumatics.getWristPosition();
     m_dashboardOutputs.lowerIntakeCurrentAmps = HandTopBackRoller.getOutputCurrent();
     m_dashboardOutputs.upperIntakeCurrentAmps = HandBottomRoller.getOutputCurrent();
 
     // Update dashboard inputs and outputs
-    m_ArmDashboardTab.update(m_dashboardInputHistory[0]);
-
-    // Process dashboard inputs
-    if (m_dashboardInputHistory[0].zeroAngleEncoder
-        != m_dashboardInputHistory[1].zeroAngleEncoder) {
-      // TODO: reset the encoder count
-      m_dashboardOutputs.angleEncoderCount += 1000;
-    }
-
-    // Rotate dashboard input history: element 0 --> element 1, element 1 --> element 0
-    ArmSubsystemDashboardInputs temp = m_dashboardInputHistory[1];
-    m_dashboardInputHistory[1] = m_dashboardInputHistory[0];
-    m_dashboardInputHistory[0] = temp;
+    m_armDashboardTab.update(m_dashboardInputs);
   }
 }
