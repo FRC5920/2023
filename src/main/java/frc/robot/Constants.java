@@ -64,34 +64,24 @@ import edu.wpi.first.wpilibj.RobotBase;
 import frc.lib.SwerveDrive.COTSFalconSwerveConstants;
 import frc.lib.SwerveDrive.SwerveModuleConstants;
 import java.util.Map;
+import org.littletonrobotics.junction.LoggedRobot;
 
 public final class Constants {
-  /** Type of robot targeted by these constants */
-  private static final RobotType s_robot = RobotType.PrototypeBot;
+
+  public static final double robotPeriodSec = LoggedRobot.defaultPeriodSecs;
+
+  /** Set the value of logPlaybackIsEnabled to true when replaying log files */
+  public static final boolean kLogPlaybackIsEnabled = false;
+
+  /** robotType indicates the type of bot this code applies to */
+  public static final RobotType kRobotType = RobotType.PrototypeBot;
 
   /** Set to true when tuning or characterizing the robot */
   public static final boolean tuningMode = false;
 
-  public static RobotType getRobot() {
-    // Simulated robot type can only be used in desktop simulation mode; not with real hardware!
-    if (RobotBase.isReal() && (s_robot == RobotType.SimulatedRobot)) {
-      throw new UnsupportedOperationException(
-          "********* Simulation mode cannot be enabled for a real robot! **********");
-    }
-
-    return s_robot;
-  }
-
   /** Returns the present robot mode */
   public static Mode getMode() {
-    switch (getRobot()) {
-      case PrototypeBot:
-        return RobotBase.isReal() ? Mode.REAL : Mode.REPLAY;
-      case SimulatedRobot:
-        return Mode.SIM;
-      default:
-        return Mode.REAL;
-    }
+    return RobotBase.isReal() ? Mode.REAL : (kLogPlaybackIsEnabled ? Mode.REPLAY : Mode.SIM);
   }
 
   public static class PneumaticsConstants {
@@ -297,8 +287,8 @@ public final class Constants {
     /** Prototype robot */
     PrototypeBot,
 
-    /** Simulated robot */
-    SimulatedRobot;
+    /** Competition robot */
+    CompetitionBot;
 
     /** Get the human-readable name of the robot type */
     @Override
