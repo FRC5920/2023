@@ -94,7 +94,6 @@ public class JoystickSubsystem extends SubsystemBase {
   /** Xbox controller used by the robot operator */
   public ProcessedXboxController operatorController;
 
-  /** Button */
   /** Creates a new JoystickSubsystem */
   public JoystickSubsystem() {
     // Configure driver controller stick and trigger processing
@@ -149,7 +148,7 @@ public class JoystickSubsystem extends SubsystemBase {
     driverController.A.onTrue(new InstantCommand(this::doNothing, this));
     driverController.B.onTrue(new InstantCommand(this::doNothing, this));
     driverController.X.onTrue(new InstantCommand(this::doNothing, this));
-    driverController.Y.onTrue(new InstantCommand(this::doNothing, this));
+    driverController.Y.onTrue(new InstantCommand(() -> botContainer.swerveSubsystem.zeroGyro()));
     driverController.leftBumper.whileTrue(new InstantCommand(this::doNothing, this));
     driverController.rightBumper.whileTrue(new InstantCommand(this::doNothing, this));
     driverController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
@@ -158,9 +157,9 @@ public class JoystickSubsystem extends SubsystemBase {
     driverController.start.onTrue(new InstantCommand(this::doNothing, this));
 
     // Map buttons on operator controller
-    operatorController.A.onTrue(new InstantCommand(this::doNothing, this));
-    operatorController.B.onTrue(new InstantCommand(this::doNothing, this));
-    operatorController.X.onTrue(new InstantCommand(this::doNothing, this));
+    operatorController.A.onTrue(new InstantCommand());
+    operatorController.B.onTrue(new InstantCommand());
+    operatorController.X.onTrue(new InstantCommand());
     operatorController.Y.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.leftBumper.whileTrue(new InstantCommand(this::doNothing, this));
     operatorController.rightBumper.whileTrue(new InstantCommand(this::doNothing, this));
@@ -168,6 +167,8 @@ public class JoystickSubsystem extends SubsystemBase {
     operatorController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.back.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.start.onTrue(new InstantCommand(this::doNothing, this));
+    operatorController.dPadUp.onTrue(new InstantCommand());
+    operatorController.dPadDown.onTrue(new InstantCommand());
   }
 
   @Override
