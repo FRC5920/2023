@@ -56,13 +56,17 @@ import frc.robot.subsystems.Arm.Arm;
 
 public class Reach extends CommandBase {
   /** Creates a new ExtendArmToRank. */
+  private Arm.Rank ReachTo;
   public Reach(Arm.Rank ReachWhere) {
     // Use addRequirements() here to declare subsystem dependencies.
+    ReachTo = ReachWhere;
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    Arm.setArmPosition(ReachTo.getEncoderCount());
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override

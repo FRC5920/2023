@@ -66,7 +66,7 @@ import frc.robot.Constants;
 
 public class Arm extends SubsystemBase {
   /** Creates a new Arm. */
-  private final WPI_TalonFX ArmYMotorMaster =
+  private final static WPI_TalonFX ArmYMotorMaster =
       new WPI_TalonFX(Constants.ArmConstants.kArmYMotorMasterPort);
   private final static CANSparkMax HandBottomRoller =
       new CANSparkMax(Constants.ArmConstants.kHandBottomRollerPort, MotorType.kBrushless);
@@ -75,7 +75,7 @@ public class Arm extends SubsystemBase {
   // private final WPI_TalonFX ArmYMotorSlave = new
   // WPI_TalonFX(Constants.ArmConstants.kArmYMotorSlavePort);
   private final WPI_TalonFX ArmExtender = new WPI_TalonFX(Constants.ArmConstants.kArmExtenderPort);
-  private final Pneumatics myPneumatics;
+  private static Pneumatics myPneumatics;
   private final static double HandRollerSpeed = 0.5;
 
   public enum GamePieceType {
@@ -89,10 +89,14 @@ public class Arm extends SubsystemBase {
   }
 
   public enum Rank {
-    PickUp,
-    Low,
-    Medium,
-    High
+    PickUp  (0),
+    Low     (50),
+    Medium  (2000),
+    High    (3000);
+
+    private final int encoderCount;
+    private Rank(int count) {this.encoderCount = count;}
+    public int getEncoderCount() { return encoderCount; }
   }
 
   public enum ArmExtenderPosition {
@@ -109,7 +113,7 @@ public class Arm extends SubsystemBase {
   };
 
   public Arm(Pneumatics s_Pneumatics) {
-    this.myPneumatics = s_Pneumatics;
+    Arm.myPneumatics = s_Pneumatics;
     configurePID();
   }
 
@@ -139,19 +143,45 @@ public class Arm extends SubsystemBase {
     ArmExtender.configNominalOutputReverse(0, Constants.ArmConstants.kArmExtenderTimeoutMs);
     ArmExtender.configPeakOutputForward(1, Constants.ArmConstants.kArmExtenderTimeoutMs);
     ArmExtender.configPeakOutputReverse(-1, Constants.ArmConstants.kArmExtenderTimeoutMs);
+
+    //set ArmYMotorMaster PID coefficients
+    ArmYMotorMaster.config_kF(
+        Constants.ArmConstants.kArmYPIDLoopIdx,
+        Constants.ArmConstants.kArmYFF,
+        Constants.ArmConstants.kArmYTimeoutMs);
+    ArmYMotorMaster.config_kP(
+        Constants.ArmConstants.kArmYPIDLoopIdx,
+        Constants.ArmConstants.kArmYP,
+        Constants.ArmConstants.kArmYTimeoutMs);
+    ArmYMotorMaster.config_kI(
+        Constants.ArmConstants.kArmYPIDLoopIdx,
+        Constants.ArmConstants.kArmYI,
+        Constants.ArmConstants.kArmYTimeoutMs);
+    ArmYMotorMaster.config_kD(
+        Constants.ArmConstants.kArmYPIDLoopIdx,
+        Constants.ArmConstants.kArmYD,
+        Constants.ArmConstants.kArmYTimeoutMs);
+    ArmYMotorMaster.config_IntegralZone(
+        Constants.ArmConstants.kArmYPIDLoopIdx,
+        Constants.ArmConstants.kArmYIz,
+        Constants.ArmConstants.kArmYTimeoutMs);
+    ArmYMotorMaster.configNominalOutputForward(0, Constants.ArmConstants.kArmYTimeoutMs);
+    ArmYMotorMaster.configNominalOutputReverse(0, Constants.ArmConstants.kArmYTimeoutMs);
+    ArmYMotorMaster.configPeakOutputForward(1, Constants.ArmConstants.kArmYTimeoutMs);
+    ArmYMotorMaster.configPeakOutputReverse(-1, Constants.ArmConstants.kArmYTimeoutMs);
   }
 
-  private void setArmExtension(ArmExtenderPosition extensionEncoderValue) {
+  public void setArmExtension(ArmExtenderPosition extensionEncoderValue) {
     ArmExtender.set(TalonFXControlMode.Position, extensionEncoderValue.encoderCount);
   }
 
-  public void setArmPosition(int desiredPosition) {
+  public static void setArmPosition(int desiredPosition) {
     if (desiredPosition >= Constants.ArmConstants.kArmExtendedHigh) {
       myPneumatics.goingBackward();
     } else {
       myPneumatics.goingForward();
     };
-    ArmYMotorMaster.setSelectedSensorPosition(desiredPosition);
+    ArmYMotorMaster.set(TalonFXControlMode.Position, desiredPosition);
   }
 
   public static void spinAllHandRollers(GamePieceType pickUpWhat, DoWhatWithGamePiece desiredHandAction) {

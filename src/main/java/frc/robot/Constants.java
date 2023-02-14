@@ -120,6 +120,13 @@ public final class Constants {
     public static final double kArmExtenderI = 0;
     public static final double kArmExtenderD = 0;
     public static final double kArmExtenderIz = 0;
+    public static final int kArmYPIDLoopIdx = 0;
+    public static final int kArmYTimeoutMs = 50;
+    public static final double kArmYFF = 0;
+    public static final double kArmYP = 0;
+    public static final double kArmYI = 0;
+    public static final double kArmYD = 0;
+    public static final double kArmYIz = 0;
   }
 
   public static class DriverConstants {
