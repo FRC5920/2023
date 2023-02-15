@@ -85,9 +85,10 @@ public class RobotContainer {
   private final int rotationAxis = XboxController.Axis.kRightX.value;
 
   /* Cameras */
-  private final PhotonCamera TagCamera = new PhotonCamera("Tag_Camera");
-  private final PhotonCamera BackCamera = new PhotonCamera("Back_Camera");
-  private final PhotonCamera ArmCamera = new PhotonCamera("Arm_Camera");
+  private final PhotonCamera TagCamera = new PhotonCamera(Constants.VisionConstants.TagCameraName);
+  private final PhotonCamera BackCamera =
+      new PhotonCamera(Constants.VisionConstants.BackupCameraName);
+  private final PhotonCamera ArmCamera = new PhotonCamera(Constants.VisionConstants.ArmCameraName);
 
   // --------------------- Robot Subsystems ----------------------------
   public final JoystickSubsystem joystickSubsystem = new JoystickSubsystem();

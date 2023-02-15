@@ -56,12 +56,12 @@ public final class GenBuildInfo {
   public static final String MAVEN_GROUP = "";
   public static final String MAVEN_NAME = "2023";
   public static final String VERSION = "unspecified";
-  public static final int GIT_REVISION = 75;
-  public static final String GIT_SHA = "efd7372df6b508574e0f71c22847512a7990a691";
-  public static final String GIT_DATE = "2023-02-14 18:21:29 PST";
-  public static final String GIT_BRANCH = "Arm";
-  public static final String BUILD_DATE = "2023-02-14 19:29:34 PST";
-  public static final long BUILD_UNIX_TIME = 1676431774453L;
+  public static final int GIT_REVISION = 112;
+  public static final String GIT_SHA = "426d97f4d690aecb407605d2cd6d7af75a4ea2f0";
+  public static final String GIT_DATE = "2023-02-15 11:24:36 PST";
+  public static final String GIT_BRANCH = "Vision";
+  public static final String BUILD_DATE = "2023-02-15 12:33:53 PST";
+  public static final long BUILD_UNIX_TIME = 1676493233494L;
   public static final int DIRTY = 1;
 
   private GenBuildInfo() {}
