@@ -91,9 +91,10 @@ public class RobotContainer {
       new JoystickButton(driver, XboxController.Button.kStart.value);
 
   /* Cameras */
-  private final PhotonCamera TagCamera = new PhotonCamera("Heimdall_Tag_Camera");
-  private final PhotonCamera BackCamera = new PhotonCamera("BackupCamera");
-  private final PhotonCamera ArmCamera = new PhotonCamera("Arm_Camera");
+  private final PhotonCamera TagCamera = new PhotonCamera(Constants.VisionConstants.TagCameraName);
+  private final PhotonCamera BackCamera =
+      new PhotonCamera(Constants.VisionConstants.BackupCameraName);
+  private final PhotonCamera ArmCamera = new PhotonCamera(Constants.VisionConstants.ArmCameraName);
 
   /* Subsystems */
   private final Swerve swerveSubsystem = new Swerve();
