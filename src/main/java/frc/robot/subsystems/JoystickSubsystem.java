@@ -8,7 +8,7 @@
 /*-----------------------------------------------------------------------------\
 |                                                                              |
 |                       ================================                       |
-|                       **    TEAM 5290 - Vikotics    **                       |
+|                       **    TEAM 5920 - Vikotics    **                       |
 |                       ================================                       |
 |                                                                              |
 |                            °        #°                                       |
@@ -55,7 +55,6 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.lib.Joystick.AxisProcChain;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.RobotContainer;
@@ -99,14 +98,6 @@ public class JoystickSubsystem extends SubsystemBase {
   /** Xbox controller used by the robot operator */
   public ProcessedXboxController operatorController;
 
-  /* Driver Buttons */
-  private final JoystickButton m_zeroGyro;
-  private final JoystickButton m_intakeCone;
-  private final JoystickButton m_intakeCube;
-  private final JoystickButton m_placeHigh;
-  private final JoystickButton m_placeLow;
-  private int m_operatorDPadDegrees;
-
   /*private final JoystickButton intake =
       new JoystickButton(driver, XboxController.Axis.kRightTrigger.value);
   private final JoystickButton eject =
@@ -131,8 +122,12 @@ public class JoystickSubsystem extends SubsystemBase {
     driverController.getStickProcessing(XboxController.Axis.kRightY).configure(stickConfig);
     AxisProcChain.Config triggerConfig =
         new AxisProcChain.Config(kDriverTriggerSensitivity, kDriverTriggerDeadbands);
-    driverController.getStickProcessing(XboxController.Axis.kLeftTrigger).configure(triggerConfig);
-    driverController.getStickProcessing(XboxController.Axis.kRightTrigger).configure(triggerConfig);
+    driverController
+        .getTriggerProcessing(XboxController.Axis.kLeftTrigger)
+        .configure(triggerConfig);
+    driverController
+        .getTriggerProcessing(XboxController.Axis.kRightTrigger)
+        .configure(triggerConfig);
 
     // Configure operator controller stick and trigger processing
     operatorController = new ProcessedXboxController(ControllerId.kOperator.port);
@@ -146,27 +141,12 @@ public class JoystickSubsystem extends SubsystemBase {
     driverController.getStickProcessing(XboxController.Axis.kRightY).configure(stickConfig);
     triggerConfig =
         new AxisProcChain.Config(kOperatorTriggerSensitivity, kOperatorTriggerDeadbands);
-    driverController.getStickProcessing(XboxController.Axis.kLeftTrigger).configure(triggerConfig);
-    driverController.getStickProcessing(XboxController.Axis.kRightTrigger).configure(triggerConfig);
-
-    /* Driver Buttons */
-    m_zeroGyro = new JoystickButton(driverController, XboxController.Button.kY.value);
-    m_intakeCone = new JoystickButton(operatorController, XboxController.Button.kA.value);
-    m_intakeCube = new JoystickButton(operatorController, XboxController.Button.kB.value);
-    m_placeHigh = new JoystickButton(operatorController, XboxController.Button.kX.value);
-    m_placeLow = new JoystickButton(operatorController, XboxController.Button.kY.value);
-    m_operatorDPadDegrees = operatorController.getPOV();
-
-    /*private final JoystickButton intake =
-        new JoystickButton(driverController, XboxController.Axis.kRightTrigger.value);
-    private final JoystickButton eject =
-        new JoystickButton(driverController, XboxController.Axis.kLeftTrigger.value);
-    private final JoystickButton armforward =
-        new JoystickButton(driverController, XboxController.Button.kX.value);
-    private final JoystickButton armback =
-        new JoystickButton(driverController, XboxController.Button.kA.value);
-    */
-
+    driverController
+        .getTriggerProcessing(XboxController.Axis.kLeftTrigger)
+        .configure(triggerConfig);
+    driverController
+        .getTriggerProcessing(XboxController.Axis.kRightTrigger)
+        .configure(triggerConfig);
   }
 
   /**
@@ -195,7 +175,10 @@ public class JoystickSubsystem extends SubsystemBase {
     operatorController.B.onTrue(new PickUpCube(botContainer.s_Arm));
     operatorController.X.onTrue(
         new PlaceObject(
-            botContainer.s_Arm, botContainer.s_BotState.storedGamePiece, Arm.Rank.Medium, Arm.ArmExtenderPosition.MiddleRank));
+            botContainer.s_Arm,
+            botContainer.s_BotState.storedGamePiece,
+            Arm.Rank.Medium,
+            Arm.ArmExtenderPosition.MiddleRank));
     operatorController.Y.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.leftBumper.whileTrue(new InstantCommand(this::doNothing, this));
     operatorController.rightBumper.whileTrue(new InstantCommand(this::doNothing, this));
@@ -205,9 +188,16 @@ public class JoystickSubsystem extends SubsystemBase {
     operatorController.start.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.dPadUp.onTrue(
         new PlaceObject(
-            botContainer.s_Arm, botContainer.s_BotState.storedGamePiece, Arm.Rank.High, Arm.ArmExtenderPosition.TopRank));
+            botContainer.s_Arm,
+            botContainer.s_BotState.storedGamePiece,
+            Arm.Rank.High,
+            Arm.ArmExtenderPosition.TopRank));
     operatorController.dPadDown.onTrue(
-        new PlaceObject(botContainer.s_Arm, botContainer.s_BotState.storedGamePiece, Arm.Rank.Low, Arm.ArmExtenderPosition.OnFloor));
+        new PlaceObject(
+            botContainer.s_Arm,
+            botContainer.s_BotState.storedGamePiece,
+            Arm.Rank.Low,
+            Arm.ArmExtenderPosition.OnFloor));
   }
 
   @Override

@@ -8,7 +8,7 @@
 /*-----------------------------------------------------------------------------\
 |                                                                              |
 |                       ================================                       |
-|                       **    TEAM 5290 - Vikotics    **                       |
+|                       **    TEAM 5920 - Vikotics    **                       |
 |                       ================================                       |
 |                                                                              |
 |                            °        #°                                       |
@@ -151,7 +151,7 @@ public class SwerveModule {
     return Rotation2d.fromDegrees(angleEncoder.getAbsolutePosition());
   }
 
-  private void resetToAbsolute() {
+  public void resetToAbsolute() {
     double absolutePosition =
         Conversions.degreesToFalcon(
             getCanCoder().getDegrees() - angleOffset.getDegrees(),

@@ -8,7 +8,7 @@
 /*-----------------------------------------------------------------------------\
 |                                                                              |
 |                       ================================                       |
-|                       **    TEAM 5290 - Vikotics    **                       |
+|                       **    TEAM 5920 - Vikotics    **                       |
 |                       ================================                       |
 |                                                                              |
 |                            °        #°                                       |
@@ -59,6 +59,7 @@ import frc.robot.subsystems.Arm.Arm.DoWhatWithGamePiece;
 public class Intake extends CommandBase {
   /** Creates a new Intake. */
   private Arm.GamePieceType gamePiece;
+
   long startTime;
 
   public Intake(Arm.GamePieceType IntakeWhat) {

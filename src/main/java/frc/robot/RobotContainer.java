@@ -8,7 +8,7 @@
 /*-----------------------------------------------------------------------------\
 |                                                                              |
 |                       ================================                       |
-|                       **    TEAM 5290 - Vikotics    **                       |
+|                       **    TEAM 5920 - Vikotics    **                       |
 |                       ================================                       |
 |                                                                              |
 |                            °        #°                                       |
@@ -51,6 +51,7 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -61,9 +62,10 @@ import frc.robot.subsystems.*;
 import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Arm.Pneumatics;
 import frc.robot.subsystems.Dashboard.DriveTab;
-import frc.robot.subsystems.Heimdall.PVCore;
+import frc.robot.subsystems.Heimdall.*;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
+import org.photonvision.PhotonCamera;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -72,15 +74,28 @@ import frc.robot.subsystems.runtimeState.BotStateSubsystem;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
+  /* Controllers */
+  // private final CommandXboxController driver = new
+  // CommandXboxController(DriverConstants.kControllerPort);
+  private final Joystick driver = new Joystick(0);
+
   /* Drive Controls */
   private final int translationAxis = XboxController.Axis.kLeftY.value;
   private final int strafeAxis = XboxController.Axis.kLeftX.value;
   private final int rotationAxis = XboxController.Axis.kRightX.value;
 
+  /* Cameras */
+  private final PhotonCamera TagCamera = new PhotonCamera("Tag_Camera");
+  private final PhotonCamera BackCamera = new PhotonCamera("Back_Camera");
+  private final PhotonCamera ArmCamera = new PhotonCamera("Arm_Camera");
+
   // --------------------- Robot Subsystems ----------------------------
   public final JoystickSubsystem joystickSubsystem = new JoystickSubsystem();
   public final Swerve swerveSubsystem = new Swerve();
   public final BotStateSubsystem s_BotState = new BotStateSubsystem();
+  private final PoseEstimatorSubsystem s_poseEstimator =
+      new PoseEstimatorSubsystem(TagCamera, swerveSubsystem);
+
   public final Pneumatics s_Pneumatics = new Pneumatics();
   public final Arm s_Arm = new Arm(s_Pneumatics);
 
@@ -88,6 +103,7 @@ public class RobotContainer {
   public final DriveTab s_DriveTab = new DriveTab();
 
   // The robot's subsystems and commands are defined here...
+  // private final Balance m_Balance = new Balance(swerveSubsystem, s_poseEstimator);
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -135,6 +151,8 @@ public class RobotContainer {
     eject.onTrue(new InstantCommand(() -> s_Arm.place()));
     armforward.onTrue(new InstantCommand(() -> s_Arm.armForward()));
     armback.onTrue(new InstantCommand(() -> s_Arm.armBackward())); */
+
+    joystickSubsystem.configureButtonBindings(this);
   }
 
   /**

@@ -8,7 +8,7 @@
 /*-----------------------------------------------------------------------------\
 |                                                                              |
 |                       ================================                       |
-|                       **    TEAM 5290 - Vikotics    **                       |
+|                       **    TEAM 5920 - Vikotics    **                       |
 |                       ================================                       |
 |                                                                              |
 |                            °        #°                                       |
@@ -51,33 +51,30 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.subsystems.Arm;
 
-import java.util.Set;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import pabeles.concurrency.IntRangeObjectConsumer;
 
 public class Arm extends SubsystemBase {
   /** Creates a new Arm. */
-  private final static WPI_TalonFX ArmYMotorMaster =
+  private static final WPI_TalonFX ArmYMotorMaster =
       new WPI_TalonFX(Constants.ArmConstants.kArmYMotorMasterPort);
-  private final static CANSparkMax HandBottomRoller =
+
+  private static final CANSparkMax HandBottomRoller =
       new CANSparkMax(Constants.ArmConstants.kHandBottomRollerPort, MotorType.kBrushless);
-  private final static CANSparkMax HandTopBackRoller =
+  private static final CANSparkMax HandTopBackRoller =
       new CANSparkMax(Constants.ArmConstants.kHandTopBackRollerPort, MotorType.kBrushless);
   // private final WPI_TalonFX ArmYMotorSlave = new
   // WPI_TalonFX(Constants.ArmConstants.kArmYMotorSlavePort);
-  private final static WPI_TalonFX ArmExtender = new WPI_TalonFX(Constants.ArmConstants.kArmExtenderPort);
+  private static final WPI_TalonFX ArmExtender =
+      new WPI_TalonFX(Constants.ArmConstants.kArmExtenderPort);
   private static Pneumatics myPneumatics;
-  private final static double HandRollerSpeed = 0.5;
+  private static final double HandRollerSpeed = 0.5;
 
   public enum GamePieceType {
     Cone,
@@ -90,28 +87,43 @@ public class Arm extends SubsystemBase {
   }
 
   public enum Rank {
-    PickUp  (0),
-    InRobot (200),
-    Low     (50),
-    Medium  (2000),
-    High    (3000);
+    PickUp(0),
+    InRobot(200),
+    Low(50),
+    Medium(2000),
+    High(3000);
 
     private final int encoderCount;
-    private Rank(int count) {this.encoderCount = count;}
-    public int getEncoderCount() { return encoderCount; }
+
+    private Rank(int count) {
+      this.encoderCount = count;
+    }
+
+    public int getEncoderCount() {
+      return encoderCount;
+    }
   }
 
   public enum ArmExtenderPosition {
-    //public static final int[] tRexPosition = new int []{0, 13629, 31880, 43589, 54841, 68187};
-    
-    StowedAway  (0),  /** Arm is fully retracted */
-    OnFloor     (1000), /** Arm is down on the floor */
-    MiddleRank  (2000), /** Arm is reaching to the middle rank */
-    TopRank     (3000); /** Arm is reaching to the top rank */
+    // public static final int[] tRexPosition = new int []{0, 13629, 31880, 43589, 54841, 68187};
 
+    StowedAway(0),
+    /** Arm is fully retracted */
+    OnFloor(1000),
+    /** Arm is down on the floor */
+    MiddleRank(2000),
+    /** Arm is reaching to the middle rank */
+    TopRank(3000);
+    /** Arm is reaching to the top rank */
     private final int encoderCount;
-    private ArmExtenderPosition(int count) {this.encoderCount = count;}
-    public int getEncoderCount() { return encoderCount; }
+
+    private ArmExtenderPosition(int count) {
+      this.encoderCount = count;
+    }
+
+    public int getEncoderCount() {
+      return encoderCount;
+    }
   };
 
   public Arm(Pneumatics s_Pneumatics) {
@@ -146,7 +158,7 @@ public class Arm extends SubsystemBase {
     ArmExtender.configPeakOutputForward(1, Constants.ArmConstants.kArmExtenderTimeoutMs);
     ArmExtender.configPeakOutputReverse(-1, Constants.ArmConstants.kArmExtenderTimeoutMs);
 
-    //set ArmYMotorMaster PID coefficients
+    // set ArmYMotorMaster PID coefficients
     ArmYMotorMaster.config_kF(
         Constants.ArmConstants.kArmYPIDLoopIdx,
         Constants.ArmConstants.kArmYFF,
@@ -182,11 +194,13 @@ public class Arm extends SubsystemBase {
       myPneumatics.goingBackward();
     } else {
       myPneumatics.goingForward();
-    };
+    }
+    ;
     ArmYMotorMaster.set(TalonFXControlMode.Position, desiredPosition);
   }
 
-  public static void spinAllHandRollers(GamePieceType pickUpWhat, DoWhatWithGamePiece desiredHandAction) {
+  public static void spinAllHandRollers(
+      GamePieceType pickUpWhat, DoWhatWithGamePiece desiredHandAction) {
     double HandBottomRollerSpeedPercent = HandRollerSpeed;
     double HandTopBackRollerSpeedPercent = 0.0;
     switch (pickUpWhat) {
@@ -210,7 +224,8 @@ public class Arm extends SubsystemBase {
   public static void zeroHandRollers() {
     HandTopBackRoller.set(0);
     HandBottomRoller.set(0);
-};
+  }
+  ;
 
   public void armForward() {
     ArmYMotorMaster.set(ControlMode.PercentOutput, 1);

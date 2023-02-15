@@ -49,97 +49,20 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.lib.Joystick;
+package frc.robot;
 
-import java.util.ArrayList;
+/** Automatically generated file containing build version information. */
+public final class GenBuildInfo {
+  public static final String MAVEN_GROUP = "";
+  public static final String MAVEN_NAME = "2023";
+  public static final String VERSION = "unspecified";
+  public static final int GIT_REVISION = 75;
+  public static final String GIT_SHA = "efd7372df6b508574e0f71c22847512a7990a691";
+  public static final String GIT_DATE = "2023-02-14 18:21:29 PST";
+  public static final String GIT_BRANCH = "Arm";
+  public static final String BUILD_DATE = "2023-02-14 19:29:34 PST";
+  public static final long BUILD_UNIX_TIME = 1676431774453L;
+  public static final int DIRTY = 1;
 
-/**
- * AxisProcChain provides a wrapper for a chain of processing that can be applied to values from a
- * controller axis. Built-in processing includes feathering and deadbanding. Additional processing
- * can be applied by extending the class
- */
-public class AxisProcChain implements AxisProcessor {
-
-  /** kFeathering gives the index of the feathering processor in the chain */
-  private static final int kFeathering = 0;
-  /** kDeadbanding gives the index of the deadbanding processor in the chain */
-  private static final int kDeadbanding = 1;
-
-  /** Configuration for an AxisProcChain */
-  public static class Config {
-    /** Sensitivity of the joystick as a value between 0.0 and 1.0 */
-    public final double sens;
-
-    /** Lower deadband applied to axis values as a value between 0.0 and 1.0 */
-    public final double dbLower;
-
-    /** Upper deadband applied to axis values as a value between 0.0 and 1.0 */
-    public final double dbUpper;
-
-    /**
-     * Initializes axis processing configuration
-     *
-     * @param sensitivity Sensitivity of axis values as a value between 0.0 and 1.0
-     * @param deadband Array of deadband values (0.0 to 1.0) with indices {0=Lower, 1=upper}
-     * @param upperDeadband Upper deadband applied to axis values as a value between 0.0 and 1.0
-     */
-    public Config(double sensitivity, double deadband[]) {
-      sens = sensitivity;
-      dbLower = deadband[0];
-      dbUpper = deadband[1];
-    }
-  }
-
-  /** Processing applied to incoming Axis values */
-  private ArrayList<AxisProcessor> m_procChain;
-
-  /**
-   * Creates the processor with a specified configuration
-   *
-   * @param config Axis processing configuration to use
-   */
-  AxisProcChain(Config config) {
-    m_procChain = new ArrayList<AxisProcessor>();
-    m_procChain.add(new AxisFeathering(config.sens));
-    m_procChain.add(new AxisDeadband(config.dbLower, config.dbUpper));
-  }
-
-  /** Process a value from a controller axis */
-  @Override
-  public double process(double axisValue) {
-    double result = axisValue;
-    for (AxisProcessor proc : m_procChain) {
-      result = proc.process(result);
-    }
-    return result;
-  }
-
-  /** Configures feathering and deadband values in the processing chain */
-  public void configure(Config config) {
-    feathering().setSensitivity(config.sens);
-    deadbanding().setLower(config.dbLower).setUpper(config.dbUpper);
-  }
-
-  /** Returns a mutable reference to the feathering processor in the chain */
-  public AxisFeathering feathering() {
-    return (AxisFeathering) m_procChain.get(kFeathering);
-  }
-
-  /** Returns a mutable reference to the deadbanding processor in the chain */
-  public AxisDeadband deadbanding() {
-    return (AxisDeadband) m_procChain.get(kDeadbanding);
-  }
-
-  /** Derived classes can use this to access an axis processor in the chain */
-  protected AxisProcessor getProc(int index) {
-    return m_procChain.get(index);
-  }
-
-  /**
-   * Derived classes can use this method to append an axis processor to the end of the processing
-   * chain.
-   */
-  protected void appendProc(AxisProcessor proc) {
-    m_procChain.add(proc);
-  }
+  private GenBuildInfo() {}
 }

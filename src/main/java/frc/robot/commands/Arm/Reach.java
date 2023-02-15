@@ -8,7 +8,7 @@
 /*-----------------------------------------------------------------------------\
 |                                                                              |
 |                       ================================                       |
-|                       **    TEAM 5290 - Vikotics    **                       |
+|                       **    TEAM 5920 - Vikotics    **                       |
 |                       ================================                       |
 |                                                                              |
 |                            °        #°                                       |
@@ -57,8 +57,10 @@ import frc.robot.subsystems.Arm.Arm;
 public class Reach extends CommandBase {
   /** Creates a new ExtendArmToRank. */
   private Arm.Rank ReachTo;
+
   private Arm.ArmExtenderPosition ReachDistance;
   Boolean isDone = false;
+
   public Reach(Arm.Rank ReachWhere, Arm.ArmExtenderPosition ReachHowFar) {
     // Use addRequirements() here to declare subsystem dependencies.
     ReachTo = ReachWhere;
@@ -66,8 +68,7 @@ public class Reach extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override

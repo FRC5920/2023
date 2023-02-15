@@ -8,7 +8,7 @@
 /*-----------------------------------------------------------------------------\
 |                                                                              |
 |                       ================================                       |
-|                       **    TEAM 5290 - Vikotics    **                       |
+|                       **    TEAM 5920 - Vikotics    **                       |
 |                       ================================                       |
 |                                                                              |
 |                            °        #°                                       |
@@ -51,7 +51,6 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.commands.Arm;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Arm.Arm;
@@ -60,6 +59,7 @@ import frc.robot.subsystems.Arm.Arm.DoWhatWithGamePiece;
 public class Drop extends CommandBase {
   /** Creates a new Drop. */
   private Arm.GamePieceType gamePiece;
+
   long startTime;
 
   public Drop(Arm.GamePieceType DropWhat) {

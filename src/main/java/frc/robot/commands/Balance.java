@@ -49,97 +49,98 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.lib.Joystick;
+package frc.robot.commands;
 
-import java.util.ArrayList;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.SwerveDrivebase.Swerve;
+import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 
-/**
- * AxisProcChain provides a wrapper for a chain of processing that can be applied to values from a
- * controller axis. Built-in processing includes feathering and deadbanding. Additional processing
- * can be applied by extending the class
- */
-public class AxisProcChain implements AxisProcessor {
+public class Balance extends CommandBase {
 
-  /** kFeathering gives the index of the feathering processor in the chain */
-  private static final int kFeathering = 0;
-  /** kDeadbanding gives the index of the deadbanding processor in the chain */
-  private static final int kDeadbanding = 1;
+  private static final TrapezoidProfile.Constraints X_CONSTRAINTS =
+      new TrapezoidProfile.Constraints(3, .5);
+  private static final TrapezoidProfile.Constraints Y_CONSTRAINTS =
+      new TrapezoidProfile.Constraints(3, .5);
+  private static final TrapezoidProfile.Constraints OMEGA_CONSTRAINTS =
+      new TrapezoidProfile.Constraints(2, .5);
+  private final ProfiledPIDController xController =
+      new ProfiledPIDController(3, 0, 0, X_CONSTRAINTS);
+  private final ProfiledPIDController yController =
+      new ProfiledPIDController(3, 0, 0, Y_CONSTRAINTS);
+  private final ProfiledPIDController omegaController =
+      new ProfiledPIDController(2, 0, 0, OMEGA_CONSTRAINTS);
 
-  /** Configuration for an AxisProcChain */
-  public static class Config {
-    /** Sensitivity of the joystick as a value between 0.0 and 1.0 */
-    public final double sens;
+  private final Swerve drivetrainSubsystem;
 
-    /** Lower deadband applied to axis values as a value between 0.0 and 1.0 */
-    public final double dbLower;
+  /** Creates a new Balance. */
+  public Balance(Swerve drivetrainSubsystem) {
+    this.drivetrainSubsystem = drivetrainSubsystem;
 
-    /** Upper deadband applied to axis values as a value between 0.0 and 1.0 */
-    public final double dbUpper;
+    xController.setTolerance(2);
+    yController.setTolerance(2);
+    omegaController.setTolerance(Units.degreesToRadians(3));
+    omegaController.enableContinuousInput(-Math.PI, Math.PI);
 
-    /**
-     * Initializes axis processing configuration
-     *
-     * @param sensitivity Sensitivity of axis values as a value between 0.0 and 1.0
-     * @param deadband Array of deadband values (0.0 to 1.0) with indices {0=Lower, 1=upper}
-     * @param upperDeadband Upper deadband applied to axis values as a value between 0.0 and 1.0
-     */
-    public Config(double sensitivity, double deadband[]) {
-      sens = sensitivity;
-      dbLower = deadband[0];
-      dbUpper = deadband[1];
-    }
+    addRequirements(drivetrainSubsystem);
   }
 
-  /** Processing applied to incoming Axis values */
-  private ArrayList<AxisProcessor> m_procChain;
-
-  /**
-   * Creates the processor with a specified configuration
-   *
-   * @param config Axis processing configuration to use
-   */
-  AxisProcChain(Config config) {
-    m_procChain = new ArrayList<AxisProcessor>();
-    m_procChain.add(new AxisFeathering(config.sens));
-    m_procChain.add(new AxisDeadband(config.dbLower, config.dbUpper));
-  }
-
-  /** Process a value from a controller axis */
+  // Called when the command is initially scheduled.
   @Override
-  public double process(double axisValue) {
-    double result = axisValue;
-    for (AxisProcessor proc : m_procChain) {
-      result = proc.process(result);
+  public void initialize() {
+    // omegaController.reset(drivetrainSubsystem.getYaw().getRadians());
+    // xController.reset(drivetrainSubsystem.getRoll());
+    // yController.reset(drivetrainSubsystem.getPitch());
+  }
+
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
+  public void execute() {
+    // drivetrainSubsystem.getPitch();
+    // drivetrainSubsystem.getRoll();
+    xController.setGoal(0);
+    yController.setGoal(0);
+    omegaController.setGoal(drivetrainSubsystem.getYaw().getRadians());
+
+    // Drive to the target
+    var xSpeed = xController.calculate(drivetrainSubsystem.getRoll());
+    if (xController.atSetpoint()) {
+      xSpeed = 0;
     }
-    return result;
+
+    var ySpeed = yController.calculate(drivetrainSubsystem.getPitch());
+    if (yController.atSetpoint()) {
+      ySpeed = 0;
+    }
+
+    var omegaSpeed = omegaController.calculate(drivetrainSubsystem.getYaw().getRadians());
+    if (omegaController.atSetpoint()) {
+      omegaSpeed = 0;
+    }
+    // https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/intro-and-chassis-speeds.html
+    drivetrainSubsystem.drive(
+        new Translation2d(ySpeed, xSpeed).times(BotStateSubsystem.MaxSpeed),
+        omegaSpeed,
+        true,
+        true);
+
+    // https://www.instructables.com/Self-Balancing-Robot-Using-PID-Algorithm-STM-MC/
+    // https://docs.wpilib.org/en/stable/docs/software/advanced-controls/controllers/pidcontroller.html
+    // https://mcm-frc-docs.readthedocs.io/en/latest/docs/software/commandbased/profilepid-subsystems-commands.html
   }
 
-  /** Configures feathering and deadband values in the processing chain */
-  public void configure(Config config) {
-    feathering().setSensitivity(config.sens);
-    deadbanding().setLower(config.dbLower).setUpper(config.dbUpper);
+  // Called once the command ends or is interrupted.
+  @Override
+  public void end(boolean interrupted) {
+    drivetrainSubsystem.stop();
   }
 
-  /** Returns a mutable reference to the feathering processor in the chain */
-  public AxisFeathering feathering() {
-    return (AxisFeathering) m_procChain.get(kFeathering);
-  }
-
-  /** Returns a mutable reference to the deadbanding processor in the chain */
-  public AxisDeadband deadbanding() {
-    return (AxisDeadband) m_procChain.get(kDeadbanding);
-  }
-
-  /** Derived classes can use this to access an axis processor in the chain */
-  protected AxisProcessor getProc(int index) {
-    return m_procChain.get(index);
-  }
-
-  /**
-   * Derived classes can use this method to append an axis processor to the end of the processing
-   * chain.
-   */
-  protected void appendProc(AxisProcessor proc) {
-    m_procChain.add(proc);
+  // Returns true when the command should end.
+  @Override
+  public boolean isFinished() {
+    return false;
   }
 }
