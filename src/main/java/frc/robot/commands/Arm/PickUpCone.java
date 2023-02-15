@@ -60,8 +60,8 @@ import frc.robot.subsystems.Heimdall.PVCore;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class PickUpCone extends SequentialCommandGroup {
   /** Creates a new PickUpCone. */
-  public PickUpCone(Arm armSubsystem, PVCore visionSubsystem) {
-    addRequirements(armSubsystem, visionSubsystem);
+  public PickUpCone(Arm armSubsystem) {
+    addRequirements(armSubsystem);
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(new Reach(Arm.Rank.PickUp, Arm.ArmExtenderPosition.OnFloor), new Fetch(Arm.GamePieceType.Cone), new Intake(Arm.GamePieceType.Cone), new Retract());

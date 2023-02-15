@@ -83,8 +83,7 @@ public class RobotContainer {
   public final BotStateSubsystem s_BotState = new BotStateSubsystem();
   public final Pneumatics s_Pneumatics = new Pneumatics();
   public final Arm s_Arm = new Arm(s_Pneumatics);
-  public final PVCore s_PVCore = new PVCore();
-  
+
   /* Dashboard Subsystems */
   public final DriveTab s_DriveTab = new DriveTab();
 
