@@ -8,7 +8,7 @@
 /*-----------------------------------------------------------------------------\
 |                                                                              |
 |                       ================================                       |
-|                       **    TEAM 5290 - Vikotics    **                       |
+|                       **    TEAM 5920 - Vikotics    **                       |
 |                       ================================                       |
 |                                                                              |
 |                            °        #°                                       |
@@ -232,7 +232,7 @@ public class Robot extends LoggedRobot {
   /** This helper method logs build info generated in GenBuildInfo.java */
   private static void logBuildInfo(Logger logger) {
     // Record metadata
-    logger.recordMetadata("Robot", Constants.getRobot().toString());
+    logger.recordMetadata("Robot Mode", Constants.getMode().toString());
     logger.recordMetadata("TuningMode", Boolean.toString(Constants.tuningMode));
     logger.recordMetadata("RuntimeType", getRuntimeType().toString());
     logger.recordMetadata("ProjectName", GenBuildInfo.MAVEN_NAME);
@@ -258,7 +258,7 @@ public class Robot extends LoggedRobot {
     // Set up data receivers & replay source
     switch (Constants.getMode()) {
       case REAL:
-        String folder = Constants.logDirectories.get(Constants.getRobot());
+        String folder = Constants.logDirectories.get(Constants.kRobotType);
         if (folder != null) {
           logger.addDataReceiver(new WPILOGWriter(folder));
         } else {
