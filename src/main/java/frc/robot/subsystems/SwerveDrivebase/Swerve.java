@@ -81,6 +81,7 @@ public class Swerve extends SubsystemBase {
   private final SwerveModule[] mSwerveMods;
   private final GyroInputsAutoLogged m_gyroMeasurements;
   private final GyroIO m_gyroIO;
+  private ChassisSpeeds m_ChassisSpeeds;
 
   /** Pose used during simulation */
   private Pose2d simOdometryPose = new Pose2d();
@@ -127,6 +128,8 @@ public class Swerve extends SubsystemBase {
     resetModulesToAbsolute();
 
     swerveOdometry = new SwerveDriveOdometry(swerveKinematics, getYaw(), getModulePositions());
+
+    m_ChassisSpeeds = new ChassisSpeeds();
   }
 
   /**
@@ -144,13 +147,13 @@ public class Swerve extends SubsystemBase {
     double y = translation.getY();
 
     // Calculate chassis speeds from the given translation and rotation
-    ChassisSpeeds chassisSpeeds =
+    m_ChassisSpeeds =
         fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(x, y, rotation, getYaw())
             : new ChassisSpeeds(x, y, rotation);
 
     // Calculate new desired swerve module states from the chassis speeds
-    SwerveModuleState[] newModuleStates = swerveKinematics.toSwerveModuleStates(chassisSpeeds);
+    SwerveModuleState[] newModuleStates = swerveKinematics.toSwerveModuleStates(m_ChassisSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(
         newModuleStates, Constants.SwerveDrivebaseConstants.maxSpeed);
 
@@ -201,6 +204,11 @@ public class Swerve extends SubsystemBase {
       positions[mod.moduleNumber] = mod.getPosition();
     }
     return positions;
+  }
+
+  /** Returns the current ChassisSpeeds */
+  public ChassisSpeeds getChassisSpeeds() {
+    return m_ChassisSpeeds;
   }
 
   /** Zeros the gyro */

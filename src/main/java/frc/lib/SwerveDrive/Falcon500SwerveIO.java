@@ -119,8 +119,8 @@ public class Falcon500SwerveIO implements SwerveModuleIO {
     inputs.driveSpeedMetersPerSecond = getSpeed();
     inputs.driveAppliedVolts = m_driveMotor.getMotorOutputVoltage();
 
-    inputs.driveCurrentAmps = new double[] {m_driveMotor.getStatorCurrent()};
-    inputs.driveTempCelcius = new double[] {m_driveMotor.getTemperature()};
+    inputs.driveCurrentAmps = m_driveMotor.getStatorCurrent();
+    inputs.driveTempCelcius = m_driveMotor.getTemperature();
 
     Rotation2d measuredAngleDegrees =
         Rotation2d.fromDegrees(
@@ -134,8 +134,8 @@ public class Falcon500SwerveIO implements SwerveModuleIO {
     inputs.angleVelocityRadPerSec = 0.0; // TODO: populate this value from Falcon measurement
 
     inputs.angleAppliedVolts = m_angleMotor.getMotorOutputVoltage();
-    inputs.angleCurrentAmps = new double[] {m_angleMotor.getStatorCurrent()};
-    inputs.angleTempCelcius = new double[] {m_angleMotor.getTemperature()};
+    inputs.angleCurrentAmps = m_angleMotor.getStatorCurrent();
+    inputs.angleTempCelcius = m_angleMotor.getTemperature();
   }
 
   /**

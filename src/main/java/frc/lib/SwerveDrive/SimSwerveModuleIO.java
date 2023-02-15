@@ -87,7 +87,7 @@ public class SimSwerveModuleIO implements SwerveModuleIO {
       new FlywheelSim(DCMotor.getFalcon500(1), kAngleMotorGearRatio, kAngleMotorMomentOfInertia);
 
   private final PIDController m_anglePID =
-      new PIDController(0.0, 0.0, 0.0, Constants.robotPeriodSec);
+      new PIDController(1.0, 0.0, 0.0, Constants.robotPeriodSec);
 
   private double m_driveDistanceMeters = 0.0;
   private double m_angleRelativePositionRad = 0.0;
@@ -109,8 +109,8 @@ public class SimSwerveModuleIO implements SwerveModuleIO {
     inputs.driveSpeedMetersPerSecond = speedMetersPerSec;
     inputs.driveDistanceMeters = m_driveDistanceMeters;
     inputs.driveAppliedVolts = m_driveMotorAppliedVolts;
-    inputs.driveCurrentAmps = new double[] {Math.abs(m_simDriveMotor.getCurrentDrawAmps())};
-    inputs.driveTempCelcius = new double[] {};
+    inputs.driveCurrentAmps = Math.abs(m_simDriveMotor.getCurrentDrawAmps());
+    inputs.driveTempCelcius = 0.0;
 
     // Calculate current module angle
     double angleDiffRad = m_simAngleMotor.getAngularVelocityRadPerSec() * Constants.robotPeriodSec;
@@ -127,8 +127,8 @@ public class SimSwerveModuleIO implements SwerveModuleIO {
     inputs.angleAbsolutePositionRad = m_angleAbsolutePositionRad;
     inputs.angleVelocityRadPerSec = m_simAngleMotor.getAngularVelocityRadPerSec();
     inputs.angleAppliedVolts = m_angleMotorAppliedVolts;
-    inputs.angleCurrentAmps = new double[] {Math.abs(m_simAngleMotor.getCurrentDrawAmps())};
-    inputs.angleTempCelcius = new double[] {};
+    inputs.angleCurrentAmps = Math.abs(m_simAngleMotor.getCurrentDrawAmps());
+    inputs.angleTempCelcius = 0.0;
   }
 
   /**

@@ -53,7 +53,10 @@ package frc.robot.subsystems.Dashboard;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -75,7 +78,7 @@ public class SwerveDashboardTab implements IDashboardTab {
   static final int kTelemetryWidth = 6;
 
   /** Height (in cells) of a swerve telemetry module on the dashboard (given a cell size of 32) */
-  static final int kTelemetryHeight = 9;
+  static final int kTelemetryHeight = 11;
 
   /** Title used for a dashboard tab that displays swerve drive info */
   static final String kSwerveTabTitle = "SwerveDrive";
@@ -141,7 +144,33 @@ public class SwerveDashboardTab implements IDashboardTab {
             .getEntry();
 
     // Display the field in a tab
-    m_tab.add(m_field2d).withSize(14, 9).withPosition(4, kTelemetryHeight);
+    m_tab.add(m_field2d).withSize(15, kTelemetryHeight).withPosition(kTelemetryWidth * 4, 0);
+
+    m_tab
+        .addDouble(
+            "CSpeed xVel",
+            () -> {
+              return m_swerveSubsystem.getChassisSpeeds().vxMetersPerSecond;
+            })
+        .withSize(kTelemetryWidth, 3)
+        .withPosition(4, 12);
+    m_tab
+        .addDouble(
+            "CSpeed yVel",
+            () -> {
+              return m_swerveSubsystem.getChassisSpeeds().vyMetersPerSecond;
+            })
+        .withSize(kTelemetryWidth, 3)
+        .withPosition(4 + kTelemetryWidth, 12);
+    m_tab
+        .addDouble(
+            "CSpeed omega",
+            () -> {
+              return Units.radiansToDegrees(
+                  m_swerveSubsystem.getChassisSpeeds().omegaRadiansPerSecond);
+            })
+        .withSize(kTelemetryWidth, 3)
+        .withPosition(4 + (2 * kTelemetryWidth), 12);
 
     Shuffleboard.selectTab(kSwerveTabTitle);
   }
@@ -176,12 +205,12 @@ public class SwerveDashboardTab implements IDashboardTab {
     private final GenericEntry driveCurrent;
     private final GenericEntry driveTemp;
 
-    private final GenericEntry absDegrees;
-    private final GenericEntry rawDegrees;
     private final GenericEntry angleVel;
     private final GenericEntry angleVolts;
     private final GenericEntry angleCurrent;
     private final GenericEntry angleTemp;
+
+    private final SwerveModuleVisualizer m_swerveVisualizer;
 
     /**
      * Creates a Shuffleboard layout for displaying telemetry of a swerve module
@@ -191,11 +220,13 @@ public class SwerveDashboardTab implements IDashboardTab {
      */
     public ModuleTelemetryLayout(
         ShuffleboardTab tab, ModuleId moduleId, int numColumns, int numRows) {
+      m_swerveVisualizer = new SwerveModuleVisualizer();
+
       // Create a vertical list layout to add subgrouped widgets to
       m_layout = tab.getLayout(moduleId.toString(), BuiltInLayouts.kGrid);
       m_layout
           .withProperties(
-              Map.of("Label position", "LEFT", "Number of columns", "1", "Number of rows", "11"))
+              Map.of("Label position", "LEFT", "Number of columns", "1", "Number of rows", "10"))
           .withSize(numColumns, numRows);
 
       BuiltInWidgets widgetType = BuiltInWidgets.kTextView;
@@ -215,25 +246,15 @@ public class SwerveDashboardTab implements IDashboardTab {
               .withPosition(0, 1)
               .withSize(numColumns, telemetryFieldHeight)
               .getEntry();
-      absDegrees =
-          m_layout
-              .add("Angle (abs)", 0)
-              .withWidget(widgetType)
-              .withPosition(0, 2)
-              .withSize(numColumns, telemetryFieldHeight)
-              .getEntry();
-      rawDegrees =
-          m_layout
-              .add("Angle (raw)", 0)
-              .withWidget(widgetType)
-              .withPosition(0, 3)
-              .withSize(numColumns, telemetryFieldHeight)
-              .getEntry();
+      m_layout
+          .add("Angle Deg", m_swerveVisualizer)
+          .withPosition(0, 2)
+          .withSize(numColumns, telemetryFieldHeight * 3);
       angleVel =
           m_layout
-              .add("Angular Vel", 0)
+              .add("Angle Rate", 0)
               .withWidget(widgetType)
-              .withPosition(0, 4)
+              .withPosition(0, 3)
               .withSize(numColumns, telemetryFieldHeight)
               .getEntry();
 
@@ -241,21 +262,21 @@ public class SwerveDashboardTab implements IDashboardTab {
           m_layout
               .add("Drive Volts", 0)
               .withWidget(widgetType)
-              .withPosition(0, 5)
+              .withPosition(0, 4)
               .withSize(numColumns, telemetryFieldHeight)
               .getEntry();
       driveCurrent =
           m_layout
               .add("Drive Current", 0)
               .withWidget(widgetType)
-              .withPosition(0, 6)
+              .withPosition(0, 5)
               .withSize(numColumns, telemetryFieldHeight)
               .getEntry();
       driveTemp =
           m_layout
               .add("Drive Temp", 0)
               .withWidget(widgetType)
-              .withPosition(0, 7)
+              .withPosition(0, 6)
               .withSize(numColumns, telemetryFieldHeight)
               .getEntry();
 
@@ -263,21 +284,21 @@ public class SwerveDashboardTab implements IDashboardTab {
           m_layout
               .add("Volts", 0)
               .withWidget(widgetType)
-              .withPosition(0, 8)
+              .withPosition(0, 7)
               .withSize(numColumns, telemetryFieldHeight)
               .getEntry();
       angleCurrent =
           m_layout
               .add("Current", 0)
               .withWidget(widgetType)
-              .withPosition(0, 9)
+              .withPosition(0, 8)
               .withSize(numColumns, telemetryFieldHeight)
               .getEntry();
       angleTemp =
           m_layout
               .add("Temp", 0)
               .withWidget(widgetType)
-              .withPosition(0, 10)
+              .withPosition(0, 9)
               .withSize(numColumns, telemetryFieldHeight)
               .getEntry();
     }
@@ -291,22 +312,68 @@ public class SwerveDashboardTab implements IDashboardTab {
       driveSpeed.setDouble(telemetry.driveSpeedMetersPerSecond);
       driveDistance.setDouble(telemetry.driveDistanceMeters);
       driveVolts.setDouble(telemetry.driveAppliedVolts);
-      driveCurrent.setDouble(
-          telemetry.driveCurrentAmps.length >= 1 ? telemetry.driveCurrentAmps[0] : 0.0);
-      driveTemp.setDouble(
-          telemetry.driveTempCelcius.length >= 1 ? telemetry.driveTempCelcius[0] : 0.0);
-      absDegrees.setDouble(Units.radiansToDegrees(telemetry.angleAbsolutePositionRad));
-      rawDegrees.setDouble(Units.radiansToDegrees(telemetry.anglePositionRad));
+      driveCurrent.setDouble(telemetry.driveCurrentAmps);
+      driveTemp.setDouble(telemetry.driveTempCelcius);
+      m_swerveVisualizer.update(
+          Units.radiansToDegrees(telemetry.angleAbsolutePositionRad),
+          Units.radiansToDegrees(telemetry.angleVelocityRadPerSec));
       angleVel.setDouble(Units.radiansToDegrees(telemetry.angleVelocityRadPerSec));
       angleVolts.setDouble(telemetry.angleAppliedVolts);
-      angleCurrent.setDouble(
-          telemetry.angleCurrentAmps.length >= 1 ? telemetry.angleCurrentAmps[0] : 0.0);
-      angleTemp.setDouble(
-          telemetry.angleTempCelcius.length >= 1 ? telemetry.angleTempCelcius[0] : 0.0);
+      angleCurrent.setDouble(telemetry.angleCurrentAmps);
+      angleTemp.setDouble(telemetry.angleTempCelcius);
     }
 
     ShuffleboardLayout getLayout() {
       return m_layout;
     }
+  }
+
+  private class SwerveModuleVisualizer implements Gyro, Sendable {
+    double m_angle;
+    double m_rate;
+
+    /**
+     * Creates an instance of the object
+     *
+     * @param angleSupplier supplies the angle of the module in degrees
+     * @param rateSupplier supplies the angle rate of change in degrees per second
+     */
+    public SwerveModuleVisualizer() {}
+
+    @Override
+    public void initSendable(SendableBuilder builder) {
+      builder.setSmartDashboardType("Gyro");
+      builder.addDoubleProperty("Value", this::getAngle, null);
+    }
+
+    /** Update the angle and rate */
+    public void update(double angleDegrees, double angleRateDegreesPerSec) {
+      m_angle = angleDegrees;
+      m_rate = angleRateDegreesPerSec;
+    }
+
+    /** Gyro.getAngle returns the angle in degrees */
+    @Override
+    public double getAngle() {
+      return m_angle;
+    }
+
+    /** Gyro.getRate returns the rate of rotation in degrees per second */
+    @Override
+    public double getRate() {
+      return m_rate;
+    }
+
+    /** Gyro.calibrate() does nothing in this implementation */
+    @Override
+    public void calibrate() {}
+
+    /** Gyro.reset() does nothing in this implementation */
+    @Override
+    public void reset() {}
+
+    /** AutoCloseable.close does nothing in this implementation */
+    @Override
+    public void close() {}
   }
 }

@@ -89,9 +89,9 @@ public class TeleopSwerve extends CommandBase {
 
   @Override
   public void execute() {
-    double yAxis = -controller.getRawAxis(translationAxis);
-    double xAxis = -controller.getRawAxis(strafeAxis);
-    double rAxis = -controller.getRawAxis(rotationAxis);
+    double yAxis = -controller.getLeftY();
+    double xAxis = -controller.getLeftX();
+    double rAxis = -controller.getRightX();
 
     translation = new Translation2d(yAxis, xAxis).times(BotStateSubsystem.MaxSpeed);
     rotation = rAxis * BotStateSubsystem.MaxRotate;
