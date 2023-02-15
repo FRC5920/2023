@@ -8,7 +8,7 @@
 /*-----------------------------------------------------------------------------\
 |                                                                              |
 |                       ================================                       |
-|                       **    TEAM 5290 - Vikotics    **                       |
+|                       **    TEAM 5920 - Vikotics    **                       |
 |                       ================================                       |
 |                                                                              |
 |                            °        #°                                       |
@@ -91,8 +91,8 @@ public class RobotContainer {
       new JoystickButton(driver, XboxController.Button.kStart.value);
 
   /* Cameras */
-  private final PhotonCamera TagCamera = new PhotonCamera("Tag_Camera");
-  private final PhotonCamera BackCamera = new PhotonCamera("Back_Camera");
+  private final PhotonCamera TagCamera = new PhotonCamera("Heimdall_Tag_Camera");
+  private final PhotonCamera BackCamera = new PhotonCamera("BackupCamera");
   private final PhotonCamera ArmCamera = new PhotonCamera("Arm_Camera");
 
   /* Subsystems */
