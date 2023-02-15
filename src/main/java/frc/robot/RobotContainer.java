@@ -61,6 +61,7 @@ import frc.robot.subsystems.*;
 import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Arm.Pneumatics;
 import frc.robot.subsystems.Dashboard.DriveTab;
+import frc.robot.subsystems.Heimdall.PVCore;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 
@@ -82,7 +83,8 @@ public class RobotContainer {
   public final BotStateSubsystem s_BotState = new BotStateSubsystem();
   public final Pneumatics s_Pneumatics = new Pneumatics();
   public final Arm s_Arm = new Arm(s_Pneumatics);
-
+  public final PVCore s_PVCore = new PVCore();
+  
   /* Dashboard Subsystems */
   public final DriveTab s_DriveTab = new DriveTab();
 

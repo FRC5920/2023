@@ -191,8 +191,8 @@ public class JoystickSubsystem extends SubsystemBase {
     driverController.start.onTrue(new InstantCommand(this::doNothing, this));
 
     // Map buttons on operator controller
-    operatorController.A.onTrue(new PickUpCone(botContainer.s_Arm));
-    operatorController.B.onTrue(new PickUpCube(botContainer.s_Arm));
+    operatorController.A.onTrue(new PickUpCone(botContainer.s_Arm, botContainer.s_PVCore));
+    operatorController.B.onTrue(new PickUpCube(botContainer.s_Arm, botContainer.s_PVCore));
     operatorController.X.onTrue(
         new PlaceObject(
             botContainer.s_Arm, botContainer.s_BotState.storedGamePiece, Arm.Rank.Medium, Arm.ArmExtenderPosition.MiddleRank));
