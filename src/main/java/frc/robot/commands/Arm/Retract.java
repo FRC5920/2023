@@ -56,6 +56,7 @@ import frc.robot.subsystems.Arm.Arm;
 
 public class Retract extends CommandBase {
   /** Creates a new Retract. */
+  Boolean isDone = false;
   public Retract() {
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -69,6 +70,7 @@ public class Retract extends CommandBase {
   public void execute() {
     Arm.setArmPosition(Arm.Rank.InRobot.getEncoderCount());
     Arm.setArmExtension(Arm.ArmExtenderPosition.StowedAway);
+    isDone = true;
   }
 
   // Called once the command ends or is interrupted.
@@ -78,6 +80,6 @@ public class Retract extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return isDone;
   }
 }
