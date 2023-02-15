@@ -75,9 +75,10 @@ import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import java.io.IOException;
 import java.util.Optional;
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
 
 public class PoseEstimatorSubsystem extends SubsystemBase {
-
+  private PhotonPoseEstimator photonPoseEstimator;
   private final PhotonCamera photonCamera;
   private final Swerve s_swerveSubsystem;
   private final AprilTagFieldLayout aprilTagFieldLayout;

@@ -86,13 +86,14 @@ public class RobotContainer {
   public final DashboardSubsystem dashboardSubsystem;
 
   /* Cameras */
-  private final PhotonCamera TagCamera = new PhotonCamera("Heimdall_Tag_Camera");
+  private final PhotonCamera TagCamera = new PhotonCamera(Constants.VisionConstants.TagCameraName);
 
   @SuppressWarnings({"unused"})
-  private final PhotonCamera BackCamera = new PhotonCamera("BackupCamera");
+  private final PhotonCamera BackCamera =
+      new PhotonCamera(Constants.VisionConstants.BackupCameraName);
 
   @SuppressWarnings({"unused"})
-  private final PhotonCamera ArmCamera = new PhotonCamera("Arm_Camera");
+  private final PhotonCamera ArmCamera = new PhotonCamera(Constants.VisionConstants.ArmCameraName);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
