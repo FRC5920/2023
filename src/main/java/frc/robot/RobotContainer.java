@@ -62,8 +62,10 @@ import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Dashboard.DriveTab;
+import frc.robot.subsystems.Heimdall.*;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
+import org.photonvision.PhotonCamera;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -85,15 +87,25 @@ public class RobotContainer {
   /* Driver Buttons */
   private final JoystickButton zeroGyro =
       new JoystickButton(driver, XboxController.Button.kY.value);
+  private final JoystickButton BalanceBot =
+      new JoystickButton(driver, XboxController.Button.kStart.value);
 
-  // --------------------- Robot Subsystems ----------------------------
-  public final JoystickSubsystem joystickSubsystem = new JoystickSubsystem();
-  public final Swerve swerveSubsystem = new Swerve();
+  /* Cameras */
+  private final PhotonCamera TagCamera = new PhotonCamera("Tag_Camera");
+  private final PhotonCamera BackCamera = new PhotonCamera("Back_Camera");
+  private final PhotonCamera ArmCamera = new PhotonCamera("Arm_Camera");
+
+  /* Subsystems */
+  private final Swerve swerveSubsystem = new Swerve();
   public final BotStateSubsystem s_BotState = new BotStateSubsystem();
+  private final PoseEstimatorSubsystem s_poseEstimator =
+      new PoseEstimatorSubsystem(TagCamera, swerveSubsystem);
+
   /* Dashboard Subsystems */
   public final DriveTab s_DriveTab = new DriveTab();
 
   // The robot's subsystems and commands are defined here...
+  // private final Balance m_Balance = new Balance(swerveSubsystem, s_poseEstimator);
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -138,6 +150,8 @@ public class RobotContainer {
     /* Driver Buttons */
 
     zeroGyro.onTrue(new InstantCommand(() -> swerveSubsystem.zeroGyro()));
+
+    BalanceBot.whileTrue(new Balance(swerveSubsystem));
   }
 
   /**
