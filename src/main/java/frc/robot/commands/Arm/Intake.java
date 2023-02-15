@@ -86,6 +86,6 @@ public class Intake extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return System.currentTimeMillis() == startTime + Constants.ArmConstants.kDropWaitTime;
+    return System.currentTimeMillis() == startTime + Constants.ArmConstants.kIntakeWaitTime;
   }
 }
