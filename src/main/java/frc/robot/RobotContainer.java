@@ -123,6 +123,8 @@ public class RobotContainer {
     eject.onTrue(new InstantCommand(() -> s_Arm.place()));
     armforward.onTrue(new InstantCommand(() -> s_Arm.armForward()));
     armback.onTrue(new InstantCommand(() -> s_Arm.armBackward())); */
+
+    joystickSubsystem.configureButtonBindings(this);
   }
 
   /**

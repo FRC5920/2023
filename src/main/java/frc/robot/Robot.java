@@ -129,6 +129,7 @@ public class Robot extends LoggedRobot {
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
 
+    // Initialize dashboard elements
     m_robotContainer.s_Arm.initDashboard();
   }
 
