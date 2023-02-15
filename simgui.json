@@ -21,8 +21,22 @@
         "open": true
       },
       "Shuffleboard": {
+        ".metadata": {
+          "Drive": {
+            "Max Speed": {
+              "open": true
+            },
+            "open": true
+          }
+        },
         "Drive": {
           "Speed Limit": {
+            "open": true
+          },
+          "open": true
+        },
+        "Vision": {
+          "Field": {
             "open": true
           },
           "open": true

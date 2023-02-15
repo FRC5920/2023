@@ -49,46 +49,20 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.commands;
+package frc.robot;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.lib.Joystick.ProcessedXboxController;
-import frc.robot.subsystems.JoystickSubsystem;
-import frc.robot.subsystems.SwerveDrivebase.Swerve;
-import frc.robot.subsystems.runtimeState.BotStateSubsystem;
+/** Automatically generated file containing build version information. */
+public final class GenBuildInfo {
+  public static final String MAVEN_GROUP = "";
+  public static final String MAVEN_NAME = "2023";
+  public static final String VERSION = "unspecified";
+  public static final int GIT_REVISION = 53;
+  public static final String GIT_SHA = "36f5ca1a11f498f943994602f9784e79d6733b6d";
+  public static final String GIT_DATE = "UNKNOWN";
+  public static final String GIT_BRANCH = "feature/support-simulation-mode";
+  public static final String BUILD_DATE = "2023-02-15 13:09:13 PST";
+  public static final long BUILD_UNIX_TIME = 1676495353082L;
+  public static final int DIRTY = 1;
 
-public class TeleopSwerve extends CommandBase {
-  private double rotation;
-  private Translation2d translation;
-  private boolean fieldRelative;
-  private boolean openLoop;
-
-  private Swerve s_Swerve;
-  private ProcessedXboxController controller;
-
-  /** Driver control */
-  public TeleopSwerve(
-      Swerve s_Swerve,
-      JoystickSubsystem joystickSubsystem,
-      boolean fieldRelative,
-      boolean openLoop) {
-    this.s_Swerve = s_Swerve;
-    addRequirements(s_Swerve);
-
-    this.controller = joystickSubsystem.driverController;
-    this.fieldRelative = fieldRelative;
-    this.openLoop = openLoop;
-  }
-
-  @Override
-  public void execute() {
-    double yAxis = -controller.getLeftY();
-    double xAxis = -controller.getLeftX();
-    double rAxis = -controller.getRightX();
-
-    translation = new Translation2d(yAxis, xAxis).times(BotStateSubsystem.MaxSpeed);
-    rotation = rAxis * BotStateSubsystem.MaxRotate;
-    s_Swerve.drive(translation, rotation, fieldRelative, openLoop);
-  }
+  private GenBuildInfo() {}
 }

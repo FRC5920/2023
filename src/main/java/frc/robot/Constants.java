@@ -188,7 +188,7 @@ public final class Constants {
       public static final int driveMotorID = 31;
       public static final int angleMotorID = 32;
       public static final int canCoderID = 33;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(108.20);
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(109.07);
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
@@ -248,7 +248,7 @@ public final class Constants {
     /** Prototype robot */
     PrototypeBot,
 
-    /** Simulated robot */
+    /** Competition robot */
     CompetitionBot;
 
     /** Get the human-readable name of the robot type */

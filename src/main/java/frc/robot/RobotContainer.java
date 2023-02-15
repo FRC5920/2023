@@ -62,8 +62,10 @@ import frc.lib.SwerveDrive.SwerveModuleIO;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
+import frc.robot.subsystems.Heimdall.*;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
+import org.photonvision.PhotonCamera;
 
 /**
  * This class is where the bulk of the robot should` be declared. Since Command-based is a
@@ -72,11 +74,25 @@ import frc.robot.subsystems.runtimeState.BotStateSubsystem;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
+
   // --------------------- Robot Subsystems ----------------------------
   public final JoystickSubsystem joystickSubsystem = new JoystickSubsystem();
-  public final Swerve swerveSubsystem;
   public final BotStateSubsystem s_BotState = new BotStateSubsystem();
+  public final Swerve swerveSubsystem;
+
+  @SuppressWarnings({"unused"})
+  private final PoseEstimatorSubsystem s_poseEstimator;
+
   public final DashboardSubsystem dashboardSubsystem;
+
+  /* Cameras */
+  private final PhotonCamera TagCamera = new PhotonCamera("Heimdall_Tag_Camera");
+
+  @SuppressWarnings({"unused"})
+  private final PhotonCamera BackCamera = new PhotonCamera("BackupCamera");
+
+  @SuppressWarnings({"unused"})
+  private final PhotonCamera ArmCamera = new PhotonCamera("Arm_Camera");
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -144,6 +160,8 @@ public class RobotContainer {
 
     swerveSubsystem.setDefaultCommand(
         new TeleopSwerve(swerveSubsystem, joystickSubsystem, fieldRelative, openLoop));
+
+    s_poseEstimator = new PoseEstimatorSubsystem(TagCamera, swerveSubsystem);
 
     dashboardSubsystem = new DashboardSubsystem(this);
     dashboardSubsystem.initialize(this);

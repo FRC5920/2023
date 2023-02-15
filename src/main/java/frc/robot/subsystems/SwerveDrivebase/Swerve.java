@@ -211,6 +211,11 @@ public class Swerve extends SubsystemBase {
     return m_ChassisSpeeds;
   }
 
+  /** Returns the swerve drive kinematics */
+  public SwerveDriveKinematics getSwerveKinematics() {
+    return swerveKinematics;
+  }
+
   /** Zeros the gyro */
   public void zeroGyro() {
     m_gyroMeasurements.yawRad = kAngleZero.getRadians();
