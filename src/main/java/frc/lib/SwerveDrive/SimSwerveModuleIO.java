@@ -116,12 +116,12 @@ public class SimSwerveModuleIO implements SwerveModuleIO {
     double angleDiffRad = m_simAngleMotor.getAngularVelocityRadPerSec() * Constants.robotPeriodSec;
     m_angleRelativePositionRad += angleDiffRad;
     m_angleAbsolutePositionRad += angleDiffRad;
-    while (m_angleAbsolutePositionRad < 0) {
-      m_angleAbsolutePositionRad += 2.0 * Math.PI;
-    }
-    while (m_angleAbsolutePositionRad > 2.0 * Math.PI) {
-      m_angleAbsolutePositionRad -= 2.0 * Math.PI;
-    }
+    // while (m_angleAbsolutePositionRad < 0) {
+    //   m_angleAbsolutePositionRad += 2.0 * Math.PI;
+    // }
+    // while (m_angleAbsolutePositionRad > 2.0 * Math.PI) {
+    //   m_angleAbsolutePositionRad -= 2.0 * Math.PI;
+    // }
 
     inputs.anglePositionRad = m_angleRelativePositionRad;
     inputs.angleAbsolutePositionRad = m_angleAbsolutePositionRad;
