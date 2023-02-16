@@ -71,18 +71,21 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.SwerveDrivebaseConstants;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import java.io.IOException;
 import java.util.Optional;
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
 public class PoseEstimatorSubsystem extends SubsystemBase {
   private PhotonPoseEstimator photonPoseEstimator;
   private final PhotonCamera photonCamera;
   private final Swerve s_swerveSubsystem;
-  private final AprilTagFieldLayout aprilTagFieldLayout;
+  private final AprilTagFieldLayout ATfieldLayout;
 
   // Kalman Filter Configuration. These can be "tuned-to-taste" based on how much
   // you trust your various sensors. Smaller numbers will cause the filter to
@@ -115,20 +118,38 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
   public PoseEstimatorSubsystem(PhotonCamera photonCamera, Swerve s_swerveSubsystem) {
     this.photonCamera = photonCamera;
     this.s_swerveSubsystem = s_swerveSubsystem;
-    AprilTagFieldLayout layout;
+    AprilTagFieldLayout fieldLayout = null;
     try {
-      layout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2023ChargedUp.m_resourceFile);
+      // Attempt to load the AprilTagFieldLayout that will tell us where the tags are on the field.
+      fieldLayout = AprilTagFields.k2023ChargedUp.loadAprilTagLayoutField();
+      // Set origin (Don't know if we need this anymore)
       var alliance = DriverStation.getAlliance();
       // var alliance = Alliance.Blue;
-      layout.setOrigin(
+      fieldLayout.setOrigin(
           alliance == Alliance.Blue
               ? OriginPosition.kBlueAllianceWallRightSide
               : OriginPosition.kRedAllianceWallRightSide);
+      // End of setting origin
+      // Create pose estimator
+      photonPoseEstimator =
+          new PhotonPoseEstimator(
+              fieldLayout,
+              PoseStrategy.LOWEST_AMBIGUITY,
+              photonCamera,
+              Constants.VisionConstants.CAMERA_TO_ROBOT);
+      // photonPoseEstimator =
+      //          new PhotonPoseEstimator(
+      //                 fieldLayout, PoseStrategy.MULTI_TAG_PNP, photonCamera,
+      // Constants.VisionConstants.CAMERA_TO_ROBOT);
+      //        photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
     } catch (IOException e) {
+      // The AprilTagFieldLayout failed to load. We won't be able to estimate poses if we don't know
+      // where the tags are.
       DriverStation.reportError("Failed to load AprilTagFieldLayout", e.getStackTrace());
-      layout = null;
+      photonPoseEstimator = null;
+      fieldLayout = null;
     }
-    this.aprilTagFieldLayout = layout;
+    this.ATfieldLayout = fieldLayout;
 
     ShuffleboardTab tab = Shuffleboard.getTab("Vision");
 
@@ -157,9 +178,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
       // Get the tag pose from field layout - consider that the layout will be null if it failed to
       // load
       Optional<Pose3d> tagPose =
-          aprilTagFieldLayout == null
-              ? Optional.empty()
-              : aprilTagFieldLayout.getTagPose(fiducialId);
+          ATfieldLayout == null ? Optional.empty() : ATfieldLayout.getTagPose(fiducialId);
       if (target.getPoseAmbiguity() <= .2 && fiducialId >= 0 && tagPose.isPresent()) {
         var targetPose = tagPose.get();
         Transform3d camToTarget = target.getBestCameraToTarget();
@@ -213,5 +232,19 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
 
   public void addTrajectory(PathPlannerTrajectory traj) {
     field2d.getObject("Trajectory").setTrajectory(traj);
+  }
+
+  /**
+   * @param estimatedRobotPose The current best guess at robot pose
+   * @return an EstimatedRobotPose with an estimated pose, the timestamp, and targets used to create
+   *     the estimate
+   */
+  public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
+    if (photonPoseEstimator == null) {
+      // The field layout failed to load, so we cannot estimate poses.
+      return Optional.empty();
+    }
+    photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
+    return photonPoseEstimator.update();
   }
 }
