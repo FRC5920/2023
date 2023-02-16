@@ -58,6 +58,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.Joystick.AxisProcChain;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.RobotContainer;
+import frc.robot.commands.Arm.Fetch;
 import frc.robot.commands.Arm.PickUpCone;
 import frc.robot.commands.Arm.PickUpCube;
 import frc.robot.commands.Arm.PlaceObject;
@@ -180,8 +181,8 @@ public class JoystickSubsystem extends SubsystemBase {
             Arm.Rank.Medium,
             Arm.ArmExtenderPosition.MiddleRank));
     operatorController.Y.onTrue(new InstantCommand(this::doNothing, this));
-    operatorController.leftBumper.whileTrue(new InstantCommand(this::doNothing, this));
-    operatorController.rightBumper.whileTrue(new InstantCommand(this::doNothing, this));
+    operatorController.leftBumper.onTrue(new Fetch(Arm.GamePieceType.Cone, botContainer.ArmCamera));
+    operatorController.rightBumper.onTrue(new Fetch(Arm.GamePieceType.Cube, botContainer.ArmCamera));
     operatorController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.back.onTrue(new InstantCommand(this::doNothing, this));
