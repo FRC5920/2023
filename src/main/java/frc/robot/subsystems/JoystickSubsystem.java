@@ -181,8 +181,8 @@ public class JoystickSubsystem extends SubsystemBase {
             Arm.Rank.Medium,
             Arm.ArmExtenderPosition.MiddleRank));
     operatorController.Y.onTrue(new InstantCommand(this::doNothing, this));
-    operatorController.leftBumper.onTrue(new Fetch(Arm.GamePieceType.Cone, botContainer.ArmCamera));
-    operatorController.rightBumper.onTrue(new Fetch(Arm.GamePieceType.Cube, botContainer.ArmCamera));
+    operatorController.leftBumper.whileTrue(new Fetch(Arm.GamePieceType.Cone, botContainer.ArmCamera));
+    operatorController.rightBumper.whileTrue(new Fetch(Arm.GamePieceType.Cube, botContainer.ArmCamera));
     operatorController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.back.onTrue(new InstantCommand(this::doNothing, this));
