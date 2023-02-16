@@ -87,7 +87,7 @@ public class SimSwerveModuleIO implements SwerveModuleIO {
       new FlywheelSim(DCMotor.getFalcon500(1), kAngleMotorGearRatio, kAngleMotorMomentOfInertia);
 
   private final PIDController m_anglePID =
-      new PIDController(1.0, 0.01, 0.0, Constants.robotPeriodSec);
+      new PIDController(1.0, 0.0, 0.0, Constants.robotPeriodSec);
 
   private double m_driveDistanceMeters = 0.0;
   private double m_angleRelativePositionRad = 0.0;

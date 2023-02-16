@@ -7,9 +7,14 @@
       "/Shuffleboard/Drive/Speed Limit": "String Chooser",
       "/Shuffleboard/SwerveDrive/Field": "Field2d",
       "/Shuffleboard/SwerveDrive/FrontLeft/Angle Deg": "Gyro",
+      "/Shuffleboard/SwerveDrive/FrontLeft/Angle/Degrees": "Gyro",
       "/Shuffleboard/SwerveDrive/FrontRight/Angle Deg": "Gyro",
+      "/Shuffleboard/SwerveDrive/FrontRight/Angle/Degrees": "Gyro",
       "/Shuffleboard/SwerveDrive/RearLeft/Angle Deg": "Gyro",
-      "/Shuffleboard/SwerveDrive/RearRight/Angle Deg": "Gyro"
+      "/Shuffleboard/SwerveDrive/RearLeft/Angle/Degrees": "Gyro",
+      "/Shuffleboard/SwerveDrive/RearRight/Angle Deg": "Gyro",
+      "/Shuffleboard/SwerveDrive/RearRight/Angle/Degrees": "Gyro",
+      "/Shuffleboard/Vision/Field": "Field2d"
     }
   },
   "NetworkTables": {

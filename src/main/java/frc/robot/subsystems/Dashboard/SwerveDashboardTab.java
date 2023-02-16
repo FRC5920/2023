@@ -75,10 +75,10 @@ import java.util.Map;
 public class SwerveDashboardTab implements IDashboardTab {
 
   /** Width (in cells) of a swerve telemetry module on the dashboard (given a cell size of 32) */
-  static final int kTelemetryWidth = 6;
+  static final int kSwerveModuleTelemetryWidth = 6;
 
   /** Height (in cells) of a swerve telemetry module on the dashboard (given a cell size of 32) */
-  static final int kTelemetryHeight = 11;
+  static final int kSwerveModuleLayoutHeight = 14;
 
   /** Title used for a dashboard tab that displays swerve drive info */
   static final String kSwerveTabTitle = "SwerveDrive";
@@ -120,18 +120,59 @@ public class SwerveDashboardTab implements IDashboardTab {
     // Add telemetry display of swerve modules
     m_moduleTelemetry =
         new ModuleTelemetryLayout[] {
-          new ModuleTelemetryLayout(m_tab, ModuleId.kFrontLeft, kTelemetryWidth, kTelemetryHeight),
-          new ModuleTelemetryLayout(m_tab, ModuleId.kFrontRight, kTelemetryWidth, kTelemetryHeight),
-          new ModuleTelemetryLayout(m_tab, ModuleId.kRearLeft, kTelemetryWidth, kTelemetryHeight),
-          new ModuleTelemetryLayout(m_tab, ModuleId.kRearRight, kTelemetryWidth, kTelemetryHeight),
+          new ModuleTelemetryLayout(
+              m_tab, ModuleId.kFrontLeft, kSwerveModuleTelemetryWidth, kSwerveModuleLayoutHeight),
+          new ModuleTelemetryLayout(
+              m_tab, ModuleId.kFrontRight, kSwerveModuleTelemetryWidth, kSwerveModuleLayoutHeight),
+          new ModuleTelemetryLayout(
+              m_tab, ModuleId.kRearLeft, kSwerveModuleTelemetryWidth, kSwerveModuleLayoutHeight),
+          new ModuleTelemetryLayout(
+              m_tab, ModuleId.kRearRight, kSwerveModuleTelemetryWidth, kSwerveModuleLayoutHeight),
         };
 
     int col = 0;
     for (ModuleId moduleId : ModuleId.values()) {
       m_moduleTelemetry[moduleId.value].getLayout().withPosition(col, 0);
-      col += kTelemetryWidth;
+      col += kSwerveModuleTelemetryWidth;
     }
 
+    // --------------------------------------
+    // Add chassis speeds layout
+    ShuffleboardLayout cspeedLayout =
+        m_tab
+            .getLayout("Chassis Speeds", BuiltInLayouts.kGrid)
+            .withProperties(
+                Map.of("Label position", "LEFT", "Number of columns", "1", "Number of rows", "3"))
+            .withSize(6, 5)
+            .withPosition(0, kSwerveModuleLayoutHeight);
+    cspeedLayout
+        .addDouble(
+            "xVel",
+            () -> {
+              return m_swerveSubsystem.getChassisSpeeds().vxMetersPerSecond;
+            })
+        .withSize(kSwerveModuleTelemetryWidth, 1)
+        .withPosition(0, 0);
+    cspeedLayout
+        .addDouble(
+            "yVel",
+            () -> {
+              return m_swerveSubsystem.getChassisSpeeds().vyMetersPerSecond;
+            })
+        .withSize(kSwerveModuleTelemetryWidth, 1)
+        .withPosition(0, 1);
+    cspeedLayout
+        .addDouble(
+            "Omega",
+            () -> {
+              return Units.radiansToDegrees(
+                  m_swerveSubsystem.getChassisSpeeds().omegaRadiansPerSecond);
+            })
+        .withSize(kSwerveModuleTelemetryWidth, 1)
+        .withPosition(0, 2);
+
+    // --------------------------------------
+    // Add max speed slider
     m_maxSpeed =
         m_tab
             .add("Max Speed", 0.75)
@@ -139,38 +180,12 @@ public class SwerveDashboardTab implements IDashboardTab {
             .withProperties(
                 Map.of(
                     "Min", 0, "Max", 1, "Block increment", 0.05)) // specify widget properties here
-            .withSize(4, 4)
-            .withPosition(0, kTelemetryHeight)
+            .withSize(kSwerveModuleTelemetryWidth * 2, 4)
+            .withPosition(kSwerveModuleTelemetryWidth, kSwerveModuleLayoutHeight)
             .getEntry();
 
     // Display the field in a tab
-    m_tab.add(m_field2d).withSize(15, kTelemetryHeight).withPosition(kTelemetryWidth * 4, 0);
-
-    m_tab
-        .addDouble(
-            "CSpeed xVel",
-            () -> {
-              return m_swerveSubsystem.getChassisSpeeds().vxMetersPerSecond;
-            })
-        .withSize(kTelemetryWidth, 3)
-        .withPosition(4, 12);
-    m_tab
-        .addDouble(
-            "CSpeed yVel",
-            () -> {
-              return m_swerveSubsystem.getChassisSpeeds().vyMetersPerSecond;
-            })
-        .withSize(kTelemetryWidth, 3)
-        .withPosition(4 + kTelemetryWidth, 12);
-    m_tab
-        .addDouble(
-            "CSpeed omega",
-            () -> {
-              return Units.radiansToDegrees(
-                  m_swerveSubsystem.getChassisSpeeds().omegaRadiansPerSecond);
-            })
-        .withSize(kTelemetryWidth, 3)
-        .withPosition(4 + (2 * kTelemetryWidth), 12);
+    // topLayout.add(m_field2d).withSize(15, kTelemetryHeight);
 
     Shuffleboard.selectTab(kSwerveTabTitle);
   }
@@ -219,87 +234,107 @@ public class SwerveDashboardTab implements IDashboardTab {
      * @param moduleId ID of the swerve module being represented
      */
     public ModuleTelemetryLayout(
-        ShuffleboardTab tab, ModuleId moduleId, int numColumns, int numRows) {
+        ShuffleboardTab tab, ModuleId moduleId, int sizeColumns, int sizeRows) {
       m_swerveVisualizer = new SwerveModuleVisualizer();
 
-      // Create a vertical list layout to add subgrouped widgets to
+      // Create a grid layout to add subgrouped widgets to
       m_layout = tab.getLayout(moduleId.toString(), BuiltInLayouts.kGrid);
       m_layout
           .withProperties(
-              Map.of("Label position", "LEFT", "Number of columns", "1", "Number of rows", "10"))
-          .withSize(numColumns, numRows);
+              Map.of("Label position", "TOP", "Number of columns", "1", "Number of rows", "2"))
+          .withSize(sizeColumns, sizeRows);
 
       BuiltInWidgets widgetType = BuiltInWidgets.kTextView;
       int telemetryFieldHeight = 1;
 
-      driveDistance =
+      // --------------------------------------
+      // Add angle layout
+      ShuffleboardLayout angleLayout =
           m_layout
-              .add("Drive Distance", 0)
-              .withWidget(widgetType)
-              .withPosition(0, 0)
-              .withSize(numColumns, telemetryFieldHeight)
-              .getEntry();
-      driveSpeed =
-          m_layout
-              .add("Drive Speed", 0)
+              .getLayout("Angle", BuiltInLayouts.kGrid)
+              .withProperties(
+                  Map.of("Label position", "LEFT", "Number of columns", "1", "Number of rows", "5"))
+              .withPosition(0, 0);
+
+      angleLayout
+          .add("Degrees", m_swerveVisualizer)
+          .withPosition(0, 0)
+          .withSize(sizeColumns, telemetryFieldHeight * 3);
+
+      angleVel =
+          angleLayout
+              .add("Rate", 0)
               .withWidget(widgetType)
               .withPosition(0, 1)
-              .withSize(numColumns, telemetryFieldHeight)
+              .withSize(sizeColumns, telemetryFieldHeight)
               .getEntry();
-      m_layout
-          .add("Angle Deg", m_swerveVisualizer)
-          .withPosition(0, 2)
-          .withSize(numColumns, telemetryFieldHeight * 3);
-      angleVel =
-          m_layout
-              .add("Angle Rate", 0)
+      angleVolts =
+          angleLayout
+              .add("Volts", 0)
+              .withWidget(widgetType)
+              .withPosition(0, 2)
+              .withSize(sizeColumns, telemetryFieldHeight)
+              .getEntry();
+      angleCurrent =
+          angleLayout
+              .add("Current", 0)
               .withWidget(widgetType)
               .withPosition(0, 3)
-              .withSize(numColumns, telemetryFieldHeight)
+              .withSize(sizeColumns, telemetryFieldHeight)
+              .getEntry();
+      angleTemp =
+          angleLayout
+              .add("Temp", 0)
+              .withWidget(widgetType)
+              .withPosition(0, 4)
+              .withSize(sizeColumns, telemetryFieldHeight)
+              .getEntry();
+
+      // --------------------------------------
+      // Add drive layout
+      ShuffleboardLayout driveLayout =
+          m_layout
+              .getLayout("Drive", BuiltInLayouts.kGrid)
+              .withProperties(
+                  Map.of("Label position", "LEFT", "Number of columns", "1", "Number of rows", "5"))
+              .withPosition(0, 1);
+
+      driveSpeed =
+          driveLayout
+              .add("Speed", 0)
+              .withWidget(widgetType)
+              .withPosition(0, 0)
+              .withSize(sizeColumns + 1, telemetryFieldHeight)
+              .getEntry();
+
+      driveDistance =
+          driveLayout
+              .add("Distance", 0)
+              .withWidget(widgetType)
+              .withPosition(0, 1)
+              .withSize(sizeColumns + 1, telemetryFieldHeight)
               .getEntry();
 
       driveVolts =
-          m_layout
-              .add("Drive Volts", 0)
-              .withWidget(widgetType)
-              .withPosition(0, 4)
-              .withSize(numColumns, telemetryFieldHeight)
-              .getEntry();
-      driveCurrent =
-          m_layout
-              .add("Drive Current", 0)
-              .withWidget(widgetType)
-              .withPosition(0, 5)
-              .withSize(numColumns, telemetryFieldHeight)
-              .getEntry();
-      driveTemp =
-          m_layout
-              .add("Drive Temp", 0)
-              .withWidget(widgetType)
-              .withPosition(0, 6)
-              .withSize(numColumns, telemetryFieldHeight)
-              .getEntry();
-
-      angleVolts =
-          m_layout
+          driveLayout
               .add("Volts", 0)
               .withWidget(widgetType)
-              .withPosition(0, 7)
-              .withSize(numColumns, telemetryFieldHeight)
+              .withPosition(0, 2)
+              .withSize(sizeColumns + 1, telemetryFieldHeight)
               .getEntry();
-      angleCurrent =
-          m_layout
+      driveCurrent =
+          driveLayout
               .add("Current", 0)
               .withWidget(widgetType)
-              .withPosition(0, 8)
-              .withSize(numColumns, telemetryFieldHeight)
+              .withPosition(0, 3)
+              .withSize(sizeColumns + 1, telemetryFieldHeight)
               .getEntry();
-      angleTemp =
-          m_layout
+      driveTemp =
+          driveLayout
               .add("Temp", 0)
               .withWidget(widgetType)
-              .withPosition(0, 9)
-              .withSize(numColumns, telemetryFieldHeight)
+              .withPosition(0, 4)
+              .withSize(sizeColumns + 1, telemetryFieldHeight)
               .getEntry();
     }
 
