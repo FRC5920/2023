@@ -80,9 +80,9 @@ public class RobotContainer {
   private final Joystick driver = new Joystick(0);
 
   /* Drive Controls */
-  private final int translationAxis = XboxController.Axis.kLeftY.value;
-  private final int strafeAxis = XboxController.Axis.kLeftX.value;
-  private final int rotationAxis = XboxController.Axis.kRightX.value;
+  public final int translationAxis = XboxController.Axis.kLeftY.value;
+  public final int strafeAxis = XboxController.Axis.kLeftX.value;
+  public final int rotationAxis = XboxController.Axis.kRightX.value;
 
   /* Cameras */
   private final PhotonCamera TagCamera = new PhotonCamera(Constants.VisionConstants.TagCameraName);
@@ -106,6 +106,10 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   // private final Balance m_Balance = new Balance(swerveSubsystem, s_poseEstimator);
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+
+  public boolean fieldRelative;
+
+  public boolean openLoop;
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   // private final CommandXboxController m_driverController =
