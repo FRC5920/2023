@@ -53,19 +53,20 @@ package frc.robot.commands.Arm;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Arm.Arm;
+import org.photonvision.PhotonCamera;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class PickUpCone extends SequentialCommandGroup {
   /** Creates a new PickUpCone. */
-  public PickUpCone(Arm armSubsystem) {
+  public PickUpCone(Arm armSubsystem, PhotonCamera camera) {
     addRequirements(armSubsystem);
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
         new Reach(Arm.Rank.PickUp, Arm.ArmExtenderPosition.OnFloor),
-        new Fetch(Arm.GamePieceType.Cone),
+        new Fetch(Arm.GamePieceType.Cone, camera),
         new Intake(Arm.GamePieceType.Cone),
         new Retract());
   }

@@ -51,6 +51,8 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.commands.Arm;
 
+import org.photonvision.PhotonCamera;
+
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Arm.Arm;
 
@@ -59,13 +61,13 @@ import frc.robot.subsystems.Arm.Arm;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class PickUpCube extends SequentialCommandGroup {
   /** Creates a new PickUpCube. */
-  public PickUpCube(Arm armSubsystem) {
+  public PickUpCube(Arm armSubsystem, PhotonCamera camera) {
     addRequirements(armSubsystem);
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
         new Reach(Arm.Rank.PickUp, Arm.ArmExtenderPosition.OnFloor),
-        new Fetch(Arm.GamePieceType.Cube),
+        new Fetch(Arm.GamePieceType.Cube, camera),
         new Intake(Arm.GamePieceType.Cube),
         new Retract());
   }

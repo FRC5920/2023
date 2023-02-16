@@ -64,6 +64,7 @@ public class Reach extends CommandBase {
   public Reach(Arm.Rank ReachWhere, Arm.ArmExtenderPosition ReachHowFar) {
     // Use addRequirements() here to declare subsystem dependencies.
     ReachTo = ReachWhere;
+    ReachDistance = ReachHowFar;
   }
 
   // Called when the command is initially scheduled.

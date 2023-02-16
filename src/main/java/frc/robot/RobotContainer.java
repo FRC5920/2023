@@ -88,7 +88,7 @@ public class RobotContainer {
   private final PhotonCamera TagCamera = new PhotonCamera(Constants.VisionConstants.TagCameraName);
   private final PhotonCamera BackCamera =
       new PhotonCamera(Constants.VisionConstants.BackupCameraName);
-  private final PhotonCamera ArmCamera = new PhotonCamera(Constants.VisionConstants.ArmCameraName);
+  public final PhotonCamera ArmCamera = new PhotonCamera(Constants.VisionConstants.ArmCameraName);
 
   // --------------------- Robot Subsystems ----------------------------
   public final JoystickSubsystem joystickSubsystem = new JoystickSubsystem();

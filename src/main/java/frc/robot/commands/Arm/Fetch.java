@@ -51,17 +51,26 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.commands.Arm;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.Arm.Arm;
+import frc.robot.subsystems.Heimdall.PoseEstimatorSubsystem;
+import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonUtils;
 
 public class Fetch extends CommandBase {
   /** Creates a new Fetch. */
   double forwardSpeed;
-
+  PhotonCamera fetchCamera;
   double rotationSpeed;
+  PIDController turnController = new PIDController(Constants.ArmConstants.kFetchAngularP, 0, Constants.ArmConstants.kFetchAngularD);
 
-  public Fetch(Arm.GamePieceType FetchWhat) {
+
+  public Fetch(Arm.GamePieceType FetchWhat, PhotonCamera camera) {
     // Use addRequirements() here to declare subsystem dependencies.
+    fetchCamera = camera;
   }
 
   // Called when the command is initially scheduled.
@@ -71,27 +80,17 @@ public class Fetch extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    /*
-    var result = camera.getLatestResult();
+
+    var result = fetchCamera.getLatestResult();
 
     if (result.hasTargets()) {
-      // First calculate range
-      double range =
-          PhotonUtils.calculateDistanceToTargetMeters(
-              CAMERA_HEIGHT_METERS,
-              TARGET_HEIGHT_METERS,
-              CAMERA_PITCH_RADIANS,
-              Units.degreesToRadians(result.getBestTarget().getPitch()));
-
-      // Use this range as the measurement we give to the PID controller.
-      // -1.0 required to ensure positive PID controller effort _increases_ range
-      forwardSpeed = -forwardController.calculate(range, GOAL_RANGE_METERS);
-
-      // Also calculate angular power
+      // Calculate angular turn power
       // -1.0 required to ensure positive PID controller effort _increases_ yaw
       rotationSpeed = -turnController.calculate(result.getBestTarget().getYaw(), 0);
-    }
-      */
+    } else {
+      // If we have no targets, stay still.
+      rotationSpeed = 0;
+  }
   }
 
   // Called once the command ends or is interrupted.

@@ -119,6 +119,8 @@ public final class Constants {
     public static final double kArmYIz = 0;
     public static final long kDropWaitTime = 5000;
     public static final long kIntakeWaitTime = 5000;
+    public static final double kFetchAngularP = 0.1;
+    public static final double kFetchAngularD = 0.0;
   }
 
   public static class DriverConstants {
