@@ -29,5 +29,5 @@
   },
   "wpilib.deployOffline": true,
   "wpilib.offline": false,
-  "wpilib.skipTests": false
+  "wpilib.skipTests": false,
 }
