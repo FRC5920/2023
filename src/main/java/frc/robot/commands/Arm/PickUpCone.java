@@ -60,13 +60,12 @@ import org.photonvision.PhotonCamera;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class PickUpCone extends SequentialCommandGroup {
   /** Creates a new PickUpCone. */
-  public PickUpCone(Arm armSubsystem, PhotonCamera camera) {
+  public PickUpCone(Arm armSubsystem) {
     addRequirements(armSubsystem);
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
         new Reach(Arm.Rank.PickUp, Arm.ArmExtenderPosition.OnFloor),
-        new Fetch(Arm.GamePieceType.Cone, camera),
         new Intake(Arm.GamePieceType.Cone),
         new Retract());
   }
