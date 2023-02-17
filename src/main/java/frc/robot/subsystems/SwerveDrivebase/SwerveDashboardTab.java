@@ -49,7 +49,7 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.subsystems.Dashboard;
+package frc.robot.subsystems.SwerveDrivebase;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
@@ -66,7 +66,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.lib.SwerveDrive.SwerveModuleIO.SwerveModuleIOTelemetry;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.SwerveDrivebase.Swerve;
+import frc.robot.subsystems.Dashboard.IDashboardTab;
 import frc.robot.subsystems.SwerveDrivebase.Swerve.ModuleId;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 import java.util.Map;
@@ -85,9 +85,6 @@ public class SwerveDashboardTab implements IDashboardTab {
 
   /** Title used for a dashboard tab that displays the field */
   static final String kFieldTabTitle = "Field";
-
-  /** A reference to the swerve subsystem */
-  private Swerve m_swerveSubsystem;
 
   /** The Shuffleboard tab to display in */
   private ShuffleboardTab m_tab;
@@ -112,8 +109,8 @@ public class SwerveDashboardTab implements IDashboardTab {
    * @param botContainer Container that holds robot subsystems
    */
   @Override
-  public void initialize(RobotContainer botContainer) {
-    m_swerveSubsystem = botContainer.swerveSubsystem;
+  public void initDashboard(RobotContainer botContainer) {
+    Swerve swerveSubsystem = botContainer.swerveSubsystem;
 
     m_tab = Shuffleboard.getTab(kSwerveTabTitle);
 
@@ -143,13 +140,13 @@ public class SwerveDashboardTab implements IDashboardTab {
             .getLayout("Chassis Speeds", BuiltInLayouts.kGrid)
             .withProperties(
                 Map.of("Label position", "LEFT", "Number of columns", "1", "Number of rows", "3"))
-            .withSize(6, 5)
+            .withSize(6, 4)
             .withPosition(0, kSwerveModuleLayoutHeight);
     cspeedLayout
         .addDouble(
             "xVel",
             () -> {
-              return m_swerveSubsystem.getChassisSpeeds().vxMetersPerSecond;
+              return swerveSubsystem.getChassisSpeeds().vxMetersPerSecond;
             })
         .withSize(kSwerveModuleTelemetryWidth, 1)
         .withPosition(0, 0);
@@ -157,7 +154,7 @@ public class SwerveDashboardTab implements IDashboardTab {
         .addDouble(
             "yVel",
             () -> {
-              return m_swerveSubsystem.getChassisSpeeds().vyMetersPerSecond;
+              return swerveSubsystem.getChassisSpeeds().vyMetersPerSecond;
             })
         .withSize(kSwerveModuleTelemetryWidth, 1)
         .withPosition(0, 1);
@@ -166,7 +163,7 @@ public class SwerveDashboardTab implements IDashboardTab {
             "Omega",
             () -> {
               return Units.radiansToDegrees(
-                  m_swerveSubsystem.getChassisSpeeds().omegaRadiansPerSecond);
+                  swerveSubsystem.getChassisSpeeds().omegaRadiansPerSecond);
             })
         .withSize(kSwerveModuleTelemetryWidth, 1)
         .withPosition(0, 2);
@@ -183,22 +180,18 @@ public class SwerveDashboardTab implements IDashboardTab {
             .withSize(kSwerveModuleTelemetryWidth * 2, 4)
             .withPosition(kSwerveModuleTelemetryWidth, kSwerveModuleLayoutHeight)
             .getEntry();
-
-    // Display the field in a tab
-    // topLayout.add(m_field2d).withSize(15, kTelemetryHeight);
-
-    Shuffleboard.selectTab(kSwerveTabTitle);
   }
 
   /** Service dashboard tab widgets */
   @Override
-  public void update() {
-    m_field2d.setRobotPose(m_swerveSubsystem.getPose());
+  public void updateDashboard(RobotContainer botContainer) {
+    Swerve swerveSubsystem = botContainer.swerveSubsystem;
+    m_field2d.setRobotPose(swerveSubsystem.getPose());
 
     // Update swerve module telemetry
     for (ModuleId moduleId : ModuleId.values()) {
       int idx = moduleId.value;
-      m_moduleTelemetry[idx].update(m_swerveSubsystem.getIOTelemetry(moduleId));
+      m_moduleTelemetry[idx].update(swerveSubsystem.getIOTelemetry(moduleId));
     }
 
     if (RobotState.isDisabled()) {

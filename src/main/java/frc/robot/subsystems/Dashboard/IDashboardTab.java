@@ -53,16 +53,32 @@ package frc.robot.subsystems.Dashboard;
 
 import frc.robot.RobotContainer;
 
-/** Abstract interface implemented by dashboard tabs */
+/** Interface implemented by dashboard tabs registered with the DashboardSubsystem */
 public interface IDashboardTab {
 
   /**
-   * Create and initialize dashboard widgets
+   * Called to create and initialize dashboard widgets in the tab
    *
-   * @param botContainer Object providing access to robot subsystems
+   * @param botContainer A reference to the global RobotContainer containing robot subsystems
    */
-  public void initialize(RobotContainer botContainer);
+  public void initDashboard(RobotContainer botContainer);
 
-  /** Service dashboard tab widgets */
-  public void update();
+  /**
+   * Called each processing cycle to update dashboard widgets
+   *
+   * @param botContainer A reference to the global RobotContainer containing robot subsystems
+   */
+  public void updateDashboard(RobotContainer botContainer);
+
+  /**
+   * Called each processing cycle in simulation mode only to update dashboard widgets
+   *
+   * @param botContainer A reference to the global RobotContainer containing robot subsystems
+   * @remarks By default, this method simply calls the normal updateDashboard() method. It's only
+   *     necessary to override this method if your dashboard tab does something specific in
+   *     simulation mode that wouldn't happen during normal execution.
+   */
+  public default void updateSimulationDashboard(RobotContainer botContainer) {
+    updateDashboard(botContainer);
+  }
 }

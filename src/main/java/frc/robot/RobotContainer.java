@@ -76,14 +76,13 @@ import org.photonvision.PhotonCamera;
 public class RobotContainer {
 
   // --------------------- Robot Subsystems ----------------------------
+  public final DashboardSubsystem dashboardSubsystem = new DashboardSubsystem();
   public final JoystickSubsystem joystickSubsystem = new JoystickSubsystem();
-  public final BotStateSubsystem s_BotState = new BotStateSubsystem();
+  public final BotStateSubsystem botStateSubsystem = new BotStateSubsystem();
   public final Swerve swerveSubsystem;
 
   @SuppressWarnings({"unused"})
-  private final PoseEstimatorSubsystem s_poseEstimator;
-
-  public final DashboardSubsystem dashboardSubsystem;
+  public final PoseEstimatorSubsystem poseEstimatorSubsystem;
 
   /* Cameras */
   private final PhotonCamera TagCamera = new PhotonCamera(Constants.VisionConstants.TagCameraName);
@@ -162,9 +161,12 @@ public class RobotContainer {
     swerveSubsystem.setDefaultCommand(
         new TeleopSwerve(swerveSubsystem, joystickSubsystem, fieldRelative, openLoop));
 
-    s_poseEstimator = new PoseEstimatorSubsystem(TagCamera, swerveSubsystem);
+    swerveSubsystem.registerDashboardTab(dashboardSubsystem);
 
-    dashboardSubsystem = new DashboardSubsystem(this);
+    poseEstimatorSubsystem = new PoseEstimatorSubsystem(TagCamera, swerveSubsystem);
+    poseEstimatorSubsystem.registerDashboardTab(dashboardSubsystem);
+
+    // Initialize all dashboard tabs
     dashboardSubsystem.initialize(this);
 
     // Configure joystick button bindings
