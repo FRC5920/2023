@@ -67,7 +67,7 @@ public class SnapToGrid extends CommandBase {
   private boolean fieldRelative;
   private boolean openLoop;
   private boolean foundSnapPoint = false;
-  double yAxis;
+  double xAxis;
 
   private Swerve s_Swerve;
   private ProcessedXboxController controller;
@@ -94,20 +94,15 @@ public class SnapToGrid extends CommandBase {
   @Override
   public void execute() {
     for (int i = 0; i < FieldConstants.Grids.nodeRowCount; i++) {
-      if (((FieldConstants.Grids.lowTranslations[i].getY()
-                  - (FieldConstants.Grids.nodeSeparationY * 0.5))
-              < s_Swerve.getPose().getY())
-          && (s_Swerve.getPose().getY()
-              <= (FieldConstants.Grids.lowTranslations[i].getY()
-                  + (FieldConstants.Grids.nodeSeparationY * 0.5)))) {
-        yAxis = FieldConstants.Grids.lowTranslations[i].getY();
+      if (s_Swerve.getPose().getY() == FieldConstants.Grids.lowTranslations[i].getY()) {
+        xAxis = 0;
         foundSnapPoint = true;
       }
     }
     if (foundSnapPoint == false) {
-      yAxis = -controller.getLeftY();
+      xAxis = -controller.getLeftX();
     }
-    double xAxis = -controller.getLeftX();
+    double yAxis = -controller.getLeftY();
     double rAxis = -controller.getRightX();
 
     translation = new Translation2d(yAxis, xAxis).times(BotStateSubsystem.MaxSpeed);
