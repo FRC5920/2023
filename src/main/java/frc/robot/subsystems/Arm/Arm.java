@@ -65,8 +65,8 @@ public class Arm extends SubsystemBase {
   private static final WPI_TalonFX ArmYMotorMaster =
       new WPI_TalonFX(Constants.ArmConstants.kArmYMotorMasterPort);
 
-  private static final CANSparkMax HandBottomRoller =
-      new CANSparkMax(Constants.ArmConstants.kHandBottomRollerPort, MotorType.kBrushless);
+  private static final WPI_TalonFX HandBottomRoller =
+      new WPI_TalonFX(Constants.ArmConstants.kHandBottomRollerPort);
   private static final CANSparkMax HandTopBackRoller =
       new CANSparkMax(Constants.ArmConstants.kHandTopBackRollerPort, MotorType.kBrushless);
   // private final WPI_TalonFX ArmYMotorSlave = new
