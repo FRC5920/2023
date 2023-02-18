@@ -102,18 +102,17 @@ public class SnapToGrid extends CommandBase {
                   + (FieldConstants.Grids.nodeSeparationY * 0.5)))) {
         yAxis = FieldConstants.Grids.lowTranslations[i].getY();
         foundSnapPoint = true;
-      } 
-    }
-      if (foundSnapPoint == true) {
-        yAxis = -controller.getLeftY();
       }
-      double xAxis = -controller.getLeftX();
-      double rAxis = -controller.getRightX();
+    }
+    if (foundSnapPoint == false) {
+      yAxis = -controller.getLeftY();
+    }
+    double xAxis = -controller.getLeftX();
+    double rAxis = -controller.getRightX();
 
-      translation = new Translation2d(yAxis, xAxis).times(BotStateSubsystem.MaxSpeed);
-      rotation = rAxis * BotStateSubsystem.MaxRotate;
-      s_Swerve.drive(translation, rotation, fieldRelative, openLoop);
-  
+    translation = new Translation2d(yAxis, xAxis).times(BotStateSubsystem.MaxSpeed);
+    rotation = rAxis * BotStateSubsystem.MaxRotate;
+    s_Swerve.drive(translation, rotation, fieldRelative, openLoop);
   }
 
   // Called once the command ends or is interrupted.
