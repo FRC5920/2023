@@ -53,22 +53,18 @@ package frc.robot.commands.Arm;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.Constants;
 import frc.robot.subsystems.Arm.Arm;
-import frc.robot.subsystems.Arm.Arm.GamePieceType;
-import frc.robot.subsystems.Heimdall.PoseEstimatorSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
-
 import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonUtils;
 
 public class Fetch extends CommandBase {
   /** Creates a new Fetch. */
   private Translation2d translation;
+
   private boolean fieldRelative;
   private boolean openLoop;
 
@@ -77,22 +73,24 @@ public class Fetch extends CommandBase {
   private int translationAxis;
   private int strafeAxis;
   private int rotationAxis;
-  
+
   PhotonCamera fetchCamera;
   double rotation;
-  PIDController turnController = new PIDController(Constants.ArmConstants.kFetchAngularP, 0, Constants.ArmConstants.kFetchAngularD);
+  PIDController turnController =
+      new PIDController(
+          Constants.ArmConstants.kFetchAngularP, 0, Constants.ArmConstants.kFetchAngularD);
   Arm.GamePieceType fetchTarget;
 
   public Fetch(
-    Arm.GamePieceType FetchWhat,
-    PhotonCamera camera,
-    Swerve s_Swerve,
-    ProcessedXboxController controller,
-    int translationAxis,
-    int strafeAxis,
-    int rotationAxis,
-    boolean fieldRelative,
-    boolean openLoop) {
+      Arm.GamePieceType FetchWhat,
+      PhotonCamera camera,
+      Swerve s_Swerve,
+      ProcessedXboxController controller,
+      int translationAxis,
+      int strafeAxis,
+      int rotationAxis,
+      boolean fieldRelative,
+      boolean openLoop) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.s_Swerve = s_Swerve;
     addRequirements(s_Swerve);
