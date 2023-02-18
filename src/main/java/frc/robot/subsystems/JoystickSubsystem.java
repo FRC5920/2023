@@ -57,9 +57,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.Joystick.AxisProcChain;
 import frc.lib.Joystick.ProcessedXboxController;
-import frc.robot.Constants;
 import frc.robot.RobotContainer;
-import frc.robot.commands.Balance;
 import frc.robot.commands.SnapToGrid;
 
 /** A subsystem providing/managing Xbox controllers for driving the robot manually */
@@ -159,11 +157,8 @@ public class JoystickSubsystem extends SubsystemBase {
     driverController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.back.onTrue(new InstantCommand(this::doNothing, this));
-    driverController.leftTriggerAsButton.whileTrue(new SnapToGrid(
-      botContainer.swerveSubsystem, 
-      botContainer.joystickSubsystem, 
-      true, 
-      true));
+    driverController.leftTriggerAsButton.whileTrue(
+        new SnapToGrid(botContainer.swerveSubsystem, botContainer.joystickSubsystem, true, true));
 
     // Map buttons on operator controller
     operatorController.A.onTrue(new InstantCommand(this::doNothing, this));
