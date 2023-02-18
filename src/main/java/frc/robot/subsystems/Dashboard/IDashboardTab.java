@@ -49,47 +49,36 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.commands;
+package frc.robot.subsystems.Dashboard;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.lib.Joystick.ProcessedXboxController;
-import frc.robot.subsystems.JoystickSubsystem;
-import frc.robot.subsystems.SwerveDrivebase.Swerve;
-import frc.robot.subsystems.runtimeState.BotStateSubsystem;
+import frc.robot.RobotContainer;
 
-public class TeleopSwerve extends CommandBase {
-  private double rotation;
-  private Translation2d translation;
-  private boolean fieldRelative;
-  private boolean openLoop;
+/** Interface implemented by dashboard tabs registered with the DashboardSubsystem */
+public interface IDashboardTab {
 
-  private Swerve s_Swerve;
-  private ProcessedXboxController controller;
+  /**
+   * Called to create and initialize dashboard widgets in the tab
+   *
+   * @param botContainer A reference to the global RobotContainer containing robot subsystems
+   */
+  public void initDashboard(RobotContainer botContainer);
 
-  /** Driver control */
-  public TeleopSwerve(
-      Swerve s_Swerve,
-      JoystickSubsystem joystickSubsystem,
-      boolean fieldRelative,
-      boolean openLoop) {
+  /**
+   * Called each processing cycle to update dashboard widgets
+   *
+   * @param botContainer A reference to the global RobotContainer containing robot subsystems
+   */
+  public void updateDashboard(RobotContainer botContainer);
 
-    this.s_Swerve = s_Swerve;
-    addRequirements(s_Swerve);
-
-    this.controller = joystickSubsystem.driverController;
-    this.fieldRelative = fieldRelative;
-    this.openLoop = openLoop;
-  }
-
-  @Override
-  public void execute() {
-    double yAxis = -controller.getLeftY();
-    double xAxis = -controller.getLeftX();
-    double rAxis = -controller.getRightX();
-
-    translation = new Translation2d(yAxis, xAxis).times(BotStateSubsystem.MaxSpeed);
-    rotation = rAxis * BotStateSubsystem.MaxRotate;
-    s_Swerve.drive(translation, rotation, fieldRelative, openLoop);
+  /**
+   * Called each processing cycle in simulation mode only to update dashboard widgets
+   *
+   * @param botContainer A reference to the global RobotContainer containing robot subsystems
+   * @remarks By default, this method simply calls the normal updateDashboard() method. It's only
+   *     necessary to override this method if your dashboard tab does something specific in
+   *     simulation mode that wouldn't happen during normal execution.
+   */
+  public default void updateSimulationDashboard(RobotContainer botContainer) {
+    updateDashboard(botContainer);
   }
 }

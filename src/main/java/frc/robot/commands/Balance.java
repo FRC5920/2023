@@ -51,45 +51,96 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.commands;
 
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.lib.Joystick.ProcessedXboxController;
-import frc.robot.subsystems.JoystickSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 
-public class TeleopSwerve extends CommandBase {
-  private double rotation;
-  private Translation2d translation;
-  private boolean fieldRelative;
-  private boolean openLoop;
+public class Balance extends CommandBase {
 
-  private Swerve s_Swerve;
-  private ProcessedXboxController controller;
+  private static final TrapezoidProfile.Constraints X_CONSTRAINTS =
+      new TrapezoidProfile.Constraints(3, .5);
+  private static final TrapezoidProfile.Constraints Y_CONSTRAINTS =
+      new TrapezoidProfile.Constraints(3, .5);
+  private static final TrapezoidProfile.Constraints OMEGA_CONSTRAINTS =
+      new TrapezoidProfile.Constraints(2, .5);
+  private final ProfiledPIDController xController =
+      new ProfiledPIDController(3, 0, 0, X_CONSTRAINTS);
+  private final ProfiledPIDController yController =
+      new ProfiledPIDController(3, 0, 0, Y_CONSTRAINTS);
+  private final ProfiledPIDController omegaController =
+      new ProfiledPIDController(2, 0, 0, OMEGA_CONSTRAINTS);
 
-  /** Driver control */
-  public TeleopSwerve(
-      Swerve s_Swerve,
-      JoystickSubsystem joystickSubsystem,
-      boolean fieldRelative,
-      boolean openLoop) {
+  private final Swerve drivetrainSubsystem;
 
-    this.s_Swerve = s_Swerve;
-    addRequirements(s_Swerve);
+  /** Creates a new Balance. */
+  public Balance(Swerve drivetrainSubsystem) {
+    this.drivetrainSubsystem = drivetrainSubsystem;
 
-    this.controller = joystickSubsystem.driverController;
-    this.fieldRelative = fieldRelative;
-    this.openLoop = openLoop;
+    xController.setTolerance(2);
+    yController.setTolerance(2);
+    omegaController.setTolerance(Units.degreesToRadians(3));
+    omegaController.enableContinuousInput(-Math.PI, Math.PI);
+
+    addRequirements(drivetrainSubsystem);
   }
 
+  // Called when the command is initially scheduled.
+  @Override
+  public void initialize() {
+    // omegaController.reset(drivetrainSubsystem.getYaw().getRadians());
+    // xController.reset(drivetrainSubsystem.getRoll());
+    // yController.reset(drivetrainSubsystem.getPitch());
+  }
+
+  // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double yAxis = -controller.getLeftY();
-    double xAxis = -controller.getLeftX();
-    double rAxis = -controller.getRightX();
+    // drivetrainSubsystem.getPitch();
+    // drivetrainSubsystem.getRoll();
+    xController.setGoal(0);
+    yController.setGoal(0);
+    omegaController.setGoal(drivetrainSubsystem.getYaw().getRadians());
 
-    translation = new Translation2d(yAxis, xAxis).times(BotStateSubsystem.MaxSpeed);
-    rotation = rAxis * BotStateSubsystem.MaxRotate;
-    s_Swerve.drive(translation, rotation, fieldRelative, openLoop);
+    // Drive to the target
+    var xSpeed = xController.calculate(drivetrainSubsystem.getRoll().getRadians());
+    if (xController.atSetpoint()) {
+      xSpeed = 0;
+    }
+
+    var ySpeed = yController.calculate(drivetrainSubsystem.getPitch().getRadians());
+    if (yController.atSetpoint()) {
+      ySpeed = 0;
+    }
+
+    var omegaSpeed = omegaController.calculate(drivetrainSubsystem.getYaw().getRadians());
+    if (omegaController.atSetpoint()) {
+      omegaSpeed = 0;
+    }
+    // https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/intro-and-chassis-speeds.html
+    drivetrainSubsystem.drive(
+        new Translation2d(ySpeed, xSpeed).times(BotStateSubsystem.MaxSpeed),
+        omegaSpeed,
+        true,
+        true);
+
+    // https://www.instructables.com/Self-Balancing-Robot-Using-PID-Algorithm-STM-MC/
+    // https://docs.wpilib.org/en/stable/docs/software/advanced-controls/controllers/pidcontroller.html
+    // https://mcm-frc-docs.readthedocs.io/en/latest/docs/software/commandbased/profilepid-subsystems-commands.html
+  }
+
+  // Called once the command ends or is interrupted.
+  @Override
+  public void end(boolean interrupted) {
+    drivetrainSubsystem.stop();
+  }
+
+  // Returns true when the command should end.
+  @Override
+  public boolean isFinished() {
+    return false;
   }
 }

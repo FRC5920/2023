@@ -162,4 +162,4 @@ bin/
 *-window.json
 
 # Don't track the generated build info file
-src/main/java/frc/robot/GenBuildInfo.java
+**/GenBuildInfo.java

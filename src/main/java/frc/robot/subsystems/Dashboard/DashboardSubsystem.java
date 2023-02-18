@@ -49,47 +49,69 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.commands;
+package frc.robot.subsystems.Dashboard;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.lib.Joystick.ProcessedXboxController;
-import frc.robot.subsystems.JoystickSubsystem;
-import frc.robot.subsystems.SwerveDrivebase.Swerve;
-import frc.robot.subsystems.runtimeState.BotStateSubsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
+import java.util.ArrayList;
 
-public class TeleopSwerve extends CommandBase {
-  private double rotation;
-  private Translation2d translation;
-  private boolean fieldRelative;
-  private boolean openLoop;
+/**
+ * The Dashboard subsystem manages a collection of dashboard tabs displayed in the Shuffleboard user
+ * interface. Other subsystems of the robot can add their own dashboard tab by calling
+ * DashboardSubsystem.add(). After all tabs have been added in this manner,
+ * DashboardSubsystem.initialize() must be called to call the initDashboard() method of all tabs
+ * added to the subsystem. Subsequently, all tabs managed by the DashboardSubsystem have their
+ * updateDashboard() method called when the DashboardSubsystem is processed by the scheduler. If
+ * running in simulation mode, all tabs have their updateSimulationDashboard() method called
+ * instead.
+ */
+public class DashboardSubsystem extends SubsystemBase {
 
-  private Swerve s_Swerve;
-  private ProcessedXboxController controller;
+  private final ArrayList<IDashboardTab> m_dashboardTabs;
+  private RobotContainer m_botContainer;
 
-  /** Driver control */
-  public TeleopSwerve(
-      Swerve s_Swerve,
-      JoystickSubsystem joystickSubsystem,
-      boolean fieldRelative,
-      boolean openLoop) {
-
-    this.s_Swerve = s_Swerve;
-    addRequirements(s_Swerve);
-
-    this.controller = joystickSubsystem.driverController;
-    this.fieldRelative = fieldRelative;
-    this.openLoop = openLoop;
+  /** Creates a new Dashboard. */
+  public DashboardSubsystem() {
+    m_dashboardTabs = new ArrayList<IDashboardTab>();
   }
 
-  @Override
-  public void execute() {
-    double yAxis = -controller.getLeftY();
-    double xAxis = -controller.getLeftX();
-    double rAxis = -controller.getRightX();
+  /**
+   * Adds a dashboard tab to be managed by the subsystem
+   *
+   * @param tab The dashboard tab to add
+   */
+  public void add(IDashboardTab tab) {
+    m_dashboardTabs.add(tab);
+  }
 
-    translation = new Translation2d(yAxis, xAxis).times(BotStateSubsystem.MaxSpeed);
-    rotation = rAxis * BotStateSubsystem.MaxRotate;
-    s_Swerve.drive(translation, rotation, fieldRelative, openLoop);
+  /**
+   * Calling this method calls initDashboard() on each dashboard tab managed by the subsystem
+   *
+   * @param botContainer A reference to the global RobotContainer instance
+   */
+  public void initialize(RobotContainer botContainer) {
+    m_botContainer = botContainer;
+    for (IDashboardTab tab : m_dashboardTabs) {
+      tab.initDashboard(botContainer);
+    }
+  }
+
+  /** Called by the scheduler during each processing cycle to service all dashboard tabs */
+  @Override
+  public void periodic() {
+    for (IDashboardTab tab : m_dashboardTabs) {
+      tab.updateDashboard(m_botContainer);
+    }
+  }
+
+  /**
+   * Called by the scheduler during each processing cycle in simulation mode to service all
+   * dashboard tabs
+   */
+  @Override
+  public void simulationPeriodic() {
+    for (IDashboardTab tab : m_dashboardTabs) {
+      tab.updateSimulationDashboard(m_botContainer);
+    }
   }
 }

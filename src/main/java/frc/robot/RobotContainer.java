@@ -52,19 +52,25 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.autos.*;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.lib.SwerveDrive.Falcon500SwerveIO;
+import frc.lib.SwerveDrive.GyroIO;
+import frc.lib.SwerveDrive.Pigeon2GyroIO;
+import frc.lib.SwerveDrive.SimGyroIO;
+import frc.lib.SwerveDrive.SimSwerveModuleIO;
+import frc.lib.SwerveDrive.SwerveModuleIO;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Arm.Pneumatics;
-import frc.robot.subsystems.Dashboard.DriveTab;
+import frc.robot.subsystems.Dashboard.DashboardSubsystem;
+import frc.robot.subsystems.Heimdall.*;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
+import org.photonvision.PhotonCamera;
 
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
+ * This class is where the bulk of the robot should` be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
@@ -72,58 +78,102 @@ import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 public class RobotContainer {
 
   // --------------------- Robot Subsystems ----------------------------
+  public final DashboardSubsystem dashboardSubsystem = new DashboardSubsystem();
   public final JoystickSubsystem joystickSubsystem = new JoystickSubsystem();
-  public final Swerve swerveSubsystem = new Swerve();
-  public final BotStateSubsystem s_BotState = new BotStateSubsystem();
+  public final BotStateSubsystem botStateSubsystem = new BotStateSubsystem();
+  public final Swerve swerveSubsystem;
   public final Pneumatics s_Pneumatics = new Pneumatics();
   public final Arm s_Arm = new Arm(s_Pneumatics);
 
-  /* Dashboard Subsystems */
-  public final DriveTab s_DriveTab = new DriveTab();
+  @SuppressWarnings({"unused"})
+  public final PoseEstimatorSubsystem poseEstimatorSubsystem;
 
-  // The robot's subsystems and commands are defined here...
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+  /* Cameras */
+  private final PhotonCamera TagCamera = new PhotonCamera(Constants.VisionConstants.TagCameraName);
 
-  // Replace with CommandPS4Controller or CommandJoystick if needed
-  // private final CommandXboxController m_driverController =
-  //    new CommandXboxController(DriverConstants.kControllerPort);
+  @SuppressWarnings({"unused"})
+  private final PhotonCamera BackCamera =
+      new PhotonCamera(Constants.VisionConstants.BackupCameraName);
+
+  @SuppressWarnings({"unused"})
+  private final PhotonCamera ArmCamera = new PhotonCamera(Constants.VisionConstants.ArmCameraName);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     boolean fieldRelative = true;
     boolean openLoop = true;
+    SwerveModuleIO swerveModuleIO[];
+    GyroIO gyroIO;
+
+    // Instantiate active subsystems
+    switch (Constants.getMode()) {
+      case REAL:
+        gyroIO = new Pigeon2GyroIO(Constants.SwerveDrivebaseConstants.pigeonID, "SwerveCAN");
+        swerveModuleIO =
+            new SwerveModuleIO[] {
+              new Falcon500SwerveIO(
+                  Constants.SwerveDrivebaseConstants.Mod0.driveMotorID,
+                  Constants.SwerveDrivebaseConstants.Mod0.angleMotorID,
+                  Constants.SwerveDrivebaseConstants.Mod0.canCoderID,
+                  Constants.SwerveDrivebaseConstants.Mod0.angleOffset,
+                  Robot.ctreConfigs),
+              new Falcon500SwerveIO(
+                  Constants.SwerveDrivebaseConstants.Mod1.driveMotorID,
+                  Constants.SwerveDrivebaseConstants.Mod1.angleMotorID,
+                  Constants.SwerveDrivebaseConstants.Mod1.canCoderID,
+                  Constants.SwerveDrivebaseConstants.Mod1.angleOffset,
+                  Robot.ctreConfigs),
+              new Falcon500SwerveIO(
+                  Constants.SwerveDrivebaseConstants.Mod2.driveMotorID,
+                  Constants.SwerveDrivebaseConstants.Mod2.angleMotorID,
+                  Constants.SwerveDrivebaseConstants.Mod2.canCoderID,
+                  Constants.SwerveDrivebaseConstants.Mod2.angleOffset,
+                  Robot.ctreConfigs),
+              new Falcon500SwerveIO(
+                  Constants.SwerveDrivebaseConstants.Mod3.driveMotorID,
+                  Constants.SwerveDrivebaseConstants.Mod3.angleMotorID,
+                  Constants.SwerveDrivebaseConstants.Mod3.canCoderID,
+                  Constants.SwerveDrivebaseConstants.Mod3.angleOffset,
+                  Robot.ctreConfigs)
+            };
+        break;
+
+      case SIM:
+      case REPLAY:
+      default:
+        gyroIO = new SimGyroIO();
+        swerveModuleIO =
+            new SwerveModuleIO[] {
+              new SimSwerveModuleIO(),
+              new SimSwerveModuleIO(),
+              new SimSwerveModuleIO(),
+              new SimSwerveModuleIO()
+            };
+        break;
+    }
+
+    swerveSubsystem =
+        new Swerve(
+            Constants.SwerveDrivebaseConstants.trackWidth,
+            Constants.SwerveDrivebaseConstants.wheelBase,
+            gyroIO,
+            swerveModuleIO[Swerve.ModuleId.kFrontLeft.value],
+            swerveModuleIO[Swerve.ModuleId.kFrontRight.value],
+            swerveModuleIO[Swerve.ModuleId.kRearLeft.value],
+            swerveModuleIO[Swerve.ModuleId.kRearRight.value]);
+
     swerveSubsystem.setDefaultCommand(
-        new TeleopSwerve(
-            swerveSubsystem, joystickSubsystem.driverController, fieldRelative, openLoop));
+        new TeleopSwerve(swerveSubsystem, joystickSubsystem, fieldRelative, openLoop));
 
-    // Configure the trigger bindings
-    configureBindings();
-  }
+    swerveSubsystem.registerDashboardTab(dashboardSubsystem);
 
-  /**
-   * Use this method to define your trigger->command mappings. Triggers can be created via the
-   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
-   * predicate, or via the named factories in {@link
-   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
-   * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-   * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-   * joysticks}.
-   */
-  private void configureBindings() {
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    // new Trigger(m_exampleSubsystem::exampleCondition)
-    //    .onTrue(new ExampleCommand(m_exampleSubsystem));
+    poseEstimatorSubsystem = new PoseEstimatorSubsystem(TagCamera, swerveSubsystem);
+    poseEstimatorSubsystem.registerDashboardTab(dashboardSubsystem);
 
-    // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
-    // cancelling on release.
-    // m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
-    /* Driver Buttons */
+    // Initialize all dashboard tabs
+    dashboardSubsystem.initialize(this);
 
-    /*intake.onTrue(new InstantCommand(() -> s_Arm.intake()));
-    eject.onTrue(new InstantCommand(() -> s_Arm.place()));
-    armforward.onTrue(new InstantCommand(() -> s_Arm.armForward()));
-    armback.onTrue(new InstantCommand(() -> s_Arm.armBackward())); */
-
+    // Configure joystick button bindings
     joystickSubsystem.configureButtonBindings(this);
   }
 
@@ -134,6 +184,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return Autos.exampleAuto(m_exampleSubsystem);
+    return new InstantCommand();
   }
 }

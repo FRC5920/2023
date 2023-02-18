@@ -58,6 +58,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.Joystick.AxisProcChain;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.RobotContainer;
+import frc.robot.commands.Balance;
 import frc.robot.subsystems.Arm.Arm;
 
 /** A subsystem providing/managing Xbox controllers for driving the robot manually */
@@ -160,7 +161,7 @@ public class JoystickSubsystem extends SubsystemBase {
     driverController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.back.onTrue(new InstantCommand(this::doNothing, this));
-    driverController.start.onTrue(new InstantCommand(this::doNothing, this));
+    driverController.start.whileTrue(new Balance(botContainer.swerveSubsystem));
 
     // Map buttons on operator controller
     operatorController.A.onTrue(new InstantCommand());
@@ -188,9 +189,9 @@ public class JoystickSubsystem extends SubsystemBase {
 
     // Run the intake motors
     double intakePercent = 0.0;
-    if (operatorController.getLeftTriggerAxis() != 0) {
+    if (operatorController.getLeftTriggerAxis() > 0.5) {
       intakePercent = 1.0;
-    } else if (operatorController.getRightTriggerAxis() != 0) {
+    } else if (operatorController.getRightTriggerAxis() > 0.5) {
       intakePercent = -1.0;
     }
 
