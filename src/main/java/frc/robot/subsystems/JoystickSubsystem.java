@@ -189,9 +189,9 @@ public class JoystickSubsystem extends SubsystemBase {
 
     // Run the intake motors
     double intakePercent = 0.0;
-    if (operatorController.getLeftTriggerAxis() > 0.5) {
+    if (operatorController.leftTriggerAsButton.getAsBoolean()) {
       intakePercent = 1.0;
-    } else if (operatorController.getRightTriggerAxis() > 0.5) {
+    } else if (operatorController.rightTriggerAsButton.getAsBoolean()) {
       intakePercent = -1.0;
     }
 
