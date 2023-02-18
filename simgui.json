@@ -5,6 +5,7 @@
       "/Shuffleboard/Drive Train/Field": "Field2d",
       "/Shuffleboard/Drive/SendableChooser[0]": "String Chooser",
       "/Shuffleboard/Drive/Speed Limit": "String Chooser",
+      "/Shuffleboard/PoseEstimator/Field": "Field2d",
       "/Shuffleboard/SwerveDrive/Field": "Field2d",
       "/Shuffleboard/SwerveDrive/FrontLeft/Angle Deg": "Gyro",
       "/Shuffleboard/SwerveDrive/FrontLeft/Angle/Degrees": "Gyro",
@@ -38,6 +39,9 @@
           "Speed Limit": {
             "open": true
           },
+          "open": true
+        },
+        "PoseEstimator": {
           "open": true
         },
         "Vision": {

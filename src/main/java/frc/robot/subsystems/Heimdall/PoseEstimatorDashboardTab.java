@@ -49,69 +49,94 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.subsystems.Dashboard;
+package frc.robot.subsystems.Heimdall;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import frc.robot.RobotContainer;
-import java.util.ArrayList;
+import frc.robot.subsystems.Dashboard.IDashboardTab;
+import frc.robot.subsystems.SwerveDrivebase.Swerve;
+import java.util.Map;
 
-/**
- * The Dashboard subsystem manages a collection of dashboard tabs displayed in the Shuffleboard user
- * interface. Other subsystems of the robot can add their own dashboard tab by calling
- * DashboardSubsystem.add(). After all tabs have been added in this manner,
- * DashboardSubsystem.initialize() must be called to call the initDashboard() method of all tabs
- * added to the subsystem. Subsequently, all tabs managed by the DashboardSubsystem have their
- * updateDashboard() method called when the DashboardSubsystem is processed by the scheduler. If
- * running in simulation mode, all tabs have their updateSimulationDashboard() method called
- * instead.
- */
-public class DashboardSubsystem extends SubsystemBase {
+/** A class supplying a Shuffleboard tab for configuring drive train parameters */
+public class PoseEstimatorDashboardTab implements IDashboardTab {
+  /** Title used for a dashboard tab that displays the field */
+  static final String kTabTitle = "PoseEstimator";
 
-  private final ArrayList<IDashboardTab> m_dashboardTabs;
-  private RobotContainer m_botContainer;
+  /** Width (in cells) of the field display */
+  static final int kFieldWidthCells = 21;
 
-  /** Creates a new Dashboard. */
-  public DashboardSubsystem() {
-    m_dashboardTabs = new ArrayList<IDashboardTab>();
+  /** Height (in cells) of the field display */
+  static final int kFieldHeightCells = 12;
+
+  /** Width (in cells) of the pose value display */
+  static final int kPoseWidthCells = 5;
+
+  /** Height (in cells) of the pose value display */
+  static final int kPoseHeightCells = 2;
+
+  /** Handle to the pose estimator subsystem */
+  private final PoseEstimatorSubsystem m_PoseEstimatorSubsystem;
+
+  /** The Shuffleboard tab to display in */
+  private ShuffleboardTab m_tab;
+
+  /** 2d view of the field */
+  private Field2d m_field2d;
+
+  /** Creates an instance of the tab */
+  PoseEstimatorDashboardTab(PoseEstimatorSubsystem poseEstimatorSubsystem) {
+    m_PoseEstimatorSubsystem = poseEstimatorSubsystem;
+    m_field2d = new Field2d();
   }
 
   /**
-   * Adds a dashboard tab to be managed by the subsystem
+   * Create and initialize dashboard widgets
    *
-   * @param tab The dashboard tab to add
-   */
-  public void add(IDashboardTab tab) {
-    m_dashboardTabs.add(tab);
-  }
-
-  /**
-   * Calling this method calls initDashboard() on each dashboard tab managed by the subsystem
-   *
-   * @param botContainer A reference to the global RobotContainer instance
-   */
-  public void initialize(RobotContainer botContainer) {
-    m_botContainer = botContainer;
-    for (IDashboardTab tab : m_dashboardTabs) {
-      tab.initDashboard(botContainer);
-    }
-  }
-
-  /** Called by the scheduler during each processing cycle to service all dashboard tabs */
-  @Override
-  public void periodic() {
-    for (IDashboardTab tab : m_dashboardTabs) {
-      tab.updateDashboard(m_botContainer);
-    }
-  }
-
-  /**
-   * Called by the scheduler during each processing cycle in simulation mode to service all
-   * dashboard tabs
+   * @param botContainer Container that holds robot subsystems
    */
   @Override
-  public void simulationPeriodic() {
-    for (IDashboardTab tab : m_dashboardTabs) {
-      tab.updateSimulationDashboard(m_botContainer);
-    }
+  public void initDashboard(RobotContainer botContainer) {
+    PoseEstimatorSubsystem poseSubsystem = botContainer.poseEstimatorSubsystem;
+    Swerve swerveSubsystem = botContainer.swerveSubsystem;
+
+    m_tab = Shuffleboard.getTab(kTabTitle);
+
+    // Add the 2D view of the field
+    m_tab
+        .add("Field", m_field2d)
+        .withSize(kFieldWidthCells, kFieldHeightCells)
+        .withPosition(0, 0)
+        .withProperties(Map.of("Label position", "HIDDEN"));
+
+    // Add the pose value
+    m_tab
+        .addString("Pose Estimator", () -> formatPose2d(poseSubsystem.getCurrentPose()))
+        .withSize(kPoseWidthCells, kPoseHeightCells)
+        .withPosition(kPoseWidthCells * 0, kFieldHeightCells);
+
+    // Add the pose value
+    m_tab
+        .addString("Swerve Odometry", () -> formatPose2d(swerveSubsystem.getPose()))
+        .withSize(kPoseWidthCells, kPoseHeightCells)
+        .withPosition(kPoseWidthCells * 1, kFieldHeightCells);
+  }
+
+  /** Service dashboard tab widgets */
+  @Override
+  public void updateDashboard(RobotContainer botContainer) {
+    FieldObject2d estimatorPoseObject = m_field2d.getRobotObject();
+    estimatorPoseObject.setPose(m_PoseEstimatorSubsystem.getCurrentPose());
+
+    FieldObject2d swervePoseObject = m_field2d.getObject("Odometry");
+    swervePoseObject.setPose(botContainer.swerveSubsystem.getPose());
+  }
+
+  private static String formatPose2d(Pose2d pose) {
+    return String.format(
+        "(%.2f, %.2f) %.2f degrees", pose.getX(), pose.getY(), pose.getRotation().getDegrees());
   }
 }
