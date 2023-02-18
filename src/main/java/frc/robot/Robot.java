@@ -56,8 +56,11 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.lib.Joystick.ProcessedXboxController;
 import frc.lib.SwerveDrive.CTREConfigs;
 import frc.lib.utility.Alert;
+import frc.robot.subsystems.JoystickSubsystem;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -151,6 +154,7 @@ public class Robot extends LoggedRobot {
     // Run the task scheduler
     CommandScheduler.getInstance().run();
     SmartDashboard.putData(CommandScheduler.getInstance());
+    SmartDashboard.putBoolean("Left Trigger Value", m_robotContainer.joystickSubsystem.driverController.leftTriggerAsButton.getAsBoolean());
 
     // Check for logging faults
     s_logReceiverQueueAlert.set(Logger.getInstance().getReceiverQueueFault());
