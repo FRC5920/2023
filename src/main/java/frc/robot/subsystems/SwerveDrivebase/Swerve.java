@@ -68,6 +68,7 @@ import frc.lib.SwerveDrive.GyroInputsAutoLogged;
 import frc.lib.SwerveDrive.SwerveModule;
 import frc.lib.SwerveDrive.SwerveModuleIO;
 import frc.robot.Constants;
+import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 public class Swerve extends SubsystemBase {
@@ -85,6 +86,9 @@ public class Swerve extends SubsystemBase {
 
   /** Pose used during simulation */
   private Pose2d simOdometryPose = new Pose2d();
+
+  /** Dashboard tab displayed in Shuffleboard */
+  private final SwerveDashboardTab m_dashboardTab = new SwerveDashboardTab();
 
   /**
    * Creates an instance of the swerve module
@@ -290,6 +294,11 @@ public class Swerve extends SubsystemBase {
 
   public SwerveModuleIO.SwerveModuleIOTelemetry getIOTelemetry(ModuleId module) {
     return mSwerveMods[module.value].getIOTelemetry();
+  }
+
+  /** Register the subsystem's dashboard tab */
+  public void registerDashboardTab(DashboardSubsystem dashboardSubsystem) {
+    dashboardSubsystem.add(m_dashboardTab);
   }
 
   /** Swerve module ID's */
