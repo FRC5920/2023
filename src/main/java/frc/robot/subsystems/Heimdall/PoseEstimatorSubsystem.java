@@ -163,9 +163,9 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
         Pose3d camPose = targetPose.transformBy(camToTarget.inverse());
 
         var visionMeasurement = camPose.transformBy(CAMERA_TO_ROBOT);
-        if (target.getPoseAmbiguity() <= .05 ){
+        if (target.getPoseAmbiguity() <= .05) {
           visionMeasurementStdDevs = VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(2));
-        }else{
+        } else {
           visionMeasurementStdDevs = VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(10));
         }
         poseEstimator.addVisionMeasurement(
