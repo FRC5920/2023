@@ -51,13 +51,13 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.subsystems.SwerveDrivebase;
 
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -78,7 +78,7 @@ public class Swerve extends SubsystemBase {
   /* Swerve Kinematics
    * No need to ever change this unless you are not doing a traditional rectangular/square 4 module swerve */
   private final SwerveDriveKinematics swerveKinematics;
-  private final SwerveDriveOdometry swerveOdometry;
+  public final SwerveDrivePoseEstimator swervePoseEstimator;
   private final SwerveModule[] mSwerveMods;
   private final GyroInputsAutoLogged m_gyroMeasurements;
   private final GyroIO m_gyroIO;
@@ -131,7 +131,9 @@ public class Swerve extends SubsystemBase {
     Timer.delay(1.0);
     resetModulesToAbsolute();
 
-    swerveOdometry = new SwerveDriveOdometry(swerveKinematics, getYaw(), getModulePositions());
+    swervePoseEstimator =
+        new SwerveDrivePoseEstimator(
+            swerveKinematics, getYaw(), getModulePositions(), simOdometryPose);
 
     m_ChassisSpeeds = new ChassisSpeeds();
   }
@@ -184,12 +186,12 @@ public class Swerve extends SubsystemBase {
 
   /** Returns the present pose */
   public Pose2d getPose() {
-    return (RobotBase.isReal()) ? swerveOdometry.getPoseMeters() : simOdometryPose;
+    return (RobotBase.isReal()) ? swervePoseEstimator.getEstimatedPosition() : simOdometryPose;
   }
 
   /** Resets odometry */
   public void resetOdometry(Pose2d pose) {
-    swerveOdometry.resetPosition(getYaw(), getModulePositions(), pose);
+    swervePoseEstimator.resetPosition(getYaw(), getModulePositions(), pose);
   }
 
   /** Returns swerve module states */
@@ -258,7 +260,7 @@ public class Swerve extends SubsystemBase {
       module.updateLoggedInputs();
     }
 
-    swerveOdometry.update(getYaw(), getModulePositions());
+    swervePoseEstimator.update(getYaw(), getModulePositions());
 
     if (RobotBase.isSimulation()) {
       SwerveModuleState[] measuredStates =
