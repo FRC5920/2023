@@ -293,6 +293,7 @@ public final class Constants {
     // pipeline indexes
     public static final int kConePipelineIndex = 1;
     public static final int kCubePipelineIndex = 0;
+    public static final int kDriverCameraPipelineIndex = -1;
   }
 
   /** A map of directories where log files should be stored */
