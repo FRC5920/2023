@@ -23,7 +23,8 @@
       "AdvantageKit": {
         "RealMetadata": {
           "open": true
-        }
+        },
+        "open": true
       },
       "Shuffleboard": {
         ".metadata": {
