@@ -100,6 +100,12 @@ public class ProcessedXboxController extends XboxController {
   /** Xbox controller dPad 'Down' button */
   public final Trigger dPadDown;
 
+  /** Left trigger as a button */
+  public Trigger leftTriggerAsButton;
+
+  /** Right trigger as a button */
+  public Trigger rightTriggerAsButton;
+
   /**
    * Creates a JoystickController instance that communicates with an Xbox controller on a specified
    * port and uses default processing for joystick axes
@@ -145,6 +151,8 @@ public class ProcessedXboxController extends XboxController {
 
     dPadUp = new Trigger(() -> dpadValueIs(this.getPOV(), new int[] {0, 45, 315}));
     dPadDown = new Trigger(() -> dpadValueIs(this.getPOV(), new int[] {180, 135, 225}));
+    leftTriggerAsButton = new Trigger(() -> this.getLeftTriggerAxis() > 0.5);
+    rightTriggerAsButton = new Trigger(() -> this.getRightTriggerAxis() > 0.5);
   }
 
   private static boolean dpadValueIs(int value, int matches[]) {
