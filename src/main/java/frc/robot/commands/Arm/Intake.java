@@ -55,16 +55,18 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Arm.Arm.DoWhatWithGamePiece;
+import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 
 public class Intake extends CommandBase {
   /** Creates a new Intake. */
   private Arm.GamePieceType gamePiece;
-
+  private BotStateSubsystem m_BotStateSubsystem;
   long startTime;
 
-  public Intake(Arm.GamePieceType IntakeWhat) {
+  public Intake(Arm.GamePieceType IntakeWhat, BotStateSubsystem myBotStateSubsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
     gamePiece = IntakeWhat;
+    m_BotStateSubsystem = myBotStateSubsystem;
   }
 
   // Called when the command is initially scheduled.
@@ -82,6 +84,7 @@ public class Intake extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     Arm.zeroHandRollers();
+    m_BotStateSubsystem.storedGamePiece = gamePiece;
   }
 
   // Returns true when the command should end.
