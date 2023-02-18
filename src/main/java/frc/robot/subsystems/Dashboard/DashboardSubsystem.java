@@ -49,46 +49,29 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.commands;
+package frc.robot.subsystems.Dashboard;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.lib.Joystick.ProcessedXboxController;
-import frc.robot.subsystems.JoystickSubsystem;
-import frc.robot.subsystems.SwerveDrivebase.Swerve;
-import frc.robot.subsystems.runtimeState.BotStateSubsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 
-public class TeleopSwerve extends CommandBase {
-  private double rotation;
-  private Translation2d translation;
-  private boolean fieldRelative;
-  private boolean openLoop;
+/** Dashboard subsystem that provides tabs on a Shuffleboard GUI */
+public class DashboardSubsystem extends SubsystemBase {
 
-  private Swerve s_Swerve;
-  private ProcessedXboxController controller;
+  /** Swerve drive tab */
+  private SwerveDashboardTab m_driveTrainTab;
 
-  /** Driver control */
-  public TeleopSwerve(
-      Swerve s_Swerve,
-      JoystickSubsystem joystickSubsystem,
-      boolean fieldRelative,
-      boolean openLoop) {
-    this.s_Swerve = s_Swerve;
-    addRequirements(s_Swerve);
+  /** Creates a new Dashboard. */
+  public DashboardSubsystem(RobotContainer botContainer) {
+    m_driveTrainTab = new SwerveDashboardTab();
+  }
 
-    this.controller = joystickSubsystem.driverController;
-    this.fieldRelative = fieldRelative;
-    this.openLoop = openLoop;
+  public void initialize(RobotContainer botContainer) {
+    m_driveTrainTab.initialize(botContainer);
   }
 
   @Override
-  public void execute() {
-    double yAxis = -controller.getLeftY();
-    double xAxis = -controller.getLeftX();
-    double rAxis = -controller.getRightX();
-
-    translation = new Translation2d(yAxis, xAxis).times(BotStateSubsystem.MaxSpeed);
-    rotation = rAxis * BotStateSubsystem.MaxRotate;
-    s_Swerve.drive(translation, rotation, fieldRelative, openLoop);
+  public void periodic() {
+    // This method gets called once per scheduler run
+    m_driveTrainTab.update();
   }
 }

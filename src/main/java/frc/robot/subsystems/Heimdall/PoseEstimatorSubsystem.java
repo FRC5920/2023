@@ -72,7 +72,6 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.SwerveDrivebaseConstants;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import java.io.IOException;
 import java.util.Optional;
@@ -155,8 +154,8 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
 
     poseEstimator =
         new SwerveDrivePoseEstimator(
-            SwerveDrivebaseConstants.swerveKinematics,
-            s_swerveSubsystem.getGyroscopeRotation(),
+            s_swerveSubsystem.getSwerveKinematics(),
+            s_swerveSubsystem.getYaw(),
             s_swerveSubsystem.getModulePositions(),
             new Pose2d(),
             stateStdDevs,
@@ -189,8 +188,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
       }
     }
     // Update pose estimator with drivetrain sensors
-    poseEstimator.update(
-        s_swerveSubsystem.getGyroscopeRotation(), s_swerveSubsystem.getModulePositions());
+    poseEstimator.update(s_swerveSubsystem.getYaw(), s_swerveSubsystem.getModulePositions());
 
     field2d.setRobotPose(getCurrentPose());
     // if (DriverStation.getAlliance() == Alliance.Red) {
@@ -219,7 +217,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
    */
   public void setCurrentPose(Pose2d newPose) {
     poseEstimator.resetPosition(
-        s_swerveSubsystem.getGyroscopeRotation(), s_swerveSubsystem.getModulePositions(), newPose);
+        s_swerveSubsystem.getYaw(), s_swerveSubsystem.getModulePositions(), newPose);
   }
 
   /**

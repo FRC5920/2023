@@ -58,6 +58,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.Joystick.AxisProcChain;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.RobotContainer;
+import frc.robot.commands.Balance;
 
 /** A subsystem providing/managing Xbox controllers for driving the robot manually */
 public class JoystickSubsystem extends SubsystemBase {
@@ -145,17 +146,18 @@ public class JoystickSubsystem extends SubsystemBase {
    * @param botContainer Object providing access to robot subsystems
    */
   public void configureButtonBindings(RobotContainer botContainer) {
+
     // Map buttons on driver controller
     driverController.A.onTrue(new InstantCommand(this::doNothing, this));
     driverController.B.onTrue(new InstantCommand(this::doNothing, this));
     driverController.X.onTrue(new InstantCommand(this::doNothing, this));
-    driverController.Y.onTrue(new InstantCommand(this::doNothing, this));
+    driverController.Y.onTrue(new InstantCommand(() -> botContainer.swerveSubsystem.zeroGyro()));
     driverController.leftBumper.whileTrue(new InstantCommand(this::doNothing, this));
     driverController.rightBumper.whileTrue(new InstantCommand(this::doNothing, this));
     driverController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.back.onTrue(new InstantCommand(this::doNothing, this));
-    driverController.start.onTrue(new InstantCommand(this::doNothing, this));
+    driverController.start.whileTrue(new Balance(botContainer.swerveSubsystem));
 
     // Map buttons on operator controller
     operatorController.A.onTrue(new InstantCommand(this::doNothing, this));

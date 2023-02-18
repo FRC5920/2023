@@ -49,20 +49,75 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot;
+package frc.lib.SwerveDrive;
 
-/** Automatically generated file containing build version information. */
-public final class GenBuildInfo {
-  public static final String MAVEN_GROUP = "";
-  public static final String MAVEN_NAME = "2023";
-  public static final String VERSION = "unspecified";
-  public static final int GIT_REVISION = 49;
-  public static final String GIT_SHA = "5713215cb6b269f667d7395b57fc93bb56c3aafd";
-  public static final String GIT_DATE = "2023-02-16 07:11:48 PST";
-  public static final String GIT_BRANCH = "main";
-  public static final String BUILD_DATE = "2023-02-16 11:21:41 PST";
-  public static final long BUILD_UNIX_TIME = 1676575301037L;
-  public static final int DIRTY = 1;
+import edu.wpi.first.math.geometry.Rotation2d;
+import org.littletonrobotics.junction.AutoLog;
 
-  private GenBuildInfo() {}
+/**
+ * SwerveModuleIO provides a common interface for the low-level I/O layer used by a swerve drive
+ * module
+ *
+ * @apiNote This interface is largely inspired by the ModuleIO interface used by FRC6328 Mechanical
+ *     Advantage (http://github.com/Mechanical-Advantage)
+ */
+public interface SwerveModuleIO {
+
+  @AutoLog
+  public static class SwerveModuleIOTelemetry {
+    public double driveSpeedMetersPerSecond = 0.0;
+    public double driveDistanceMeters = 0.0;
+    public double driveAppliedVolts = 0.0;
+    public double driveCurrentAmps = 0.0;
+    public double driveTempCelcius = 0.0;
+
+    public double angleAbsolutePositionRad = 0.0;
+    public double anglePositionRad = 0.0;
+    public double angleVelocityRadPerSec = 0.0;
+    public double angleAppliedVolts = 0.0;
+    public double angleCurrentAmps = 0.0;
+    public double angleTempCelcius = 0.0;
+  }
+
+  /** Updates the set of loggable inputs */
+  public void updateLoggedInputs(SwerveModuleIOTelemetry inputs);
+
+  /**
+   * Set the desired speed of the module
+   *
+   * @param speedMetersPerSecond desired speed in meters per second
+   * @param isOpenLoop true to use open-loop control of speed; else false for closed-loop control
+   */
+  public void setSpeed(double speedMetersPerSecond, boolean isOpenLoop);
+
+  /**
+   * Set the desired angle of the module
+   *
+   * @param angle angle as a Rotation2d object
+   */
+  public void setAngle(Rotation2d angle);
+
+  /**
+   * Returns the current speed of the module
+   *
+   * @return the current speed of the module in meters per second
+   */
+  public double getSpeed();
+
+  /**
+   * Returns the current angle of the module
+   *
+   * @return the current angle of the module as a Rotation2d object
+   */
+  public Rotation2d getAngle();
+
+  /**
+   * Returns the current distance measurement from the module in meters
+   *
+   * @return the current distance measurement of the module in meters
+   */
+  public double getDistance();
+
+  /** Reset the swerve module angle to its zero position */
+  public default void resetToAbsolute() {}
 }

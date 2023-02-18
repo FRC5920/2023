@@ -18,5 +18,16 @@
   },
   "editor.tabSize": 2,
   "editor.detectIndentation": false,
-  "java.configuration.updateBuildConfiguration": "interactive"
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.server.launchMode": "Standard",
+  "java.format.enabled": false,
+  "spotlessGradle.format.enable": true,
+  "spotlessGradle.diagnostics.enable": false,
+  "editor.defaultFormatter": "richardwillis.vscode-spotless-gradle",
+  "[json]": {
+    "editor.defaultFormatter": "richardwillis.vscode-spotless-gradle"
+  },
+  "wpilib.deployOffline": true,
+  "wpilib.offline": false,
+  "wpilib.skipTests": false
 }
