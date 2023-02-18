@@ -85,6 +85,7 @@ public final class Constants {
   public static class DriverConstants {
     public static final int kControllerPort = 0;
     public static final double stickDeadband = 0.1;
+    public static final double kDriverTriggerThreshold = 0.2;
   }
 
   public static class OperatorConstants {
