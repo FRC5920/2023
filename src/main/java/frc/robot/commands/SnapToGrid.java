@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.lib.Joystick.ProcessedXboxController;
+import frc.robot.FieldConstants;
 import frc.robot.subsystems.JoystickSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
@@ -18,6 +19,8 @@ public class SnapToGrid extends CommandBase {
   private Translation2d translation;
   private boolean fieldRelative;
   private boolean openLoop;
+  private boolean foundSnapPoint = false;
+  double yAxis;
 
   private Swerve s_Swerve;
   private ProcessedXboxController controller;
@@ -45,7 +48,13 @@ public class SnapToGrid extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double yAxis = -controller.getLeftY();
+    for (int i = 0; i < FieldConstants.Grids.nodeRowCount; i++) {
+    if (((FieldConstants.Grids.lowTranslations[i].getY() - (FieldConstants.Grids.nodeSeparationY * 0.5)) < s_Swerve.getPose().getY()) && 
+    (s_Swerve.getPose().getY() <= (FieldConstants.Grids.lowTranslations[i].getY() + (FieldConstants.Grids.nodeSeparationY * 0.5)))) {
+      yAxis = FieldConstants.Grids.lowTranslations[i].getY();
+    } else {
+      yAxis = -controller.getLeftY();
+    }
     double xAxis = -controller.getLeftX();
     double rAxis = -controller.getRightX();
 
@@ -53,6 +62,7 @@ public class SnapToGrid extends CommandBase {
     rotation = rAxis * BotStateSubsystem.MaxRotate;
     s_Swerve.drive(translation, rotation, fieldRelative, openLoop);
   }
+}
 
   // Called once the command ends or is interrupted.
   @Override
@@ -64,3 +74,4 @@ public class SnapToGrid extends CommandBase {
     return false;
   }
 }
+
