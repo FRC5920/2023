@@ -154,7 +154,7 @@ public class Robot extends LoggedRobot {
     SmartDashboard.putBoolean(
         "Left Trigger Value",
         m_robotContainer.joystickSubsystem.driverController.leftTriggerAsButton.getAsBoolean());
-
+    SmartDashboard.putData(m_robotContainer.swerveSubsystem);
     // Check for logging faults
     s_logReceiverQueueAlert.set(Logger.getInstance().getReceiverQueueFault());
 
