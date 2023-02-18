@@ -92,19 +92,11 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
   // on the final pose estimate.
 
   /**
-   * Standard deviations of model states. Increase these numbers to trust your model's state
-   * estimates less. This matrix is in the form [x, y, theta]ᵀ, with units in meters and radians,
-   * then meters.
-   */
-  private static final Vector<N3> stateStdDevs =
-      VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5));
-
-  /**
    * Standard deviations of the vision measurements. Increase these numbers to trust global
    * measurements from vision less. This matrix is in the form [x, y, theta]ᵀ, with units in meters
    * and radians.
    */
-  private static final Vector<N3> visionMeasurementStdDevs =
+  private Vector<N3> visionMeasurementStdDevs =
       VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(10));
 
   private final SwerveDrivePoseEstimator poseEstimator;
@@ -171,8 +163,11 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
         Pose3d camPose = targetPose.transformBy(camToTarget.inverse());
 
         var visionMeasurement = camPose.transformBy(CAMERA_TO_ROBOT);
-
-        // poseEstimator.addVisionMeasurement(visionMeasurement.toPose2d(), resultTimestamp);
+        if (target.getPoseAmbiguity() <= .05 ){
+          visionMeasurementStdDevs = VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(2));
+        }else{
+          visionMeasurementStdDevs = VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(10));
+        }
         poseEstimator.addVisionMeasurement(
             visionMeasurement.toPose2d(), resultTimestamp, visionMeasurementStdDevs);
       }
