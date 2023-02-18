@@ -57,6 +57,8 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -122,26 +124,14 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
     try {
       // Attempt to load the AprilTagFieldLayout that will tell us where the tags are on the field.
       fieldLayout = AprilTagFields.k2023ChargedUp.loadAprilTagLayoutField();
-      // Set origin (Don't know if we need this anymore)
-      var alliance = DriverStation.getAlliance();
-      // var alliance = Alliance.Blue;
-      fieldLayout.setOrigin(
-          alliance == Alliance.Blue
-              ? OriginPosition.kBlueAllianceWallRightSide
-              : OriginPosition.kRedAllianceWallRightSide);
-      // End of setting origin
       // Create pose estimator
       photonPoseEstimator =
           new PhotonPoseEstimator(
               fieldLayout,
-              PoseStrategy.LOWEST_AMBIGUITY,
+              PoseStrategy.MULTI_TAG_PNP,
               photonCamera,
               Constants.VisionConstants.CAMERA_TO_ROBOT);
-      // photonPoseEstimator =
-      //          new PhotonPoseEstimator(
-      //                 fieldLayout, PoseStrategy.MULTI_TAG_PNP, photonCamera,
-      // Constants.VisionConstants.CAMERA_TO_ROBOT);
-      //        photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+              photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
     } catch (IOException e) {
       // The AprilTagFieldLayout failed to load. We won't be able to estimate poses if we don't know
       // where the tags are.
@@ -150,15 +140,15 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
       fieldLayout = null;
     }
     this.ATfieldLayout = fieldLayout;
-
-    poseEstimator =
+poseEstimator = s_swerveSubsystem.swervePoseEstimator;
+   /*poseEstimator =
         new SwerveDrivePoseEstimator(
             s_swerveSubsystem.getSwerveKinematics(),
             s_swerveSubsystem.getYaw(),
             s_swerveSubsystem.getModulePositions(),
             new Pose2d(),
             stateStdDevs,
-            visionMeasurementStdDevs);
+            visionMeasurementStdDevs);*/
   }
 
   /** Register the subsystem's dashboard tab */
@@ -185,7 +175,9 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
         Pose3d camPose = targetPose.transformBy(camToTarget.inverse());
 
         var visionMeasurement = camPose.transformBy(CAMERA_TO_ROBOT);
-        poseEstimator.addVisionMeasurement(visionMeasurement.toPose2d(), resultTimestamp);
+    
+        //poseEstimator.addVisionMeasurement(visionMeasurement.toPose2d(), resultTimestamp);
+        poseEstimator.addVisionMeasurement(visionMeasurement.toPose2d(), resultTimestamp, visionMeasurementStdDevs );
       }
     }
     // Update pose estimator with drivetrain sensors
