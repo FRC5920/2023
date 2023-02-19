@@ -53,6 +53,8 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.FieldConstants;
@@ -94,6 +96,7 @@ public class SnapToGrid extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    SmartDashboard.putNumber("robot Y value", s_Swerve.getPose().getY());
     for (int i = 0; i < FieldConstants.Grids.nodeRowCount; i++) {
       if (((FieldConstants.Grids.lowTranslations[i].getY() - Units.inchesToMeters(11))
               <= s_Swerve.getPose().getY())
@@ -101,8 +104,10 @@ public class SnapToGrid extends CommandBase {
               <= (FieldConstants.Grids.lowTranslations[i].getY() + Units.inchesToMeters(11)))) {
         xAxis = (FieldConstants.Grids.lowTranslations[i].getY() - s_Swerve.getPose().getY());
         foundSnapPoint = true;
-      } 
+        SmartDashboard.putNumber("target node index", i);
+      }
     }
+    SmartDashboard.putBoolean("foundSnapPoint", foundSnapPoint);
     if (foundSnapPoint == false) {
       xAxis = -controller.getLeftX();
     }
