@@ -96,6 +96,7 @@ public class SnapToGrid extends CommandBase {
   @Override
   public void execute() {
     for (int i = 0; i < FieldConstants.Grids.nodeRowCount; i++) {
+      SmartDashboard.putNumber("snap for loop index", i);
       if (((FieldConstants.Grids.lowTranslations[i].getY() - Units.inchesToMeters(11))
               <= s_Swerve.getPose().getY())
           && (s_Swerve.getPose().getY()
