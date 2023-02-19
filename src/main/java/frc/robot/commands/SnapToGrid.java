@@ -95,13 +95,13 @@ public class SnapToGrid extends CommandBase {
   @Override
   public void execute() {
     for (int i = 0; i < FieldConstants.Grids.nodeRowCount; i++) {
-      if (((FieldConstants.Grids.lowTranslations[i].getY() - Units.inchesToMeters(11)) <= s_Swerve.getPose().getY())
-          && (s_Swerve.getPose().getY() <= (FieldConstants.Grids.lowTranslations[i].getY() + Units.inchesToMeters(11)))) {
+      if (((FieldConstants.Grids.lowTranslations[i].getY() - Units.inchesToMeters(11))
+              <= s_Swerve.getPose().getY())
+          && (s_Swerve.getPose().getY()
+              <= (FieldConstants.Grids.lowTranslations[i].getY() + Units.inchesToMeters(11)))) {
         xAxis = (FieldConstants.Grids.lowTranslations[i].getY() - s_Swerve.getPose().getY());
         foundSnapPoint = true;
-      } else {
-        foundSnapPoint = false;
-      }
+      } 
     }
     if (foundSnapPoint == false) {
       xAxis = -controller.getLeftX();
@@ -112,6 +112,7 @@ public class SnapToGrid extends CommandBase {
     translation = new Translation2d(yAxis, xAxis).times(BotStateSubsystem.MaxSpeed);
     rotation = rAxis * BotStateSubsystem.MaxRotate;
     s_Swerve.drive(translation, rotation, fieldRelative, openLoop);
+    foundSnapPoint = false;
   }
 
   // Called once the command ends or is interrupted.
