@@ -69,6 +69,7 @@ public class SnapToGrid extends CommandBase {
   private boolean fieldRelative;
   private boolean openLoop;
   private boolean foundSnapPoint = false;
+  int timesGotXFromJoystick;
   double xAxis;
 
   private Swerve s_Swerve;
@@ -90,7 +91,9 @@ public class SnapToGrid extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    timesGotXFromJoystick = 0;
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -108,6 +111,8 @@ public class SnapToGrid extends CommandBase {
     SmartDashboard.putBoolean("foundSnapPoint", foundSnapPoint);
     if (foundSnapPoint == false) {
       xAxis = -controller.getLeftX();
+      timesGotXFromJoystick++;
+      SmartDashboard.putNumber("times got X from joystick", timesGotXFromJoystick);
     }
     double yAxis = -controller.getLeftY();
     double rAxis = -controller.getRightX();
