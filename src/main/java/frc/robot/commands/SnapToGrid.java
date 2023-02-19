@@ -52,6 +52,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.FieldConstants;
@@ -94,8 +95,8 @@ public class SnapToGrid extends CommandBase {
   @Override
   public void execute() {
     for (int i = 0; i < FieldConstants.Grids.nodeRowCount; i++) {
-      if (((FieldConstants.Grids.lowTranslations[i].getY() - 11) <= s_Swerve.getPose().getY())
-          && (s_Swerve.getPose().getY() <= (FieldConstants.Grids.lowTranslations[i].getY() + 11))) {
+      if (((FieldConstants.Grids.lowTranslations[i].getY() - Units.inchesToMeters(11)) <= s_Swerve.getPose().getY())
+          && (s_Swerve.getPose().getY() <= (FieldConstants.Grids.lowTranslations[i].getY() + Units.inchesToMeters(11)))) {
         xAxis = (FieldConstants.Grids.lowTranslations[i].getY() - s_Swerve.getPose().getY());
         foundSnapPoint = true;
       } else {
