@@ -60,6 +60,7 @@ import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.RobotContainer;
 import frc.robot.commands.Balance;
 import frc.robot.subsystems.Arm.Arm;
+import frc.robot.subsystems.Intake.IntakeSubsystem;
 
 /** A subsystem providing/managing Xbox controllers for driving the robot manually */
 public class JoystickSubsystem extends SubsystemBase {
@@ -98,6 +99,9 @@ public class JoystickSubsystem extends SubsystemBase {
 
   /** Handle to the Arm subsystem */
   Arm m_armSubsystem;
+
+  /** Handle to the intake subsystem */
+  IntakeSubsystem m_intakeSubsystem;
 
   /** Creates a new JoystickSubsystem */
   public JoystickSubsystem() {
@@ -150,6 +154,7 @@ public class JoystickSubsystem extends SubsystemBase {
    */
   public void configureButtonBindings(RobotContainer botContainer) {
     m_armSubsystem = botContainer.s_Arm;
+    m_intakeSubsystem = botContainer.intakeSubsystem;
 
     // Map buttons on driver controller
     driverController.A.onTrue(new InstantCommand(this::doNothing, this));
@@ -186,16 +191,7 @@ public class JoystickSubsystem extends SubsystemBase {
   public void periodic() {
     m_armSubsystem.runAngleMotor(operatorController.getLeftY());
     m_armSubsystem.runExtenderMotor(operatorController.getRightY());
-
-    // Run the intake motors
-    double intakePercent = 0.0;
-    if (operatorController.leftTriggerAsButton.getAsBoolean()) {
-      intakePercent = 1.0;
-    } else if (operatorController.rightTriggerAsButton.getAsBoolean()) {
-      intakePercent = -1.0;
-    }
-
-    m_armSubsystem.runIntakeMotor(intakePercent);
+    m_intakeSubsystem.runIntakeFront(operatorController.getRightY());
   }
 
   /** Placeholder used for empty commands mapped to joystick */

@@ -72,7 +72,6 @@ public class Arm extends SubsystemBase {
   // WPI_TalonFX(Constants.ArmConstants.kArmYMotorSlavePort);
   private final WPI_TalonFX ArmExtender = new WPI_TalonFX(Constants.ArmConstants.kArmExtenderPort);
   private final Pneumatics myPneumatics;
-  private final double HandRollerSpeed = 0.5;
 
   /** Dashboard tab for the Arm subsystem */
   private final ArmDashboardTab m_armDashboardTab;
@@ -96,20 +95,6 @@ public class Arm extends SubsystemBase {
 
     /** true when the wrist is in the inverted position; else false */
     WristPosition wristPosition = WristPosition.Normal;
-
-    /** Motor current measurement (Amperes) from the top intake motor */
-    double upperIntakeCurrentAmps = 0.0;
-
-    /** Motor current measurement (Amperes) from the bottom intake motor */
-    double lowerIntakeCurrentAmps = 0.0;
-  }
-
-  public class ArmSubsystemDashboardInputs {
-    /** Gives the speed to run intake motors at when taking in cargo */
-    double intakeCargoMotorSpeed = 0.0;
-
-    /** Gives the speed to run intake motors at when placing cargo */
-    double placeCargoMotorSpeed = 0.0;
   }
 
   public enum GamePieceType {
@@ -173,18 +158,6 @@ public class Arm extends SubsystemBase {
 
   public void runExtenderMotor(double percent) {
     ArmExtender.set(percent * 0.2); // Set max output to 20% for slow motion
-  }
-
-  public void runIntakeMotor(double percent) {
-    double motorSpeedPercent = 0.0;
-    if (percent > 0) {
-      motorSpeedPercent = m_dashboardInputs.intakeCargoMotorSpeed;
-    } else if (percent < 0) {
-      motorSpeedPercent = m_dashboardInputs.placeCargoMotorSpeed;
-    }
-
-    HandBottomRoller.set(motorSpeedPercent);
-    HandTopBackRoller.set(motorSpeedPercent);
   }
 
   public void toggleWristPosition() {

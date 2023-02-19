@@ -65,6 +65,7 @@ import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Arm.Pneumatics;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 import frc.robot.subsystems.Heimdall.*;
+import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 import org.photonvision.PhotonCamera;
@@ -84,6 +85,7 @@ public class RobotContainer {
   public final Swerve swerveSubsystem;
   public final Pneumatics s_Pneumatics = new Pneumatics();
   public final Arm s_Arm = new Arm(s_Pneumatics);
+  public final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
 
   @SuppressWarnings({"unused"})
   public final PoseEstimatorSubsystem poseEstimatorSubsystem;
@@ -170,6 +172,7 @@ public class RobotContainer {
     poseEstimatorSubsystem = new PoseEstimatorSubsystem(TagCamera, swerveSubsystem);
     poseEstimatorSubsystem.registerDashboardTab(dashboardSubsystem);
 
+    dashboardSubsystem.add(intakeSubsystem.getDashboardTab());
     // Initialize all dashboard tabs
     dashboardSubsystem.initialize(this);
 
