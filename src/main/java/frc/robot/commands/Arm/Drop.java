@@ -52,11 +52,11 @@
 package frc.robot.commands.Arm;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Arm.Arm;
+import frc.robot.Constants;
 
 public class Drop extends CommandBase {
   /** Creates a new Drop. */
-  public Drop(Arm.GamePieceType DropWhat) {
+  public Drop(Constants.GamePieceType DropWhat) {
     // Use addRequirements() here to declare subsystem dependencies.
   }
 

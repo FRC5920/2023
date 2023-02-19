@@ -83,8 +83,8 @@ public class RobotContainer {
   public final JoystickSubsystem joystickSubsystem = new JoystickSubsystem();
   public final BotStateSubsystem botStateSubsystem = new BotStateSubsystem();
   public final Swerve swerveSubsystem;
-  public final Pneumatics s_Pneumatics = new Pneumatics();
-  public final Arm s_Arm = new Arm(s_Pneumatics);
+  public final Pneumatics pneumaticsSubsystem = new Pneumatics();
+  public final Arm armSubsystem = new Arm();
   public final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
 
   @SuppressWarnings({"unused"})
@@ -173,6 +173,8 @@ public class RobotContainer {
     poseEstimatorSubsystem.registerDashboardTab(dashboardSubsystem);
 
     dashboardSubsystem.add(intakeSubsystem.getDashboardTab());
+    dashboardSubsystem.add(armSubsystem.getDashboardTab());
+
     // Initialize all dashboard tabs
     dashboardSubsystem.initialize(this);
 

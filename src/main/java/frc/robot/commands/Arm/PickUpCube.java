@@ -52,6 +52,7 @@
 package frc.robot.commands.Arm;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Constants;
 import frc.robot.subsystems.Arm.Arm;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
@@ -63,6 +64,7 @@ public class PickUpCube extends SequentialCommandGroup {
     addRequirements(armSubsystem);
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
-    addCommands(new Reach(Arm.Rank.PickUp), new Intake(Arm.GamePieceType.Cube), new Retract());
+    addCommands(
+        new Reach(Arm.Rank.PickUp), new Intake(Constants.GamePieceType.Cube), new Retract());
   }
 }

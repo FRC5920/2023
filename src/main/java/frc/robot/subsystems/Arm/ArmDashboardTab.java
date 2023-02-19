@@ -57,60 +57,73 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import frc.robot.subsystems.Arm.Arm.ArmSubsystemDashboardInputs;
-import frc.robot.subsystems.Arm.Arm.ArmSubsystemDashboardOutputs;
+import frc.robot.RobotContainer;
+import frc.robot.subsystems.Arm.Arm.ArmSubsystemTelemetry;
+import frc.robot.subsystems.Arm.Arm.MotorTelemetry;
+import frc.robot.subsystems.Dashboard.IDashboardTab;
 import java.util.Map;
 
 /** Dashboard tab for tuning the Arm subsystem */
-public class ArmDashboardTab {
+public class ArmDashboardTab implements IDashboardTab {
   // Height of subpanels
-  final int kPanelHeight = 3;
+  final int kPanelHeight = 4;
 
   // Width of subpanels
-  final int kPanelWidth = 6;
+  final int kPanelWidth = 10;
 
   /** The dashboard tab */
   private ShuffleboardTab m_tab;
 
   /** Measurements populated by the subsystem */
-  private final ArmSubsystemDashboardOutputs m_measurements;
+  private final ArmSubsystemTelemetry m_telemetry;
 
-  /** NetworkTables entry used to control motor speed for intake */
-  private GenericEntry m_nteIntakeMotorSpeed;
+  /** NetworkTables entry used to control angle motor position */
+  private GenericEntry m_angleMotorPositionNTE;
 
-  /** NetworkTables entry used to control motor speed for placement */
-  private GenericEntry m_ntePlacementMotorSpeed;
+  /** NetworkTables entry used to control extender motor position */
+  private GenericEntry m_extenderMotorPositionNTE;
 
   /** Create an instance of the tab */
-  public ArmDashboardTab(ArmSubsystemDashboardOutputs measurements) {
-    m_measurements = measurements;
+  public ArmDashboardTab(ArmSubsystemTelemetry telemetry) {
+    m_telemetry = telemetry;
   }
 
   /** Called to initialize the dashboard tab */
-  public void initialize() {
+  public void initDashboard(RobotContainer botContainer) {
     final String kTabTitle = "Arm Subsystem";
     m_tab = Shuffleboard.getTab(kTabTitle);
 
-    createAnglePanel();
-    createExtenderPanel();
-    createWristPanel();
-    createIntakeCurrentPanel();
-    createIntakeSpeedPanel();
-
-    Shuffleboard.selectTab(kTabTitle);
+    createAnglePanel(kPanelHeight * 0, kPanelWidth * 0, kPanelWidth, kPanelHeight);
+    createExtenderPanel(kPanelHeight * 0, kPanelWidth * 1, kPanelWidth, kPanelHeight);
+    createTelemetryPanel(m_telemetry.angleTelemetry, "Angle Motor Telemetry", 4, 0, kPanelWidth, 4);
+    createTelemetryPanel(
+        m_telemetry.extenderTelemetry,
+        "Extender Motor Telemetry",
+        4,
+        kPanelWidth * 1,
+        kPanelWidth,
+        4);
   }
 
   /** Updates dashboard widgets with subsystem measurements and obtains dashboard input values */
-  public void update(ArmSubsystemDashboardInputs inputs) {
-    inputs.intakeCargoMotorSpeed = m_nteIntakeMotorSpeed.getDouble(0.1);
-    inputs.placeCargoMotorSpeed = m_ntePlacementMotorSpeed.getDouble(0.1);
+  public void updateDashboard(RobotContainer botContainer) {
+    botContainer.armSubsystem.DEBUG_setAnglePosition(m_angleMotorPositionNTE.getDouble(0.0));
+    botContainer.armSubsystem.DEBUG_setExtenderPosition(m_extenderMotorPositionNTE.getDouble(0.0));
   }
 
-  private void createAnglePanel() {
+  /**
+   * Builds a panel with angle motor widgets on the dashboard tab
+   *
+   * @param panelRow Row position of the panel on the dashboard
+   * @param panelCol Column position of the panel on the dashboard
+   * @param widthCells Width of the panel in cells
+   * @param heightCells Height of the panel in cells
+   */
+  private void createAnglePanel(int panelRow, int panelColumn, int widthCells, int heightCells) {
     ShuffleboardLayout layout = m_tab.getLayout("Angle Motor", BuiltInLayouts.kGrid);
     layout
-        .withSize(kPanelWidth, kPanelHeight)
-        .withPosition(0 * kPanelWidth, 0)
+        .withSize(widthCells, heightCells)
+        .withPosition(panelColumn, panelRow)
         .withProperties(
             Map.of("Label position", "LEFT", "Number of columns", 1, "Number of rows", 2));
 
@@ -119,27 +132,34 @@ public class ArmDashboardTab {
         .addDouble(
             "Encoder",
             () -> {
-              return m_measurements.angleEncoderCount;
+              return m_telemetry.angleEncoderCount;
             })
         .withWidget(BuiltInWidgets.kTextView)
         .withPosition(0, 0);
 
-    // Set up a widget to display the angle in degrees
-    layout
-        .addDouble(
-            "Degrees",
-            () -> {
-              return m_measurements.angleDegrees;
-            })
-        .withWidget(BuiltInWidgets.kTextView)
-        .withPosition(0, 1);
+    // Set up a slider to control motor position
+    m_angleMotorPositionNTE =
+        layout
+            .add("Position", 0.0)
+            .withWidget(BuiltInWidgets.kNumberSlider)
+            .withProperties(Map.of("min", 0.00, "max", 10000.0, "Block increment", 10.0))
+            .withPosition(0, 1)
+            .getEntry();
   }
 
-  private void createExtenderPanel() {
+  /**
+   * Builds a panel with extender motor widgets on the dashboard tab
+   *
+   * @param panelRow Row position of the panel on the dashboard
+   * @param panelCol Column position of the panel on the dashboard
+   * @param widthCells Width of the panel in cells
+   * @param heightCells Height of the panel in cells
+   */
+  private void createExtenderPanel(int panelRow, int panelColumn, int widthCells, int heightCells) {
     ShuffleboardLayout layout = m_tab.getLayout("Extender Motor", BuiltInLayouts.kGrid);
     layout
-        .withSize(kPanelWidth, kPanelHeight)
-        .withPosition(1 * kPanelWidth, 0)
+        .withSize(widthCells, heightCells)
+        .withPosition(panelColumn, panelRow)
         .withProperties(
             Map.of("Label position", "LEFT", "Number of columns", 1, "Number of rows", 2));
 
@@ -148,93 +168,73 @@ public class ArmDashboardTab {
         .addDouble(
             "Encoder",
             () -> {
-              return m_measurements.extenderEncoderCount;
+              return m_telemetry.extenderEncoderCount;
             })
         .withWidget(BuiltInWidgets.kTextView)
         .withPosition(0, 0);
 
-    // Set up a widget to display the angle in degrees
-    layout
-        .addDouble(
-            "Position (meters)",
-            () -> {
-              return m_measurements.extenderPositionMeters;
-            })
-        .withWidget(BuiltInWidgets.kTextView)
-        .withPosition(0, 1);
-  }
-
-  private void createWristPanel() {
-    ShuffleboardLayout layout = m_tab.getLayout("Wrist Pneumatics", BuiltInLayouts.kGrid);
-    layout
-        .withSize(kPanelWidth, kPanelHeight)
-        .withPosition(2 * kPanelWidth, 0)
-        .withProperties(
-            Map.of("Label position", "LEFT", "Number of columns", 1, "Number of rows", 1));
-
-    // Add a widget to show the present wrist orientation
-    layout
-        .addString(
-            "Orientation",
-            () -> {
-              return m_measurements.wristPosition.toString();
-            })
-        .withWidget(BuiltInWidgets.kTextView)
-        .withPosition(0, 0);
-  }
-
-  private void createIntakeSpeedPanel() {
-    ShuffleboardLayout layout = m_tab.getLayout("Intake Motor Speed", BuiltInLayouts.kGrid);
-    layout
-        .withSize(kPanelWidth * 3, 3)
-        .withPosition(0, 1 * kPanelHeight)
-        .withProperties(
-            Map.of("Label position", "LEFT", "Number of columns", 2, "Number of rows", 1));
-
-    // Set up a slider to control motor speed during intake
-    m_nteIntakeMotorSpeed =
+    // Set up a slider to control motor position
+    m_extenderMotorPositionNTE =
         layout
-            .add("Intake Speed (%)", 0.5)
+            .add("Position", 0.0)
             .withWidget(BuiltInWidgets.kNumberSlider)
-            .withProperties(Map.of("min", 0.01, "max", 1.0)) // specify widget properties here
-            .withPosition(0, 0)
-            .getEntry();
-
-    // Set up a slider to control motor speed during placement
-    m_ntePlacementMotorSpeed =
-        layout
-            .add("Placement Speed (%)", 0.2)
-            .withWidget(BuiltInWidgets.kNumberSlider)
-            .withProperties(Map.of("min", 0.01, "max", 1.0)) // specify widget properties here
-            .withPosition(1, 0)
+            .withProperties(Map.of("min", 0.00, "max", 10000.0, "Block increment", 10.0))
+            .withPosition(0, 1)
             .getEntry();
   }
 
-  private void createIntakeCurrentPanel() {
-    ShuffleboardLayout layout = m_tab.getLayout("Intake Motor Current", BuiltInLayouts.kGrid);
+  /**
+   * Creates a panel for displaying motor telemetry
+   *
+   * @param telemetry Telemetry to connect to widgets
+   * @param panelTitle Title to display in the panel
+   * @param panelRow Row position of the panel on the dashboard
+   * @param panelCol Column position of the panel on the dashboard
+   * @param widthCells Width of the panel in cells
+   * @param heightCells Height of the panel in cells
+   */
+  private void createTelemetryPanel(
+      MotorTelemetry telemetry,
+      String panelTitle,
+      int panelRow,
+      int panelColumn,
+      int widthCells,
+      int heightCells) {
+    ShuffleboardLayout layout = m_tab.getLayout(panelTitle, BuiltInLayouts.kGrid);
     layout
-        .withSize(kPanelWidth * 3, 8)
-        .withPosition(0 * kPanelWidth, 2 * kPanelHeight)
+        .withSize(widthCells, heightCells)
+        .withPosition(panelColumn, panelRow)
         .withProperties(
-            Map.of("Label position", "LEFT", "Number of columns", 1, "Number of rows", 2));
+            Map.of("Label position", "LEFT", "Number of columns", 1, "Number of rows", 3));
 
-    // Set up a widget to display the instantaneous motor current value in amps
+    // Set up a widget to display motor current value in amps
     layout
         .addDouble(
-            "Upper Intake Current",
+            "Current",
             () -> {
-              return m_measurements.upperIntakeCurrentAmps;
+              return telemetry.statorCurrentAmps;
             })
         .withWidget(BuiltInWidgets.kGraph)
         .withPosition(0, 0);
 
+    // Set up a widget to display the applied motor voltage
     layout
         .addDouble(
-            "Lower Intake Current",
+            "Voltage",
             () -> {
-              return m_measurements.lowerIntakeCurrentAmps;
+              return telemetry.motorVolts;
             })
-        .withWidget(BuiltInWidgets.kGraph)
+        .withWidget(BuiltInWidgets.kTextView)
         .withPosition(0, 1);
+
+    // Set up a widget to display the motor temperature
+    layout
+        .addDouble(
+            "Temp",
+            () -> {
+              return telemetry.temperatureCelcius;
+            })
+        .withWidget(BuiltInWidgets.kTextView)
+        .withPosition(0, 2);
   }
 }

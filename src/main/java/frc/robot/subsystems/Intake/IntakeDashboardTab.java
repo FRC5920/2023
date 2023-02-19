@@ -57,20 +57,19 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import frc.robot.RobotContainer;
+import frc.robot.subsystems.Dashboard.IDashboardTab;
 import frc.robot.subsystems.Intake.IntakeSubsystem.IntakeSubsystemTelemetry;
 import frc.robot.subsystems.Intake.IntakeSubsystem.MotorTelemetry;
-import frc.robot.subsystems.Dashboard.IDashboardTab;
-import frc.robot.RobotContainer;
-
 import java.util.Map;
 
 /** Dashboard tab for tuning the Arm subsystem */
 public class IntakeDashboardTab implements IDashboardTab {
   // Height of subpanels
-  final int kPanelHeight = 3;
+  final int kPanelHeight = 4;
 
   // Width of subpanels
-  final int kPanelWidth = 6;
+  final int kPanelWidth = 10;
 
   /** The dashboard tab */
   private ShuffleboardTab m_tab;
@@ -88,9 +87,9 @@ public class IntakeDashboardTab implements IDashboardTab {
   private GenericEntry m_rearMotorSpeedNTE;
 
   /** Create an instance of the tab */
-  public IntakeDashboardTab(IntakeSubsystem subsystem) {
+  public IntakeDashboardTab(IntakeSubsystem subsystem, IntakeSubsystemTelemetry telemetry) {
     m_intakeSubsystem = subsystem;
-    m_telemetry = new IntakeSubsystemTelemetry();
+    m_telemetry = telemetry;
   }
 
   /** Called to initialize the dashboard tab */
@@ -98,10 +97,14 @@ public class IntakeDashboardTab implements IDashboardTab {
     final String kTabTitle = "Intake Subsystem";
     m_tab = Shuffleboard.getTab(kTabTitle);
 
-    createTelemetryPanel(m_telemetry.frontMotor, 0, 0, kPanelWidth, 6);
-    //createIntakeSpeedPanel();
-
-    Shuffleboard.selectTab(kTabTitle);
+    createTelemetryPanel(
+        m_telemetry.frontMotor, "Front Roller", 0, kPanelWidth * 0, kPanelWidth, kPanelHeight);
+    createTelemetryPanel(
+        m_telemetry.frontMotor, "Rear Roller", 0, kPanelWidth * 1, kPanelWidth, kPanelHeight);
+    m_frontMotorSpeedNTE =
+        createMotorSpeedSlider("Front Roller Speed (RPM)", 9, kPanelWidth * 0, kPanelWidth, 4);
+    m_rearMotorSpeedNTE =
+        createMotorSpeedSlider("Rear Roller Speed (RPM)", 9, kPanelWidth * 1, kPanelWidth, 4);
   }
 
   /** Updates dashboard widgets with subsystem measurements and obtains dashboard input values */
@@ -109,29 +112,35 @@ public class IntakeDashboardTab implements IDashboardTab {
     // Set motor speeds
     double frontMotorSpeed = m_frontMotorSpeedNTE.getDouble(0.0);
     double rearMotorSpeed = m_rearMotorSpeedNTE.getDouble(0.0);
-    m_intakeSubsystem.runIntakeFront(frontMotorSpeed);
-    // TODO: run rear motor
+    m_intakeSubsystem.setFrontRollerRPM(frontMotorSpeed);
+    m_intakeSubsystem.DEBUG_runRearRoller(rearMotorSpeed);
   }
 
-  private void createTelemetryPanel(MotorTelemetry telemetry, 
-    int panelRow, int panelColumn, int widthCells, int heightCells) {
-    ShuffleboardLayout layout = m_tab.getLayout("Intake Motor Current", BuiltInLayouts.kGrid);
+  /**
+   * Creates a panel for displaying motor telemetry
+   *
+   * @param telemetry Telemetry to connect to widgets
+   * @param panelTitle Title to display in the panel
+   * @param panelRow Row position of the panel on the dashboard
+   * @param panelCol Column position of the panel on the dashboard
+   * @param widthCells Width of the panel in cells
+   * @param heightCells Height of the panel in cells
+   */
+  private void createTelemetryPanel(
+      MotorTelemetry telemetry,
+      String panelTitle,
+      int panelRow,
+      int panelColumn,
+      int widthCells,
+      int heightCells) {
+    ShuffleboardLayout layout = m_tab.getLayout(panelTitle, BuiltInLayouts.kGrid);
     layout
-        .withSize(kPanelWidth * 3, 8)
+        .withSize(widthCells, heightCells)
         .withPosition(panelColumn, panelRow)
         .withProperties(
-            Map.of("Label position", "LEFT", "Number of columns", 1, "Number of rows", 3));
+            Map.of("Label position", "LEFT", "Number of columns", 1, "Number of rows", 4));
 
-    // Set up a widget to display the instantaneous motor current value in amps
-    layout
-        .addDouble(
-            "Voltage",
-            () -> {
-              return telemetry.motorVolts;
-            })
-        .withWidget(BuiltInWidgets.kGraph)
-        .withPosition(0, 0);
-
+    // Set up a widget to display motor current value in amps
     layout
         .addDouble(
             "Current",
@@ -139,45 +148,62 @@ public class IntakeDashboardTab implements IDashboardTab {
               return telemetry.statorCurrentAmps;
             })
         .withWidget(BuiltInWidgets.kGraph)
+        .withPosition(0, 0);
+
+    // Set up a widget to display the applied motor voltage
+    layout
+        .addDouble(
+            "Voltage",
+            () -> {
+              return telemetry.motorVolts;
+            })
+        .withWidget(BuiltInWidgets.kTextView)
         .withPosition(0, 1);
 
+    // Set up a widget to display the motor temperature
     layout
         .addDouble(
             "Temp",
             () -> {
               return telemetry.temperatureCelcius;
             })
-        .withWidget(BuiltInWidgets.kGraph)
-        .withPosition(0, 1);
-  }
+        .withWidget(BuiltInWidgets.kTextView)
+        .withPosition(0, 2);
 
-  private void createIntakeSpeedPanel(int panelRow, int panelColumn, int widthCells, int heightCells) {
-    ShuffleboardLayout layout = m_tab.getLayout("Intake Motor Speed", BuiltInLayouts.kGrid);
+    // Set up a widget to display the motor RPM
     layout
-        .withSize(widthCells, heightCells)
-        .withPosition(panelColumn, panelRow)
-        .withProperties(
-            Map.of("Label position", "LEFT", "Number of columns", 2, "Number of rows", 1));
-
-    Map<String, Object> speedSliderMap = Map.of("min", 0.00, "max", 1000.0, "Block increment", 1.0);
-    // Set up a slider to control motor speed during intake
-    m_frontMotorSpeedNTE =
-        layout
-            .add("Front Speed (RPM)", 0.0)
-            .withWidget(BuiltInWidgets.kNumberSlider)
-            .withProperties(speedSliderMap) // slider min/max/increment
-            .withPosition(0, 0)
-            .getEntry();
-
-    // Set up a slider to control motor speed during placement
-    m_rearMotorSpeedNTE =
-        layout
-            .add("Rear Speed (RPM)", 0.0)
-            .withWidget(BuiltInWidgets.kNumberSlider)
-            .withProperties(speedSliderMap) // slider min/max/increment
-            .withPosition(1, 0)
-            .getEntry();
+        .addDouble(
+            "RPM",
+            () -> {
+              return telemetry.motorRPM;
+            })
+        .withWidget(BuiltInWidgets.kTextView)
+        .withPosition(0, 3);
   }
 
+  /**
+   * Creates a panel for intake speed
+   *
+   * @param panelRow Row position of the panel on the dashboard
+   * @param panelCol Column position of the panel on the dashboard
+   * @param widthCells Width of the panel in cells
+   * @param heightCells Height of the panel in cells
+   */
+  private GenericEntry createMotorSpeedSlider(
+      String panelTitle, int row, int column, int widthCells, int heightCells) {
 
+    Map<String, Object> speedSliderMap =
+        Map.of("min", 0.00, "max", 3000.0, "Block increment", 10.0);
+    // Set up a slider to control motor speed during intake
+    GenericEntry ntEntry =
+        m_tab
+            .add(panelTitle, 0.0)
+            .withWidget(BuiltInWidgets.kNumberSlider)
+            .withProperties(speedSliderMap) // slider min/max/increment
+            .withPosition(column, row)
+            .withSize(widthCells, heightCells)
+            .getEntry();
+
+    return ntEntry;
+  }
 }

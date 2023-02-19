@@ -54,7 +54,7 @@ package frc.robot.subsystems.runtimeState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.Arm.Arm;
+import frc.robot.Constants;
 
 public class BotStateSubsystem extends SubsystemBase {
 
@@ -146,5 +146,5 @@ public class BotStateSubsystem extends SubsystemBase {
     m_currentLimitingIsEnabled = enabled;
   }
 
-  public Arm.GamePieceType storedGamePiece;
+  public Constants.GamePieceType storedGamePiece;
 }

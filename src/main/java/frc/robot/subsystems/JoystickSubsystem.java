@@ -153,7 +153,7 @@ public class JoystickSubsystem extends SubsystemBase {
    * @param botContainer Object providing access to robot subsystems
    */
   public void configureButtonBindings(RobotContainer botContainer) {
-    m_armSubsystem = botContainer.s_Arm;
+    m_armSubsystem = botContainer.armSubsystem;
     m_intakeSubsystem = botContainer.intakeSubsystem;
 
     // Map buttons on driver controller
@@ -177,7 +177,7 @@ public class JoystickSubsystem extends SubsystemBase {
     operatorController.rightBumper.whileTrue(
         new InstantCommand(
             () -> {
-              m_armSubsystem.toggleWristPosition();
+              botContainer.pneumaticsSubsystem.toggleWristPosition();
             }));
     operatorController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
@@ -189,9 +189,10 @@ public class JoystickSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    m_armSubsystem.runAngleMotor(operatorController.getLeftY());
-    m_armSubsystem.runExtenderMotor(operatorController.getRightY());
-    m_intakeSubsystem.runIntakeFront(operatorController.getRightY());
+    m_armSubsystem.DEBUG_runAngleMotor(operatorController.getLeftY());
+    m_armSubsystem.DEBUG_runExtenderMotor(operatorController.getRightY());
+    m_intakeSubsystem.DEBUG_runFrontRoller(operatorController.getLeftTriggerAxis());
+    m_intakeSubsystem.DEBUG_runRearRoller(operatorController.getRightTriggerAxis());
   }
 
   /** Placeholder used for empty commands mapped to joystick */

@@ -307,4 +307,17 @@ public final class Constants {
       return this.name();
     }
   };
+
+  /** An enumeration of cargo types */
+  public enum GamePieceType {
+    Nothing,
+    Cone,
+    Cube;
+
+    /** Get the human-readable name of the cargo type */
+    @Override
+    public String toString() {
+      return this.name();
+    }
+  }
 }

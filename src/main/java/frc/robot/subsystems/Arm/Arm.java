@@ -52,60 +52,43 @@
 package frc.robot.subsystems.Arm;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Arm.Pneumatics.WristPosition;
 
 public class Arm extends SubsystemBase {
-  /** Creates a new Arm. */
-  private final WPI_TalonFX ArmYMotorMaster =
-      new WPI_TalonFX(Constants.ArmConstants.kArmYMotorMasterPort);
+  static final int kAngleMotorCANId = Constants.ArmConstants.kArmYMotorMasterPort;
+  static final int kExtenderMotorCANId = Constants.ArmConstants.kArmExtenderPort;
 
-  private final CANSparkMax HandBottomRoller =
-      new CANSparkMax(Constants.ArmConstants.kHandBottomRollerPort, MotorType.kBrushless);
-  private final CANSparkMax HandTopBackRoller =
-      new CANSparkMax(Constants.ArmConstants.kHandTopBackRollerPort, MotorType.kBrushless);
-  // private final WPI_TalonFX ArmYMotorSlave = new
-  // WPI_TalonFX(Constants.ArmConstants.kArmYMotorSlavePort);
-  private final WPI_TalonFX ArmExtender = new WPI_TalonFX(Constants.ArmConstants.kArmExtenderPort);
-  private final Pneumatics myPneumatics;
+  /** Number of encoder counts per rotation */
+  static final int kFalconCountsPerRotation = 2048;
+
+  /** Diameter (meters) of the angle motor gear TODO: measure this value */
+  static final double kAngleMotorCouplingDiameterMeters = Units.inchesToMeters(4);
+
+  /** Gear ratio used to couple the angle motor to the arm mechanism */
+  static final double kAngleMotorGearRatio = 1.0; // TODO: set this constant
+
+  /** Diameter (meters) of the angle motor gear TODO: measure this value */
+  static final double kExtenderMotorCouplingDiameterMeters = Units.inchesToMeters(2);
+
+  /** Gear ratio used to couple the elevator motor to the elevator mechanism */
+  static final double kExtenderMotorGearRatio = 1.0; // TODO: set this constant
+
+  /** Motor controlling the angle of the arm */
+  private final WPI_TalonFX m_angleMotor = new WPI_TalonFX(kAngleMotorCANId);
+
+  /** Motor controlling the extension of the arm */
+  private final WPI_TalonFX m_extenderMotor = new WPI_TalonFX(kExtenderMotorCANId);
 
   /** Dashboard tab for the Arm subsystem */
-  private final ArmDashboardTab m_armDashboardTab;
+  private final ArmDashboardTab m_dashboardTab;
+
   /** Output values displayed on the dashboard */
-  private final ArmSubsystemDashboardOutputs m_dashboardOutputs =
-      new ArmSubsystemDashboardOutputs();
-  /** History of input values received from the dashboard: 0=current; 1=previous */
-  private final ArmSubsystemDashboardInputs m_dashboardInputs = new ArmSubsystemDashboardInputs();
-
-  /** Measurements gathered in the Arm subsystem */
-  public class ArmSubsystemDashboardOutputs {
-    /** Raw encoder count from the angle motor */
-    double angleEncoderCount = 0;
-    /** Angle motor reading in degrees */
-    double angleDegrees = 0.0;
-
-    /** Raw encoder count from the extender motor */
-    double extenderEncoderCount = 0;
-    /** Extender motor position in meters */
-    double extenderPositionMeters = 0.0;
-
-    /** true when the wrist is in the inverted position; else false */
-    WristPosition wristPosition = WristPosition.Normal;
-  }
-
-  public enum GamePieceType {
-    Cone,
-    Cube
-  }
-
-  public enum DoWhatWithGamePiece {
-    In,
-    Out
-  }
+  private final ArmSubsystemTelemetry m_telemetry = new ArmSubsystemTelemetry();
 
   public enum Rank {
     PickUp,
@@ -114,144 +97,185 @@ public class Arm extends SubsystemBase {
     High
   }
 
-  public Arm(Pneumatics s_Pneumatics) {
-    this.myPneumatics = s_Pneumatics;
-    configurePID();
-    m_armDashboardTab = new ArmDashboardTab(m_dashboardOutputs);
+  /** Creates an instance of the subsystem */
+  public Arm() {
+    configureMotors();
+    m_dashboardTab = new ArmDashboardTab(m_telemetry);
   }
 
-  private void configurePID() {
-    // set ArmExtender PID coefficients
-    ArmExtender.config_kF(
-        Constants.ArmConstants.kPIDLoopIdx,
-        Constants.ArmConstants.kFF,
-        Constants.ArmConstants.kTimeoutMs);
-    ArmExtender.config_kP(
-        Constants.ArmConstants.kPIDLoopIdx,
-        Constants.ArmConstants.kP,
-        Constants.ArmConstants.kTimeoutMs);
-    ArmExtender.config_kI(
-        Constants.ArmConstants.kPIDLoopIdx,
-        Constants.ArmConstants.kI,
-        Constants.ArmConstants.kTimeoutMs);
-    ArmExtender.config_kD(
-        Constants.ArmConstants.kPIDLoopIdx,
-        Constants.ArmConstants.kD,
-        Constants.ArmConstants.kTimeoutMs);
-    ArmExtender.config_IntegralZone(
-        Constants.ArmConstants.kPIDLoopIdx,
-        Constants.ArmConstants.kIz,
-        Constants.ArmConstants.kTimeoutMs);
-    ArmExtender.configNominalOutputForward(0, Constants.ArmConstants.kTimeoutMs);
-    ArmExtender.configNominalOutputReverse(0, Constants.ArmConstants.kTimeoutMs);
-    ArmExtender.configPeakOutputForward(1, Constants.ArmConstants.kTimeoutMs);
-    ArmExtender.configPeakOutputReverse(-1, Constants.ArmConstants.kTimeoutMs);
-  }
-
-  private void setArmExtension(int extensionEncoderValue) {
-    // TODO: Set up PID control here
-  }
-
-  public void runAngleMotor(double percent) {
-    ArmYMotorMaster.set(percent * 0.2); // Set max output to 20% for slow motion
-  }
-
-  public void runExtenderMotor(double percent) {
-    ArmExtender.set(percent * 0.2); // Set max output to 20% for slow motion
-  }
-
-  public void toggleWristPosition() {
-    Pneumatics.WristPosition position =
-        myPneumatics.getWristPosition() == WristPosition.Normal
-            ? WristPosition.Inverted
-            : WristPosition.Normal;
-    myPneumatics.setWristPosition(position);
-  }
-
-  public void setArmPosition(int desiredPosition) {
-    if (desiredPosition >= Constants.ArmConstants.kArmExtendedHigh) {
-      myPneumatics.goingBackward();
-    } else {
-      myPneumatics.goingForward();
-    }
-    ;
-    ArmYMotorMaster.setSelectedSensorPosition(desiredPosition);
-  }
-
-  public void spinAllHandRollers(GamePieceType pickUpWhat, DoWhatWithGamePiece desiredHandAction) {
-    double intakeSpeed = m_dashboardInputs.intakeCargoMotorSpeed;
-    double HandBottomRollerSpeedPercent = intakeSpeed;
-    double HandTopBackRollerSpeedPercent = 0.0;
-    switch (pickUpWhat) {
-      case Cone:
-        HandTopBackRollerSpeedPercent = intakeSpeed;
-        break;
-      case Cube:
-        HandTopBackRollerSpeedPercent = -1 * intakeSpeed;
-        break;
-      default:
-        break;
-    }
-    if (desiredHandAction == DoWhatWithGamePiece.Out) {
-      double placementSpeed = m_dashboardInputs.placeCargoMotorSpeed;
-      HandBottomRollerSpeedPercent = -1 * placementSpeed;
-      HandTopBackRollerSpeedPercent = -1 * placementSpeed;
-    }
-
-    HandBottomRoller.set(HandBottomRollerSpeedPercent);
-    HandTopBackRoller.set(HandTopBackRollerSpeedPercent);
-  }
-
-  public void zeroHandRollers() {
-    HandTopBackRoller.set(0);
-    HandBottomRoller.set(0);
+  public void setAngle(AnglePreset preset) {
+    // NOTE: we may need to apply a trapezoidal motion profile here
+    m_angleMotor.setSelectedSensorPosition(preset.encoderCount);
   }
 
   public void armForward(double percentOutput) {
-    ArmYMotorMaster.set(ControlMode.PercentOutput, 1);
+    m_angleMotor.set(ControlMode.PercentOutput, 1);
   }
 
   public void armBackward(double percentOutput) {
-    ArmYMotorMaster.set(ControlMode.PercentOutput, -1);
+    m_angleMotor.set(ControlMode.PercentOutput, -1);
   }
 
-  public void intake() {
-    HandBottomRoller.set(0.5);
-    HandTopBackRoller.set(0.5);
+  /**
+   * Debug routine to set the angle motor position in closed-loop mode
+   *
+   * @param position Position to set the motor to in falcon encoder ticks
+   */
+  public void DEBUG_setAnglePosition(double position) {
+    m_angleMotor.set(TalonFXControlMode.Position, position);
   }
 
-  public void place() {
-    HandBottomRoller.set(-0.5);
-    HandTopBackRoller.set(-0.5);
+  /**
+   * Debug routine to set the extender motor position in closed-loop mode
+   *
+   * @param position Position to set the motor to in falcon encoder ticks
+   */
+  public void DEBUG_setExtenderPosition(double position) {
+    m_extenderMotor.set(TalonFXControlMode.Position, position);
   }
 
-  private double angleEncoderToDegrees(double encoderCount) {
-    // TODO: convert encoder count to degrees
-    return encoderCount;
+  /**
+   * Debug routine to drive the angle motor directly in open-loop mode
+   *
+   * @param speedPercent Percentage of max output applied to the motor (0.0 to +/-1.0)
+   */
+  public void DEBUG_runAngleMotor(double speedPercent) {
+    m_angleMotor.set(speedPercent);
   }
 
-  private double extenderEncoderToDegrees(double encoderCount) {
-    // TODO: convert encoder count to degrees
-    return encoderCount;
+  /**
+   * Debug routine to drive the extender motor directly in open-loop mode
+   *
+   * @param speedPercent Percentage of max output applied to the motor (0.0 to +/-1.0)
+   */
+  public void DEBUG_runExtenderMotor(double speedPercent) {
+    m_extenderMotor.set(speedPercent);
   }
 
-  public void initDashboard() {
-    m_armDashboardTab.initialize();
+  /** Converts an encoder value from the angle motor to a corresponding angle in degrees */
+  private static double angleEncoderToDegrees(double encoderCount) {
+    // TODO: verify this calculation
+    return Units.rotationsToDegrees(
+        encoderCount / (double) kFalconCountsPerRotation * kAngleMotorGearRatio);
+  }
+
+  /**
+   * Converts an encoder value from the extender motor to a corresponding extender distance in
+   * meters
+   */
+  private static double extenderEncoderToMeters(double encoderCount) {
+    // TODO: verify this calculation
+    final double kEncoderDistancePerPulse =
+        (kExtenderMotorCouplingDiameterMeters * Math.PI)
+            / (double) kFalconCountsPerRotation
+            * kAngleMotorGearRatio;
+    return encoderCount * kEncoderDistancePerPulse;
   }
 
   @Override
   public void periodic() {
-    // Update measurements
-    m_dashboardOutputs.angleEncoderCount = ArmYMotorMaster.getSelectedSensorPosition();
-    m_dashboardOutputs.angleDegrees = angleEncoderToDegrees(m_dashboardOutputs.angleEncoderCount);
-    m_dashboardOutputs.extenderEncoderCount = ArmExtender.getSelectedSensorPosition();
-    m_dashboardOutputs.extenderPositionMeters =
-        extenderEncoderToDegrees(m_dashboardOutputs.extenderEncoderCount);
-    m_dashboardOutputs.wristPosition = myPneumatics.getWristPosition();
-    m_dashboardOutputs.lowerIntakeCurrentAmps = HandTopBackRoller.getOutputCurrent();
-    m_dashboardOutputs.upperIntakeCurrentAmps = HandBottomRoller.getOutputCurrent();
+    // Gather telemetry for angle motor
+    m_telemetry.angleTelemetry.motorVolts = m_angleMotor.getMotorOutputVoltage();
+    m_telemetry.angleTelemetry.statorCurrentAmps = m_angleMotor.getStatorCurrent();
+    m_telemetry.angleTelemetry.temperatureCelcius = m_angleMotor.getTemperature();
+    m_telemetry.angleEncoderCount = m_angleMotor.getSelectedSensorPosition();
+    m_telemetry.angleDegrees = angleEncoderToDegrees(m_telemetry.angleEncoderCount);
 
-    // Update dashboard inputs and outputs
-    m_armDashboardTab.update(m_dashboardInputs);
+    // Gather telemetry for extender motor
+    m_telemetry.extenderTelemetry.motorVolts = m_extenderMotor.getMotorOutputVoltage();
+    m_telemetry.extenderTelemetry.statorCurrentAmps = m_extenderMotor.getStatorCurrent();
+    m_telemetry.extenderTelemetry.temperatureCelcius = m_extenderMotor.getTemperature();
+    m_telemetry.extenderEncoderCount = m_extenderMotor.getSelectedSensorPosition();
+    m_telemetry.extenderPositionMeters = extenderEncoderToMeters(m_telemetry.extenderEncoderCount);
+  }
+
+  /** Returns the subsystem's dashboard tab */
+  public ArmDashboardTab getDashboardTab() {
+    return m_dashboardTab;
+  }
+
+  /** Configures motors in the subsystem */
+  private void configureMotors() {
+    // set ArmExtender PID coefficients
+    m_extenderMotor.config_kF(
+        Constants.ArmConstants.kPIDLoopIdx,
+        Constants.ArmConstants.kFF,
+        Constants.ArmConstants.kTimeoutMs);
+    m_extenderMotor.config_kP(
+        Constants.ArmConstants.kPIDLoopIdx,
+        Constants.ArmConstants.kP,
+        Constants.ArmConstants.kTimeoutMs);
+    m_extenderMotor.config_kI(
+        Constants.ArmConstants.kPIDLoopIdx,
+        Constants.ArmConstants.kI,
+        Constants.ArmConstants.kTimeoutMs);
+    m_extenderMotor.config_kD(
+        Constants.ArmConstants.kPIDLoopIdx,
+        Constants.ArmConstants.kD,
+        Constants.ArmConstants.kTimeoutMs);
+    m_extenderMotor.config_IntegralZone(
+        Constants.ArmConstants.kPIDLoopIdx,
+        Constants.ArmConstants.kIz,
+        Constants.ArmConstants.kTimeoutMs);
+    m_extenderMotor.configNominalOutputForward(0, Constants.ArmConstants.kTimeoutMs);
+    m_extenderMotor.configNominalOutputReverse(0, Constants.ArmConstants.kTimeoutMs);
+    m_extenderMotor.configPeakOutputForward(1, Constants.ArmConstants.kTimeoutMs);
+    m_extenderMotor.configPeakOutputReverse(-1, Constants.ArmConstants.kTimeoutMs);
+  }
+
+  /** An enumeration of cargo types */
+  public enum AnglePreset {
+    /** Default angle */
+    kDefault(0), // TODO: establish this encoder count experimentally
+
+    /** Angle used when intaking cargo */
+    kIntake(0), // TODO: establish this encoder count experimentally
+
+    /** Angle used when placing cargo */
+    kPlacement(0); // TODO: establish this encoder count experimentally
+
+    /** The encoder count corresponding to a given preset */
+    private int encoderCount;
+
+    private AnglePreset(int count) {
+      encoderCount = count;
+    }
+
+    /** Get the human-readable name of the angle preset */
+    @Override
+    public String toString() {
+      return this.name();
+    }
+  }
+
+  public static class MotorTelemetry {
+    /** Voltage applied to the motor (Volts) */
+    double motorVolts = 0.0;
+
+    /** Motor current measurement (Amperes) from the motor */
+    double statorCurrentAmps = 0.0;
+
+    /** Motor temperature measurement (Celcius) from the motor */
+    double temperatureCelcius = 0.0;
+  }
+
+  /** Measurements gathered in the Arm subsystem */
+  public class ArmSubsystemTelemetry {
+    /** Angle motor measurements */
+    MotorTelemetry angleTelemetry = new MotorTelemetry();
+    /** Raw encoder count from the angle motor */
+    double angleEncoderCount = 0;
+    /** Angle motor reading in degrees */
+    double angleDegrees = 0.0;
+
+    /** Extender motor telemetry */
+    MotorTelemetry extenderTelemetry = new MotorTelemetry();
+    /** Raw encoder count from the extender motor */
+    double extenderEncoderCount = 0;
+    /** Extender motor position in meters */
+    double extenderPositionMeters = 0.0;
+
+    /** true when the wrist is in the inverted position; else false */
+    WristPosition wristPosition = WristPosition.Normal;
   }
 }

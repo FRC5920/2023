@@ -62,7 +62,47 @@ import frc.robot.Constants;
 
 public class Pneumatics extends SubsystemBase {
 
-  /** Double-valve positions */
+  /** Creates a new Pneumatics. */
+  Compressor phCompressor = new Compressor(1, PneumaticsModuleType.REVPH);
+
+  boolean enabled = phCompressor.isEnabled();
+  boolean pressureSwitch = phCompressor.getPressureSwitchValue();
+  // double currentCompressor = phCompressor.getCompressorCurrent();
+  PneumaticHub m_PHub = new PneumaticHub(Constants.PneumaticsConstants.kPDHCAN);
+  private final DoubleSolenoid m_PWrist =
+      new DoubleSolenoid(
+          PneumaticsModuleType.REVPH,
+          Constants.PneumaticsConstants.kArmLeftRotatorPort,
+          Constants.PneumaticsConstants.kArmRightRotatorPort);
+
+  /** Creates an instance of the subsystem */
+  public Pneumatics() {
+    phCompressor.enableDigital();
+    m_PWrist.set(kOff);
+  }
+
+  // Sets the desired wrist position
+  public void setWristPosition(WristPosition pos) {
+    m_PWrist.set(pos.value);
+  }
+
+  // Returns the present wrist position
+  public WristPosition getWristPosition() {
+    return (m_PWrist.get() == kForward) ? WristPosition.Normal : WristPosition.Inverted;
+  }
+
+  public void toggleWristPosition() {
+    Pneumatics.WristPosition position =
+        getWristPosition() == WristPosition.Normal ? WristPosition.Inverted : WristPosition.Normal;
+    setWristPosition(position);
+  }
+
+  @Override
+  public void periodic() {
+    // This method will be called once per scheduler run
+  }
+
+  /** Wrist positions */
   public enum WristPosition {
     /** Normal position */
     Normal(DoubleSolenoid.Value.kForward),
@@ -82,45 +122,4 @@ public class Pneumatics extends SubsystemBase {
       return this.name();
     }
   };
-
-  /** Creates a new Pneumatics. */
-  Compressor phCompressor = new Compressor(1, PneumaticsModuleType.REVPH);
-
-  boolean enabled = phCompressor.isEnabled();
-  boolean pressureSwitch = phCompressor.getPressureSwitchValue();
-  // double currentCompressor = phCompressor.getCompressorCurrent();
-  PneumaticHub m_PHub = new PneumaticHub(Constants.PneumaticsConstants.kPDHCAN);
-  private final DoubleSolenoid m_PWrist =
-      new DoubleSolenoid(
-          PneumaticsModuleType.REVPH,
-          Constants.PneumaticsConstants.kArmLeftRotatorPort,
-          Constants.PneumaticsConstants.kArmRightRotatorPort);
-
-  public Pneumatics() {
-    phCompressor.enableDigital();
-    m_PWrist.set(kOff);
-  }
-
-  public void goingForward() {
-    m_PWrist.set(kForward);
-  }
-
-  public void goingBackward() {
-    m_PWrist.set(kReverse);
-  }
-
-  // Sets the desired wrist position
-  public void setWristPosition(WristPosition pos) {
-    m_PWrist.set(pos.value);
-  }
-
-  // Returns the present wrist position
-  public WristPosition getWristPosition() {
-    return (m_PWrist.get() == kForward) ? WristPosition.Normal : WristPosition.Inverted;
-  }
-
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-  }
 }
