@@ -94,8 +94,9 @@ public class SnapToGrid extends CommandBase {
   @Override
   public void execute() {
     for (int i = 0; i < FieldConstants.Grids.nodeRowCount; i++) {
-      if (s_Swerve.getPose().getY() == FieldConstants.Grids.lowTranslations[i].getY()) {
-        xAxis = 0;
+      if (((FieldConstants.Grids.lowTranslations[i].getY() - 11) <= s_Swerve.getPose().getY()) 
+      && (s_Swerve.getPose().getY() <= (FieldConstants.Grids.lowTranslations[i].getY() + 11))) {
+        xAxis = (s_Swerve.getPose().getY() - FieldConstants.Grids.lowTranslations[i].getY());
         foundSnapPoint = true;
       } else {
         foundSnapPoint = false;
