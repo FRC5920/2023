@@ -58,10 +58,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.Joystick.AxisProcChain;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.RobotContainer;
+import frc.robot.commands.Arm.ContinuousGetObject;
 import frc.robot.commands.Arm.Fetch;
 import frc.robot.commands.Arm.PickUpObject;
 import frc.robot.commands.Arm.PlaceObject;
 import frc.robot.subsystems.Arm.Arm;
+import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 
 /** A subsystem providing/managing Xbox controllers for driving the robot manually */
 public class JoystickSubsystem extends SubsystemBase {
@@ -181,7 +183,7 @@ public class JoystickSubsystem extends SubsystemBase {
             Arm.ArmExtenderPosition.MiddleRank));
     operatorController.Y.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.leftBumper.whileTrue(
-        new Fetch(
+        new ContinuousGetObject(
             Arm.GamePieceType.Cone,
             botContainer.ArmCamera,
             botContainer.swerveSubsystem,
@@ -190,9 +192,12 @@ public class JoystickSubsystem extends SubsystemBase {
             botContainer.strafeAxis,
             botContainer.rotationAxis,
             botContainer.fieldRelative,
-            botContainer.openLoop));
+            botContainer.openLoop,
+            botContainer.s_Arm,
+            botContainer.s_BotState
+            ));
     operatorController.rightBumper.whileTrue(
-        new Fetch(
+        new ContinuousGetObject(
             Arm.GamePieceType.Cube,
             botContainer.ArmCamera,
             botContainer.swerveSubsystem,
@@ -201,7 +206,9 @@ public class JoystickSubsystem extends SubsystemBase {
             botContainer.strafeAxis,
             botContainer.rotationAxis,
             botContainer.fieldRelative,
-            botContainer.openLoop));
+            botContainer.openLoop,
+            botContainer.s_Arm,
+            botContainer.s_BotState));
     operatorController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.back.onTrue(new InstantCommand(this::doNothing, this));
