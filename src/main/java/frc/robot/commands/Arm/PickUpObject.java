@@ -61,13 +61,16 @@ import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class PickUpObject extends SequentialCommandGroup {
   /** Creates a new PickUpCone. */
-  public PickUpObject(Arm armSubsystem, BotStateSubsystem myBotStateSubsystem, Arm.GamePieceType pickUpWhat) {
+  public PickUpObject(
+    Arm armSubsystem, 
+    BotStateSubsystem myBotStateSubsystem, 
+    Arm.GamePieceType pickUpWhat
+    ) {
     addRequirements(armSubsystem);
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
         new Reach(Arm.Rank.PickUp, Arm.ArmExtenderPosition.OnFloor),
-        new Intake(pickUpWhat, myBotStateSubsystem),
-        new Retract());
+        new Intake(pickUpWhat, myBotStateSubsystem));
   }
 }

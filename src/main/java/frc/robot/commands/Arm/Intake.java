@@ -55,6 +55,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Arm.Arm.DoWhatWithGamePiece;
+import frc.robot.subsystems.Arm.Arm.GamePieceType;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 
 public class Intake extends CommandBase {
@@ -85,11 +86,13 @@ public class Intake extends CommandBase {
   public void end(boolean interrupted) {
     Arm.zeroHandRollers();
     m_BotStateSubsystem.storedGamePiece = gamePiece;
+    new Retract();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return System.currentTimeMillis() == startTime + Constants.ArmConstants.kIntakeWaitTime;
+    return false;
+    }
   }
-}
+
