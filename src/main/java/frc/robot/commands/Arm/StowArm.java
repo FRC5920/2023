@@ -17,7 +17,7 @@ public class StowArm extends SequentialCommandGroup {
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
       new PositionArm(Arm.Rank.InRobot),
-      new Retract()
+      new Reach(Arm.ArmExtenderPosition.StowedAway)
     );
   }
 }

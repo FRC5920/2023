@@ -71,6 +71,6 @@ public class PlaceObject extends SequentialCommandGroup {
       new PositionArm(PlaceWhere),
       new Reach(PlaceHowFar), 
       new Drop(PlaceWhat), 
-      new Retract());
+      new Reach(Arm.ArmExtenderPosition.StowedAway));
   }
 }

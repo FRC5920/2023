@@ -86,7 +86,7 @@ public class Intake extends CommandBase {
   public void end(boolean interrupted) {
     Arm.zeroHandRollers();
     m_BotStateSubsystem.storedGamePiece = gamePiece;
-    new Retract();
+    new Reach(Arm.ArmExtenderPosition.StowedAway);
   }
 
   // Returns true when the command should end.
