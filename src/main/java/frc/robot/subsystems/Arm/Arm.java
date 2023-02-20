@@ -52,6 +52,7 @@
 package frc.robot.subsystems.Arm;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.math.util.Units;
@@ -196,6 +197,8 @@ public class Arm extends SubsystemBase {
 
   /** Configures motors in the subsystem */
   private void configureMotors() {
+    // set Arm angle settings
+    m_angleMotor.setNeutralMode(NeutralMode.Brake);
     // set ArmExtender PID coefficients
     m_extenderMotor.config_kF(
         Constants.ArmConstants.kPIDLoopIdx,
