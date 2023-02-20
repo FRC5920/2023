@@ -102,7 +102,7 @@ public class SnapToGrid extends CommandBase {
       if (((FieldConstants.Grids.lowTranslations[i].getY() - Units.inchesToMeters(11))
               <= s_Swerve.getPose().getY())
           && (s_Swerve.getPose().getY()
-              <= (FieldConstants.Grids.lowTranslations[i].getY() + Units.inchesToMeters(11)))) {
+              < (FieldConstants.Grids.lowTranslations[i].getY() + Units.inchesToMeters(11)))) {
         xAxis = (FieldConstants.Grids.lowTranslations[i].getY() - s_Swerve.getPose().getY());
         foundSnapPoint = true;
         SmartDashboard.putNumber("target node index", i);
