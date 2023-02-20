@@ -121,7 +121,7 @@ public class SnapToGrid extends CommandBase {
     rotation = rAxis * BotStateSubsystem.MaxRotate;
     s_Swerve.drive(translation, rotation, fieldRelative, openLoop);
     foundSnapPoint = false;
-    SmartDashboard.putNumber("robot Y value", s_Swerve.getPose().getY());
+    SmartDashboard.putNumber("robot Y value inches", Units.metersToInches(s_Swerve.getPose().getY()));
   }
 
   // Called once the command ends or is interrupted.
