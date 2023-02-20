@@ -66,6 +66,9 @@ import org.littletonrobotics.junction.LoggedRobot;
 
 public final class Constants {
 
+  /** multiplier for the speed in SnapToGrid command */
+  public static final double kGridCorrectionMultiplier = 2.5;
+
   public static final double robotPeriodSec = LoggedRobot.defaultPeriodSecs;
 
   /** Set the value of logPlaybackIsEnabled to true when replaying log files */
