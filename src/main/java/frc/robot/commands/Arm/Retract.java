@@ -69,7 +69,6 @@ public class Retract extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    Arm.setArmPosition(Arm.Rank.InRobot.getEncoderCount());
     Arm.setArmExtension(Arm.ArmExtenderPosition.StowedAway);
     isDone = true;
   }
