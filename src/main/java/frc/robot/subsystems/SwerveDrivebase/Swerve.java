@@ -69,7 +69,6 @@ import frc.lib.SwerveDrive.SwerveModule;
 import frc.lib.SwerveDrive.SwerveModuleIO;
 import frc.robot.Constants;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
-import org.littletonrobotics.junction.Logger;
 
 public class Swerve extends SubsystemBase {
   /** Set to true to enable a dashboard tab for the Swerve subsystem */
@@ -203,14 +202,35 @@ public class Swerve extends SubsystemBase {
     }
   }
 
+  /** Sets all swerve wheels to a direction relative to the bot */
+  public void setWheelPreset(WheelPreset preset) {
+    SwerveModuleState desiredStates[] = getModuleStates();
+    for (int idx = 0; idx < preset.angles.length; ++idx) {
+      desiredStates[idx].angle = preset.angles[idx];
+    }
+    setModuleStates(desiredStates);
+  }
+
   /** Returns the present pose */
   public Pose2d getPose() {
-    return (RobotBase.isReal()) ? swervePoseEstimator.getEstimatedPosition() : simOdometryPose;
+    Pose2d pose;
+    if (RobotBase.isReal()) {
+      pose = swervePoseEstimator.getEstimatedPosition();
+    } else {
+      pose =
+          new Pose2d(
+              swervePoseEstimator.getEstimatedPosition().getTranslation(),
+              simOdometryPose.getRotation());
+    }
+    return pose;
   }
 
   /** Resets odometry */
   public void resetOdometry(Pose2d pose) {
     swervePoseEstimator.resetPosition(getYaw(), getModulePositions(), pose);
+    if (RobotBase.isSimulation()) {
+      simOdometryPose = pose;
+    }
   }
 
   /** Returns swerve module states */
@@ -278,7 +298,7 @@ public class Swerve extends SubsystemBase {
   @Override
   public void periodic() {
     m_gyroIO.updateInputs(m_gyroMeasurements);
-    Logger.getInstance().processInputs("Drive/Gyro", m_gyroMeasurements);
+    // Logger.getInstance().processInputs("Drive/Gyro", m_gyroMeasurements);
     for (SwerveModule module : mSwerveMods) {
       module.updateLoggedInputs();
     }
@@ -301,18 +321,6 @@ public class Swerve extends SubsystemBase {
                   speeds.vyMetersPerSecond * .02,
                   speeds.omegaRadiansPerSecond * .02));
     }
-
-    // SmartDashboard.putNumber("Gyro", getYaw());
-    // SmartDashboard.putNumber("Roll", getRoll());
-    // SmartDashboard.putNumber("Pitch", getPitch());
-    // for (SwerveModule mod : mSwerveMods) {
-    //  SmartDashboard.putNumber(
-    //      "Mod " + mod.moduleNumber + " Cancoder", mod.getAngle().getDegrees());
-    //  SmartDashboard.putNumber(
-    //      "Mod " + mod.moduleNumber + " Integrated", mod.getPosition().angle.getDegrees());
-    //  SmartDashboard.putNumber(
-    //      "Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
-    // }
   }
 
   public SwerveModuleIO.SwerveModuleIOTelemetry getIOTelemetry(ModuleId module) {
@@ -347,4 +355,39 @@ public class Swerve extends SubsystemBase {
       return this.name().substring(1); // Strip 'k' prefix from name
     }
   };
+
+  private static final double kWheelForward = 0.0;
+  private static final double kWheelBackward = Math.PI;
+  private static final double kWheelLeft = Math.PI / 2.0;
+  private static final double kWheelRight = 1.5 * Math.PI;
+  private static final double kWheelNorthWest = 0.75 * Math.PI;
+  private static final double kWheelNorthEast = 0.25 * Math.PI;
+  private static final double kWheelSouthWest = 1.25 * Math.PI;
+  private static final double kWheelSouthEast = 1.75 * Math.PI;
+
+  /** Preset directions for the swerve wheels */
+  public enum WheelPreset {
+
+    /** Wheels aligned for driving forward */
+    Forward(new double[] {kWheelForward, kWheelForward, kWheelForward, kWheelForward}),
+    /** Wheels aligned for driving backward */
+    Reverse(new double[] {kWheelBackward, kWheelBackward, kWheelBackward, kWheelBackward}),
+    /** Wheels aligned for slewing directly to the left */
+    SlewLeft(new double[] {kWheelLeft, kWheelLeft, kWheelLeft, kWheelLeft}),
+    /** Wheels aligned for slewing directly to the right */
+    SlewRight(new double[] {kWheelRight, kWheelRight, kWheelRight, kWheelRight}),
+    /** Wheels aligned at 45-degree angles for rotation in place to the right */
+    RotateLeft(new double[] {kWheelSouthWest, kWheelNorthWest, kWheelSouthWest, kWheelNorthEast}),
+    /** Wheels aligned at 45-degree angles for rotation in place to the left */
+    RotateRight(new double[] {kWheelNorthEast, kWheelSouthEast, kWheelNorthWest, kWheelSouthWest});
+
+    public final Rotation2d angles[];
+
+    private WheelPreset(double _angles[]) {
+      angles = new Rotation2d[_angles.length];
+      for (int idx = 0; idx < angles.length; ++idx) {
+        angles[idx] = new Rotation2d(_angles[idx]);
+      }
+    }
+  }
 }

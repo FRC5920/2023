@@ -1,38 +1,44 @@
 {
-  "HALProvider": {
-    "PowerDistributions": {
-      "0": {
-        "PowerDistribution[0]": {
-          "open": true
-        }
-      },
-      "window": {
-        "visible": true
-      }
-    }
-  },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
-      "/Shuffleboard/Drive Train/Field": "Field2d",
-      "/Shuffleboard/Drive/SendableChooser[0]": "String Chooser",
-      "/Shuffleboard/Drive/Speed Limit": "String Chooser",
+      "/Shuffleboard/Auto Builder/Field": "Field2d",
+      "/Shuffleboard/Auto Builder/Initial Position": "String Chooser",
+      "/Shuffleboard/Auto Builder/Rotation PID": "PIDController",
+      "/Shuffleboard/Auto Builder/Route": "String Chooser",
+      "/Shuffleboard/Auto Builder/Secondary Action": "String Chooser",
+      "/Shuffleboard/Auto Builder/Translation PID": "PIDController",
+      "/Shuffleboard/Auto Builder/Waypoint": "String Chooser",
       "/Shuffleboard/PoseEstimator/Field": "Field2d",
-      "/Shuffleboard/SwerveDrive/Field": "Field2d",
-      "/Shuffleboard/SwerveDrive/FrontLeft/Angle Deg": "Gyro",
       "/Shuffleboard/SwerveDrive/FrontLeft/Angle/Degrees": "Gyro",
-      "/Shuffleboard/SwerveDrive/FrontRight/Angle Deg": "Gyro",
       "/Shuffleboard/SwerveDrive/FrontRight/Angle/Degrees": "Gyro",
-      "/Shuffleboard/SwerveDrive/RearLeft/Angle Deg": "Gyro",
       "/Shuffleboard/SwerveDrive/RearLeft/Angle/Degrees": "Gyro",
-      "/Shuffleboard/SwerveDrive/RearRight/Angle Deg": "Gyro",
-      "/Shuffleboard/SwerveDrive/RearRight/Angle/Degrees": "Gyro",
-      "/Shuffleboard/Vision/Field": "Field2d",
-      "/SmartDashboard/turn Intake Left": "Command",
-      "/SmartDashboard/turn Intake Right": "Command"
+      "/Shuffleboard/SwerveDrive/RearRight/Angle/Degrees": "Gyro"
     },
     "windows": {
-      "/Shuffleboard/PoseEstimator/Field": {
+      "/Shuffleboard/Auto Builder/Field": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Auto Builder/Initial Position": {
+        "window": {
+          "name": "Initial Position",
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Auto Builder/Rotation PID": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Auto Builder/Route": {
+        "window": {
+          "name": "Escape Route",
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Auto Builder/Translation PID": {
         "window": {
           "visible": true
         }
@@ -40,43 +46,11 @@
     }
   },
   "NetworkTables": {
-    "Retained Values": {
-      "open": false
-    },
     "transitory": {
-      "AdvantageKit": {
-        "RealMetadata": {
-          "open": true
-        },
-        "open": true
-      },
       "Shuffleboard": {
-        ".metadata": {
-          "Drive": {
-            "Max Speed": {
-              "open": true
-            },
-            "open": true
-          }
-        },
-        "Drive": {
-          "Speed Limit": {
-            "open": true
-          },
-          "open": true
-        },
         "PoseEstimator": {
           "open": true
         },
-        "Vision": {
-          "Field": {
-            "open": true
-          },
-          "open": true
-        },
-        "open": true
-      },
-      "photonvision": {
         "open": true
       }
     }

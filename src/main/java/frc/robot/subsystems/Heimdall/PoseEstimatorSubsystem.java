@@ -65,6 +65,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -152,32 +153,38 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // Update pose estimator with the best visible target
-    var pipelineResult = photonCamera.getLatestResult();
-    var resultTimestamp = pipelineResult.getTimestampSeconds();
-    if (resultTimestamp != previousPipelineTimestamp && pipelineResult.hasTargets()) {
-      previousPipelineTimestamp = resultTimestamp;
-      var target = pipelineResult.getBestTarget();
-      var fiducialId = target.getFiducialId();
-      // Get the tag pose from field layout - consider that the layout will be null if it failed to
-      // load
-      Optional<Pose3d> tagPose =
-          ATfieldLayout == null ? Optional.empty() : ATfieldLayout.getTagPose(fiducialId);
-      if (target.getPoseAmbiguity() <= .2 && fiducialId >= 0 && tagPose.isPresent()) {
-        var targetPose = tagPose.get();
-        Transform3d camToTarget = target.getBestCameraToTarget();
-        Pose3d camPose = targetPose.transformBy(camToTarget.inverse());
+    // Update vision processing if executing on the bot
+    if (RobotBase.isReal()) {
 
-        var visionMeasurement = camPose.transformBy(CAMERA_TO_ROBOT);
-        if (target.getPoseAmbiguity() <= .05) {
-          visionMeasurementStdDevs = VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(2));
-        } else {
-          visionMeasurementStdDevs = VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(10));
+      // Update pose estimator with the best visible target
+      var pipelineResult = photonCamera.getLatestResult();
+      var resultTimestamp = pipelineResult.getTimestampSeconds();
+      if (resultTimestamp != previousPipelineTimestamp && pipelineResult.hasTargets()) {
+        previousPipelineTimestamp = resultTimestamp;
+        var target = pipelineResult.getBestTarget();
+        var fiducialId = target.getFiducialId();
+        // Get the tag pose from field layout - consider that the layout will be null if it failed
+        // to
+        // load
+        Optional<Pose3d> tagPose =
+            ATfieldLayout == null ? Optional.empty() : ATfieldLayout.getTagPose(fiducialId);
+        if (target.getPoseAmbiguity() <= .2 && fiducialId >= 0 && tagPose.isPresent()) {
+          var targetPose = tagPose.get();
+          Transform3d camToTarget = target.getBestCameraToTarget();
+          Pose3d camPose = targetPose.transformBy(camToTarget.inverse());
+
+          var visionMeasurement = camPose.transformBy(CAMERA_TO_ROBOT);
+          if (target.getPoseAmbiguity() <= .05) {
+            visionMeasurementStdDevs = VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(2));
+          } else {
+            visionMeasurementStdDevs = VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(10));
+          }
+          poseEstimator.addVisionMeasurement(
+              visionMeasurement.toPose2d(), resultTimestamp, visionMeasurementStdDevs);
         }
-        poseEstimator.addVisionMeasurement(
-            visionMeasurement.toPose2d(), resultTimestamp, visionMeasurementStdDevs);
       }
     }
+
     // Update pose estimator with drivetrain sensors
     poseEstimator.update(s_swerveSubsystem.getYaw(), s_swerveSubsystem.getModulePositions());
 
