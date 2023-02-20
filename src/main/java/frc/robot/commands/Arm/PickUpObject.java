@@ -59,15 +59,15 @@ import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class PickUpCone extends SequentialCommandGroup {
+public class PickUpObject extends SequentialCommandGroup {
   /** Creates a new PickUpCone. */
-  public PickUpCone(Arm armSubsystem, BotStateSubsystem myBotStateSubsystem) {
+  public PickUpObject(Arm armSubsystem, BotStateSubsystem myBotStateSubsystem, Arm.GamePieceType pickUpWhat) {
     addRequirements(armSubsystem);
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
         new Reach(Arm.Rank.PickUp, Arm.ArmExtenderPosition.OnFloor),
-        new Intake(Arm.GamePieceType.Cone, myBotStateSubsystem),
+        new Intake(pickUpWhat, myBotStateSubsystem),
         new Retract());
   }
 }

@@ -59,8 +59,7 @@ import frc.lib.Joystick.AxisProcChain;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.RobotContainer;
 import frc.robot.commands.Arm.Fetch;
-import frc.robot.commands.Arm.PickUpCone;
-import frc.robot.commands.Arm.PickUpCube;
+import frc.robot.commands.Arm.PickUpObject;
 import frc.robot.commands.Arm.PlaceObject;
 import frc.robot.subsystems.Arm.Arm;
 
@@ -172,8 +171,8 @@ public class JoystickSubsystem extends SubsystemBase {
     driverController.start.onTrue(new InstantCommand(this::doNothing, this));
 
     // Map buttons on operator controller
-    operatorController.A.onTrue(new PickUpCone(botContainer.s_Arm, botContainer.s_BotState));
-    operatorController.B.onTrue(new PickUpCube(botContainer.s_Arm, botContainer.s_BotState));
+    operatorController.A.onTrue(new InstantCommand(this::doNothing, this));
+    operatorController.B.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.X.onTrue(
         new PlaceObject(
             botContainer.s_Arm,
