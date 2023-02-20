@@ -130,7 +130,7 @@ public class PoseEstimatorDashboardTab implements IDashboardTab {
   public void updateDashboard(RobotContainer botContainer) {
     FieldObject2d swervePoseObject = m_field2d.getRobotObject();
     swervePoseObject.setPose(botContainer.swerveSubsystem.getPose());
-    
+
     FieldObject2d estimatorPoseObject = m_field2d.getObject("Odometry");
     estimatorPoseObject.setPose(m_PoseEstimatorSubsystem.getCurrentPose());
   }
