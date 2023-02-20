@@ -96,7 +96,7 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    boolean fieldRelative = false;
+    boolean fieldRelative = true;
     boolean openLoop = true;
     SwerveModuleIO swerveModuleIO[];
     GyroIO gyroIO;
