@@ -61,9 +61,8 @@ public class Reach extends CommandBase {
   private Arm.ArmExtenderPosition ReachDistance;
   Boolean isDone = false;
 
-  public Reach(Arm.Rank ReachWhere, Arm.ArmExtenderPosition ReachHowFar) {
+  public Reach(Arm.ArmExtenderPosition ReachHowFar) {
     // Use addRequirements() here to declare subsystem dependencies.
-    ReachTo = ReachWhere;
     ReachDistance = ReachHowFar;
   }
 
@@ -74,7 +73,6 @@ public class Reach extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    Arm.setArmPosition(ReachTo.getEncoderCount());
     Arm.setArmExtension(ReachDistance);
     isDone = true;
   }
