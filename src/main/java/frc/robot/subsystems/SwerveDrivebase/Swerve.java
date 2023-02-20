@@ -62,7 +62,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.SwerveDrive.GyroIO;
 import frc.lib.SwerveDrive.GyroInputsAutoLogged;
@@ -231,8 +230,12 @@ public class Swerve extends SubsystemBase {
 
   /** Returns the yaw measurement */
   public Rotation2d getYaw() {
-    Rotation2d yaw = Rotation2d.fromRadians(m_gyroMeasurements.yawRad);
-    return (Constants.SwerveDrivebaseConstants.invertGyro) ? yaw.minus(kAngle360) : yaw;
+    if (RobotBase.isSimulation()) {
+      return simOdometryPose.getRotation();
+    } else {
+      Rotation2d yaw = Rotation2d.fromRadians(m_gyroMeasurements.yawRad);
+      return (Constants.SwerveDrivebaseConstants.invertGyro) ? yaw.minus(kAngle360) : yaw;
+    }
   }
 
   /** Returns the roll measurement */
@@ -283,14 +286,14 @@ public class Swerve extends SubsystemBase {
     // SmartDashboard.putNumber("Gyro", getYaw());
     // SmartDashboard.putNumber("Roll", getRoll());
     // SmartDashboard.putNumber("Pitch", getPitch());
-    //for (SwerveModule mod : mSwerveMods) {
+    // for (SwerveModule mod : mSwerveMods) {
     //  SmartDashboard.putNumber(
     //      "Mod " + mod.moduleNumber + " Cancoder", mod.getAngle().getDegrees());
     //  SmartDashboard.putNumber(
     //      "Mod " + mod.moduleNumber + " Integrated", mod.getPosition().angle.getDegrees());
     //  SmartDashboard.putNumber(
     //      "Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
-    //}
+    // }
   }
 
   public SwerveModuleIO.SwerveModuleIOTelemetry getIOTelemetry(ModuleId module) {
