@@ -321,7 +321,9 @@ public final class Constants {
     }
 
     public static String[] getNames() {
-      return nameMap.keySet().toArray(new String[nameMap.size()]);
+      String names[] = nameMap.keySet().toArray(new String[nameMap.size()]);
+      Arrays.sort(names);
+      return names;
     }
   };
 
@@ -370,7 +372,9 @@ public final class Constants {
     }
 
     public static String[] getNames() {
-      return nameMap.keySet().toArray(new String[nameMap.size()]);
+      String names[] = nameMap.keySet().toArray(new String[nameMap.size()]);
+      Arrays.sort(names);
+      return names;
     }
   };
 
@@ -412,7 +416,9 @@ public final class Constants {
     }
 
     public static String[] getNames() {
-      return nameMap.keySet().toArray(new String[nameMap.size()]);
+      String names[] = nameMap.keySet().toArray(new String[nameMap.size()]);
+      Arrays.sort(names);
+      return names;
     }
   };
 }

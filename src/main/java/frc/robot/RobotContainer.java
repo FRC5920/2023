@@ -61,6 +61,7 @@ import frc.lib.SwerveDrive.SimSwerveModuleIO;
 import frc.lib.SwerveDrive.SwerveModuleIO;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.Dashboard.AutoDashboardTab;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 import frc.robot.subsystems.Heimdall.*;
 import frc.robot.subsystems.Intake.Intake;
@@ -95,6 +96,8 @@ public class RobotContainer {
 
   @SuppressWarnings({"unused"})
   private final PhotonCamera ArmCamera = new PhotonCamera(Constants.VisionConstants.ArmCameraName);
+
+  private final AutoDashboardTab m_autoDashboardTab = new AutoDashboardTab();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -167,6 +170,7 @@ public class RobotContainer {
 
     poseEstimatorSubsystem = new PoseEstimatorSubsystem(TagCamera, swerveSubsystem);
     poseEstimatorSubsystem.registerDashboardTab(dashboardSubsystem);
+    dashboardSubsystem.add(m_autoDashboardTab);
 
     // Initialize all dashboard tabs
     dashboardSubsystem.initialize(this);
