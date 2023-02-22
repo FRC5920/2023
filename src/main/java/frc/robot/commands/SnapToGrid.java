@@ -69,14 +69,14 @@ public class SnapToGrid extends CommandBase {
   private Translation2d translation;
   private boolean fieldRelative;
   private boolean openLoop;
-  private boolean foundSnapPoint = false;
+  private boolean foundSnapPoint[] = new boolean[2];
   int timesGotXFromJoystick;
   double xAxis;
 
   private static final double GridkP = 0.5;
   private static final double GridkI = 0;
   private static final double GridkD = 0.5;
-  PIDController GridPID = new PIDController(GridkP, GridkI, GridkD);
+  PIDController gridPID = new PIDController(GridkP, GridkI, GridkD);
 
   /** Grid lines to snap to */
   private class GridLine {
@@ -117,7 +117,8 @@ public class SnapToGrid extends CommandBase {
     // Use addRequirements() here to declare subsystem dependencies.
     this.s_Swerve = s_Swerve;
     addRequirements(s_Swerve);
-
+    foundSnapPoint[0] = foundSnapPoint[1] = false;
+    
     // Create y grid values
     yGridLines = new GridLine[FieldConstants.Grids.nodeRowCount];
     for (int i = 0; i < FieldConstants.Grids.nodeRowCount; i++) {
@@ -167,33 +168,38 @@ public class SnapToGrid extends CommandBase {
     // Get the current Y coordinate
     double currentY = s_Swerve.getPose().getY();
 
-    boolean foundSnapPoint = false;
+    // Rotate history
+    foundSnapPoint[1] = foundSnapPoint[0];
+    foundSnapPoint[0] = false;
     double distanceToGrid = 0;
 
     // Check if our current Y coordinate is within capture range of a grid line
     for (GridLine gridLine : yGridLines) {
       if (gridLine.isInCaptureRange(currentY)) {
-        foundSnapPoint = true;
+        foundSnapPoint[0] = true;
         distanceToGrid = gridLine.distanceFromGridLine(currentY);
-        GridPID.setSetpoint(gridLine.gridY);
-        SmartDashboard.putNumber("Set point Y", GridPID.getSetpoint());
+
+        if (foundSnapPoint[0] && !foundSnapPoint[1]) {
+          gridPID.reset();
+        }
+        gridPID.setSetpoint(gridLine.gridY);
+        SmartDashboard.putNumber("Set point Y", gridPID.getSetpoint());
         SmartDashboard.putNumber("distanceToGrid", distanceToGrid);
+        break;
       }
     }
 
-    SmartDashboard.putBoolean("foundSnapPoint", foundSnapPoint);
+    SmartDashboard.putBoolean("foundSnapPoint", foundSnapPoint[0]);
 
     double xSpeed = yAxis;
-    double ySpeed = (foundSnapPoint) ? GridPID.calculate(currentY) : xAxis;
+    double ySpeed = (foundSnapPoint[0]) ? gridPID.calculate(currentY) : xAxis;
     SmartDashboard.putNumber("xSpeed", xSpeed);
     SmartDashboard.putNumber("ySpeed", ySpeed);
     translation = new Translation2d(xSpeed, ySpeed).times(BotStateSubsystem.MaxSpeed);
     rotation = rAxis * BotStateSubsystem.MaxRotate;
 
     s_Swerve.drive(translation, rotation, fieldRelative, openLoop);
-    foundSnapPoint = false;
-    SmartDashboard.putNumber(
-        "robot Y value", s_Swerve.getPose().getY());
+    SmartDashboard.putNumber("robot Y value", s_Swerve.getPose().getY());
   }
 
   // Called once the command ends or is interrupted.
