@@ -54,12 +54,9 @@ package frc.robot.commands;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.PerpetualCommand;
 import frc.lib.Joystick.ProcessedXboxController;
-import frc.robot.Constants;
 import frc.robot.FieldConstants;
 import frc.robot.subsystems.JoystickSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
@@ -80,7 +77,6 @@ public class SnapToGrid extends CommandBase {
   private static final double GridkI = 0;
   private static final double GridkD = 0.5;
   PIDController GridPID = new PIDController(GridkP, GridkI, GridkD);
-  
 
   /** Grid lines to snap to */
   private class GridLine {
@@ -187,8 +183,7 @@ public class SnapToGrid extends CommandBase {
     SmartDashboard.putBoolean("foundSnapPoint", foundSnapPoint);
 
     double xSpeed = yAxis;
-    double ySpeed =
-        (foundSnapPoint) ? GridPID.calculate(currentY) : xAxis;
+    double ySpeed = (foundSnapPoint) ? GridPID.calculate(currentY) : xAxis;
     SmartDashboard.putNumber("ySpeed", ySpeed);
     translation = new Translation2d(xSpeed, ySpeed).times(BotStateSubsystem.MaxSpeed);
     rotation = rAxis * BotStateSubsystem.MaxRotate;
