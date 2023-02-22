@@ -73,6 +73,34 @@ public class SnapToGrid extends CommandBase {
   int timesGotXFromJoystick;
   double xAxis;
 
+  /** Grid lines to snap to */
+  private class GridLine {
+    private final double kCaptureRangeMeters = Units.inchesToMeters(11);
+    private final double gridY;
+
+    /** Creates a GridLine with a specified Y coordinate */
+    public GridLine(double y) {
+      gridY = y;
+    }
+
+    /**
+     * Returns true if a given Y coordinate is within the capture range of the GridLine
+     *
+     * @param y Y coordinate to test
+     */
+    public boolean isInCaptureRange(double y) {
+      return (Math.abs(distanceFromGridLine(y)) <= kCaptureRangeMeters);
+    }
+
+    /** Returns the distance (meters) between the GridLine and a given Y coordinate */
+    public double distanceFromGridLine(double y) {
+      return gridY - y;
+    }
+  }
+
+  /** Y coordinates of grid lines that line up with goal stations */
+  final GridLine yGridLines[];
+
   private Swerve s_Swerve;
   private ProcessedXboxController controller;
 
@@ -84,6 +112,12 @@ public class SnapToGrid extends CommandBase {
     // Use addRequirements() here to declare subsystem dependencies.
     this.s_Swerve = s_Swerve;
     addRequirements(s_Swerve);
+
+    // Create y grid values
+    yGridLines = new GridLine[FieldConstants.Grids.nodeRowCount];
+    for (int i = 0; i < FieldConstants.Grids.nodeRowCount; i++) {
+      yGridLines[i] = new GridLine(FieldConstants.Grids.lowTranslations[i].getY());
+    }
 
     this.controller = joystickSubsystem.driverController;
     this.fieldRelative = fieldRelative;
@@ -99,6 +133,8 @@ public class SnapToGrid extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+
+    /*
     for (int i = 0; i < FieldConstants.Grids.nodeRowCount; i++) {
       if (((FieldConstants.Grids.lowTranslations[i].getY() - Units.inchesToMeters(11))
               <= s_Swerve.getPose().getY())
@@ -117,11 +153,35 @@ public class SnapToGrid extends CommandBase {
       timesGotXFromJoystick++;
       SmartDashboard.putNumber("times got X from joystick", timesGotXFromJoystick);
     }
+    */
+
+    double xAxis = -controller.getLeftX();
     double yAxis = -controller.getLeftY();
     double rAxis = -controller.getRightX();
 
-    translation = new Translation2d(yAxis, xAxis).times(BotStateSubsystem.MaxSpeed);
+    // Get the current Y coordinate
+    double currentY = s_Swerve.getPose().getY();
+
+    boolean foundSnapPoint = false;
+    double distanceToGrid = 0;
+
+    // Check if our current Y coordinate is within capture range of a grid line
+    for (GridLine gridLine : yGridLines) {
+      if (gridLine.isInCaptureRange(currentY)) {
+        foundSnapPoint = true;
+        distanceToGrid = gridLine.distanceFromGridLine(currentY);
+        SmartDashboard.putNumber("distanceToGrid", distanceToGrid);
+      }
+    }
+
+    SmartDashboard.putBoolean("foundSnapPoint", foundSnapPoint);
+
+    double xSpeed = yAxis;
+    double ySpeed =
+        (foundSnapPoint) ? (distanceToGrid * Constants.kGridCorrectionMultiplier) : xAxis;
+    translation = new Translation2d(xSpeed, ySpeed).times(BotStateSubsystem.MaxSpeed);
     rotation = rAxis * BotStateSubsystem.MaxRotate;
+
     s_Swerve.drive(translation, rotation, fieldRelative, openLoop);
     foundSnapPoint = false;
     SmartDashboard.putNumber(
