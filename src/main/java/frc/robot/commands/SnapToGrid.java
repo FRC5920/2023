@@ -179,6 +179,7 @@ public class SnapToGrid extends CommandBase {
     double xSpeed = yAxis;
     double ySpeed =
         (foundSnapPoint) ? (distanceToGrid * Constants.kGridCorrectionMultiplier) : xAxis;
+    SmartDashboard.putNumber("ySpeed", ySpeed);
     translation = new Translation2d(xSpeed, ySpeed).times(BotStateSubsystem.MaxSpeed);
     rotation = rAxis * BotStateSubsystem.MaxRotate;
 
