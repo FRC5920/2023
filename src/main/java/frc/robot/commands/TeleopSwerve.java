@@ -52,6 +52,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.subsystems.JoystickSubsystem;
@@ -88,6 +89,8 @@ public class TeleopSwerve extends CommandBase {
     double rAxis = -controller.getRightX();
 
     translation = new Translation2d(yAxis, xAxis).times(BotStateSubsystem.MaxSpeed);
+    SmartDashboard.putNumber("xSpeed", translation.getX());
+    SmartDashboard.putNumber("ySpeed", translation.getY());
     rotation = rAxis * BotStateSubsystem.MaxRotate;
     s_Swerve.drive(translation, rotation, fieldRelative, openLoop);
   }
