@@ -51,10 +51,13 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.commands;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.PerpetualCommand;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.Constants;
 import frc.robot.FieldConstants;
@@ -72,6 +75,12 @@ public class SnapToGrid extends CommandBase {
   private boolean foundSnapPoint = false;
   int timesGotXFromJoystick;
   double xAxis;
+
+  private static final double GridkP = 0.5;
+  private static final double GridkI = 0;
+  private static final double GridkD = 0.5;
+  PIDController GridPID = new PIDController(GridkP, GridkI, GridkD);
+  
 
   /** Grid lines to snap to */
   private class GridLine {
@@ -170,6 +179,7 @@ public class SnapToGrid extends CommandBase {
       if (gridLine.isInCaptureRange(currentY)) {
         foundSnapPoint = true;
         distanceToGrid = gridLine.distanceFromGridLine(currentY);
+        GridPID.setSetpoint(gridLine.gridY);
         SmartDashboard.putNumber("distanceToGrid", distanceToGrid);
       }
     }
@@ -178,7 +188,7 @@ public class SnapToGrid extends CommandBase {
 
     double xSpeed = yAxis;
     double ySpeed =
-        (foundSnapPoint) ? (distanceToGrid * Constants.kGridCorrectionMultiplier) : xAxis;
+        (foundSnapPoint) ? GridPID.calculate(currentY) : xAxis;
     SmartDashboard.putNumber("ySpeed", ySpeed);
     translation = new Translation2d(xSpeed, ySpeed).times(BotStateSubsystem.MaxSpeed);
     rotation = rAxis * BotStateSubsystem.MaxRotate;
