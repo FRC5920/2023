@@ -176,6 +176,7 @@ public class SnapToGrid extends CommandBase {
         foundSnapPoint = true;
         distanceToGrid = gridLine.distanceFromGridLine(currentY);
         GridPID.setSetpoint(gridLine.gridY);
+        SmartDashboard.putNumber("Set point Y inches", GridPID.getSetpoint());
         SmartDashboard.putNumber("distanceToGrid", distanceToGrid);
       }
     }
@@ -184,6 +185,7 @@ public class SnapToGrid extends CommandBase {
 
     double xSpeed = yAxis;
     double ySpeed = (foundSnapPoint) ? GridPID.calculate(currentY) : xAxis;
+    SmartDashboard.putNumber("xSpeed", xSpeed);
     SmartDashboard.putNumber("ySpeed", ySpeed);
     translation = new Translation2d(xSpeed, ySpeed).times(BotStateSubsystem.MaxSpeed);
     rotation = rAxis * BotStateSubsystem.MaxRotate;
