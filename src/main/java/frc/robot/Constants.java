@@ -51,7 +51,6 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot;
 
-import java.util.*;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -62,6 +61,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.lib.SwerveDrive.COTSFalconSwerveConstants;
 import frc.lib.SwerveDrive.SwerveModuleConstants;
+import java.util.*;
 import org.littletonrobotics.junction.LoggedRobot;
 
 public final class Constants {

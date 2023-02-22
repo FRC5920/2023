@@ -1,3 +1,54 @@
+////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2023 FIRST and other WPILib contributors.
+// http://github.com/FRC5920
+// Open Source Software; you can modify and/or share it under the terms of the
+// license given in WPILib-License.md in the root directory of this project.
+////////////////////////////////////////////////////////////////////////////////
+
+/*-----------------------------------------------------------------------------\
+|                                                                              |
+|                       ================================                       |
+|                       **    TEAM 5920 - Vikotics    **                       |
+|                       ================================                       |
+|                                                                              |
+|                            °        #°                                       |
+|                            *O       °@o                                      |
+|                            O@ °o@@#° o@@                                     |
+|                           #@@@@@@@@@@@@@@                                    |
+|                           @@@@@@@@@@@@@@@                                    |
+|                           @@@@@@@@@@@@@@°                                    |
+|                             #@@@@@@@@@@@@@O....   .                          |
+|                             o@@@@@@@@@@@@@@@@@@@@@o                          |
+|                             O@@@@@@@@@@@@@@@@@@@#°                    *      |
+|                             O@@@@@@@@@@@@@@@@@@@@@#O                O@@    O |
+|                            .@@@@@@@@°@@@@@@@@@@@@@@@@#            °@@@    °@@|
+|                            #@@O°°°°  @@@@@@@@@@@@@@@@@@°          @@@#*   @@@|
+|                         .#@@@@@  o#oo@@@@@@@@@@@@@@@@@@@@@.       O@@@@@@@@@@|
+|                        o@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@°     @@@@@@@@@°|
+|                        @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@   .@@@@@o°   |
+|          °***          @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  @@@@@o     |
+|     o#@@@@@@@@@@@@.   *@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@o@@@@@@      |
+|OOo°@@@@@@@@@@@@O°#@#   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@       |
+|@@@@@@@@@@@@@@@@    o°  .@@@@@@@@@@@@@@@@@@@@@@@@#*@@@@@@@@@@@@@@@@@@@@       |
+|@@@@@@@@@@@@@@@*         O@@@@@@@@@@@@@@@@@@@@@@@   °@@@@@@@@@@@@@@@@@@o      |
+|@@@@#@@@@@@@@@            @@@@@@@@@@@@@@@@@@@@@@       .*@@@@@@@@@@@@@@.      |
+|@@@°      @@@@O           @@@@@@@@@@@@@@@@@@@@o           °@@@@@@@@@@@o       |
+|          @@@@@          .@@@@@@@@@@@@@@@@@@@*               O@@@@@@@*        |
+|           @@@@@        o@@@@@@@@@@@@@@@@@@@@.               #@@@@@O          |
+|           *@@@@@@@*  o@@@@@@@@@@@@@@@@@@@@@@°              o@@@@@            |
+|           @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@.              @@@@@#            |
+|          @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@O             #@@@@@             |
+|          .@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#           .@@@@@°             |
+|           @@@@@@@@@@O*    @@@@@@@@@@@@@@@@@@@@@°         °O@@@°              |
+|            °O@@@@@@       @@@@@@@@@@@@@@@@@@@@@@@                            |
+|              o@@@@@°      @@@@@@@@@@@@@@@@@@@@@@@@                           |
+|               @@@@@@.     @@@@@@@@@@@@@@@@@@@@@@@@@o                         |
+|                @@@@@@*    @@@@@@@@@@@@@@@@@@@@@@@@@@                         |
+|                o@@@@@@.  o@@@@@@@@@@@@@@@@@@@@@@@@@@@                        |
+|                 #@@@@@@  *@@@@@@@@@@@@@@@@@@@@@@@@@@@@                       |
+|                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
+|                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
+\-----------------------------------------------------------------------------*/
 package frc.robot;
 
 import java.util.*;
@@ -10,7 +61,7 @@ public class AutoConstants {
    * @remarks Goal stations are named from A-I, always starting with the station closest to the
    *     adjoining alliance's feeder station.
    */
-  public enum GoalLocation {
+  public enum Substation {
     // TODO: add coordinates
     A(0, 0.0, 0.0),
     B(1, 0.0, 0.0),
@@ -21,14 +72,14 @@ public class AutoConstants {
     G(6, 0.0, 0.0),
     H(7, 0.0, 0.0);
 
-    private static final Map<String, GoalLocation> nameMap =
+    private static final Map<String, Substation> nameMap =
         Map.of("A", A, "B", B, "C", C, "D", D, "E", E, "F", F, "G", G, "H", H);
 
     private final int id;
     private final double x; // X coordinate
     private final double y; // Y coordinate
 
-    private GoalLocation(int idx, double xLoc, double yLoc) {
+    private Substation(int idx, double xLoc, double yLoc) {
       id = idx;
       x = xLoc;
       y = yLoc;
@@ -40,7 +91,50 @@ public class AutoConstants {
       return this.name();
     }
 
-    public static GoalLocation fromString(String s) {
+    public static Substation fromString(String s) {
+      return nameMap.get(s);
+    }
+
+    public static String[] getNames() {
+      String names[] = nameMap.keySet().toArray(new String[nameMap.size()]);
+      Arrays.sort(names);
+      return names;
+    }
+  };
+
+  /////////////////////////////////////////////////////////////////////////////
+  /**
+   * Staging points
+   *
+   * @remarks Staging points are used to indicate transitional points where the robot might be
+   *     positioned in an auto routine
+   */
+  public enum Lane {
+    // TODO: add coordinates
+    SubLane(
+        0, 0.0), // Lane closest to substations in space between substations and charging station
+    ChargeLane(
+        1,
+        0.0); // Lane closest to charging station in space between substations and charging station
+
+    private static final Map<String, Lane> nameMap =
+        Map.of("SubLane", SubLane, "ChargeLane", ChargeLane);
+
+    private final int id;
+    private final double x; // X coordinate
+
+    private Lane(int idx, double xCoordinate) {
+      id = idx;
+      x = xCoordinate;
+    }
+
+    /** Get the human-readable name of the robot type */
+    @Override
+    public String toString() {
+      return this.name();
+    }
+
+    public static Lane fromString(String s) {
       return nameMap.get(s);
     }
 

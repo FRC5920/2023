@@ -51,15 +51,13 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.subsystems.Dashboard;
 
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.AutoConstants.CargoLocation;
-import frc.robot.AutoConstants.GoalLocation;
 import frc.robot.AutoConstants.StagingLocation;
+import frc.robot.AutoConstants.Substation;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import java.util.*;
@@ -71,20 +69,20 @@ public class AutoDashboardTab implements IDashboardTab {
   static final String kTabTitle = "Auto Builder";
 
   /** Width (in cells) of the field display */
-  static final int kFieldWidthCells = 21;
+  static final int kFieldWidthCells = 10;
 
   /** Height (in cells) of the field display */
-  static final int kFieldHeightCells = 12;
+  static final int kFieldHeightCells = 6;
 
   /** Width (in cells) of a swerve telemetry module on the dashboard (given a cell size of 32) */
   static final int kSubPanelWidth = 6;
 
   /** Height (in cells) of a swerve telemetry module on the dashboard (given a cell size of 32) */
-  static final int kSubPanelHeight = 14;
+  static final int kSubPanelHeight = 6;
 
   static final String kCargoNames[] = CargoLocation.getNames();
 
-  static final String kGoalNames[] = GoalLocation.getNames();
+  static final String kGoalNames[] = Substation.getNames();
 
   static final String kStagingLocationNames[] = StagingLocation.getNames();
 
@@ -122,7 +120,33 @@ public class AutoDashboardTab implements IDashboardTab {
         .withPosition(0, 0)
         .withProperties(Map.of("Label position", "HIDDEN"));
 
-    createInitialPositionPanel(kFieldHeightCells, 0, kSubPanelWidth, kSubPanelHeight);
+    // Set up the initial position chooser
+    for (int i = 0; i < kGoalNames.length; ++i) {
+      String goalName = kGoalNames[i];
+      if (0 == i) {
+        m_initialPositionChooser.setDefaultOption(goalName, goalName);
+      } else {
+        m_initialPositionChooser.addOption(goalName, goalName);
+      }
+    }
+    m_tab
+        .add("Initial Position", m_initialPositionChooser)
+        .withSize(3, 1)
+        .withPosition(kFieldHeightCells, 0);
+
+    // Set up the lane chooser
+    for (int i = 0; i < kGoalNames.length; ++i) {
+      String goalName = kGoalNames[i];
+      if (0 == i) {
+        m_initialPositionChooser.setDefaultOption(goalName, goalName);
+      } else {
+        m_initialPositionChooser.addOption(goalName, goalName);
+      }
+    }
+    m_tab
+        .add("Initial Position", m_initialPositionChooser)
+        .withSize(3, 1)
+        .withPosition(kFieldHeightCells, 0);
   }
 
   /** Service dashboard tab widgets */
@@ -130,26 +154,5 @@ public class AutoDashboardTab implements IDashboardTab {
   public void updateDashboard(RobotContainer botContainer) {
     Swerve swerveSubsystem = botContainer.swerveSubsystem;
     m_field2d.setRobotPose(swerveSubsystem.getPose());
-  }
-
-  private void createInitialPositionPanel(int row, int col, int panelWidth, int panelHeight) {
-
-    // Set up the initial position chooser
-    for (String goalName : kGoalNames) {
-      m_initialPositionChooser.addOption(goalName, goalName);
-    }
-    m_initialPositionChooser.setDefaultOption(kGoalNames[0], kGoalNames[0]);
-
-    ShuffleboardLayout layout =
-        m_tab
-            .getLayout("Initial Position", BuiltInLayouts.kGrid)
-            .withProperties(
-                Map.of("Label position", "LEFT", "Number of columns", "1", "Number of rows", "3"))
-            .withSize(panelWidth, panelHeight)
-            .withPosition(col, row);
-    layout
-        .add("Initial Position", m_initialPositionChooser)
-        .withSize(kSubPanelWidth, 1)
-        .withPosition(0, 0);
   }
 }
