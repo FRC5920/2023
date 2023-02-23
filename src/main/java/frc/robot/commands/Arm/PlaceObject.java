@@ -68,9 +68,9 @@ public class PlaceObject extends SequentialCommandGroup {
     // addCommands(new FooCommand(), new BarCommand());
     addRequirements(armSubsystem);
     addCommands(
-      new PositionArm(PlaceWhere),
-      new Reach(PlaceHowFar), 
-      new Drop(PlaceWhat), 
-      new Reach(Arm.ArmExtenderPosition.StowedAway));
+        new PositionArm(PlaceWhere),
+        new Reach(PlaceHowFar),
+        new Drop(PlaceWhat),
+        new Reach(Arm.ArmExtenderPosition.StowedAway));
   }
 }

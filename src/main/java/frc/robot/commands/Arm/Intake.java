@@ -52,15 +52,14 @@
 package frc.robot.commands.Arm;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
 import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Arm.Arm.DoWhatWithGamePiece;
-import frc.robot.subsystems.Arm.Arm.GamePieceType;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 
 public class Intake extends CommandBase {
   /** Creates a new Intake. */
   private Arm.GamePieceType gamePiece;
+
   private BotStateSubsystem m_BotStateSubsystem;
   long startTime;
 
@@ -93,6 +92,5 @@ public class Intake extends CommandBase {
   @Override
   public boolean isFinished() {
     return false;
-    }
   }
-
+}

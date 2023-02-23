@@ -59,11 +59,8 @@ import frc.lib.Joystick.AxisProcChain;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.RobotContainer;
 import frc.robot.commands.Arm.ContinuousGetObject;
-import frc.robot.commands.Arm.Fetch;
-import frc.robot.commands.Arm.PickUpObject;
 import frc.robot.commands.Arm.PlaceObject;
 import frc.robot.subsystems.Arm.Arm;
-import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 
 /** A subsystem providing/managing Xbox controllers for driving the robot manually */
 public class JoystickSubsystem extends SubsystemBase {
@@ -194,8 +191,7 @@ public class JoystickSubsystem extends SubsystemBase {
             botContainer.fieldRelative,
             botContainer.openLoop,
             botContainer.s_Arm,
-            botContainer.s_BotState
-            ));
+            botContainer.s_BotState));
     operatorController.rightBumper.whileTrue(
         new ContinuousGetObject(
             Arm.GamePieceType.Cube,
