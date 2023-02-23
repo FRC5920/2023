@@ -169,6 +169,20 @@ public class Swerve extends SubsystemBase {
     }
   }
 
+  public void runVelocity(ChassisSpeeds speeds) {
+
+    m_ChassisSpeeds = speeds;
+
+    // Calculate new desired swerve module states from the chassis speeds
+    SwerveModuleState[] newModuleStates = swerveKinematics.toSwerveModuleStates(m_ChassisSpeeds);
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        newModuleStates, Constants.SwerveDrivebaseConstants.maxSpeed);
+
+    // Apply the new desired module states
+    for (SwerveModule mod : mSwerveMods) {
+      mod.setDesiredState(newModuleStates[mod.moduleNumber], false);
+    }
+  }
   /** Stops swerve drive motion */
   public void stop() {
     drive(new Translation2d(0, 0).times(0), 0, true, true);
