@@ -104,12 +104,11 @@ public class RobotContainer {
     boolean openLoop = true;
     SwerveModuleIO swerveModuleIO[];
     GyroIO gyroIO;
-    Pneumatics s_Pneumatics;
+    Pneumatics s_Pneumatics = new Pneumatics();
 
     // Instantiate active subsystems
     switch (Constants.getMode()) {
       case REAL:
-        s_Pneumatics = new Pneumatics();
         gyroIO = new Pigeon2GyroIO(Constants.SwerveDrivebaseConstants.pigeonID, "SwerveCAN");
         swerveModuleIO =
             new SwerveModuleIO[] {

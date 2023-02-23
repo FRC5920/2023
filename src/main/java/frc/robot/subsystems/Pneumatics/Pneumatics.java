@@ -57,6 +57,8 @@ import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.simulation.SolenoidSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -73,6 +75,7 @@ public class Pneumatics extends SubsystemBase {
           PneumaticsModuleType.REVPH,
           Constants.PneumaticsConstants.kArmLeftRotatorPort,
           Constants.PneumaticsConstants.kArmRightRotatorPort);
+  private XboxController xbk = new XboxController(1);
 
   public Pneumatics() {
     phCompressor.enableDigital();
@@ -90,5 +93,10 @@ public class Pneumatics extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    if (xbk.getLeftBumperPressed()) {
+      goingForward();
+    } else {
+      goingBackward();
+    }
   }
 }

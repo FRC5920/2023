@@ -1,4 +1,16 @@
 {
+  "HALProvider": {
+    "PowerDistributions": {
+      "0": {
+        "PowerDistribution[0]": {
+          "open": true
+        }
+      },
+      "window": {
+        "visible": true
+      }
+    }
+  },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
@@ -19,6 +31,9 @@
     }
   },
   "NetworkTables": {
+    "Retained Values": {
+      "open": false
+    },
     "transitory": {
       "AdvantageKit": {
         "RealMetadata": {
@@ -50,6 +65,9 @@
           },
           "open": true
         },
+        "open": true
+      },
+      "photonvision": {
         "open": true
       }
     }
