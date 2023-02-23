@@ -232,7 +232,8 @@ public final class Constants {
             new Translation3d(0.0952, 0.0, 0.2794),
             new Rotation3d(
                 0, 0,
-                180)); // Cam mounted facing forward, half a meter forward of center, half a meter up
+                180)); // Cam mounted facing forward, half a meter forward of center, half a meter
+    // up
     // from center.
 
     public static final Transform3d ROBOT_TO_CAMERA = CAMERA_TO_ROBOT.inverse();
