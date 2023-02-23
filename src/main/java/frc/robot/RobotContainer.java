@@ -64,6 +64,7 @@ import frc.robot.subsystems.*;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 import frc.robot.subsystems.Heimdall.*;
 import frc.robot.subsystems.Intake.Intake;
+import frc.robot.subsystems.Pneumatics.Pneumatics;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 import org.photonvision.PhotonCamera;
@@ -82,6 +83,7 @@ public class RobotContainer {
   public final BotStateSubsystem botStateSubsystem = new BotStateSubsystem();
   public final Swerve swerveSubsystem;
   public final Intake m_Intake = new Intake();
+  // public final Pneumatics s_Pneumatics;
 
   @SuppressWarnings({"unused"})
   public final PoseEstimatorSubsystem poseEstimatorSubsystem;
@@ -102,10 +104,12 @@ public class RobotContainer {
     boolean openLoop = true;
     SwerveModuleIO swerveModuleIO[];
     GyroIO gyroIO;
+    Pneumatics s_Pneumatics;
 
     // Instantiate active subsystems
     switch (Constants.getMode()) {
       case REAL:
+        s_Pneumatics = new Pneumatics();
         gyroIO = new Pigeon2GyroIO(Constants.SwerveDrivebaseConstants.pigeonID, "SwerveCAN");
         swerveModuleIO =
             new SwerveModuleIO[] {
