@@ -49,17 +49,17 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.subsystems.Dashboard;
+package frc.robot.autos.AutoBuilder;
 
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import frc.robot.AutoConstants.CargoLocation;
-import frc.robot.AutoConstants.StagingLocation;
-import frc.robot.AutoConstants.Substation;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.SwerveDrivebase.Swerve;
+import frc.robot.autos.AutoConstants.CargoLocation;
+import frc.robot.autos.AutoConstants.StagingLocation;
+import frc.robot.autos.AutoConstants.Substation;
+import frc.robot.subsystems.Dashboard.IDashboardTab;
 import java.util.*;
 import java.util.function.Function;
 
@@ -155,10 +155,7 @@ public class AutoDashboardTab implements IDashboardTab {
 
   /** Service dashboard tab widgets */
   @Override
-  public void updateDashboard(RobotContainer botContainer) {
-    Swerve swerveSubsystem = botContainer.swerveSubsystem;
-    m_field2d.setRobotPose(swerveSubsystem.getPose());
-  }
+  public void updateDashboard(RobotContainer botContainer) {}
 
   private class ChooserWithChangeDetection<V> extends SendableChooser<V> {
     private V m_lastValue;

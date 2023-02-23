@@ -49,7 +49,7 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot;
+package frc.robot.autos;
 
 import java.util.*;
 
