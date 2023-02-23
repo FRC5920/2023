@@ -64,7 +64,7 @@ public class Pneumatics extends SubsystemBase {
   /** Creates a new Pneumatics. */
   Compressor phCompressor = new Compressor(1, PneumaticsModuleType.REVPH);
 
-  boolean enabled = phCompressor.enabled();
+  boolean enabled = phCompressor.isEnabled();
   boolean pressureSwitch = phCompressor.getPressureSwitchValue();
   // double currentCompressor = phCompressor.getCompressorCurrent();
   PneumaticHub m_PHub = new PneumaticHub(Constants.PneumaticsConstants.kPDHCAN);
