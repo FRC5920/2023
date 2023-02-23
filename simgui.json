@@ -2,6 +2,11 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Auto Builder/Field": "Field2d",
+      "/Shuffleboard/Auto Builder/Initial Position": "String Chooser",
+      "/Shuffleboard/Auto Builder/Lane": "String Chooser",
+      "/Shuffleboard/Auto Builder/Route": "String Chooser",
+      "/Shuffleboard/Auto Builder/Secondary Action": "String Chooser",
       "/Shuffleboard/Drive Train/Field": "Field2d",
       "/Shuffleboard/Drive/SendableChooser[0]": "String Chooser",
       "/Shuffleboard/Drive/Speed Limit": "String Chooser",

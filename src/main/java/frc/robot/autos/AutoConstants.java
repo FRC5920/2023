@@ -61,7 +61,7 @@ public class AutoConstants {
    * @remarks Goal stations are named from A-I, always starting with the station closest to the
    *     adjoining alliance's feeder station.
    */
-  public enum Substation {
+  public static enum Substation {
     // TODO: add coordinates
     A(0, 0.0, 0.0),
     B(1, 0.0, 0.0),
@@ -109,16 +109,16 @@ public class AutoConstants {
    * @remarks Staging points are used to indicate transitional points where the robot might be
    *     positioned in an auto routine
    */
-  public enum Lane {
+  public static enum Lane {
     // TODO: add coordinates
-    SubLane(
+    SubSide(
         0, 0.0), // Lane closest to substations in space between substations and charging station
-    ChargeLane(
+    ChargerSide(
         1,
         0.0); // Lane closest to charging station in space between substations and charging station
 
     private static final Map<String, Lane> nameMap =
-        Map.of("SubLane", SubLane, "ChargeLane", ChargeLane);
+        Map.of("SubSide", SubSide, "ChargerSide", ChargerSide);
 
     private final int id;
     private final double x; // X coordinate
@@ -152,19 +152,19 @@ public class AutoConstants {
    * @remarks Staging points are used to indicate transitional points where the robot might be
    *     positioned in an auto routine
    */
-  public enum StagingLocation {
+  public static enum StagingLocation {
     // TODO: add coordinates
     N(0, 0.0, 0.0), // Just North of the charging station
     S(1, 0.0, 0.0), // Just South of the charging station
 
     // Far North staging areas next to center line
     U(2, 0.0, 0.0), // Furthest north next to center line
-    V(2, 0.0, 0.0), // Secondmost north next to center line
+    V(3, 0.0, 0.0), // Secondmost north next to center line
 
     // Staging areas between charging station and cargo
-    X(2, 0.0, 0.0), // North of charging station
-    Y(2, 0.0, 0.0), // Centered on charging station
-    Z(2, 0.0, 0.0); // South of charging station
+    X(4, 0.0, 0.0), // North of charging station
+    Y(5, 0.0, 0.0), // Centered on charging station
+    Z(6, 0.0, 0.0); // South of charging station
 
     private static final Map<String, StagingLocation> nameMap =
         Map.of("N", N, "S", S, "U", U, "V", V, "X", X, "Y", Y, "Z", Z);
@@ -203,12 +203,12 @@ public class AutoConstants {
    * @remarks Staging points are used to indicate transitional points where the robot might be
    *     positioned in an auto routine
    */
-  public enum CargoLocation {
+  public static enum CargoLocation {
     // TODO: add coordinates
     C1(0, 0.0, 0.0), // North of the charging station
     C2(1, 0.0, 0.0), // Centered on northern half of the charging station
-    C3(1, 0.0, 0.0), // Centered on southern half of the charging station
-    C4(1, 0.0, 0.0); // South of the charging station
+    C3(2, 0.0, 0.0), // Centered on southern half of the charging station
+    C4(3, 0.0, 0.0); // South of the charging station
 
     private static final Map<String, CargoLocation> nameMap =
         Map.of("C1", C1, "C2", C2, "C3", C3, "C4", C4);
@@ -230,6 +230,45 @@ public class AutoConstants {
     }
 
     public static CargoLocation fromString(String s) {
+      return nameMap.get(s);
+    }
+
+    public static String[] getNames() {
+      String names[] = nameMap.keySet().toArray(new String[nameMap.size()]);
+      Arrays.sort(names);
+      return names;
+    }
+  };
+
+  /////////////////////////////////////////////////////////////////////////////
+  /**
+   * Staging points
+   *
+   * @remarks Staging points are used to indicate transitional points where the robot might be
+   *     positioned in an auto routine
+   */
+  public static enum SecondaryAction {
+    // TODO: add coordinates
+    WaitAtLocation(0), // Go to a location and wait
+    Balance(1), // Balance on the charging station
+    AcquireCargo(2); // Acquire a piece of cargo
+
+    private static final Map<String, SecondaryAction> nameMap =
+        Map.of("WaitAtLocation", WaitAtLocation, "Balance", Balance, "AcquireCargo", AcquireCargo);
+
+    private final int id;
+
+    private SecondaryAction(int idx) {
+      id = idx;
+    }
+
+    /** Get the human-readable name of the robot type */
+    @Override
+    public String toString() {
+      return this.name();
+    }
+
+    public static SecondaryAction fromString(String s) {
       return nameMap.get(s);
     }
 

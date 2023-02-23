@@ -56,12 +56,12 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.RobotContainer;
-import frc.robot.autos.AutoConstants.CargoLocation;
+import frc.robot.autos.AutoConstants.Lane;
+import frc.robot.autos.AutoConstants.SecondaryAction;
 import frc.robot.autos.AutoConstants.StagingLocation;
 import frc.robot.autos.AutoConstants.Substation;
 import frc.robot.subsystems.Dashboard.IDashboardTab;
 import java.util.*;
-import java.util.function.Function;
 
 /** A class supplying a Shuffleboard tab for configuring drive train parameters */
 public class AutoDashboardTab implements IDashboardTab {
@@ -76,16 +76,10 @@ public class AutoDashboardTab implements IDashboardTab {
   static final int kFieldHeightCells = 6;
 
   /** Width (in cells) of a swerve telemetry module on the dashboard (given a cell size of 32) */
-  static final int kSubPanelWidth = 6;
+  static final int kChooserWidth = 4;
 
   /** Height (in cells) of a swerve telemetry module on the dashboard (given a cell size of 32) */
-  static final int kSubPanelHeight = 6;
-
-  static final String kCargoNames[] = CargoLocation.getNames();
-
-  static final String kGoalNames[] = Substation.getNames();
-
-  static final String kStagingLocationNames[] = StagingLocation.getNames();
+  static final int kChooserHeight = 1;
 
   /** The Shuffleboard tab */
   private ShuffleboardTab m_tab;
@@ -94,14 +88,17 @@ public class AutoDashboardTab implements IDashboardTab {
   private Field2d m_field2d;
 
   /** Initial position chooser */
-  private final ChooserWithChangeDetection<String> m_initialPositionChooser =
-      new ChooserWithChangeDetection<String>();
+  private final ChooserWithChangeDetection<Substation> m_initialPositionChooser =
+      new ChooserWithChangeDetection<Substation>();
   /** Staging position/route chooser */
-  private final SendableChooser<String> m_laneChooser = new SendableChooser<String>();
+  private final ChooserWithChangeDetection<Lane> m_laneChooser =
+      new ChooserWithChangeDetection<Lane>();
   /** Staging position/route chooser */
-  private final SendableChooser<String> m_stagingRouteChooser = new SendableChooser<String>();
+  private final ChooserWithChangeDetection<StagingLocation> m_stagingRouteChooser =
+      new ChooserWithChangeDetection<StagingLocation>();
   /** Cargo position chooser */
-  private final SendableChooser<String> m_cargoPosition = new SendableChooser<String>();
+  private final ChooserWithChangeDetection<SecondaryAction> m_secondaryActionChooser =
+      new ChooserWithChangeDetection<SecondaryAction>();
 
   /** Creates an instance of the tab */
   public AutoDashboardTab() {
@@ -121,43 +118,71 @@ public class AutoDashboardTab implements IDashboardTab {
     m_tab
         .add("Field", m_field2d)
         .withSize(kFieldWidthCells, kFieldHeightCells)
-        .withPosition(0, 0)
+        .withPosition(0, 0 * kChooserWidth)
         .withProperties(Map.of("Label position", "HIDDEN"));
 
     // Set up the initial position chooser
-    for (int i = 0; i < kGoalNames.length; ++i) {
-      String goalName = kGoalNames[i];
-      if (0 == i) {
-        m_initialPositionChooser.setDefaultOption(goalName, goalName);
-      } else {
-        m_initialPositionChooser.addOption(goalName, goalName);
-      }
-    }
+    populateChooser(m_initialPositionChooser, Substation.getNames(), Substation.values());
     m_tab
         .add("Initial Position", m_initialPositionChooser)
-        .withSize(3, 1)
-        .withPosition(kFieldHeightCells, 0);
+        .withSize(kChooserWidth, kChooserHeight)
+        .withPosition(0 * kChooserWidth, kFieldHeightCells);
 
     // Set up the lane chooser
-    for (int i = 0; i < kGoalNames.length; ++i) {
-      String goalName = kGoalNames[i];
+    populateChooser(m_laneChooser, Lane.getNames(), Lane.values());
+    m_tab
+        .add("Lane", m_laneChooser)
+        .withSize(kChooserWidth, kChooserHeight)
+        .withPosition(1 * kChooserWidth, kFieldHeightCells);
+
+    // Set up a chooser for the staging/transitional location to pass through
+    populateChooser(m_stagingRouteChooser, StagingLocation.getNames(), StagingLocation.values());
+    m_tab
+        .add("Route", m_stagingRouteChooser)
+        .withSize(kChooserWidth, kChooserHeight)
+        .withPosition(2 * kChooserWidth, kFieldHeightCells);
+
+    // Set up a chooser for the secondary action to take
+    populateChooser(m_secondaryActionChooser, SecondaryAction.getNames(), SecondaryAction.values());
+    m_tab
+        .add("Secondary Action", m_stagingRouteChooser)
+        .withSize(kChooserWidth, kChooserHeight)
+        .withPosition(3 * kChooserWidth, kFieldHeightCells);
+  }
+
+  /**
+   * Populates a String chooser
+   *
+   * @param chooser The chooser to populate
+   * @param choices An array of strings representing the choices
+   * @post The chooser will be populated with the given choices and the default value will be set to
+   *     the first choice
+   */
+  private static <V> void populateChooser(
+      SendableChooser<V> chooser, String choices[], V values[]) {
+    for (int i = 0; i < choices.length; ++i) {
+      String choice = choices[i];
+      V value = values[i];
       if (0 == i) {
-        m_initialPositionChooser.setDefaultOption(goalName, goalName);
+        chooser.setDefaultOption(choice, value);
       } else {
-        m_initialPositionChooser.addOption(goalName, goalName);
+        chooser.addOption(choice, value);
       }
     }
-    m_tab
-        .add("Initial Position", m_initialPositionChooser)
-        .withSize(3, 1)
-        .withPosition(kFieldHeightCells, 0);
   }
 
   /** Service dashboard tab widgets */
   @Override
-  public void updateDashboard(RobotContainer botContainer) {}
+  public void updateDashboard(RobotContainer botContainer) {
+    if (m_initialPositionChooser.hasChanged()
+        || m_laneChooser.hasChanged()
+        || m_stagingRouteChooser.hasChanged()
+        || m_secondaryActionChooser.hasChanged()) {
+      // Rebuild the auto routine
+    }
+  }
 
-  private class ChooserWithChangeDetection<V> extends SendableChooser<V> {
+  private static class ChooserWithChangeDetection<V> extends SendableChooser<V> {
     private V m_lastValue;
 
     @Override
@@ -166,11 +191,8 @@ public class AutoDashboardTab implements IDashboardTab {
       m_lastValue = object;
     }
 
-    public void processChanges(Function<V, V> changeCallback) {
-      V currentValue = getSelected();
-      if (m_lastValue != currentValue) {
-        changeCallback.apply(currentValue);
-      }
+    public boolean hasChanged() {
+      return m_lastValue != getSelected();
     }
   }
 }
