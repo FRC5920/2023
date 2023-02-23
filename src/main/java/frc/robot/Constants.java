@@ -221,6 +221,12 @@ public final class Constants {
         new TrapezoidProfile.Constraints(
             kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
   }
+  
+  public static class PneumaticsConstants {
+    public static final int kPDHCAN = 10;
+    public static final int kArmLeftRotatorPort = 0;
+    public static final int kArmRightRotatorPort = 1;
+  }
 
   public static class VisionConstants {
 
