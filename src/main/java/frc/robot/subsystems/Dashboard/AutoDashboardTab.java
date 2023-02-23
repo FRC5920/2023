@@ -61,6 +61,7 @@ import frc.robot.AutoConstants.Substation;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import java.util.*;
+import java.util.function.Function;
 
 /** A class supplying a Shuffleboard tab for configuring drive train parameters */
 public class AutoDashboardTab implements IDashboardTab {
@@ -93,11 +94,14 @@ public class AutoDashboardTab implements IDashboardTab {
   private Field2d m_field2d;
 
   /** Initial position chooser */
-  private final SendableChooser<String> m_initialPositionChooser = new SendableChooser<>();
+  private final ChooserWithChangeDetection<String> m_initialPositionChooser =
+      new ChooserWithChangeDetection<String>();
   /** Staging position/route chooser */
-  private final SendableChooser<String> m_stagingRouteChooser = new SendableChooser<>();
+  private final SendableChooser<String> m_laneChooser = new SendableChooser<String>();
+  /** Staging position/route chooser */
+  private final SendableChooser<String> m_stagingRouteChooser = new SendableChooser<String>();
   /** Cargo position chooser */
-  private final SendableChooser<String> m_cargoPosition = new SendableChooser<>();
+  private final SendableChooser<String> m_cargoPosition = new SendableChooser<String>();
 
   /** Creates an instance of the tab */
   public AutoDashboardTab() {
@@ -154,5 +158,22 @@ public class AutoDashboardTab implements IDashboardTab {
   public void updateDashboard(RobotContainer botContainer) {
     Swerve swerveSubsystem = botContainer.swerveSubsystem;
     m_field2d.setRobotPose(swerveSubsystem.getPose());
+  }
+
+  private class ChooserWithChangeDetection<V> extends SendableChooser<V> {
+    private V m_lastValue;
+
+    @Override
+    public void setDefaultOption(String name, V object) {
+      super.setDefaultOption(name, object);
+      m_lastValue = object;
+    }
+
+    public void processChanges(Function<V, V> changeCallback) {
+      V currentValue = getSelected();
+      if (m_lastValue != currentValue) {
+        changeCallback.apply(currentValue);
+      }
+    }
   }
 }
