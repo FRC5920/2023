@@ -239,7 +239,7 @@ public final class Constants {
     public static final Transform3d ROBOT_TO_CAMERA = CAMERA_TO_ROBOT.inverse();
     static final String TagCameraName = "Heimdall_Tag_Camera";
     static final String ArmCameraName = "Arm_Camera";
-    static final String BackupCameraName = "BackupCamera";
+    static final String BackupCameraName = "Heimdall_Backup_Cam";
   }
 
   /** A map of directories where log files should be stored */
