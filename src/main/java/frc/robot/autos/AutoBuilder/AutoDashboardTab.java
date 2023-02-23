@@ -100,6 +100,8 @@ public class AutoDashboardTab implements IDashboardTab {
   private final ChooserWithChangeDetection<SecondaryAction> m_secondaryActionChooser =
       new ChooserWithChangeDetection<SecondaryAction>();
 
+  private AutoRoutineBuilder m_builder;
+
   /** Creates an instance of the tab */
   public AutoDashboardTab() {
     m_field2d = new Field2d();
@@ -179,7 +181,17 @@ public class AutoDashboardTab implements IDashboardTab {
         || m_stagingRouteChooser.hasChanged()
         || m_secondaryActionChooser.hasChanged()) {
       // Rebuild the auto routine
+      m_builder =
+          new AutoRoutineBuilder(
+              m_initialPositionChooser.getSelected(),
+              m_laneChooser.getSelected(),
+              m_stagingRouteChooser.getSelected());
     }
+  }
+
+  /** Returns the current auto routine builder */
+  public AutoRoutineBuilder getAutoBuilder() {
+    return m_builder;
   }
 
   private static class ChooserWithChangeDetection<V> extends SendableChooser<V> {
