@@ -58,6 +58,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import frc.robot.RobotContainer;
+import frc.robot.commands.Balance;
 import frc.robot.commands.DriveToPose;
 import frc.robot.subsystems.Dashboard.IDashboardTab;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
@@ -127,6 +128,7 @@ public class PoseEstimatorDashboardTab implements IDashboardTab {
         .withPosition(kPoseWidthCells * 1, kFieldHeightCells);
 
     m_tab.add(new DriveToPose(swerveSubsystem, new Pose2d(4, 3.55, new Rotation2d(0))));
+    m_tab.add(new Balance(swerveSubsystem));
   }
 
   /** Service dashboard tab widgets */
