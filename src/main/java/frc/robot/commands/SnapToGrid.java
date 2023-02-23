@@ -74,7 +74,7 @@ public class SnapToGrid extends CommandBase {
   int timesGotXFromJoystick;
   double xAxis;
 
-  private static final double GridkP = 0.5;
+  private static final double GridkP = 1.0;
   private static final double GridkI = 0.05;
   private static final double GridkD = 0.2;
   PIDController gridPID = new PIDController(GridkP, GridkI, GridkD);
