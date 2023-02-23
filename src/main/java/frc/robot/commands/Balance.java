@@ -51,9 +51,8 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.commands;
 
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
@@ -61,18 +60,12 @@ import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 
 public class Balance extends CommandBase {
 
-  private static final TrapezoidProfile.Constraints X_CONSTRAINTS =
-      new TrapezoidProfile.Constraints(3, .5);
-  private static final TrapezoidProfile.Constraints Y_CONSTRAINTS =
-      new TrapezoidProfile.Constraints(3, .5);
-  private static final TrapezoidProfile.Constraints OMEGA_CONSTRAINTS =
-      new TrapezoidProfile.Constraints(2, .5);
-  private final ProfiledPIDController xController =
-      new ProfiledPIDController(3, 0, 0, X_CONSTRAINTS);
-  private final ProfiledPIDController yController =
-      new ProfiledPIDController(3, 0, 0, Y_CONSTRAINTS);
-  private final ProfiledPIDController omegaController =
-      new ProfiledPIDController(2, 0, 0, OMEGA_CONSTRAINTS);
+  private static final double SwerveP = 1.0;
+  private static final double SwerveI = 0.05;
+  private static final double SwervekD = 0.2;
+  private final PIDController xController = new PIDController(SwerveP, SwerveI, SwervekD);
+  private final PIDController yController = new PIDController(SwerveP, SwerveI, SwervekD);
+  private final PIDController omegaController = new PIDController(SwerveP, SwerveI, SwervekD);
 
   private final Swerve drivetrainSubsystem;
 
@@ -101,9 +94,9 @@ public class Balance extends CommandBase {
   public void execute() {
     // drivetrainSubsystem.getPitch();
     // drivetrainSubsystem.getRoll();
-    xController.setGoal(0);
-    yController.setGoal(0);
-    omegaController.setGoal(drivetrainSubsystem.getYaw().getRadians());
+    xController.setSetpoint(0);
+    yController.setSetpoint(0);
+    omegaController.setSetpoint(drivetrainSubsystem.getYaw().getRadians());
 
     // Drive to the target
     var xSpeed = xController.calculate(drivetrainSubsystem.getRoll().getRadians());
