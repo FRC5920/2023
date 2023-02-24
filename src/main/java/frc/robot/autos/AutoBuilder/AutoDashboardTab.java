@@ -56,10 +56,10 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.RobotContainer;
-import frc.robot.autos.AutoConstants.Lane;
+import frc.robot.autos.AutoConstants.Grids;
+import frc.robot.autos.AutoConstants.Lanes;
 import frc.robot.autos.AutoConstants.SecondaryAction;
-import frc.robot.autos.AutoConstants.StagingLocation;
-import frc.robot.autos.AutoConstants.Substation;
+import frc.robot.autos.AutoConstants.Waypoints;
 import frc.robot.subsystems.Dashboard.IDashboardTab;
 import java.util.*;
 
@@ -88,14 +88,14 @@ public class AutoDashboardTab implements IDashboardTab {
   private Field2d m_field2d;
 
   /** Initial position chooser */
-  private final ChooserWithChangeDetection<Substation> m_initialPositionChooser =
-      new ChooserWithChangeDetection<Substation>();
+  private final ChooserWithChangeDetection<Grids.ScoringPosition> m_initialPositionChooser =
+      new ChooserWithChangeDetection<Grids.ScoringPosition>();
   /** Staging position/route chooser */
-  private final ChooserWithChangeDetection<Lane> m_laneChooser =
-      new ChooserWithChangeDetection<Lane>();
+  private final ChooserWithChangeDetection<Lanes.ID> m_laneChooser =
+      new ChooserWithChangeDetection<Lanes.ID>();
   /** Staging position/route chooser */
-  private final ChooserWithChangeDetection<StagingLocation> m_stagingRouteChooser =
-      new ChooserWithChangeDetection<StagingLocation>();
+  private final ChooserWithChangeDetection<Waypoints.ID> m_stagingRouteChooser =
+      new ChooserWithChangeDetection<Waypoints.ID>();
   /** Cargo position chooser */
   private final ChooserWithChangeDetection<SecondaryAction> m_secondaryActionChooser =
       new ChooserWithChangeDetection<SecondaryAction>();
@@ -124,21 +124,22 @@ public class AutoDashboardTab implements IDashboardTab {
         .withProperties(Map.of("Label position", "HIDDEN"));
 
     // Set up the initial position chooser
-    populateChooser(m_initialPositionChooser, Substation.getNames(), Substation.values());
+    populateChooser(
+        m_initialPositionChooser, Grids.ScoringPosition.getNames(), Grids.ScoringPosition.values());
     m_tab
         .add("Initial Position", m_initialPositionChooser)
         .withSize(kChooserWidth, kChooserHeight)
         .withPosition(0 * kChooserWidth, kFieldHeightCells);
 
     // Set up the lane chooser
-    populateChooser(m_laneChooser, Lane.getNames(), Lane.values());
+    populateChooser(m_laneChooser, Lanes.ID.getNames(), Lanes.ID.values());
     m_tab
         .add("Lane", m_laneChooser)
         .withSize(kChooserWidth, kChooserHeight)
         .withPosition(1 * kChooserWidth, kFieldHeightCells);
 
     // Set up a chooser for the staging/transitional location to pass through
-    populateChooser(m_stagingRouteChooser, StagingLocation.getNames(), StagingLocation.values());
+    populateChooser(m_stagingRouteChooser, Waypoints.ID.getNames(), Waypoints.ID.values());
     m_tab
         .add("Route", m_stagingRouteChooser)
         .withSize(kChooserWidth, kChooserHeight)

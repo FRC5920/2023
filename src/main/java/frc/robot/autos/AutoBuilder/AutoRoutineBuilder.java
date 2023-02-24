@@ -54,16 +54,16 @@ package frc.robot.autos.AutoBuilder;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.autos.AutoConstants.Lane;
+import frc.robot.autos.AutoConstants.Grids;
+import frc.robot.autos.AutoConstants.Lanes;
 import frc.robot.autos.AutoConstants.SecondaryAction;
-import frc.robot.autos.AutoConstants.StagingLocation;
-import frc.robot.autos.AutoConstants.Substation;
+import frc.robot.autos.AutoConstants.Waypoints;
 
 /** A class used to build auto routines */
 public class AutoRoutineBuilder {
-  private final Substation m_startingPosition;
-  private final Lane m_escapeLane;
-  private final StagingLocation m_escapeRoute;
+  private final Grids.ScoringPosition m_startingPosition;
+  private final Lanes.ID m_escapeLane;
+  private final Waypoints.ID m_escapeRoute;
   private SecondaryAction m_secondaryAction;
 
   /** Trajectory followed when driving away from the substation */
@@ -75,7 +75,8 @@ public class AutoRoutineBuilder {
   /** Trajectory showing the overall path taken by the robot */
   PathPlannerTrajectory m_cumulativeTrajectory;
 
-  AutoRoutineBuilder(Substation startingPosition, Lane escapeLane, StagingLocation escapeRoute) {
+  AutoRoutineBuilder(
+      Grids.ScoringPosition startingPosition, Lanes.ID escapeLane, Waypoints.ID escapeRoute) {
     m_startingPosition = startingPosition;
     m_escapeLane = escapeLane;
     m_escapeRoute = escapeRoute;

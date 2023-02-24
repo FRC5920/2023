@@ -52,6 +52,7 @@
 package frc.robot.subsystems.Heimdall;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -112,17 +113,25 @@ public class PoseEstimatorDashboardTab implements IDashboardTab {
         .withPosition(0, 0)
         .withProperties(Map.of("Label position", "HIDDEN"));
 
-    // Add the pose value
+    // Add the pose estimator's pose
     m_tab
-        .addString("Pose Estimator", () -> formatPose2d(poseSubsystem.getCurrentPose()))
+        .addString("Pose Estimator (m)", () -> formatPose2d(poseSubsystem.getCurrentPose(), false))
         .withSize(kPoseWidthCells, kPoseHeightCells)
         .withPosition(kPoseWidthCells * 0, kFieldHeightCells);
+    m_tab
+        .addString("Pose Estimator (in)", () -> formatPose2d(poseSubsystem.getCurrentPose(), true))
+        .withSize(kPoseWidthCells, kPoseHeightCells)
+        .withPosition(kPoseWidthCells * 0, kFieldHeightCells + kPoseHeightCells);
 
     // Add the pose value
     m_tab
-        .addString("Swerve Odometry", () -> formatPose2d(swerveSubsystem.getPose()))
+        .addString("Swerve Pose (m)", () -> formatPose2d(swerveSubsystem.getPose(), false))
         .withSize(kPoseWidthCells, kPoseHeightCells)
         .withPosition(kPoseWidthCells * 1, kFieldHeightCells);
+    m_tab
+        .addString("Swerve Pose (in)", () -> formatPose2d(swerveSubsystem.getPose(), true))
+        .withSize(kPoseWidthCells, kPoseHeightCells)
+        .withPosition(kPoseWidthCells * 1, kFieldHeightCells + kPoseHeightCells);
   }
 
   /** Service dashboard tab widgets */
@@ -135,8 +144,17 @@ public class PoseEstimatorDashboardTab implements IDashboardTab {
     swervePoseObject.setPose(botContainer.swerveSubsystem.getPose());
   }
 
-  private static String formatPose2d(Pose2d pose) {
-    return String.format(
-        "(%.2f, %.2f) %.2f degrees", pose.getX(), pose.getY(), pose.getRotation().getDegrees());
+  private static String formatPose2d(Pose2d pose, boolean asInches) {
+    if (asInches) {
+      return String.format(
+          "(%.2f in, %.2f in) %.2f degrees",
+          Units.metersToInches(pose.getX()),
+          Units.metersToInches(pose.getY()),
+          pose.getRotation().getDegrees());
+    } else {
+      return String.format(
+          "(%.2f m, %.2f m) %.2f degrees",
+          pose.getX(), pose.getY(), pose.getRotation().getDegrees());
+    }
   }
 }
