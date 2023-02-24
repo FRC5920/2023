@@ -58,9 +58,13 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.simulation.SolenoidSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
+import frc.robot.commands.Arm.RotateIntake;
 
 public class Pneumatics extends SubsystemBase {
   /** Creates a new Pneumatics. */
@@ -79,7 +83,7 @@ public class Pneumatics extends SubsystemBase {
 
   public Pneumatics() {
     phCompressor.enableDigital();
-    m_PWrist.set(kOff);
+    m_PWrist.set(kOff);  
   }
 
   public void goingForward() {

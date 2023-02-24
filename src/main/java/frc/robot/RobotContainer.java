@@ -51,6 +51,7 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.lib.SwerveDrive.Falcon500SwerveIO;
@@ -60,6 +61,7 @@ import frc.lib.SwerveDrive.SimGyroIO;
 import frc.lib.SwerveDrive.SimSwerveModuleIO;
 import frc.lib.SwerveDrive.SwerveModuleIO;
 import frc.robot.commands.*;
+import frc.robot.commands.Arm.RotateIntake;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 import frc.robot.subsystems.Heimdall.*;
@@ -83,7 +85,7 @@ public class RobotContainer {
   public final BotStateSubsystem botStateSubsystem = new BotStateSubsystem();
   public final Swerve swerveSubsystem;
   public final Intake m_Intake = new Intake();
-  // public final Pneumatics s_Pneumatics;
+  public final Pneumatics s_Pneumatics = new Pneumatics();
 
   @SuppressWarnings({"unused"})
   public final PoseEstimatorSubsystem poseEstimatorSubsystem;
@@ -104,7 +106,7 @@ public class RobotContainer {
     boolean openLoop = true;
     SwerveModuleIO swerveModuleIO[];
     GyroIO gyroIO;
-    Pneumatics s_Pneumatics = new Pneumatics();
+    
 
     // Instantiate active subsystems
     switch (Constants.getMode()) {
@@ -176,6 +178,9 @@ public class RobotContainer {
 
     // Configure joystick button bindings
     joystickSubsystem.configureButtonBindings(this);
+
+    SmartDashboard.putData("turn Intake Left", new RotateIntake(s_Pneumatics, true));
+    SmartDashboard.putData("turn Intake Right", new RotateIntake(s_Pneumatics, false));
   }
 
   /**
