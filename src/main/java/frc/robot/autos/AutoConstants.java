@@ -68,7 +68,7 @@ public class AutoConstants {
     /**
      * Distance from the drive base to the outside edge of the bumper on a given side of the robot
      */
-    private static final double kBumperWidthMeters = Units.inchesToMeters(3.25);
+    private static final double kBumperWidthMeters = Units.inchesToMeters(0.75 + 2.5);
 
     /** Total width of the (square) robot footprint in meters */
     private static final double kFootprintWidth = kDriveBaseWidthMeters + (2 * kBumperWidthMeters);
@@ -191,9 +191,13 @@ public class AutoConstants {
     /**
      * Robot center Y coordinate in the East-West portion of the INSIDE lane furthest from the
      * scoring table
+     *
+     * <p>TODO: this value needs experimental refinement!
      */
     public static double kUpperEastWestInsideCenterY =
-        FieldConstants.Community.midY - BotDimensions.kHalfFootprintWidth;
+        FieldConstants.Community.chargingStationLeftY
+            + Units.inchesToMeters(59.39)
+            - BotDimensions.kHalfFootprintWidth;
 
     /**
      * Robot center Y coordinate in the East-West portion of the OUTSIDE lane furthest from the
@@ -232,11 +236,7 @@ public class AutoConstants {
 
       private ID(int idx) {
         id = idx;
-        if (id == 0) {
-          xNorthSouthCenter = kNSInsideCenterX;
-        } else {
-          xNorthSouthCenter = kNSOutsideCenterX;
-        }
+        xNorthSouthCenter = (id == 0) ? kNSInsideCenterX : kNSOutsideCenterX;
       }
 
       /** Get the human-readable name of the robot type */

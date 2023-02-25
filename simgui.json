@@ -3,6 +3,7 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/Shuffleboard/Auto Builder/Field": "Field2d",
+      "/Shuffleboard/Auto Builder/FirstWaypoint": "String Chooser",
       "/Shuffleboard/Auto Builder/Initial Position": "String Chooser",
       "/Shuffleboard/Auto Builder/Lane": "String Chooser",
       "/Shuffleboard/Auto Builder/Route": "String Chooser",

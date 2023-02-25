@@ -73,10 +73,10 @@ public class AutoDashboardTab implements IDashboardTab {
   static final String kTabTitle = "Auto Builder";
 
   /** Width (in cells) of the field display */
-  static final int kFieldWidthCells = 10;
+  static final int kFieldWidthCells = 16;
 
   /** Height (in cells) of the field display */
-  static final int kFieldHeightCells = 6;
+  static final int kFieldHeightCells = 11;
 
   /** Width (in cells) of a swerve telemetry module on the dashboard (given a cell size of 32) */
   static final int kChooserWidth = 4;
@@ -162,7 +162,7 @@ public class AutoDashboardTab implements IDashboardTab {
     // Set up a chooser for the secondary action to take
     populateChooser(m_secondaryActionChooser, SecondaryAction.getNames(), SecondaryAction.values());
     m_tab
-        .add("Secondary Action", m_routeChooser)
+        .add("Secondary Action", m_secondaryActionChooser)
         .withSize(kChooserWidth, kChooserHeight)
         .withPosition(4 * kChooserWidth, kFieldHeightCells);
   }
