@@ -207,24 +207,24 @@ public class Arm extends SubsystemBase {
 
   public static void spinAllHandRollers(
       GamePieceType pickUpWhat, DoWhatWithGamePiece desiredHandAction) {
-    double HandBottomRollerSpeedPercent = HandRollerSpeed;
-    double HandTopBackRollerSpeedPercent = 0.0;
+    double HandFrontRollerSpeedPercent = HandRollerSpeed;
+    double HandBackRollerSpeedPercent = 0.0;
     switch (pickUpWhat) {
       case Cone:
-        HandTopBackRollerSpeedPercent = HandRollerSpeed;
+        HandBackRollerSpeedPercent = HandRollerSpeed;
         break;
       case Cube:
-        HandTopBackRollerSpeedPercent = -1 * HandRollerSpeed;
+        HandBackRollerSpeedPercent = -1 * HandRollerSpeed;
         break;
       default:
         break;
     }
     if (desiredHandAction == DoWhatWithGamePiece.Out) {
-      HandBottomRollerSpeedPercent *= -1;
-      HandTopBackRollerSpeedPercent *= -1;
+      HandFrontRollerSpeedPercent *= -1;
+      HandBackRollerSpeedPercent *= -1;
     }
-    HandFrontRoller.set(HandBottomRollerSpeedPercent);
-    // HandBackRoller.set(HandTopBackRollerSpeedPercent);
+    HandFrontRoller.set(HandFrontRollerSpeedPercent);
+    // HandBackRoller.set(HandBackRollerSpeedPercent);
   }
 
   public static void zeroHandRollers() {
