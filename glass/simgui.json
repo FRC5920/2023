@@ -46,16 +46,19 @@
       },
       "/Shuffleboard/Auto Builder/Lane": {
         "window": {
+          "name": "Lane",
           "visible": true
         }
       },
       "/Shuffleboard/Auto Builder/Route": {
         "window": {
+          "name": "Route",
           "visible": true
         }
       },
       "/Shuffleboard/Auto Builder/Secondary Action": {
         "window": {
+          "name": "Secondary Action",
           "visible": true
         }
       }
