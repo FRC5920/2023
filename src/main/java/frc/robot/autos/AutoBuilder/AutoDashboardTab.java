@@ -58,6 +58,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.RobotContainer;
+import frc.robot.autos.AutoConstants.EscapeRoute;
 import frc.robot.autos.AutoConstants.Grids;
 import frc.robot.autos.AutoConstants.Lanes;
 import frc.robot.autos.AutoConstants.SecondaryAction;
@@ -95,9 +96,13 @@ public class AutoDashboardTab implements IDashboardTab {
   /** Staging position/route chooser */
   private final ChooserWithChangeDetection<Lanes.ID> m_laneChooser =
       new ChooserWithChangeDetection<Lanes.ID>();
-  /** Staging position/route chooser */
-  private final ChooserWithChangeDetection<Waypoints.ID> m_stagingRouteChooser =
+  /** Route chooser */
+  private final ChooserWithChangeDetection<EscapeRoute.ID> m_routeChooser =
+      new ChooserWithChangeDetection<EscapeRoute.ID>();
+  /** Waypoint chooser */
+  private final ChooserWithChangeDetection<Waypoints.ID> m_escapeWaypointChooser =
       new ChooserWithChangeDetection<Waypoints.ID>();
+
   /** Cargo position chooser */
   private final ChooserWithChangeDetection<SecondaryAction> m_secondaryActionChooser =
       new ChooserWithChangeDetection<SecondaryAction>();
@@ -140,19 +145,26 @@ public class AutoDashboardTab implements IDashboardTab {
         .withSize(kChooserWidth, kChooserHeight)
         .withPosition(1 * kChooserWidth, kFieldHeightCells);
 
-    // Set up a chooser for the staging/transitional location to pass through
-    populateChooser(m_stagingRouteChooser, Waypoints.ID.getNames(), Waypoints.ID.values());
+    // Set up a chooser for the route to follow out of the community
+    populateChooser(m_routeChooser, EscapeRoute.ID.getNames(), EscapeRoute.ID.values());
     m_tab
-        .add("Route", m_stagingRouteChooser)
+        .add("Route", m_routeChooser)
         .withSize(kChooserWidth, kChooserHeight)
         .withPosition(2 * kChooserWidth, kFieldHeightCells);
+
+    // Set up a chooser for the waypoint to move to outside the community
+    populateChooser(m_escapeWaypointChooser, Waypoints.ID.getNames(), Waypoints.ID.values());
+    m_tab
+        .add("FirstWaypoint", m_escapeWaypointChooser)
+        .withSize(kChooserWidth, kChooserHeight)
+        .withPosition(3 * kChooserWidth, kFieldHeightCells);
 
     // Set up a chooser for the secondary action to take
     populateChooser(m_secondaryActionChooser, SecondaryAction.getNames(), SecondaryAction.values());
     m_tab
-        .add("Secondary Action", m_stagingRouteChooser)
+        .add("Secondary Action", m_routeChooser)
         .withSize(kChooserWidth, kChooserHeight)
-        .withPosition(3 * kChooserWidth, kFieldHeightCells);
+        .withPosition(4 * kChooserWidth, kFieldHeightCells);
   }
 
   /**
@@ -178,19 +190,23 @@ public class AutoDashboardTab implements IDashboardTab {
   @Override
   public void updateDashboard(RobotContainer botContainer) {
 
-    /*
     if (m_initialPositionChooser.hasChanged()
         || m_laneChooser.hasChanged()
-        || m_stagingRouteChooser.hasChanged()
+        || m_routeChooser.hasChanged()
         || m_secondaryActionChooser.hasChanged()) {
       // Rebuild the auto routine
       m_builder =
           new AutoRoutineBuilder(
+              botContainer,
               m_initialPositionChooser.getSelected(),
               m_laneChooser.getSelected(),
-              m_stagingRouteChooser.getSelected());
+              m_routeChooser.getSelected(),
+              m_escapeWaypointChooser.getSelected());
+
+      // Display the auto trajectory on the field
+      m_field2d.getObject("EscapeTrajectory").setTrajectory(m_builder.getTrajectory());
     }
-    */
+
     if (m_initialPositionChooser.hasChanged()) {
       Pose2d pose = m_initialPositionChooser.getSelected().pose;
       m_field2d.setRobotPose(pose);

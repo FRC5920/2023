@@ -78,7 +78,7 @@ public class AutoConstants {
   }
 
   /** Constants indicating the robot's rotational orientation */
-  public static class BotRotation {
+  public static class BotOrientation {
     /** Bot is rotated toward Grids */
     public static final Rotation2d kFacingGrid = new Rotation2d(Math.PI);
     /** Bot is rotated toward the middle of the field */
@@ -131,7 +131,7 @@ public class AutoConstants {
         id = idx;
         double x = kRobotCenterX;
         double y = kFirstGridCenterY + (kDistanceBetweenGridCenters * id);
-        pose = new Pose2d(x, y, BotRotation.kFacingGrid);
+        pose = new Pose2d(x, y, BotOrientation.kFacingGrid);
       }
 
       /** Get the human-readable name of the robot type */
@@ -218,8 +218,8 @@ public class AutoConstants {
     /**
      * Lanes
      *
-     * @remarks Staging points are used to indicate transitional points where the robot might be
-     *     positioned in an auto routine
+     * @remarks Lanes are used to indicate imaginary lantes that run between the Grids and the
+     *     Charging Station.
      */
     public static enum ID {
       Inside(0),
@@ -229,22 +229,74 @@ public class AutoConstants {
 
       private final int id;
       public final double xNorthSouthCenter; // X-coordinate of the lane's North-South section
-      public final double
-          yUpperEastWestCenter; // Y-coordinate of the lane's upper East-West section
-      public final double
-          yLowerEastWestCenter; // Y-coordinate of the lane's upper East-West section
 
       private ID(int idx) {
         id = idx;
         if (id == 0) {
           xNorthSouthCenter = kNSInsideCenterX;
-          yUpperEastWestCenter = kUpperEastWestInsideCenterY;
-          yLowerEastWestCenter = kLowerEastWestInsideCenterY;
         } else {
           xNorthSouthCenter = kNSOutsideCenterX;
-          yUpperEastWestCenter = kUpperEastWestOutsideCenterY;
-          yLowerEastWestCenter = kLowerEastWestOutsideCenterY;
         }
+      }
+
+      /** Get the human-readable name of the robot type */
+      @Override
+      public String toString() {
+        return this.name();
+      }
+
+      public static ID fromString(String s) {
+        return nameMap.get(s);
+      }
+
+      public static String[] getNames() {
+        String names[] = nameMap.keySet().toArray(new String[nameMap.size()]);
+        Arrays.sort(names);
+        return names;
+      }
+
+      public double getYForRoute(EscapeRoute.ID route) {
+        double y = -1.0;
+        switch (route) {
+          case NorthOfCS: // North of CS
+            y = (id == 0) ? kUpperEastWestInsideCenterY : kUpperEastWestOutsideCenterY;
+            break;
+          case SouthOfCS: // South of CS
+            y = (id == 0) ? kLowerEastWestInsideCenterY : kLowerEastWestOutsideCenterY;
+            break;
+          case CenterOfCS: // Through CS
+            y = ChargingStation.kCenterY;
+            break;
+        }
+        return y;
+      }
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  /** Constants used to identify the route the bot will take out of the community */
+  public static class EscapeRoute {
+    public static enum ID {
+      /**
+       * This route takes the bot to the North of the charging station, on the side furthest from
+       * the scoring table
+       */
+      NorthOfCS(0),
+      /**
+       * This route takes the bot to the South of the charging station, on the side closest to the
+       * scoring table
+       */
+      SouthOfCS(1),
+      /** This route takes the bot through the center of the Charging Station */
+      CenterOfCS(2);
+
+      private static final Map<String, ID> nameMap =
+          Map.of("NorthOfCS", NorthOfCS, "SouthOfCS", SouthOfCS, "CenterOfCS", CenterOfCS);
+
+      private final int id;
+
+      private ID(int idx) {
+        id = idx;
       }
 
       /** Get the human-readable name of the robot type */
