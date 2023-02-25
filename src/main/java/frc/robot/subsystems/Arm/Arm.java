@@ -55,13 +55,13 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Pneumatics.Pneumatics;
-import com.revrobotics.CANSparkMaxLowLevel;
 
 public class Arm extends SubsystemBase {
   // TODO: Testing
@@ -73,7 +73,7 @@ public class Arm extends SubsystemBase {
   private static final WPI_TalonFX HandFrontRoller =
       new WPI_TalonFX(Constants.ArmConstants.kHandFrontRollerPort);
   private static final CANSparkMax HandBackRoller =
-    new CANSparkMax(Constants.ArmConstants.kHandBackRollerPort, MotorType.kBrushless);
+      new CANSparkMax(Constants.ArmConstants.kHandBackRollerPort, MotorType.kBrushless);
   private static final WPI_TalonFX ArmYMotorSlave =
       new WPI_TalonFX(Constants.ArmConstants.kArmYMotorSlavePort);
 
