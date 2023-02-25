@@ -51,7 +51,7 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot;
 
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.lib.SwerveDrive.Falcon500SwerveIO;
@@ -60,11 +60,10 @@ import frc.lib.SwerveDrive.Pigeon2GyroIO;
 import frc.lib.SwerveDrive.SimGyroIO;
 import frc.lib.SwerveDrive.SimSwerveModuleIO;
 import frc.lib.SwerveDrive.SwerveModuleIO;
-import frc.robot.autos.*;
 import frc.robot.commands.*;
+import frc.robot.commands.Arm.RotateIntake;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Arm.Arm;
-import frc.robot.subsystems.Arm.Pneumatics;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 import frc.robot.subsystems.Heimdall.*;
 import frc.robot.subsystems.Intake.Intake;
@@ -88,13 +87,10 @@ public class RobotContainer {
   public final Swerve swerveSubsystem;
   public final Intake m_Intake = new Intake();
   public final Pneumatics s_Pneumatics = new Pneumatics();
+  public final Arm s_Arm = new Arm(s_Pneumatics);
 
   @SuppressWarnings({"unused"})
   public final PoseEstimatorSubsystem poseEstimatorSubsystem;
-  /* Drive Controls */
-  public final int translationAxis = XboxController.Axis.kLeftY.value;
-  public final int strafeAxis = XboxController.Axis.kLeftX.value;
-  public final int rotationAxis = XboxController.Axis.kRightX.value;
 
   /* Cameras */
   private final PhotonCamera TagCamera = new PhotonCamera(Constants.VisionConstants.TagCameraName);
@@ -103,32 +99,8 @@ public class RobotContainer {
   private final PhotonCamera BackCamera =
       new PhotonCamera(Constants.VisionConstants.BackupCameraName);
 
-  public final PhotonCamera ArmCamera = new PhotonCamera(Constants.VisionConstants.ArmCameraName);
-
-  // --------------------- Robot Subsystems ----------------------------
-  public final JoystickSubsystem joystickSubsystem = new JoystickSubsystem();
-  public final Swerve swerveSubsystem = new Swerve();
-  public final BotStateSubsystem s_BotState = new BotStateSubsystem();
-  private final PoseEstimatorSubsystem s_poseEstimator =
-      new PoseEstimatorSubsystem(TagCamera, swerveSubsystem);
-
-  public final Pneumatics s_Pneumatics = new Pneumatics();
-  public final Arm s_Arm = new Arm(s_Pneumatics);
-
-  /* Dashboard Subsystems */
-  public final DriveTab s_DriveTab = new DriveTab();
-
-  // The robot's subsystems and commands are defined here...
-  // private final Balance m_Balance = new Balance(swerveSubsystem, s_poseEstimator);
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-
-  public boolean fieldRelative;
-
-  public boolean openLoop;
-
-  // Replace with CommandPS4Controller or CommandJoystick if needed
-  // private final CommandXboxController m_driverController =
-  //    new CommandXboxController(DriverConstants.kControllerPort);
+  @SuppressWarnings({"unused"})
+  private final PhotonCamera ArmCamera = new PhotonCamera(Constants.VisionConstants.ArmCameraName);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -195,14 +167,7 @@ public class RobotContainer {
             swerveModuleIO[Swerve.ModuleId.kRearRight.value]);
 
     swerveSubsystem.setDefaultCommand(
-        new TeleopSwerve(
-            swerveSubsystem,
-            joystickSubsystem.driverController,
-            translationAxis,
-            strafeAxis,
-            rotationAxis,
-            fieldRelative,
-            openLoop));
+        new TeleopSwerve(swerveSubsystem, joystickSubsystem, fieldRelative, openLoop));
 
     swerveSubsystem.registerDashboardTab(dashboardSubsystem);
 
@@ -215,7 +180,8 @@ public class RobotContainer {
     // Configure joystick button bindings
     joystickSubsystem.configureButtonBindings(this);
 
-    joystickSubsystem.configureButtonBindings(this);
+    SmartDashboard.putData("turn Intake Left", new RotateIntake(s_Pneumatics, true));
+    SmartDashboard.putData("turn Intake Right", new RotateIntake(s_Pneumatics, false));
   }
 
   /**
