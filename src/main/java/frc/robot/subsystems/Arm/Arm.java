@@ -65,10 +65,10 @@ public class Arm extends SubsystemBase {
   private static final WPI_TalonFX ArmYMotorMaster =
       new WPI_TalonFX(Constants.ArmConstants.kArmYMotorMasterPort);
 
-  private static final WPI_TalonFX HandBottomRoller =
-      new WPI_TalonFX(Constants.ArmConstants.kHandBottomRollerPort);
-  private static final CANSparkMax HandTopBackRoller =
-      new CANSparkMax(Constants.ArmConstants.kHandTopBackRollerPort, MotorType.kBrushless);
+  private static final WPI_TalonFX HandFrontRoller =
+      new WPI_TalonFX(Constants.ArmConstants.kHandFrontRollerPort);
+  private static final CANSparkMax HandBackRoller =
+      new CANSparkMax(Constants.ArmConstants.kHandBackRollerPort, MotorType.kBrushless);
   private static final WPI_TalonFX ArmYMotorSlave = 
     new WPI_TalonFX(Constants.ArmConstants.kArmYMotorSlavePort);
   
@@ -221,13 +221,13 @@ public class Arm extends SubsystemBase {
       HandBottomRollerSpeedPercent *= -1;
       HandTopBackRollerSpeedPercent *= -1;
     }
-    HandBottomRoller.set(HandBottomRollerSpeedPercent);
-    HandTopBackRoller.set(HandTopBackRollerSpeedPercent);
+    HandFrontRoller.set(HandBottomRollerSpeedPercent);
+    HandBackRoller.set(HandTopBackRollerSpeedPercent);
   }
 
   public static void zeroHandRollers() {
-    HandTopBackRoller.set(0);
-    HandBottomRoller.set(0);
+    HandBackRoller.set(0);
+    HandFrontRoller.set(0);
   }
   ;
 
@@ -240,13 +240,13 @@ public class Arm extends SubsystemBase {
   }
 
   public void intake() {
-    HandBottomRoller.set(0.5);
-    HandTopBackRoller.set(0.5);
+    HandFrontRoller.set(0.5);
+    HandBackRoller.set(0.5);
   }
 
   public void place() {
-    HandBottomRoller.set(-0.5);
-    HandTopBackRoller.set(-0.5);
+    HandFrontRoller.set(-0.5);
+    HandBackRoller.set(-0.5);
   }
 
   @Override
