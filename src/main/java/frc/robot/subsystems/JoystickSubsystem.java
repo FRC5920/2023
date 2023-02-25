@@ -58,10 +58,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.Joystick.AxisProcChain;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.RobotContainer;
-import frc.robot.commands.Arm.ContinuousGetObject;
-import frc.robot.commands.Arm.PlaceObject;
 import frc.robot.commands.Balance;
-import frc.robot.subsystems.Arm.Arm;
 
 /** A subsystem providing/managing Xbox controllers for driving the robot manually */
 public class JoystickSubsystem extends SubsystemBase {
@@ -98,16 +95,7 @@ public class JoystickSubsystem extends SubsystemBase {
   /** Xbox controller used by the robot operator */
   public ProcessedXboxController operatorController;
 
-  /*private final JoystickButton intake =
-      new JoystickButton(driver, XboxController.Axis.kRightTrigger.value);
-  private final JoystickButton eject =
-      new JoystickButton(driver, XboxController.Axis.kLeftTrigger.value);
-  private final JoystickButton armforward =
-      new JoystickButton(driver, XboxController.Button.kX.value);
-  private final JoystickButton armback =
-      new JoystickButton(driver, XboxController.Button.kA.value);
-  */
-
+  /** Button */
   /** Creates a new JoystickSubsystem */
   public JoystickSubsystem() {
     // Configure driver controller stick and trigger processing
@@ -174,55 +162,14 @@ public class JoystickSubsystem extends SubsystemBase {
     // Map buttons on operator controller
     operatorController.A.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.B.onTrue(new InstantCommand(this::doNothing, this));
-    operatorController.X.onTrue(
-        new PlaceObject(
-            botContainer.s_Arm,
-            botContainer.s_BotState.storedGamePiece,
-            Arm.Rank.Medium,
-            Arm.ArmExtenderPosition.MiddleRank));
+    operatorController.X.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.Y.onTrue(new InstantCommand(this::doNothing, this));
-    operatorController.leftBumper.whileTrue(
-        new ContinuousGetObject(
-            Arm.GamePieceType.Cone,
-            botContainer.ArmCamera,
-            botContainer.swerveSubsystem,
-            botContainer.joystickSubsystem.driverController,
-            botContainer.translationAxis,
-            botContainer.strafeAxis,
-            botContainer.rotationAxis,
-            botContainer.fieldRelative,
-            botContainer.openLoop,
-            botContainer.s_Arm,
-            botContainer.s_BotState));
-    operatorController.rightBumper.whileTrue(
-        new ContinuousGetObject(
-            Arm.GamePieceType.Cube,
-            botContainer.ArmCamera,
-            botContainer.swerveSubsystem,
-            botContainer.joystickSubsystem.driverController,
-            botContainer.translationAxis,
-            botContainer.strafeAxis,
-            botContainer.rotationAxis,
-            botContainer.fieldRelative,
-            botContainer.openLoop,
-            botContainer.s_Arm,
-            botContainer.s_BotState));
+    operatorController.leftBumper.whileTrue(new InstantCommand(this::doNothing, this));
+    operatorController.rightBumper.whileTrue(new InstantCommand(this::doNothing, this));
     operatorController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.back.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.start.onTrue(new InstantCommand(this::doNothing, this));
-    operatorController.dPadUp.onTrue(
-        new PlaceObject(
-            botContainer.s_Arm,
-            botContainer.s_BotState.storedGamePiece,
-            Arm.Rank.High,
-            Arm.ArmExtenderPosition.TopRank));
-    operatorController.dPadDown.onTrue(
-        new PlaceObject(
-            botContainer.s_Arm,
-            botContainer.s_BotState.storedGamePiece,
-            Arm.Rank.Low,
-            Arm.ArmExtenderPosition.OnFloor));
   }
 
   @Override
