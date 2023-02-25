@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2023-5920 FIRST and other WPILib contributors.
+// Copyright (c) 2023 FIRST and other WPILib contributors.
 // http://github.com/FRC5920
 // Open Source Software; you can modify and/or share it under the terms of the
 // license given in WPILib-License.md in the root directory of this project.
@@ -49,102 +49,105 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.subsystems.runtimeState;
+package frc.robot.commands.Arm;
 
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotState;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.lib.Joystick.ProcessedXboxController;
+import frc.robot.Constants;
 import frc.robot.subsystems.Arm.Arm;
+import frc.robot.subsystems.SwerveDrivebase.Swerve;
+import frc.robot.subsystems.runtimeState.BotStateSubsystem;
+import org.photonvision.PhotonCamera;
 
-public class BotStateSubsystem extends SubsystemBase {
+public class Fetch extends CommandBase {
+  /** Creates a new Fetch. */
+  private Translation2d translation;
 
-  /** true when manual control is active; else false */
-  private boolean m_manualControl = false;
-  /** true when the robot is shooting; else false */
-  private boolean m_robotIsShooting = false;
-  /** true when motor current limiting is enabled; else false */
-  private boolean m_currentLimitingIsEnabled = false;
-  /** speeds based on Shuffleboard */
-  public static double MaxSpeed = 1;
+  private boolean fieldRelative;
+  private boolean openLoop;
 
-  public static double MaxRotate = 2.5;
+  private Swerve s_Swerve;
+  private ProcessedXboxController controller;
+  private int translationAxis;
+  private int strafeAxis;
+  private int rotationAxis;
 
-  /** Creates an instance of the object */
-  public BotStateSubsystem() {}
+  PhotonCamera fetchCamera;
+  double rotation;
+  PIDController turnController =
+      new PIDController(
+          Constants.ArmConstants.kFetchAngularP, 0, Constants.ArmConstants.kFetchAngularD);
+  Arm.GamePieceType fetchTarget;
 
+  public Fetch(
+      Arm.GamePieceType FetchWhat,
+      PhotonCamera camera,
+      Swerve s_Swerve,
+      ProcessedXboxController controller,
+      int translationAxis,
+      int strafeAxis,
+      int rotationAxis,
+      boolean fieldRelative,
+      boolean openLoop) {
+    // Use addRequirements() here to declare subsystem dependencies.
+    this.s_Swerve = s_Swerve;
+    addRequirements(s_Swerve);
+
+    this.controller = controller;
+    this.translationAxis = translationAxis;
+    this.strafeAxis = strafeAxis;
+    this.rotationAxis = rotationAxis;
+    this.fieldRelative = fieldRelative;
+    this.openLoop = openLoop;
+    fetchCamera = camera;
+    fetchTarget = FetchWhat;
+  }
+
+  // Called when the command is initially scheduled.
   @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
+  public void initialize() {
+    if (fetchTarget == Arm.GamePieceType.Cone) {
+      fetchCamera.setPipelineIndex(Constants.VisionConstants.kConePipelineIndex);
+    } else {
+      fetchCamera.setPipelineIndex(Constants.VisionConstants.kCubePipelineIndex);
+    }
   }
 
-  /**
-   * Gets the current manual control enablement
-   *
-   * @return true if manual control is enabled
-   */
-  public boolean manualControlIsEnabled() {
-    return m_manualControl;
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
+  public void execute() {
+    double yAxis = -controller.getRawAxis(translationAxis);
+    double xAxis = -controller.getRawAxis(strafeAxis);
+
+    yAxis = (Math.abs(yAxis) < Constants.DriverConstants.stickDeadband) ? 0 : yAxis;
+    xAxis = (Math.abs(xAxis) < Constants.DriverConstants.stickDeadband) ? 0 : xAxis;
+
+    var result = fetchCamera.getLatestResult();
+
+    if (result.hasTargets()) {
+      // Calculate angular turn power
+      // -1.0 required to ensure positive PID controller effort _increases_ yaw
+      rotation = -turnController.calculate(result.getBestTarget().getYaw(), 0);
+    } else {
+      // If we have no targets, stay still.
+      rotation = 0;
+    }
+    translation = new Translation2d(yAxis, xAxis).times(BotStateSubsystem.MaxSpeed);
+    rotation *= BotStateSubsystem.MaxRotate;
+    s_Swerve.drive(translation, rotation, fieldRelative, openLoop);
   }
 
-  /**
-   * Enables/disables manual control
-   *
-   * @param enable true to enable manual control; else false
-   */
-  public void enableManualControl(boolean enable) {
-    m_manualControl = enable;
+  // Called once the command ends or is interrupted.
+  @Override
+  public void end(boolean interrupted) {
+    fetchCamera.setPipelineIndex(Constants.VisionConstants.kDriverCameraPipelineIndex);
   }
 
-  /**
-   * Returns whether the robot is shooting or not
-   *
-   * @return true if the robot is presently shooting; else false
-   */
-  public boolean robotIsShooting() {
-    return m_robotIsShooting;
+  // Returns true when the command should end.
+  @Override
+  public boolean isFinished() {
+    return false;
   }
-
-  /**
-   * Returns whether the present alliance is the Red alliance
-   *
-   * @return true if the present alliance is Red; else false
-   */
-  public boolean isRedAlliance() {
-    return DriverStation.Alliance.Red == DriverStation.getAlliance();
-  }
-
-  /**
-   * Returns whether the present alliance is the Blue alliance
-   *
-   * @return true if the present alliance is Blue; else false
-   */
-  public boolean isBlueAlliance() {
-    return DriverStation.Alliance.Blue == DriverStation.getAlliance();
-  }
-
-  /** Sets whether the */
-  /** Returns true if the robot is being driven in Manual, tele-operated mode */
-  public boolean robotIsInManualTeleOpMode() {
-    return (RobotState.isEnabled() && RobotState.isTeleop() && m_manualControl);
-  }
-
-  /**
-   * Gets the enablement of motor current limiting
-   *
-   * @return true if motor current limiting is enabled; else false
-   */
-  public boolean getCurrentLimitEnabled() {
-    return m_currentLimitingIsEnabled;
-  }
-
-  /**
-   * Sets motor current limiting enablement
-   *
-   * @param enabled true to enable motor current limiting; else false to disable
-   */
-  public void setCurrentLimitEnabled(boolean enabled) {
-    m_currentLimitingIsEnabled = enabled;
-  }
-
-  public Arm.GamePieceType storedGamePiece;
 }

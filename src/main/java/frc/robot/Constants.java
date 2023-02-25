@@ -275,6 +275,11 @@ public final class Constants {
     static final String TagCameraName = "Heimdall_Tag_Camera";
     static final String ArmCameraName = "Arm_Camera";
     static final String BackupCameraName = "Heimdall_Backup_Cam";
+
+    // pipeline indexes
+    public static final int kConePipelineIndex = 1;
+    public static final int kCubePipelineIndex = 0;
+    public static final int kDriverCameraPipelineIndex = -1;
   }
 
   /** A map of directories where log files should be stored */
