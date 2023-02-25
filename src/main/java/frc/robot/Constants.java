@@ -87,8 +87,8 @@ public final class Constants {
     public static final int kArmYMotorSlavePort = 6;
     public static final int kHandFrontRollerPort = 5;
     public static final int kHandBackRollerPort = 20;
+    public static final int kArmExtenderPort = 8;
 
-    public static final int kArmExtenderPort = 20;
     public static final int kArmStoredPosition = 0;
     public static final int kArmIntakePosition = 500;
     public static final int kArmPlaceHighPosition = 2500;
