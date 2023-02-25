@@ -49,78 +49,36 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.lib.SwerveDrive;
+package frc.robot.subsystems.Dashboard;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import frc.robot.Constants;
+import frc.robot.RobotContainer;
 
-public class SwerveModule {
-  public int moduleNumber;
-  private Rotation2d m_lastAngle;
-
-  private SwerveModuleIO m_moduleIO;
-  private SwerveModuleIOTelemetryAutoLogged m_loggedTelemetry =
-      new SwerveModuleIOTelemetryAutoLogged();
-
-  public SwerveModule(
-      int moduleNumber, SwerveModuleIO moduleIO) { // SwerveModuleConstants moduleConstants) {
-    this.moduleNumber = moduleNumber;
-    this.m_moduleIO = moduleIO;
-    m_lastAngle = getState().angle;
-  }
-
-  public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
-    /* This is a custom optimize function, since default WPILib optimize assumes continuous controller which CTRE and Rev onboard is not */
-    desiredState = CTREModuleState.optimize(desiredState, getState().angle);
-    setAngle(desiredState);
-    setSpeed(desiredState, isOpenLoop);
-  }
-
-  private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
-    m_moduleIO.setSpeed(desiredState.speedMetersPerSecond, isOpenLoop);
-  }
-
-  private void setAngle(SwerveModuleState desiredState) {
-    Rotation2d angle =
-        (Math.abs(desiredState.speedMetersPerSecond)
-                <= (Constants.SwerveDrivebaseConstants.maxSpeed * 0.01))
-            ? m_lastAngle
-            : desiredState
-                .angle; // Prevent rotating module if speed is less then 1%. Prevents Jittering.
-
-    m_moduleIO.setAngle(angle);
-    m_lastAngle = angle;
-  }
-
-  public Rotation2d getAngle() {
-    return m_moduleIO.getAngle();
-  }
-
-  public void resetToAbsolute() {
-    m_moduleIO.resetToAbsolute();
-  }
-
-  public SwerveModuleState getState() {
-    return new SwerveModuleState(m_moduleIO.getSpeed(), m_moduleIO.getAngle());
-  }
-
-  public SwerveModulePosition getPosition() {
-    return new SwerveModulePosition(m_moduleIO.getDistance(), getAngle());
-  }
-
-  /** Update logged input values */
-  public void updateLoggedInputs() {
-    m_moduleIO.updateLoggedInputs(m_loggedTelemetry);
-  }
+/** Interface implemented by dashboard tabs registered with the DashboardSubsystem */
+public interface IDashboardTab {
 
   /**
-   * Returns the module's telemetry values
+   * Called to create and initialize dashboard widgets in the tab
    *
-   * @return A SwerveModuleIOInputs object containing the module's telemetry values
+   * @param botContainer A reference to the global RobotContainer containing robot subsystems
    */
-  public SwerveModuleIO.SwerveModuleIOTelemetry getIOTelemetry() {
-    return m_loggedTelemetry;
+  public void initDashboard(RobotContainer botContainer);
+
+  /**
+   * Called each processing cycle to update dashboard widgets
+   *
+   * @param botContainer A reference to the global RobotContainer containing robot subsystems
+   */
+  public void updateDashboard(RobotContainer botContainer);
+
+  /**
+   * Called each processing cycle in simulation mode only to update dashboard widgets
+   *
+   * @param botContainer A reference to the global RobotContainer containing robot subsystems
+   * @remarks By default, this method simply calls the normal updateDashboard() method. It's only
+   *     necessary to override this method if your dashboard tab does something specific in
+   *     simulation mode that wouldn't happen during normal execution.
+   */
+  public default void updateSimulationDashboard(RobotContainer botContainer) {
+    updateDashboard(botContainer);
   }
 }

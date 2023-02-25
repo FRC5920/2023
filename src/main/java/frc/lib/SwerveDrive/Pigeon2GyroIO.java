@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2023 FIRST and other WPILib contributors.
+// Copyright (c) 2023-6328 FIRST and other WPILib contributors.
 // http://github.com/FRC5920
 // Open Source Software; you can modify and/or share it under the terms of the
 // license given in WPILib-License.md in the root directory of this project.
@@ -49,20 +49,41 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot;
+package frc.lib.SwerveDrive;
 
-/** Automatically generated file containing build version information. */
-public final class GenBuildInfo {
-  public static final String MAVEN_GROUP = "";
-  public static final String MAVEN_NAME = "2023";
-  public static final String VERSION = "unspecified";
-  public static final int GIT_REVISION = 109;
-  public static final String GIT_SHA = "1ecbadb8a29aec0f81648543916df9d050941fc1";
-  public static final String GIT_DATE = "2023-02-22 18:01:14 PST";
-  public static final String GIT_BRANCH = "Arm";
-  public static final String BUILD_DATE = "2023-02-23 09:41:58 PST";
-  public static final long BUILD_UNIX_TIME = 1677174118082L;
-  public static final int DIRTY = 1;
+import com.ctre.phoenix.ErrorCode;
+import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 
-  private GenBuildInfo() {}
+/** IO implementation for Pigeon2 */
+public class Pigeon2GyroIO implements GyroIO {
+  private final WPI_Pigeon2 pigeon;
+  private final double[] yprDegrees = new double[3];
+  private final double[] xyzDps = new double[3];
+
+  public Pigeon2GyroIO(int canID, String canBus) {
+    pigeon = new WPI_Pigeon2(canID, canBus);
+    pigeon.configFactoryDefault();
+    pigeon.zeroGyroBiasNow();
+    pigeon.setYaw(0.0);
+  }
+
+  public void setYaw(Rotation2d angle) {
+    pigeon.setYaw(angle.getDegrees());
+  }
+
+  /** Get gyro measurements */
+  @Override
+  public void updateInputs(GyroInputs OUTmeasurements) {
+    pigeon.getYawPitchRoll(yprDegrees);
+    pigeon.getRawGyro(xyzDps);
+    OUTmeasurements.isConnected = pigeon.getLastError().equals(ErrorCode.OK);
+    OUTmeasurements.rollRad = Units.degreesToRadians(yprDegrees[1]);
+    OUTmeasurements.pitchRad = Units.degreesToRadians(-yprDegrees[2]);
+    OUTmeasurements.yawRad = Units.degreesToRadians(yprDegrees[0]);
+    OUTmeasurements.rollVelocityRadPerSec = Units.degreesToRadians(xyzDps[1]);
+    OUTmeasurements.pitchVelocityRadPerSec = Units.degreesToRadians(-xyzDps[0]);
+    OUTmeasurements.yawVelocityRadPerSec = Units.degreesToRadians(xyzDps[2]);
+  }
 }

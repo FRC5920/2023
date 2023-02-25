@@ -49,78 +49,44 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.lib.SwerveDrive;
+package frc.robot.commands.Arm;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import frc.robot.Constants;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.Pneumatics.Pneumatics;
 
-public class SwerveModule {
-  public int moduleNumber;
-  private Rotation2d m_lastAngle;
+public class RotateIntake extends CommandBase {
+  private boolean rotateLeft;
+  private Pneumatics s_Pneumatics;
 
-  private SwerveModuleIO m_moduleIO;
-  private SwerveModuleIOTelemetryAutoLogged m_loggedTelemetry =
-      new SwerveModuleIOTelemetryAutoLogged();
-
-  public SwerveModule(
-      int moduleNumber, SwerveModuleIO moduleIO) { // SwerveModuleConstants moduleConstants) {
-    this.moduleNumber = moduleNumber;
-    this.m_moduleIO = moduleIO;
-    m_lastAngle = getState().angle;
+  /** Creates a new RotateIntake. */
+  public RotateIntake(Pneumatics s_Pneumatics, boolean RotateLeft) {
+    this.s_Pneumatics = s_Pneumatics;
+    this.rotateLeft = RotateLeft;
+    // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(s_Pneumatics);
   }
 
-  public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
-    /* This is a custom optimize function, since default WPILib optimize assumes continuous controller which CTRE and Rev onboard is not */
-    desiredState = CTREModuleState.optimize(desiredState, getState().angle);
-    setAngle(desiredState);
-    setSpeed(desiredState, isOpenLoop);
+  // Called when the command is initially scheduled.
+  @Override
+  public void initialize() {}
+
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
+  public void execute() {
+    if (rotateLeft) {
+      s_Pneumatics.goingForward();
+    } else {
+      s_Pneumatics.goingBackward();
+    }
   }
 
-  private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
-    m_moduleIO.setSpeed(desiredState.speedMetersPerSecond, isOpenLoop);
-  }
+  // Called once the command ends or is interrupted.
+  @Override
+  public void end(boolean interrupted) {}
 
-  private void setAngle(SwerveModuleState desiredState) {
-    Rotation2d angle =
-        (Math.abs(desiredState.speedMetersPerSecond)
-                <= (Constants.SwerveDrivebaseConstants.maxSpeed * 0.01))
-            ? m_lastAngle
-            : desiredState
-                .angle; // Prevent rotating module if speed is less then 1%. Prevents Jittering.
-
-    m_moduleIO.setAngle(angle);
-    m_lastAngle = angle;
-  }
-
-  public Rotation2d getAngle() {
-    return m_moduleIO.getAngle();
-  }
-
-  public void resetToAbsolute() {
-    m_moduleIO.resetToAbsolute();
-  }
-
-  public SwerveModuleState getState() {
-    return new SwerveModuleState(m_moduleIO.getSpeed(), m_moduleIO.getAngle());
-  }
-
-  public SwerveModulePosition getPosition() {
-    return new SwerveModulePosition(m_moduleIO.getDistance(), getAngle());
-  }
-
-  /** Update logged input values */
-  public void updateLoggedInputs() {
-    m_moduleIO.updateLoggedInputs(m_loggedTelemetry);
-  }
-
-  /**
-   * Returns the module's telemetry values
-   *
-   * @return A SwerveModuleIOInputs object containing the module's telemetry values
-   */
-  public SwerveModuleIO.SwerveModuleIOTelemetry getIOTelemetry() {
-    return m_loggedTelemetry;
+  // Returns true when the command should end.
+  @Override
+  public boolean isFinished() {
+    return false;
   }
 }

@@ -49,78 +49,69 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.lib.SwerveDrive;
+package frc.robot.subsystems.Dashboard;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import frc.robot.Constants;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
+import java.util.ArrayList;
 
-public class SwerveModule {
-  public int moduleNumber;
-  private Rotation2d m_lastAngle;
+/**
+ * The Dashboard subsystem manages a collection of dashboard tabs displayed in the Shuffleboard user
+ * interface. Other subsystems of the robot can add their own dashboard tab by calling
+ * DashboardSubsystem.add(). After all tabs have been added in this manner,
+ * DashboardSubsystem.initialize() must be called to call the initDashboard() method of all tabs
+ * added to the subsystem. Subsequently, all tabs managed by the DashboardSubsystem have their
+ * updateDashboard() method called when the DashboardSubsystem is processed by the scheduler. If
+ * running in simulation mode, all tabs have their updateSimulationDashboard() method called
+ * instead.
+ */
+public class DashboardSubsystem extends SubsystemBase {
 
-  private SwerveModuleIO m_moduleIO;
-  private SwerveModuleIOTelemetryAutoLogged m_loggedTelemetry =
-      new SwerveModuleIOTelemetryAutoLogged();
+  private final ArrayList<IDashboardTab> m_dashboardTabs;
+  private RobotContainer m_botContainer;
 
-  public SwerveModule(
-      int moduleNumber, SwerveModuleIO moduleIO) { // SwerveModuleConstants moduleConstants) {
-    this.moduleNumber = moduleNumber;
-    this.m_moduleIO = moduleIO;
-    m_lastAngle = getState().angle;
-  }
-
-  public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
-    /* This is a custom optimize function, since default WPILib optimize assumes continuous controller which CTRE and Rev onboard is not */
-    desiredState = CTREModuleState.optimize(desiredState, getState().angle);
-    setAngle(desiredState);
-    setSpeed(desiredState, isOpenLoop);
-  }
-
-  private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
-    m_moduleIO.setSpeed(desiredState.speedMetersPerSecond, isOpenLoop);
-  }
-
-  private void setAngle(SwerveModuleState desiredState) {
-    Rotation2d angle =
-        (Math.abs(desiredState.speedMetersPerSecond)
-                <= (Constants.SwerveDrivebaseConstants.maxSpeed * 0.01))
-            ? m_lastAngle
-            : desiredState
-                .angle; // Prevent rotating module if speed is less then 1%. Prevents Jittering.
-
-    m_moduleIO.setAngle(angle);
-    m_lastAngle = angle;
-  }
-
-  public Rotation2d getAngle() {
-    return m_moduleIO.getAngle();
-  }
-
-  public void resetToAbsolute() {
-    m_moduleIO.resetToAbsolute();
-  }
-
-  public SwerveModuleState getState() {
-    return new SwerveModuleState(m_moduleIO.getSpeed(), m_moduleIO.getAngle());
-  }
-
-  public SwerveModulePosition getPosition() {
-    return new SwerveModulePosition(m_moduleIO.getDistance(), getAngle());
-  }
-
-  /** Update logged input values */
-  public void updateLoggedInputs() {
-    m_moduleIO.updateLoggedInputs(m_loggedTelemetry);
+  /** Creates a new Dashboard. */
+  public DashboardSubsystem() {
+    m_dashboardTabs = new ArrayList<IDashboardTab>();
   }
 
   /**
-   * Returns the module's telemetry values
+   * Adds a dashboard tab to be managed by the subsystem
    *
-   * @return A SwerveModuleIOInputs object containing the module's telemetry values
+   * @param tab The dashboard tab to add
    */
-  public SwerveModuleIO.SwerveModuleIOTelemetry getIOTelemetry() {
-    return m_loggedTelemetry;
+  public void add(IDashboardTab tab) {
+    m_dashboardTabs.add(tab);
+  }
+
+  /**
+   * Calling this method calls initDashboard() on each dashboard tab managed by the subsystem
+   *
+   * @param botContainer A reference to the global RobotContainer instance
+   */
+  public void initialize(RobotContainer botContainer) {
+    m_botContainer = botContainer;
+    for (IDashboardTab tab : m_dashboardTabs) {
+      tab.initDashboard(botContainer);
+    }
+  }
+
+  /** Called by the scheduler during each processing cycle to service all dashboard tabs */
+  @Override
+  public void periodic() {
+    for (IDashboardTab tab : m_dashboardTabs) {
+      tab.updateDashboard(m_botContainer);
+    }
+  }
+
+  /**
+   * Called by the scheduler during each processing cycle in simulation mode to service all
+   * dashboard tabs
+   */
+  @Override
+  public void simulationPeriodic() {
+    for (IDashboardTab tab : m_dashboardTabs) {
+      tab.updateSimulationDashboard(m_botContainer);
+    }
   }
 }

@@ -55,9 +55,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -145,15 +143,6 @@ public final class Constants {
     public static final double trackWidth = Units.inchesToMeters(18.75); // /stock 21.73
     public static final double wheelBase = Units.inchesToMeters(18.75); // stock 21.73
     public static final double wheelCircumference = chosenModule.wheelCircumference;
-
-    /* Swerve Kinematics
-     * No need to ever change this unless you are not doing a traditional rectangular/square 4 module swerve */
-    public static final SwerveDriveKinematics swerveKinematics =
-        new SwerveDriveKinematics(
-            new Translation2d(wheelBase / 2.0, trackWidth / 2.0),
-            new Translation2d(wheelBase / 2.0, -trackWidth / 2.0),
-            new Translation2d(-wheelBase / 2.0, trackWidth / 2.0),
-            new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0));
 
     /* Module Gear Ratios */
     public static final double driveGearRatio = chosenModule.driveGearRatio;
@@ -272,18 +261,23 @@ public final class Constants {
             kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
   }
 
+  public static class PneumaticsConstants {
+    public static final int kPDHCAN = 62;
+    public static final int kArmLeftRotatorPort = 0;
+    public static final int kArmRightRotatorPort = 1;
+  }
+
   public static class VisionConstants {
 
     public static final double fiducialAmbiguityLimit = 0.2;
     /** Physical location of the camera on the robot, relative to the center of the robot. */
     // TODO: get the actual location of the tag camera to the robot transform
     public static final Transform3d CAMERA_TO_ROBOT =
-        new Transform3d(
-            new Translation3d(0.5, 0.0, 0.5),
-            new Rotation3d(
-                0, 0,
-                0)); // Cam mounted facing forward, half a meter forward of center, half a meter up
-    // from center.
+    new Transform3d(
+        new Translation3d(0.0952, 0.0, 0.2794),
+        new Rotation3d(
+            0, 0,
+            Math.toRadians(180))); 
 
     public static final Transform3d ROBOT_TO_CAMERA = CAMERA_TO_ROBOT.inverse();
     static final String TagCameraName = "Heimdall_Tag_Camera";

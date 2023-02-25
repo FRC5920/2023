@@ -61,6 +61,7 @@ import frc.robot.RobotContainer;
 import frc.robot.commands.Arm.ContinuousGetObject;
 import frc.robot.commands.Arm.PlaceObject;
 import frc.robot.subsystems.Arm.Arm;
+import frc.robot.commands.Balance;
 
 /** A subsystem providing/managing Xbox controllers for driving the robot manually */
 public class JoystickSubsystem extends SubsystemBase {
@@ -157,6 +158,7 @@ public class JoystickSubsystem extends SubsystemBase {
    * @param botContainer Object providing access to robot subsystems
    */
   public void configureButtonBindings(RobotContainer botContainer) {
+
     // Map buttons on driver controller
     driverController.A.onTrue(new InstantCommand(this::doNothing, this));
     driverController.B.onTrue(new InstantCommand(this::doNothing, this));
@@ -167,7 +169,7 @@ public class JoystickSubsystem extends SubsystemBase {
     driverController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.back.onTrue(new InstantCommand(this::doNothing, this));
-    driverController.start.onTrue(new InstantCommand(this::doNothing, this));
+    driverController.start.whileTrue(new Balance(botContainer.swerveSubsystem));
 
     // Map buttons on operator controller
     operatorController.A.onTrue(new InstantCommand(this::doNothing, this));

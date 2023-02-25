@@ -106,12 +106,12 @@ public class Balance extends CommandBase {
     omegaController.setGoal(drivetrainSubsystem.getYaw().getRadians());
 
     // Drive to the target
-    var xSpeed = xController.calculate(drivetrainSubsystem.getRoll());
+    var xSpeed = xController.calculate(drivetrainSubsystem.getRoll().getRadians());
     if (xController.atSetpoint()) {
       xSpeed = 0;
     }
 
-    var ySpeed = yController.calculate(drivetrainSubsystem.getPitch());
+    var ySpeed = yController.calculate(drivetrainSubsystem.getPitch().getRadians());
     if (yController.atSetpoint()) {
       ySpeed = 0;
     }

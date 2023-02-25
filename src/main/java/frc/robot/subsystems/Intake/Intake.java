@@ -49,78 +49,32 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.lib.SwerveDrive;
+package frc.robot.subsystems.Intake;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import frc.robot.Constants;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class SwerveModule {
-  public int moduleNumber;
-  private Rotation2d m_lastAngle;
+public class Intake extends SubsystemBase {
+  /** Creates a new Intake. */
+  WPI_TalonFX m_armMotor;
 
-  private SwerveModuleIO m_moduleIO;
-  private SwerveModuleIOTelemetryAutoLogged m_loggedTelemetry =
-      new SwerveModuleIOTelemetryAutoLogged();
+  WPI_TalonFX m_takeUpMotor;
+  XboxController myController;
 
-  public SwerveModule(
-      int moduleNumber, SwerveModuleIO moduleIO) { // SwerveModuleConstants moduleConstants) {
-    this.moduleNumber = moduleNumber;
-    this.m_moduleIO = moduleIO;
-    m_lastAngle = getState().angle;
+  public Intake() {
+
+    m_takeUpMotor = new WPI_TalonFX(6);
+    m_armMotor = new WPI_TalonFX(5);
+    myController = new XboxController(1);
   }
 
-  public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
-    /* This is a custom optimize function, since default WPILib optimize assumes continuous controller which CTRE and Rev onboard is not */
-    desiredState = CTREModuleState.optimize(desiredState, getState().angle);
-    setAngle(desiredState);
-    setSpeed(desiredState, isOpenLoop);
-  }
-
-  private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
-    m_moduleIO.setSpeed(desiredState.speedMetersPerSecond, isOpenLoop);
-  }
-
-  private void setAngle(SwerveModuleState desiredState) {
-    Rotation2d angle =
-        (Math.abs(desiredState.speedMetersPerSecond)
-                <= (Constants.SwerveDrivebaseConstants.maxSpeed * 0.01))
-            ? m_lastAngle
-            : desiredState
-                .angle; // Prevent rotating module if speed is less then 1%. Prevents Jittering.
-
-    m_moduleIO.setAngle(angle);
-    m_lastAngle = angle;
-  }
-
-  public Rotation2d getAngle() {
-    return m_moduleIO.getAngle();
-  }
-
-  public void resetToAbsolute() {
-    m_moduleIO.resetToAbsolute();
-  }
-
-  public SwerveModuleState getState() {
-    return new SwerveModuleState(m_moduleIO.getSpeed(), m_moduleIO.getAngle());
-  }
-
-  public SwerveModulePosition getPosition() {
-    return new SwerveModulePosition(m_moduleIO.getDistance(), getAngle());
-  }
-
-  /** Update logged input values */
-  public void updateLoggedInputs() {
-    m_moduleIO.updateLoggedInputs(m_loggedTelemetry);
-  }
-
-  /**
-   * Returns the module's telemetry values
-   *
-   * @return A SwerveModuleIOInputs object containing the module's telemetry values
-   */
-  public SwerveModuleIO.SwerveModuleIOTelemetry getIOTelemetry() {
-    return m_loggedTelemetry;
+  @Override
+  public void periodic() {
+    // This method will be called once per scheduler run
+    m_armMotor.setNeutralMode(NeutralMode.Brake);
+    m_armMotor.set(ControlMode.PercentOutput, myController.getRightY());
   }
 }
