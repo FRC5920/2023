@@ -82,11 +82,7 @@ public final class Constants {
     return RobotBase.isReal() ? Mode.REAL : (kLogPlaybackIsEnabled ? Mode.REPLAY : Mode.SIM);
   }
 
-  public static class PneumaticsConstants {
-    public static final int kPDHCAN = 10;
-    public static final int kArmLeftRotatorPort = 0;
-    public static final int kArmRightRotatorPort = 1;
-  }
+
 
   public static class ArmConstants {
     public static final int kArmYMotorMasterPort = 5;
