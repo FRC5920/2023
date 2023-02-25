@@ -63,7 +63,7 @@ import frc.lib.SwerveDrive.SwerveModuleIO;
 import frc.robot.commands.*;
 import frc.robot.commands.Arm.RotateIntake;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.Arm.Arm;
+import frc.robot.subsystems.Arm.*;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 import frc.robot.subsystems.Heimdall.*;
 import frc.robot.subsystems.Intake.Intake;
