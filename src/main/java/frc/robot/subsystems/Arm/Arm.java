@@ -54,8 +54,6 @@ package frc.robot.subsystems.Arm;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -71,8 +69,8 @@ public class Arm extends SubsystemBase {
 
   private static final WPI_TalonFX HandFrontRoller =
       new WPI_TalonFX(Constants.ArmConstants.kHandFrontRollerPort);
-  private static final CANSparkMax HandBackRoller =
-      new CANSparkMax(Constants.ArmConstants.kHandBackRollerPort, MotorType.kBrushless);
+  // private static final CANSparkMax HandBackRoller =
+  //   new CANSparkMax(Constants.ArmConstants.kHandBackRollerPort, MotorType.kBrushless);
   private static final WPI_TalonFX ArmYMotorSlave =
       new WPI_TalonFX(Constants.ArmConstants.kArmYMotorSlavePort);
 
@@ -226,11 +224,11 @@ public class Arm extends SubsystemBase {
       HandTopBackRollerSpeedPercent *= -1;
     }
     HandFrontRoller.set(HandBottomRollerSpeedPercent);
-    HandBackRoller.set(HandTopBackRollerSpeedPercent);
+    // HandBackRoller.set(HandTopBackRollerSpeedPercent);
   }
 
   public static void zeroHandRollers() {
-    HandBackRoller.set(0);
+    // HandBackRoller.set(0);
     HandFrontRoller.set(0);
   }
   ;
@@ -245,12 +243,12 @@ public class Arm extends SubsystemBase {
 
   public void intake() {
     HandFrontRoller.set(0.5);
-    HandBackRoller.set(0.5);
+    // HandBackRoller.set(0.5);
   }
 
   public void place() {
     HandFrontRoller.set(-0.5);
-    HandBackRoller.set(-0.5);
+    // HandBackRoller.set(-0.5);
   }
 
   @Override
