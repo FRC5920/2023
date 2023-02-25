@@ -106,7 +106,6 @@ public class RobotContainer {
     boolean openLoop = true;
     SwerveModuleIO swerveModuleIO[];
     GyroIO gyroIO;
-    
 
     // Instantiate active subsystems
     switch (Constants.getMode()) {

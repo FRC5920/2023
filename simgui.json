@@ -27,7 +27,9 @@
       "/Shuffleboard/SwerveDrive/RearLeft/Angle/Degrees": "Gyro",
       "/Shuffleboard/SwerveDrive/RearRight/Angle Deg": "Gyro",
       "/Shuffleboard/SwerveDrive/RearRight/Angle/Degrees": "Gyro",
-      "/Shuffleboard/Vision/Field": "Field2d"
+      "/Shuffleboard/Vision/Field": "Field2d",
+      "/SmartDashboard/turn Intake Left": "Command",
+      "/SmartDashboard/turn Intake Right": "Command"
     }
   },
   "NetworkTables": {

@@ -223,7 +223,7 @@ public final class Constants {
   }
 
   public static class PneumaticsConstants {
-    public static final int kPDHCAN = 10;
+    public static final int kPDHCAN = 62;
     public static final int kArmLeftRotatorPort = 0;
     public static final int kArmRightRotatorPort = 1;
   }
