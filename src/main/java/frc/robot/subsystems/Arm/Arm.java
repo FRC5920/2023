@@ -56,12 +56,15 @@ import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Pneumatics.Pneumatics;
 
 public class Arm extends SubsystemBase {
+  // TODO: Testing
+  public XboxController opXboxController = new XboxController(1);
   /** Creates a new Arm. */
   private static final WPI_TalonFX ArmYMotorMaster =
       new WPI_TalonFX(Constants.ArmConstants.kArmYMotorMasterPort);
@@ -253,6 +256,13 @@ public class Arm extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+
+    // TODO: Testing Code
+    ArmYMotorMaster.set(
+        TalonFXControlMode.PercentOutput, opXboxController.getLeftX(), null, HandRollerSpeed);
+    ArmExtender.set(TalonFXControlMode.PercentOutput, opXboxController.getRightY());
+    //
+
     SmartDashboard.putNumber(
         "ArmYMotor Encoder Value", (ArmYMotorMaster.getSelectedSensorPosition()));
   }
