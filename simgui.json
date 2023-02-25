@@ -1,4 +1,16 @@
 {
+  "HALProvider": {
+    "PowerDistributions": {
+      "0": {
+        "PowerDistribution[0]": {
+          "open": true
+        }
+      },
+      "window": {
+        "visible": true
+      }
+    }
+  },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
@@ -15,10 +27,15 @@
       "/Shuffleboard/SwerveDrive/RearLeft/Angle/Degrees": "Gyro",
       "/Shuffleboard/SwerveDrive/RearRight/Angle Deg": "Gyro",
       "/Shuffleboard/SwerveDrive/RearRight/Angle/Degrees": "Gyro",
-      "/Shuffleboard/Vision/Field": "Field2d"
+      "/Shuffleboard/Vision/Field": "Field2d",
+      "/SmartDashboard/turn Intake Left": "Command",
+      "/SmartDashboard/turn Intake Right": "Command"
     }
   },
   "NetworkTables": {
+    "Retained Values": {
+      "open": false
+    },
     "transitory": {
       "AdvantageKit": {
         "RealMetadata": {
@@ -50,6 +67,9 @@
           },
           "open": true
         },
+        "open": true
+      },
+      "photonvision": {
         "open": true
       }
     }

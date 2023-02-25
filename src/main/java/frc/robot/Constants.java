@@ -222,6 +222,12 @@ public final class Constants {
             kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
   }
 
+  public static class PneumaticsConstants {
+    public static final int kPDHCAN = 62;
+    public static final int kArmLeftRotatorPort = 0;
+    public static final int kArmRightRotatorPort = 1;
+  }
+
   public static class VisionConstants {
 
     public static final double fiducialAmbiguityLimit = 0.2;
