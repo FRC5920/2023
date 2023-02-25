@@ -51,6 +51,9 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.autos;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.FieldConstants;
 import java.util.*;
@@ -61,17 +64,29 @@ public class AutoConstants {
   public static class BotDimensions {
 
     /** Width of the square internal swerve drive base, bumpers not included */
-    private static double kDriveBaseWidthMeters = Units.inchesToMeters(26);
+    private static final double kDriveBaseWidthMeters = Units.inchesToMeters(26);
     /**
      * Distance from the drive base to the outside edge of the bumper on a given side of the robot
      */
-    private static double kBumperWidthMeters = Units.inchesToMeters(3.25);
+    private static final double kBumperWidthMeters = Units.inchesToMeters(3.25);
 
     /** Total width of the (square) robot footprint in meters */
-    public static double kFootprintWidth = kDriveBaseWidthMeters + (2 * kBumperWidthMeters);
+    private static final double kFootprintWidth = kDriveBaseWidthMeters + (2 * kBumperWidthMeters);
 
     /** Half the robot footprint width (i.e. the center of the robot) */
-    public static double kHalfFootprintWidth = kFootprintWidth / 2;
+    private static final double kHalfFootprintWidth = kFootprintWidth / 2;
+  }
+
+  /** Constants indicating the robot's rotational orientation */
+  public static class BotRotation {
+    /** Bot is rotated toward Grids */
+    public static final Rotation2d kFacingGrid = new Rotation2d(Math.PI);
+    /** Bot is rotated toward the middle of the field */
+    public static final Rotation2d kFacingField = new Rotation2d(0.0);
+    /** Bot is rotated facing in the opposite direction of the scoring table */
+    public static final Rotation2d kFacingNorth = new Rotation2d(Math.PI / 2);
+    /** Bot is rotated facing the scoring table */
+    public static final Rotation2d kFacingSouth = new Rotation2d(1.5 * Math.PI);
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -103,19 +118,20 @@ public class AutoConstants {
       E(4),
       F(5),
       G(6),
-      H(7);
+      H(7),
+      I(8);
 
       private static final Map<String, ScoringPosition> nameMap =
-          Map.of("A", A, "B", B, "C", C, "D", D, "E", E, "F", F, "G", G, "H", H);
+          Map.of("A", A, "B", B, "C", C, "D", D, "E", E, "F", F, "G", G, "H", H, "I", I);
 
       private final int id;
-      private final double x; // X coordinate
-      private final double y; // Y coordinate
+      public final Pose2d pose;
 
       private ScoringPosition(int idx) {
         id = idx;
-        x = kRobotCenterX;
-        y = kFirstGridCenterY + (kDistanceBetweenGridCenters * id);
+        double x = kRobotCenterX;
+        double y = kFirstGridCenterY + (kDistanceBetweenGridCenters * id);
+        pose = new Pose2d(x, y, BotRotation.kFacingGrid);
       }
 
       /** Get the human-readable name of the robot type */
@@ -212,20 +228,22 @@ public class AutoConstants {
       private static final Map<String, ID> nameMap = Map.of("Inside", Inside, "Outside", Outside);
 
       private final int id;
-      private final double xNorthSouth; // X-coordinate of the lane's North-South section
-      private final double yUpperEastWest; // Y-coordinate of the lane's upper East-West section
-      private final double yLowerEastWest; // Y-coordinate of the lane's upper East-West section
+      public final double xNorthSouthCenter; // X-coordinate of the lane's North-South section
+      public final double
+          yUpperEastWestCenter; // Y-coordinate of the lane's upper East-West section
+      public final double
+          yLowerEastWestCenter; // Y-coordinate of the lane's upper East-West section
 
       private ID(int idx) {
         id = idx;
         if (id == 0) {
-          xNorthSouth = kNSInsideCenterX;
-          yUpperEastWest = kUpperEastWestInsideCenterY;
-          yLowerEastWest = kLowerEastWestInsideCenterY;
+          xNorthSouthCenter = kNSInsideCenterX;
+          yUpperEastWestCenter = kUpperEastWestInsideCenterY;
+          yLowerEastWestCenter = kLowerEastWestInsideCenterY;
         } else {
-          xNorthSouth = kNSOutsideCenterX;
-          yUpperEastWest = kUpperEastWestOutsideCenterY;
-          yLowerEastWest = kLowerEastWestOutsideCenterY;
+          xNorthSouthCenter = kNSOutsideCenterX;
+          yUpperEastWestCenter = kUpperEastWestOutsideCenterY;
+          yLowerEastWestCenter = kLowerEastWestOutsideCenterY;
         }
       }
 
@@ -292,13 +310,13 @@ public class AutoConstants {
               Z);
 
       private final int id;
-      private final double x; // X coordinate
-      private final double y; // Y coordinate
 
-      private ID(int idx, double xLoc, double yLoc) {
+      /** Coordinates on the field */
+      public final Translation2d coordinates;
+
+      private ID(int idx, double x, double y) {
         id = idx;
-        x = xLoc;
-        y = yLoc;
+        coordinates = new Translation2d(x, y);
       }
 
       /** Get the human-readable name of the robot type */
@@ -336,13 +354,15 @@ public class AutoConstants {
         Map.of("C1", C1, "C2", C2, "C3", C3, "C4", C4);
 
     private final int id;
-    private final double x; // X coordinate
-    private final double y; // Y coordinate
+
+    /** Coordinates on the field */
+    public final Translation2d coordinates;
 
     private CargoLocation(int idx) {
       id = idx;
-      x = FieldConstants.StagingLocations.translations[id].getX();
-      y = FieldConstants.StagingLocations.translations[id].getY();
+      double x = FieldConstants.StagingLocations.translations[id].getX();
+      double y = FieldConstants.StagingLocations.translations[id].getY();
+      coordinates = new Translation2d(x, y);
     }
 
     /** Get the human-readable name of the robot type */

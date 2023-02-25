@@ -54,6 +54,8 @@ package frc.robot.autos.AutoBuilder;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.RobotContainer;
 import frc.robot.autos.AutoConstants.Grids;
 import frc.robot.autos.AutoConstants.Lanes;
 import frc.robot.autos.AutoConstants.SecondaryAction;
@@ -82,8 +84,17 @@ public class AutoRoutineBuilder {
     m_escapeRoute = escapeRoute;
   }
 
-  Command buildCommand() {
-    // TODO: implement this method
-    return new InstantCommand();
+  Command buildCommand(RobotContainer botContainer) {
+    SequentialCommandGroup auto = new SequentialCommandGroup();
+
+    // Reset the robot pose to the initial position
+    auto.addCommands(
+        new InstantCommand(
+            () -> {
+              botContainer.swerveSubsystem.resetOdometry(m_startingPosition.pose);
+              botContainer.poseEstimatorSubsystem.setCurrentPose(m_startingPosition.pose);
+            }));
+
+    return auto;
   }
 }

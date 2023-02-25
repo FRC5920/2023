@@ -264,7 +264,7 @@ public class Swerve extends SubsystemBase {
       module.updateLoggedInputs();
     }
 
-    swervePoseEstimator.updateWithTime(Timer.getFPGATimestamp(), getYaw(), getModulePositions());
+    swervePoseEstimator.update(getYaw(), getModulePositions());
 
     if (RobotBase.isSimulation()) {
       SwerveModuleState[] measuredStates =

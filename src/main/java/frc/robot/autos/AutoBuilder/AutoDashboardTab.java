@@ -51,10 +51,12 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.autos.AutoBuilder;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.RobotContainer;
 import frc.robot.autos.AutoConstants.Grids;
 import frc.robot.autos.AutoConstants.Lanes;
@@ -166,17 +168,17 @@ public class AutoDashboardTab implements IDashboardTab {
     for (int i = 0; i < choices.length; ++i) {
       String choice = choices[i];
       V value = values[i];
-      if (0 == i) {
-        chooser.setDefaultOption(choice, value);
-      } else {
-        chooser.addOption(choice, value);
-      }
+      chooser.addOption(choice, value);
     }
+
+    chooser.setDefaultOption(choices[0], values[0]);
   }
 
   /** Service dashboard tab widgets */
   @Override
   public void updateDashboard(RobotContainer botContainer) {
+
+    /*
     if (m_initialPositionChooser.hasChanged()
         || m_laneChooser.hasChanged()
         || m_stagingRouteChooser.hasChanged()
@@ -188,6 +190,13 @@ public class AutoDashboardTab implements IDashboardTab {
               m_laneChooser.getSelected(),
               m_stagingRouteChooser.getSelected());
     }
+    */
+    if (m_initialPositionChooser.hasChanged()) {
+      Pose2d pose = m_initialPositionChooser.getSelected().pose;
+      m_field2d.setRobotPose(pose);
+      SmartDashboard.putNumber("initialX", pose.getX());
+      SmartDashboard.putNumber("initialY", pose.getY());
+    }
   }
 
   /** Returns the current auto routine builder */
@@ -197,15 +206,12 @@ public class AutoDashboardTab implements IDashboardTab {
 
   private static class ChooserWithChangeDetection<V> extends SendableChooser<V> {
     private V m_lastValue;
-
-    @Override
-    public void setDefaultOption(String name, V object) {
-      super.setDefaultOption(name, object);
-      m_lastValue = object;
-    }
+    private boolean m_initialChangeFlag = true;
 
     public boolean hasChanged() {
-      return m_lastValue != getSelected();
+      boolean changed = m_initialChangeFlag || (m_lastValue != getSelected());
+      m_initialChangeFlag = false;
+      return changed;
     }
   }
 }

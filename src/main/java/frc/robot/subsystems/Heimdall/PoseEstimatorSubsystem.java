@@ -65,7 +65,6 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -174,10 +173,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
       }
     }
     // Update pose estimator with drivetrain sensors
-    poseEstimator.updateWithTime(
-        Timer.getFPGATimestamp(),
-        s_swerveSubsystem.getYaw(),
-        s_swerveSubsystem.getModulePositions());
+    poseEstimator.update(s_swerveSubsystem.getYaw(), s_swerveSubsystem.getModulePositions());
 
     field2d.setRobotPose(getCurrentPose());
     // if (DriverStation.getAlliance() == Alliance.Red) {
