@@ -92,6 +92,40 @@ public final class Constants {
     public static final double stickDeadband = 0.1;
   }
 
+  public static class ArmConstants {
+    public static final int kArmYMotorMasterPort = 7;
+    public static final int kArmYMotorSlavePort = 6;
+    public static final int kHandFrontRollerPort = 5;
+    public static final int kHandBackRollerPort = 20;
+    public static final int kArmExtenderPort = 8;
+
+    public static final int kArmStoredPosition = 0;
+    public static final int kArmIntakePosition = 500;
+    public static final int kArmPlaceHighPosition = 2500;
+    public static final int kArmPlaceMiddlePosition = 2600;
+    public static final int kArmRetracted = 0;
+    public static final int kArmExtendedHigh = 4000;
+    public static final int kArmExtendedMiddle = 3000;
+    public static final int kArmExtenderPIDLoopIdx = 0;
+    public static final int kArmExtenderTimeoutMs = 50;
+    public static final double kArmExtenderFF = 0;
+    public static final double kArmExtenderP = 0;
+    public static final double kArmExtenderI = 0;
+    public static final double kArmExtenderD = 0;
+    public static final double kArmExtenderIz = 0;
+    public static final int kArmYPIDLoopIdx = 0;
+    public static final int kArmYTimeoutMs = 50;
+    public static final double kArmYFF = 0;
+    public static final double kArmYP = 0;
+    public static final double kArmYI = 0;
+    public static final double kArmYD = 0;
+    public static final double kArmYIz = 0;
+    public static final long kDropWaitTime = 5000;
+    public static final long kIntakeWaitTime = 5000;
+    public static final double kFetchAngularP = 0.1;
+    public static final double kFetchAngularD = 0.0;
+  }
+  
   public static final class SwerveDrivebaseConstants {
     public static final int pigeonID = 41;
     public static final boolean invertGyro = false; // Always ensure Gyro is CCW+ CW-
