@@ -130,6 +130,7 @@ public class Arm extends SubsystemBase {
 
   public Arm(Pneumatics s_Pneumatics) {
     ArmYMotorSlave.follow(ArmYMotorMaster);
+    ArmYMotorSlave.setInverted(true);
     this.myPneumatics = s_Pneumatics;
     configurePID();
   }
