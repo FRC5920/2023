@@ -60,9 +60,9 @@ import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 
 public class Balance extends CommandBase {
 
-  private static final double SwerveP = 1.0;
-  private static final double SwerveI = 0.05;
-  private static final double SwervekD = 0.2;
+  private static final double SwerveP = 0.07;
+  private static final double SwerveI = 0.00;
+  private static final double SwervekD = 0.0;
   private final PIDController xController = new PIDController(SwerveP, SwerveI, SwervekD);
   private final PIDController yController = new PIDController(SwerveP, SwerveI, SwervekD);
   private final PIDController omegaController = new PIDController(SwerveP, SwerveI, SwervekD);
@@ -73,8 +73,8 @@ public class Balance extends CommandBase {
   public Balance(Swerve drivetrainSubsystem) {
     this.drivetrainSubsystem = drivetrainSubsystem;
 
-    xController.setTolerance(2);
-    yController.setTolerance(2);
+    xController.setTolerance(3);
+    yController.setTolerance(3);
     omegaController.setTolerance(Units.degreesToRadians(3));
     omegaController.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -99,12 +99,12 @@ public class Balance extends CommandBase {
     omegaController.setSetpoint(drivetrainSubsystem.getYaw().getRadians());
 
     // Drive to the target
-    var xSpeed = xController.calculate(drivetrainSubsystem.getRoll().getRadians());
+    var xSpeed = xController.calculate(-drivetrainSubsystem.getPitch().getDegrees());
     if (xController.atSetpoint()) {
       xSpeed = 0;
     }
 
-    var ySpeed = yController.calculate(drivetrainSubsystem.getPitch().getRadians());
+    var ySpeed = yController.calculate(-drivetrainSubsystem.getRoll().getDegrees());
     if (yController.atSetpoint()) {
       ySpeed = 0;
     }
@@ -115,7 +115,7 @@ public class Balance extends CommandBase {
     }
     // https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/intro-and-chassis-speeds.html
     drivetrainSubsystem.drive(
-        new Translation2d(ySpeed, xSpeed).times(BotStateSubsystem.MaxSpeed),
+        new Translation2d(ySpeed, xSpeed).times(BotStateSubsystem.MaxSpeed * .2),
         omegaSpeed,
         true,
         true);
