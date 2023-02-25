@@ -60,8 +60,8 @@ import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.RobotContainer;
 import frc.robot.commands.Arm.ContinuousGetObject;
 import frc.robot.commands.Arm.PlaceObject;
-import frc.robot.subsystems.Arm.Arm;
 import frc.robot.commands.Balance;
+import frc.robot.subsystems.Arm.Arm;
 
 /** A subsystem providing/managing Xbox controllers for driving the robot manually */
 public class JoystickSubsystem extends SubsystemBase {

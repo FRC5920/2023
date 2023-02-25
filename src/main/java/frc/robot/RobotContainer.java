@@ -52,7 +52,6 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.lib.SwerveDrive.Falcon500SwerveIO;
@@ -61,11 +60,8 @@ import frc.lib.SwerveDrive.Pigeon2GyroIO;
 import frc.lib.SwerveDrive.SimGyroIO;
 import frc.lib.SwerveDrive.SimSwerveModuleIO;
 import frc.lib.SwerveDrive.SwerveModuleIO;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.autos.*;
 import frc.robot.commands.*;
-import frc.robot.commands.Arm.RotateIntake;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Arm.Pneumatics;
@@ -106,6 +102,7 @@ public class RobotContainer {
   @SuppressWarnings({"unused"})
   private final PhotonCamera BackCamera =
       new PhotonCamera(Constants.VisionConstants.BackupCameraName);
+
   public final PhotonCamera ArmCamera = new PhotonCamera(Constants.VisionConstants.ArmCameraName);
 
   // --------------------- Robot Subsystems ----------------------------
