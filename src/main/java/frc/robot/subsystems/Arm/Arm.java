@@ -62,14 +62,14 @@ import frc.robot.Constants;
 
 public class Arm extends SubsystemBase {
   /** Creates a new Arm. */
-  private WPI_TalonFX ArmYMotorMaster =
+  private static final WPI_TalonFX ArmYMotorMaster =
       new WPI_TalonFX(Constants.ArmConstants.kArmYMotorMasterPort);
 
   private static final WPI_TalonFX HandBottomRoller =
       new WPI_TalonFX(Constants.ArmConstants.kHandBottomRollerPort);
   private static final CANSparkMax HandTopBackRoller =
       new CANSparkMax(Constants.ArmConstants.kHandTopBackRollerPort, MotorType.kBrushless);
-  private static WPI_TalonFX ArmYMotorSlave = 
+  private static final WPI_TalonFX ArmYMotorSlave = 
     new WPI_TalonFX(Constants.ArmConstants.kArmYMotorSlavePort);
   
   private static final WPI_TalonFX ArmExtender =
