@@ -62,18 +62,19 @@ import frc.robot.Constants;
 
 public class Arm extends SubsystemBase {
   /** Creates a new Arm. */
-  private static final WPI_TalonFX ArmYMotorMaster =
+  private WPI_TalonFX ArmYMotorMaster =
       new WPI_TalonFX(Constants.ArmConstants.kArmYMotorMasterPort);
 
   private static final WPI_TalonFX HandBottomRoller =
       new WPI_TalonFX(Constants.ArmConstants.kHandBottomRollerPort);
   private static final CANSparkMax HandTopBackRoller =
       new CANSparkMax(Constants.ArmConstants.kHandTopBackRollerPort, MotorType.kBrushless);
-  private final WPI_TalonFX ArmYMotorSlave = 
+  private static WPI_TalonFX ArmYMotorSlave = 
     new WPI_TalonFX(Constants.ArmConstants.kArmYMotorSlavePort);
-  ArmYMotorSlave.Follow(ArmYMotorMaster);
+  
   private static final WPI_TalonFX ArmExtender =
     new WPI_TalonFX(Constants.ArmConstants.kArmExtenderPort);
+    
   private static Pneumatics myPneumatics;
   private static final double HandRollerSpeed = 0.5;
 
@@ -128,6 +129,7 @@ public class Arm extends SubsystemBase {
   };
 
   public Arm(Pneumatics s_Pneumatics) {
+    ArmYMotorSlave.follow(ArmYMotorMaster);
     this.myPneumatics = s_Pneumatics;
     configurePID();
   }
