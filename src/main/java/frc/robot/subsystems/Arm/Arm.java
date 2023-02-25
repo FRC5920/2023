@@ -69,10 +69,11 @@ public class Arm extends SubsystemBase {
       new WPI_TalonFX(Constants.ArmConstants.kHandBottomRollerPort);
   private static final CANSparkMax HandTopBackRoller =
       new CANSparkMax(Constants.ArmConstants.kHandTopBackRollerPort, MotorType.kBrushless);
-  // private final WPI_TalonFX ArmYMotorSlave = new
-  // WPI_TalonFX(Constants.ArmConstants.kArmYMotorSlavePort);
+  private final WPI_TalonFX ArmYMotorSlave = 
+    new WPI_TalonFX(Constants.ArmConstants.kArmYMotorSlavePort);
+  ArmYMotorSlave.Follow(ArmYMotorMaster);
   private static final WPI_TalonFX ArmExtender =
-      new WPI_TalonFX(Constants.ArmConstants.kArmExtenderPort);
+    new WPI_TalonFX(Constants.ArmConstants.kArmExtenderPort);
   private static Pneumatics myPneumatics;
   private static final double HandRollerSpeed = 0.5;
 
