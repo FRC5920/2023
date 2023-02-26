@@ -236,7 +236,7 @@ public class Arm extends SubsystemBase {
   }
   ;
 
-  public void armForward() {
+  /* public void armForward() {
     ArmYMotorMaster.set(ControlMode.PercentOutput, 1);
   }
 
@@ -252,6 +252,7 @@ public class Arm extends SubsystemBase {
   public void place() {
     HandFrontRoller.set(-0.5);
   }
+  */
 
   @Override
   public void periodic() {
