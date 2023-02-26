@@ -63,7 +63,6 @@ import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 import frc.robot.subsystems.Heimdall.*;
-import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Pneumatics.Pneumatics;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
