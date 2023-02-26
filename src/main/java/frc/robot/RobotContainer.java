@@ -94,7 +94,8 @@ public class RobotContainer {
       new PhotonCamera(Constants.VisionConstants.BackupCameraName);
 
   @SuppressWarnings({"unused"})
-  private final PhotonCamera ArmCamera = new PhotonCamera(Constants.VisionConstants.ArmCameraName);
+  public
+  final PhotonCamera ArmCamera = new PhotonCamera(Constants.VisionConstants.ArmCameraName);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -102,6 +103,7 @@ public class RobotContainer {
     boolean openLoop = true;
     SwerveModuleIO swerveModuleIO[];
     GyroIO gyroIO;
+    
 
     // Instantiate active subsystems
     switch (Constants.getMode()) {
