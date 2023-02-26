@@ -52,6 +52,7 @@
 package frc.robot.subsystems.Arm;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.revrobotics.CANSparkMax;
@@ -134,6 +135,7 @@ public class Arm extends SubsystemBase {
   };
 
   public Arm(Pneumatics s_Pneumatics) {
+    HandFrontRoller.setNeutralMode(NeutralMode.Brake);
     ArmYMotorSlave.follow(ArmYMotorMaster);
     ArmYMotorSlave.setInverted(true);
     this.myPneumatics = s_Pneumatics;
