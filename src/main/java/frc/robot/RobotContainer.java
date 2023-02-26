@@ -82,7 +82,6 @@ public class RobotContainer {
   public final JoystickSubsystem joystickSubsystem = new JoystickSubsystem();
   public final BotStateSubsystem botStateSubsystem = new BotStateSubsystem();
   public final Swerve swerveSubsystem;
-  public final Intake m_Intake = new Intake();
   public static final Pneumatics s_Pneumatics = new Pneumatics();
 
   @SuppressWarnings({"unused"})
