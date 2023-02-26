@@ -69,9 +69,13 @@ public class Pneumatics extends SubsystemBase {
   boolean enabled = phCompressor.isEnabled();
   boolean pressureSwitch = phCompressor.getPressureSwitchValue();
   // double currentCompressor = phCompressor.getCompressorCurrent();
-  private final DoubleSolenoid m_PWrist =
-      new DoubleSolenoid(
-          PneumaticsModuleType.REVPH,
+  // private final DoubleSolenoid m_PWrist =
+  //    new DoubleSolenoid(
+  //        PneumaticsModuleType.REVPH,
+  //        Constants.PneumaticsConstants.kArmLeftRotatorPort,
+  //        Constants.PneumaticsConstants.kArmRightRotatorPort);
+  private DoubleSolenoid m_PWrist =
+      m_PHub.makeDoubleSolenoid(
           Constants.PneumaticsConstants.kArmLeftRotatorPort,
           Constants.PneumaticsConstants.kArmRightRotatorPort);
 
