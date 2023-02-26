@@ -156,28 +156,8 @@ public class JoystickSubsystem extends SubsystemBase {
     driverController.B.onTrue(new InstantCommand(this::doNothing, this));
     driverController.X.onTrue(new InstantCommand(this::doNothing, this));
     driverController.Y.onTrue(new InstantCommand(() -> botContainer.swerveSubsystem.zeroGyro()));
-    driverController.leftBumper.whileTrue(
-        new ZTarget(
-            Arm.GamePieceType.Cone,
-            botContainer.ArmCamera,
-            botContainer.swerveSubsystem,
-            botContainer.joystickSubsystem.driverController,
-            botContainer.translationAxis,
-            botContainer.strafeAxis,
-            botContainer.rotationAxis,
-            botContainer.fieldRelative,
-            botContainer.openLoop));
-    operatorController.rightBumper.whileTrue(
-        new ZTarget(
-            Arm.GamePieceType.Cube,
-            botContainer.ArmCamera,
-            botContainer.swerveSubsystem,
-            botContainer.joystickSubsystem.driverController,
-            botContainer.translationAxis,
-            botContainer.strafeAxis,
-            botContainer.rotationAxis,
-            botContainer.fieldRelative,
-            botContainer.openLoop));
+    driverController.leftBumper.whileTrue(new InstantCommand(this::doNothing, this));
+    operatorController.rightBumper.whileTrue(new InstantCommand(this::doNothing, this));
     driverController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.back.onTrue(new InstantCommand(this::doNothing, this));
