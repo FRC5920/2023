@@ -203,6 +203,8 @@ public class AutoDashboardTab implements IDashboardTab {
               m_routeChooser.getSelected(),
               m_escapeWaypointChooser.getSelected());
 
+      m_builder.build(botContainer);
+
       // Display the auto trajectory on the field
       m_field2d.getObject("EscapeTrajectory").setTrajectory(m_builder.getTrajectory());
     }
@@ -227,6 +229,7 @@ public class AutoDashboardTab implements IDashboardTab {
     public boolean hasChanged() {
       boolean changed = m_initialChangeFlag || (m_lastValue != getSelected());
       m_initialChangeFlag = false;
+      m_lastValue = getSelected();
       return changed;
     }
   }

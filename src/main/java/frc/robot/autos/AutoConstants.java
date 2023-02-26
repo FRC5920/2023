@@ -176,48 +176,50 @@ public class AutoConstants {
    * Constants used in conjunction with imaginary "lanes" that run between the Grids and the
    * Charging Station.
    *
-   * @note The INSIDE lane is closest to the Grids, while the OUTSIDE lane is closest to the
-   *     charging station
+   * @note The OUTER lane is closest to the Grids, while the INNER lane is closest to the charging
+   *     station
    */
   public static class Lanes {
 
-    /** Robot center X coordinate in the middle of the North-South section of the INSIDE lane */
-    public static double kNSInsideCenterX = Grids.kRobotCenterX;
+    /** Margin introduced to lane centers */
+    public static final double kLaneMargin = Units.inchesToMeters(4);
 
-    /** Robot center X coordinate in the middle of the North-South section of the OUTSIDE lane */
-    public static double kNSOutsideCenterX =
-        ChargingStation.kGridSideX - (BotDimensions.kHalfFootprintWidth);
+    /** Robot center X coordinate in the middle of the North-South section of the INNER lane */
+    public static final double kInnerLaneColumnCenterX =
+        ChargingStation.kGridSideX - (BotDimensions.kHalfFootprintWidth) - kLaneMargin;
+
+    /** Robot center X coordinate in the middle of the North-South section of the OUTER lane */
+    public static final double kOuterLaneColumnCenterX =
+        Grids.kGridEdgeX + BotDimensions.kHalfFootprintWidth + kLaneMargin;
 
     /**
-     * Robot center Y coordinate in the East-West portion of the INSIDE lane furthest from the
+     * Y coordinate of the center of the East-West portion of the OUTER lane furthest from the
      * scoring table
      *
      * <p>TODO: this value needs experimental refinement!
      */
-    public static double kUpperEastWestInsideCenterY =
-        FieldConstants.Community.chargingStationLeftY
-            + Units.inchesToMeters(59.39)
-            - BotDimensions.kHalfFootprintWidth;
+    public static double kOuterLaneNorthCenterY = Grids.ScoringPosition.I.pose.getY() - kLaneMargin;
 
     /**
-     * Robot center Y coordinate in the East-West portion of the OUTSIDE lane furthest from the
+     * Y coordinate in the center of the East-West portion of the INNER lane furthest from the
      * scoring table
      */
-    public static double kUpperEastWestOutsideCenterY =
-        ChargingStation.kNorthSideY + BotDimensions.kHalfFootprintWidth;
+    public static double kInnerLaneNorthCenterY =
+        ChargingStation.kNorthSideY + BotDimensions.kHalfFootprintWidth + kLaneMargin;
 
     /**
-     * Robot center Y coordinate in the East-West portion of the INSIDE lane closest to the scoring
+     * Y coordinate in the center of the East-West portion of the OUTER lane closest to the scoring
      * table
      */
-    public static double kLowerEastWestInsideCenterY = 0.0 + BotDimensions.kHalfFootprintWidth;
+    public static double kOuterLaneSouthCenterY =
+        0.0 + BotDimensions.kHalfFootprintWidth + kLaneMargin;
 
     /**
-     * Robot center Y coordinate in the East-West portion of the OUTSIDE lane closest to the scoring
+     * Y coordinate in the center of the East-West portion of the INNER lane closest to the scoring
      * table
      */
-    public static double kLowerEastWestOutsideCenterY =
-        ChargingStation.kSouthSideY - BotDimensions.kHalfFootprintWidth;
+    public static double kInnerLaneSouthCenterY =
+        ChargingStation.kSouthSideY - BotDimensions.kHalfFootprintWidth - kLaneMargin;
 
     /**
      * Lanes
@@ -226,17 +228,17 @@ public class AutoConstants {
      *     Charging Station.
      */
     public static enum ID {
-      Inside(0),
-      Outside(1);
+      Outer(0),
+      Inner(1);
 
-      private static final Map<String, ID> nameMap = Map.of("Inside", Inside, "Outside", Outside);
+      private static final Map<String, ID> nameMap = Map.of("Inner", Inner, "Outer", Outer);
 
       private final int id;
-      public final double xNorthSouthCenter; // X-coordinate of the lane's North-South section
+      public final double xColumnCenter; // X-coordinate of the lane's North-South section
 
       private ID(int idx) {
         id = idx;
-        xNorthSouthCenter = (id == 0) ? kNSInsideCenterX : kNSOutsideCenterX;
+        xColumnCenter = (id == 1) ? kInnerLaneColumnCenterX : kOuterLaneColumnCenterX;
       }
 
       /** Get the human-readable name of the robot type */
@@ -259,10 +261,10 @@ public class AutoConstants {
         double y = -1.0;
         switch (route) {
           case NorthOfCS: // North of CS
-            y = (id == 0) ? kUpperEastWestInsideCenterY : kUpperEastWestOutsideCenterY;
+            y = (id == Inner.id) ? kInnerLaneNorthCenterY : kOuterLaneNorthCenterY;
             break;
           case SouthOfCS: // South of CS
-            y = (id == 0) ? kLowerEastWestInsideCenterY : kLowerEastWestOutsideCenterY;
+            y = (id == Outer.id) ? kInnerLaneSouthCenterY : kOuterLaneSouthCenterY;
             break;
           case CenterOfCS: // Through CS
             y = ChargingStation.kCenterY;
@@ -320,17 +322,69 @@ public class AutoConstants {
   //////////////////////////////////////////////////////////////////////////////////////////////////
   /** Constants used in conjunction with predefined waypoints used in auto routines */
   public static class Waypoints {
+    public static enum Transitional {
+      // Outer lane North corner waypoints
+      OuterNorthCornerBottom(Lanes.kOuterLaneColumnCenterX, Lanes.kOuterLaneNorthCenterY - BotDimensions.kHalfFootprintWidth),
+      OuterNorthCornerTop(Lanes.kOuterLaneColumnCenterX + BotDimensions.kHalfFootprintWidth, Lanes.kOuterLaneNorthCenterY),
+
+      // Inner lane North corner waypoints
+      InnerNorthCornerBottom(Lanes.kInnerLaneColumnCenterX, Lanes.kInnerLaneNorthCenterY - BotDimensions.kHalfFootprintWidth),
+      InnerNorthCornerTop(Lanes.kInnerLaneColumnCenterX + BotDimensions.kHalfFootprintWidth, Lanes.kInnerLaneNorthCenterY),
+
+      // Outer lane South corner waypoints
+      OuterSouthCornerBottom(Lanes.kOuterLaneColumnCenterX, Lanes.kOuterLaneSouthCenterY - BotDimensions.kHalfFootprintWidth),
+      OuterSouthCornerTop(Lanes.kOuterLaneColumnCenterX + BotDimensions.kHalfFootprintWidth, Lanes.kOuterLaneSouthCenterY),
+
+      // Inner lane South corner waypoints
+      InnerSouthCornerBottom(Lanes.kInnerLaneColumnCenterX, Lanes.kInnerLaneSouthCenterY - BotDimensions.kHalfFootprintWidth),
+      InnerSouthCornerTop(Lanes.kInnerLaneColumnCenterX + BotDimensions.kHalfFootprintWidth, Lanes.kInnerLaneSouthCenterY),
+
+      /**
+       * OUTER lane North of the charging station aligned with Fieldward side of Charging Station
+       */
+      OuterLaneNorthOfCS(ChargingStation.kFieldSideX, Lanes.kOuterLaneNorthCenterY),
+      /**
+       * INNER lane North of the charging station aligned with Fieldward side of Charging Station
+       */
+      InnerLaneNorthOfCS(ChargingStation.kFieldSideX, Lanes.kInnerLaneNorthCenterY),
+
+      /**
+       * OUTER lane South of the charging station aligned with Fieldward side of Charging Station
+       */
+      OuterLaneSouthOfCS(ChargingStation.kFieldSideX + 0.1, Lanes.kOuterLaneSouthCenterY),
+      /**
+       * INNER lane South of the charging station aligned with Fieldward side of Charging Station
+       */
+      InnerLaneSouthOfCS(ChargingStation.kFieldSideX + 0.1, Lanes.kInnerLaneSouthCenterY);
+
+      public final Translation2d coordinates;
+
+      private Transitional(double x, double y) {
+        coordinates = new Translation2d(x, y);
+      }
+    }
+
+    private static final List<Transitional> kOuterNorthCornerList = List.of(Transitional.OuterNorthCornerBottom, Transitional.OuterNorthCornerTop);
+    private static final List<Transitional> kOuterSouthCornerList = List.of(Transitional.OuterSouthCornerBottom, Transitional.OuterSouthCornerTop);
+
+    private static final List<Transitional> kInnerNorthCornerList = List.of(Transitional.InnerNorthCornerTop, Transitional.InnerNorthCornerBottom);
+    private static final List<Transitional> kInnerSouthCornerList = List.of(Transitional.InnerSouthCornerTop, Transitional.InnerSouthCornerBottom);
+
+    public static final Map<String, List<Transitional>> cornerMap = Map.of(
+      (Lanes.ID.Outer.name() + EscapeRoute.ID.NorthOfCS.name()), kOuterNorthCornerList,
+      (Lanes.ID.Inner.name() + EscapeRoute.ID.NorthOfCS.name()), kInnerNorthCornerList,
+      (Lanes.ID.Outer.name() + EscapeRoute.ID.SouthOfCS.name()), kOuterSouthCornerList,
+      (Lanes.ID.Inner.name() + EscapeRoute.ID.SouthOfCS.name()), kInnerSouthCornerList
+    );
+
+    public static final Map<String, Transitional> transitionalMap = Map.of(
+      (Lanes.ID.Outer.name() + EscapeRoute.ID.NorthOfCS.name()), Transitional.OuterLaneNorthOfCS,
+      (Lanes.ID.Inner.name() + EscapeRoute.ID.NorthOfCS.name()), Transitional.InnerLaneNorthOfCS,
+      (Lanes.ID.Outer.name() + EscapeRoute.ID.SouthOfCS.name()), Transitional.OuterLaneSouthOfCS,
+      (Lanes.ID.Inner.name() + EscapeRoute.ID.SouthOfCS.name()), Transitional.InnerLaneSouthOfCS
+    );
+    
     public static enum ID {
-      /** Inside lane beyond tape just North of the charging station */
-      InsideNorth(0, 4.0, Lanes.kUpperEastWestInsideCenterY),
-      /** Inside lane beyond tape South of the charging station */
-      InsideSouth(0, ChargingStation.kFieldSideX + 0.1, Lanes.kLowerEastWestInsideCenterY),
-
-      /** Outside lane beyond tape just North of the charging station */
-      OutsideNorth(1, 4.0, Lanes.kUpperEastWestOutsideCenterY),
-      /** Outside lane beyond tape South of the charging station */
-      OutsideSouth(0, ChargingStation.kFieldSideX + 0.1, Lanes.kLowerEastWestOutsideCenterY),
-
       // Far North staging areas next to center line
       U(2, 7.5, 7.5), // Furthest north next to center line
       V(3, 7.5, 6.0), // Secondmost north next to center line
@@ -342,14 +396,6 @@ public class AutoConstants {
 
       private static final Map<String, ID> nameMap =
           Map.of(
-              "InsideNorth",
-              InsideNorth,
-              "InsideSouth",
-              InsideSouth,
-              "OutsideNorth",
-              OutsideNorth,
-              "OutsideSouth",
-              OutsideSouth,
               "U",
               U,
               "V",
