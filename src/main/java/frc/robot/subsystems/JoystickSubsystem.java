@@ -58,6 +58,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.Joystick.AxisProcChain;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.RobotContainer;
+import frc.robot.commands.Arm.ContinuousGetObject;
+import frc.robot.commands.Arm.PlaceObject;
 import frc.robot.commands.Arm.RotateIntake;
 import frc.robot.commands.Arm.ZTarget;
 import frc.robot.commands.Balance;
@@ -152,16 +154,53 @@ public class JoystickSubsystem extends SubsystemBase {
   public void configureButtonBindings(RobotContainer botContainer) {
 
     // Map buttons on driver controller
-    driverController.A.onTrue(new InstantCommand(this::doNothing, this));
+    driverController.A.onTrue(new PlaceObject(
+      botContainer.armSubsystem, 
+      botContainer.botStateSubsystem.storedGamePiece, 
+      Arm.Rank.Low, 
+      botContainer.s_Pneumatics, 
+      Arm.ArmExtenderPosition.OnFloor));
     driverController.B.onTrue(new InstantCommand(this::doNothing, this));
-    driverController.X.onTrue(new InstantCommand(this::doNothing, this));
-    driverController.Y.onTrue(new InstantCommand(() -> botContainer.swerveSubsystem.zeroGyro()));
-    driverController.leftBumper.whileTrue(new InstantCommand(this::doNothing, this));
-    operatorController.rightBumper.whileTrue(new InstantCommand(this::doNothing, this));
+    driverController.X.onTrue(new PlaceObject(
+      botContainer.armSubsystem, 
+      botContainer.botStateSubsystem.storedGamePiece, 
+      Arm.Rank.Medium, 
+      botContainer.s_Pneumatics, 
+      Arm.ArmExtenderPosition.MiddleRank));
+    driverController.Y.onTrue(new PlaceObject(
+      botContainer.armSubsystem, 
+      botContainer.botStateSubsystem.storedGamePiece, 
+      Arm.Rank.High, 
+      botContainer.s_Pneumatics, 
+      Arm.ArmExtenderPosition.TopRank));
+    driverController.leftBumper.whileTrue(new ContinuousGetObject(
+      Arm.GamePieceType.Cone, 
+      botContainer.ArmCamera, 
+      botContainer.swerveSubsystem, driverController, 
+      0, 
+      0, 
+      0, 
+      true, 
+      botContainer.openLoop, 
+      botContainer.armSubsystem, 
+      botContainer.botStateSubsystem, 
+      botContainer.s_Pneumatics));
+    operatorController.rightBumper.whileTrue(new ContinuousGetObject(
+      Arm.GamePieceType.Cube, 
+      botContainer.ArmCamera, 
+      botContainer.swerveSubsystem, driverController, 
+      0, 
+      0, 
+      0, 
+      true, 
+      botContainer.openLoop, 
+      botContainer.armSubsystem, 
+      botContainer.botStateSubsystem, 
+      botContainer.s_Pneumatics));
     driverController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.back.onTrue(new InstantCommand(this::doNothing, this));
-    driverController.start.whileTrue(new Balance(botContainer.swerveSubsystem));
+    driverController.start.onTrue(new InstantCommand(this::doNothing, this));
 
     // Map buttons on operator controller
     operatorController.A.onTrue(new InstantCommand(this::doNothing, this));

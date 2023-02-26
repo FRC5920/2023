@@ -132,7 +132,7 @@ public class Arm extends SubsystemBase {
     }
   };
 
-  public Arm(Pneumatics s_Pneumatics) {
+  public Arm() {
     HandFrontRoller.setNeutralMode(NeutralMode.Brake);
     ArmYMotorSlave.follow(ArmYMotorMaster);
     ArmYMotorSlave.setInverted(true);

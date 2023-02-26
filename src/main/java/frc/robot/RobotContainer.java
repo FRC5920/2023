@@ -61,6 +61,7 @@ import frc.lib.SwerveDrive.SimSwerveModuleIO;
 import frc.lib.SwerveDrive.SwerveModuleIO;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 import frc.robot.subsystems.Heimdall.*;
 import frc.robot.subsystems.Pneumatics.Pneumatics;
@@ -81,7 +82,10 @@ public class RobotContainer {
   public final JoystickSubsystem joystickSubsystem = new JoystickSubsystem();
   public final BotStateSubsystem botStateSubsystem = new BotStateSubsystem();
   public final Swerve swerveSubsystem;
-  public static final Pneumatics s_Pneumatics = new Pneumatics();
+  public final static Pneumatics s_Pneumatics = new Pneumatics();
+  public final Arm armSubsystem = new Arm();
+  public final boolean openLoop;
+
 
   @SuppressWarnings({"unused"})
   public final PoseEstimatorSubsystem poseEstimatorSubsystem;
@@ -100,7 +104,7 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     boolean fieldRelative = true;
-    boolean openLoop = true;
+    openLoop = true;
     SwerveModuleIO swerveModuleIO[];
     GyroIO gyroIO;
     
