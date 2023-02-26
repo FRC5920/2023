@@ -131,8 +131,8 @@ public class Fetch extends CommandBase {
       // -1.0 required to ensure positive PID controller effort _increases_ yaw
       rotation = -turnController.calculate(result.getBestTarget().getYaw(), 0);
     } else {
-      // If we have no targets, stay still.
-      rotation = 0;
+      // If we have no targets, rotate according to joystick as normal.
+      rotation = -controller.getRightX();
     }
     translation = new Translation2d(yAxis, xAxis).times(BotStateSubsystem.MaxSpeed);
     rotation *= BotStateSubsystem.MaxRotate;
