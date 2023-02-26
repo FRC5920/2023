@@ -59,7 +59,9 @@ import frc.lib.Joystick.AxisProcChain;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.RobotContainer;
 import frc.robot.commands.Arm.RotateIntake;
+import frc.robot.commands.Arm.ZTarget;
 import frc.robot.commands.Balance;
+import frc.robot.subsystems.Arm.Arm;
 
 /** A subsystem providing/managing Xbox controllers for driving the robot manually */
 public class JoystickSubsystem extends SubsystemBase {
@@ -117,6 +119,7 @@ public class JoystickSubsystem extends SubsystemBase {
     driverController
         .getTriggerProcessing(XboxController.Axis.kRightTrigger)
         .configure(triggerConfig);
+    
 
     // Configure operator controller stick and trigger processing
     operatorController = new ProcessedXboxController(ControllerId.kOperator.port);
@@ -153,8 +156,28 @@ public class JoystickSubsystem extends SubsystemBase {
     driverController.B.onTrue(new InstantCommand(this::doNothing, this));
     driverController.X.onTrue(new InstantCommand(this::doNothing, this));
     driverController.Y.onTrue(new InstantCommand(() -> botContainer.swerveSubsystem.zeroGyro()));
-    driverController.leftBumper.whileTrue(new InstantCommand(this::doNothing, this));
-    driverController.rightBumper.whileTrue(new InstantCommand(this::doNothing, this));
+    driverController.leftBumper.whileTrue(
+        new ZTarget(
+            Arm.GamePieceType.Cone,
+            botContainer.ArmCamera,
+            botContainer.swerveSubsystem,
+            botContainer.joystickSubsystem.driverController,
+            botContainer.translationAxis,
+            botContainer.strafeAxis,
+            botContainer.rotationAxis,
+            botContainer.fieldRelative,
+            botContainer.openLoop));
+    operatorController.rightBumper.whileTrue(
+        new ZTarget(
+            Arm.GamePieceType.Cube,
+            botContainer.ArmCamera,
+            botContainer.swerveSubsystem,
+            botContainer.joystickSubsystem.driverController,
+            botContainer.translationAxis,
+            botContainer.strafeAxis,
+            botContainer.rotationAxis,
+            botContainer.fieldRelative,
+            botContainer.openLoop));
     driverController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.back.onTrue(new InstantCommand(this::doNothing, this));
