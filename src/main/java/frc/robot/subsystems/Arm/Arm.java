@@ -95,7 +95,6 @@ public class Arm extends SubsystemBase {
   }
 
   public enum Rank {
-    PickUp(0),
     InRobot(200),
     Low(50),
     Medium(2000),
