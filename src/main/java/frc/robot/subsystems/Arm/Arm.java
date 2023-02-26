@@ -200,12 +200,6 @@ public class Arm extends SubsystemBase {
   }
 
   public static void setArmPosition(int desiredPosition) {
-    if (desiredPosition >= Constants.ArmConstants.kArmExtendedHigh) {
-      myPneumatics.goingBackward();
-    } else {
-      myPneumatics.goingForward();
-    }
-    ;
     ArmYMotorMaster.set(TalonFXControlMode.Position, desiredPosition);
   }
 

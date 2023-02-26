@@ -90,7 +90,7 @@ public class Intake extends CommandBase {
       Arm.HandBackRoller.set(Constants.ArmConstants.kHoldCubeVelocity);
     }
     m_BotStateSubsystem.storedGamePiece = gamePiece;
-    new Reach(Arm.ArmExtenderPosition.StowedAway);
+    new StowArm();
   }
 
   // Returns true when the command should end.

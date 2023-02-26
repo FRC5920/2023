@@ -53,6 +53,7 @@ package frc.robot.commands.Arm;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Arm.Arm;
+import frc.robot.subsystems.Pneumatics.Pneumatics;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
@@ -63,14 +64,16 @@ public class PlaceObject extends SequentialCommandGroup {
       Arm armSubsystem,
       Arm.GamePieceType PlaceWhat,
       Arm.Rank PlaceWhere,
+      Pneumatics s_Pneumatics,
       Arm.ArmExtenderPosition PlaceHowFar) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addRequirements(armSubsystem);
     addCommands(
-        new PositionArm(PlaceWhere),
+        new RotateArmAndIntake(PlaceWhere, s_Pneumatics),
         new Reach(PlaceHowFar),
         new Drop(PlaceWhat),
-        new Reach(Arm.ArmExtenderPosition.StowedAway));
+        new StowArm()
+        );
   }
 }

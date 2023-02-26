@@ -54,6 +54,7 @@ package frc.robot.commands.Arm;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.subsystems.Arm.Arm;
+import frc.robot.subsystems.Pneumatics.Pneumatics;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 import org.photonvision.PhotonCamera;
@@ -74,7 +75,8 @@ public class ContinuousGetObject extends ParallelCommandGroup {
       boolean fetchFieldRelative,
       boolean fetchOpenLoop,
       Arm armSubsystem,
-      BotStateSubsystem myBotStateSubsystem) {
+      BotStateSubsystem myBotStateSubsystem,
+      Pneumatics myPneumatics) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
@@ -88,6 +90,6 @@ public class ContinuousGetObject extends ParallelCommandGroup {
             fetchRotationAxis,
             fetchFieldRelative,
             fetchOpenLoop),
-        new PickUpObject(armSubsystem, myBotStateSubsystem, GetWhat));
+        new PickUpObject(armSubsystem, myBotStateSubsystem, GetWhat, myPneumatics));
   }
 }

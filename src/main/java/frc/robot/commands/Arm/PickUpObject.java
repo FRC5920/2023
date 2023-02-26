@@ -53,6 +53,7 @@ package frc.robot.commands.Arm;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Arm.Arm;
+import frc.robot.subsystems.Pneumatics.Pneumatics;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
@@ -61,12 +62,12 @@ import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 public class PickUpObject extends SequentialCommandGroup {
   /** Creates a new PickUpCone. */
   public PickUpObject(
-      Arm armSubsystem, BotStateSubsystem myBotStateSubsystem, Arm.GamePieceType pickUpWhat) {
+      Arm armSubsystem, BotStateSubsystem myBotStateSubsystem, Arm.GamePieceType pickUpWhat, Pneumatics pneumaticSubsystem) {
     addRequirements(armSubsystem);
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-        new PositionArm(Arm.Rank.Low),
+        new RotateArmAndIntake(Arm.Rank.Low, pneumaticSubsystem),
         new Reach(Arm.ArmExtenderPosition.OnFloor),
         new Intake(pickUpWhat, myBotStateSubsystem));
   }
