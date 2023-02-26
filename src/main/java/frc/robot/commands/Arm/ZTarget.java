@@ -61,7 +61,7 @@ import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 import org.photonvision.PhotonCamera;
 
-public class Fetch extends CommandBase {
+public class ZTarget extends CommandBase {
   /** Creates a new Fetch. */
   private Translation2d translation;
 
@@ -81,7 +81,7 @@ public class Fetch extends CommandBase {
           Constants.ArmConstants.kFetchAngularP, 0, Constants.ArmConstants.kFetchAngularD);
   Arm.GamePieceType fetchTarget;
 
-  public Fetch(
+  public ZTarget(
       Arm.GamePieceType FetchWhat,
       PhotonCamera camera,
       Swerve s_Swerve,
