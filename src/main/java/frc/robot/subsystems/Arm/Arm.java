@@ -81,7 +81,6 @@ public class Arm extends SubsystemBase {
   private static final WPI_TalonFX ArmExtender =
       new WPI_TalonFX(Constants.ArmConstants.kArmExtenderPort);
 
-  private static Pneumatics myPneumatics;
   private static final double HandRollerSpeed = 0.5;
 
   public enum GamePieceType {
@@ -137,7 +136,6 @@ public class Arm extends SubsystemBase {
     HandFrontRoller.setNeutralMode(NeutralMode.Brake);
     ArmYMotorSlave.follow(ArmYMotorMaster);
     ArmYMotorSlave.setInverted(true);
-    this.myPneumatics = s_Pneumatics;
     configurePID();
   }
 
