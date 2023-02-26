@@ -324,20 +324,36 @@ public class AutoConstants {
   public static class Waypoints {
     public static enum Transitional {
       // Outer lane North corner waypoints
-      OuterNorthCornerBottom(Lanes.kOuterLaneColumnCenterX, Lanes.kOuterLaneNorthCenterY - BotDimensions.kHalfFootprintWidth),
-      OuterNorthCornerTop(Lanes.kOuterLaneColumnCenterX + BotDimensions.kHalfFootprintWidth, Lanes.kOuterLaneNorthCenterY),
+      OuterNorthCornerBottom(
+          Lanes.kOuterLaneColumnCenterX,
+          Lanes.kOuterLaneNorthCenterY - BotDimensions.kHalfFootprintWidth),
+      OuterNorthCornerTop(
+          Lanes.kOuterLaneColumnCenterX + BotDimensions.kHalfFootprintWidth,
+          Lanes.kOuterLaneNorthCenterY),
 
       // Inner lane North corner waypoints
-      InnerNorthCornerBottom(Lanes.kInnerLaneColumnCenterX, Lanes.kInnerLaneNorthCenterY - BotDimensions.kHalfFootprintWidth),
-      InnerNorthCornerTop(Lanes.kInnerLaneColumnCenterX + BotDimensions.kHalfFootprintWidth, Lanes.kInnerLaneNorthCenterY),
+      InnerNorthCornerBottom(
+          Lanes.kInnerLaneColumnCenterX,
+          Lanes.kInnerLaneNorthCenterY - BotDimensions.kHalfFootprintWidth),
+      InnerNorthCornerTop(
+          Lanes.kInnerLaneColumnCenterX + BotDimensions.kHalfFootprintWidth,
+          Lanes.kInnerLaneNorthCenterY),
 
       // Outer lane South corner waypoints
-      OuterSouthCornerBottom(Lanes.kOuterLaneColumnCenterX, Lanes.kOuterLaneSouthCenterY - BotDimensions.kHalfFootprintWidth),
-      OuterSouthCornerTop(Lanes.kOuterLaneColumnCenterX + BotDimensions.kHalfFootprintWidth, Lanes.kOuterLaneSouthCenterY),
+      OuterSouthCornerBottom(
+          Lanes.kOuterLaneColumnCenterX,
+          Lanes.kOuterLaneSouthCenterY - BotDimensions.kHalfFootprintWidth),
+      OuterSouthCornerTop(
+          Lanes.kOuterLaneColumnCenterX + BotDimensions.kHalfFootprintWidth,
+          Lanes.kOuterLaneSouthCenterY),
 
       // Inner lane South corner waypoints
-      InnerSouthCornerBottom(Lanes.kInnerLaneColumnCenterX, Lanes.kInnerLaneSouthCenterY - BotDimensions.kHalfFootprintWidth),
-      InnerSouthCornerTop(Lanes.kInnerLaneColumnCenterX + BotDimensions.kHalfFootprintWidth, Lanes.kInnerLaneSouthCenterY),
+      InnerSouthCornerBottom(
+          Lanes.kInnerLaneColumnCenterX,
+          Lanes.kInnerLaneSouthCenterY - BotDimensions.kHalfFootprintWidth),
+      InnerSouthCornerTop(
+          Lanes.kInnerLaneColumnCenterX + BotDimensions.kHalfFootprintWidth,
+          Lanes.kInnerLaneSouthCenterY),
 
       /**
        * OUTER lane North of the charging station aligned with Fieldward side of Charging Station
@@ -364,26 +380,34 @@ public class AutoConstants {
       }
     }
 
-    private static final List<Transitional> kOuterNorthCornerList = List.of(Transitional.OuterNorthCornerBottom, Transitional.OuterNorthCornerTop);
-    private static final List<Transitional> kOuterSouthCornerList = List.of(Transitional.OuterSouthCornerBottom, Transitional.OuterSouthCornerTop);
+    private static final List<Transitional> kOuterNorthCornerList =
+        List.of(Transitional.OuterNorthCornerBottom, Transitional.OuterNorthCornerTop);
+    private static final List<Transitional> kOuterSouthCornerList =
+        List.of(Transitional.OuterSouthCornerBottom, Transitional.OuterSouthCornerTop);
 
-    private static final List<Transitional> kInnerNorthCornerList = List.of(Transitional.InnerNorthCornerTop, Transitional.InnerNorthCornerBottom);
-    private static final List<Transitional> kInnerSouthCornerList = List.of(Transitional.InnerSouthCornerTop, Transitional.InnerSouthCornerBottom);
+    private static final List<Transitional> kInnerNorthCornerList =
+        List.of(Transitional.InnerNorthCornerTop, Transitional.InnerNorthCornerBottom);
+    private static final List<Transitional> kInnerSouthCornerList =
+        List.of(Transitional.InnerSouthCornerTop, Transitional.InnerSouthCornerBottom);
 
-    public static final Map<String, List<Transitional>> cornerMap = Map.of(
-      (Lanes.ID.Outer.name() + EscapeRoute.ID.NorthOfCS.name()), kOuterNorthCornerList,
-      (Lanes.ID.Inner.name() + EscapeRoute.ID.NorthOfCS.name()), kInnerNorthCornerList,
-      (Lanes.ID.Outer.name() + EscapeRoute.ID.SouthOfCS.name()), kOuterSouthCornerList,
-      (Lanes.ID.Inner.name() + EscapeRoute.ID.SouthOfCS.name()), kInnerSouthCornerList
-    );
+    public static final Map<String, List<Transitional>> cornerMap =
+        Map.of(
+            (Lanes.ID.Outer.name() + EscapeRoute.ID.NorthOfCS.name()), kOuterNorthCornerList,
+            (Lanes.ID.Inner.name() + EscapeRoute.ID.NorthOfCS.name()), kInnerNorthCornerList,
+            (Lanes.ID.Outer.name() + EscapeRoute.ID.SouthOfCS.name()), kOuterSouthCornerList,
+            (Lanes.ID.Inner.name() + EscapeRoute.ID.SouthOfCS.name()), kInnerSouthCornerList);
 
-    public static final Map<String, Transitional> transitionalMap = Map.of(
-      (Lanes.ID.Outer.name() + EscapeRoute.ID.NorthOfCS.name()), Transitional.OuterLaneNorthOfCS,
-      (Lanes.ID.Inner.name() + EscapeRoute.ID.NorthOfCS.name()), Transitional.InnerLaneNorthOfCS,
-      (Lanes.ID.Outer.name() + EscapeRoute.ID.SouthOfCS.name()), Transitional.OuterLaneSouthOfCS,
-      (Lanes.ID.Inner.name() + EscapeRoute.ID.SouthOfCS.name()), Transitional.InnerLaneSouthOfCS
-    );
-    
+    public static final Map<String, Transitional> transitionalMap =
+        Map.of(
+            (Lanes.ID.Outer.name() + EscapeRoute.ID.NorthOfCS.name()),
+                Transitional.OuterLaneNorthOfCS,
+            (Lanes.ID.Inner.name() + EscapeRoute.ID.NorthOfCS.name()),
+                Transitional.InnerLaneNorthOfCS,
+            (Lanes.ID.Outer.name() + EscapeRoute.ID.SouthOfCS.name()),
+                Transitional.OuterLaneSouthOfCS,
+            (Lanes.ID.Inner.name() + EscapeRoute.ID.SouthOfCS.name()),
+                Transitional.InnerLaneSouthOfCS);
+
     public static enum ID {
       // Far North staging areas next to center line
       U(2, 7.5, 7.5), // Furthest north next to center line
@@ -394,18 +418,7 @@ public class AutoConstants {
       Y(5, 6.0, ChargingStation.kCenterY), // Centered on charging station
       Z(6, 6.0, ChargingStation.kSouthSideY); // South of charging station
 
-      private static final Map<String, ID> nameMap =
-          Map.of(
-              "U",
-              U,
-              "V",
-              V,
-              "X",
-              X,
-              "Y",
-              Y,
-              "Z",
-              Z);
+      private static final Map<String, ID> nameMap = Map.of("U", U, "V", V, "X", X, "Y", Y, "Z", Z);
 
       private final int id;
 

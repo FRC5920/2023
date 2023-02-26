@@ -64,17 +64,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.RobotContainer;
-import frc.robot.autos.AutoConstants.BotDimensions;
 import frc.robot.autos.AutoConstants.BotOrientation;
 import frc.robot.autos.AutoConstants.EscapeRoute;
 import frc.robot.autos.AutoConstants.Grids;
 import frc.robot.autos.AutoConstants.Lanes;
 import frc.robot.autos.AutoConstants.SecondaryAction;
 import frc.robot.autos.AutoConstants.Waypoints;
+import frc.robot.autos.AutoConstants.Waypoints.Transitional;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
-
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /** A class used to build auto routines */
 public class AutoRoutineBuilder {
@@ -184,92 +184,118 @@ public class AutoRoutineBuilder {
 
   /** Generates a path for the bot to follow to get out of the Grid/community */
   private void generateEscapeTrajectory() {
-    ArrayList<PathPointHelper> escapeWaypoints = new ArrayList<PathPointHelper>();
+    ArrayList<PathPointHelper> pointList = new ArrayList<PathPointHelper>();
 
     Rotation2d initialHolRot = m_startingPosition.pose.getRotation();
-    Rotation2d populateLater = new Rotation2d();  // Placeholder for value filled in later
-    PathPointHelper initialWaypoint = new PathPointHelper(
-      "Initial position", m_startingPosition.pose.getX(), m_startingPosition.pose.getY(), // X, Y
-      BotOrientation.kFacingField, // Heading
-      initialHolRot); // Holonomic rotation
-    escapeWaypoints.add(initialWaypoint);
-    
+    Rotation2d populateLater = new Rotation2d(); // Placeholder for value filled in later
+    PathPointHelper initialWaypoint =
+        new PathPointHelper(
+            "Initial position",
+            m_startingPosition.pose.getX(),
+            m_startingPosition.pose.getY(), // X, Y
+            populateLater, // Heading
+            initialHolRot); // Holonomic rotation
+    pointList.add(initialWaypoint);
+
     // ------------------------------------------------------
     // Generate a point that moves the bot into the active
     // lane from the starting position
-    PathPointHelper laneWaypoint;
-    if (m_escapeLane == Lanes.ID.Outer) {
-      // OUTER lane doesn' need to move far from the initial position, but we set the initial
-      // heading
-      laneWaypoint = new PathPointHelper("Inital Lane Waypoint",
-              m_escapeLane.xColumnCenter, initialWaypoint.getY(), // X, Y
-              populateLater, // Heading will get filled in later
-              initialHolRot); // Holonomic Rotation
+    PathPointHelper laneWaypoint =
+        new PathPointHelper(
+            "Inital Lane Waypoint",
+            m_escapeLane.xColumnCenter,
+            initialWaypoint.getY(), // X, Y
+            populateLater, // Heading will get filled in later
+            initialHolRot); // Holonomic Rotation
+    pointList.add(laneWaypoint);
 
+    // Concatenate the name of the lane and the route to create a key for lookups
     String laneRouteKey = m_escapeLane.name() + m_escapeRoute.name();
 
-    // Determine the transitional waypoint to use
-    Waypoints.Transitional transitionalWaypoint = Waypoints.transitionalMap.get(laneRouteKey);
- 
-    // If corner waypoints are needed, add them
-    if (laneWaypoint.getY() != transitionalWaypoint.coordinates.getY()) {
-      
+    // If the initial position is not on the same end of the Grids as the route, then we
+    // need to generate waypoints for a tight corner.
+    if (!((m_startingPosition == Grids.ScoringPosition.A)
+            && (m_escapeRoute == EscapeRoute.ID.SouthOfCS))
+        && !((m_startingPosition == Grids.ScoringPosition.I)
+            && (m_escapeRoute == EscapeRoute.ID.NorthOfCS))) {
+      List<Transitional> cornerWaypoints = Waypoints.cornerMap.get(laneRouteKey);
+      for (Transitional wp : cornerWaypoints) {
+        pointList.add(
+            new PathPointHelper(
+                "CornerWaypoint",
+                wp.coordinates.getX(),
+                wp.coordinates.getY(),
+                populateLater,
+                initialHolRot));
+      }
     }
-    // ------------------------------------------------------
-    // Generate a trajectory that moves the bot to the end of the current lane column
-    final PathConstraints escapePathConstraints =
-        new PathConstraints(kMaxEscapeVelocityMetersPerSec, kMaxEscapeAccelerationMetersPerSec2);
-    m_escapeTrajectory =
-        PathPlanner.generatePath(
-            escapePathConstraints,
-            // Set a waypoint at the initial position
-            new PathPoint(
-                new Translation2d(xInitial, yInitial), // Translation
-                BotOrientation.kFacingField, // Heading
-                thetaInitial), // Holonomic Rotation
-            // Move to a waypoint at the initial point of the active lane
-            laneWaypoint,
-            // Move to the extreme Y coordinate of the active lane (does nothing if going over CS)
-            new PathPoint(
-                new Translation2d(
-                    m_escapeLane.xColumnCenter,
-                    m_escapeLane.getYForRoute(m_escapeRoute)), // Translation
-                BotOrientation.kFacingNorth, // Heading
-                BotOrientation.kFacingField), // Holonomic rotation
 
-            // Move to a transitional waypoint corresponding to the selected lane
-            new PathPoint(
-                new Translation2d(
-                    transitionalWaypoint.coordinates.getX(),
-                    transitionalWaypoint.coordinates.getY()), // Translation
-                BotOrientation.kFacingField, // Heading
-                BotOrientation.kFacingField) // Holonomic rotation
-            );
+    // Add the transitional waypoint for the active lane and route
+    Waypoints.Transitional transitionalWaypoint = Waypoints.transitionalMap.get(laneRouteKey);
+    pointList.add(
+        new PathPointHelper(
+            "EscapeEnd",
+            transitionalWaypoint.coordinates.getX(),
+            transitionalWaypoint.coordinates.getY(),
+            BotOrientation.kFacingField,
+            initialHolRot));
+
+    // Update each waypoint in the list so that it points to the waypoint following it.
+    ArrayList<PathPoint> escapeList = new ArrayList<PathPoint>();
+    for (int idx = 1; idx < pointList.size(); ++idx) {
+      PathPointHelper wp = pointList.get(idx - 1);
+      PathPointHelper wpNext = pointList.get(idx);
+
+      // Calculate the angle between the two waypoints
+      double dx = wpNext.getX() - wp.getX();
+      double dy = wpNext.getY() - wp.getY();
+      double theta = Math.atan2(dy, dx);
+      System.out.printf("******* <%s> theta=%.2f\n", wp.name, theta);
+
+      escapeList.add(
+          new PathPoint(wp.getPosition(), new Rotation2d(theta), wp.getHolonomicRotation()));
+    }
+
+    // DEBUG: Print the list of generated waypoints
+    for (PathPointHelper wp : pointList) {
+      System.out.println(wp.format());
+    }
+
+    // Create a trajectory from the waypoints
+    PathConstraints escapePathConstraints =
+        new PathConstraints(kMaxEscapeVelocityMetersPerSec, kMaxEscapeAccelerationMetersPerSec2);
+
+    m_escapeTrajectory = PathPlanner.generatePath(escapePathConstraints, escapeList);
   }
 
   public Trajectory getTrajectory() {
     return m_cumulativeTrajectory;
   }
 
-
   private static class PathPointHelper extends PathPoint {
     public final String name;
 
-    public PathPointHelper(String nameStr, double x, double y, Rotation2d theta, Rotation2d holRot) {
-      super( new Translation2d(x, y), theta, holRot);
+    public PathPointHelper(
+        String nameStr, double x, double y, Rotation2d theta, Rotation2d holRot) {
+      super(new Translation2d(x, y), theta, holRot);
       name = nameStr;
     }
 
     public String format() {
-      return String.format("<%s> (x=%.2f, y=%.2f), theta=%.2f deg, holonomic=%.2f deg\n",
-        name, position.getX(), position.getY(), heading.getDegrees(), holonomicRotation.getDegrees());
+      return String.format(
+          "<%s> (x=%.2f, y=%.2f), theta=%.2f deg, holonomic=%.2f deg\n",
+          name,
+          position.getX(),
+          position.getY(),
+          heading.getDegrees(),
+          holonomicRotation.getDegrees());
     }
 
     public double getX() {
       return position.getX();
     }
 
-    public double getY() { 
+    public double getY() {
       return position.getY();
     }
 
