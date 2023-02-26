@@ -8,6 +8,7 @@
       "/Shuffleboard/Auto Builder/Lane": "String Chooser",
       "/Shuffleboard/Auto Builder/Route": "String Chooser",
       "/Shuffleboard/Auto Builder/Secondary Action": "String Chooser",
+      "/Shuffleboard/Auto Builder/Waypoint": "String Chooser",
       "/Shuffleboard/Drive Train/Field": "Field2d",
       "/Shuffleboard/Drive/SendableChooser[0]": "String Chooser",
       "/Shuffleboard/Drive/Speed Limit": "String Chooser",
@@ -31,7 +32,12 @@
         "Robot": {
           "style": "Box/Image"
         },
+        "bottom": 544,
         "height": 8.013679504394531,
+        "image": "/home/dave/git/VIKotics/2023/glass/2023-field.png",
+        "left": 46,
+        "right": 1088,
+        "top": 36,
         "width": 16.541748046875,
         "window": {
           "visible": true
@@ -40,11 +46,6 @@
       "/Shuffleboard/Auto Builder/Initial Position": {
         "window": {
           "name": "Initial Position",
-          "visible": true
-        }
-      },
-      "/Shuffleboard/Auto Builder/Lane": {
-        "window": {
           "visible": true
         }
       },

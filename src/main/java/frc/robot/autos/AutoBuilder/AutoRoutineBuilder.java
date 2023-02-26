@@ -65,13 +65,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.RobotContainer;
+import frc.robot.autos.AutoConstants.BotDimensions;
 import frc.robot.autos.AutoConstants.BotOrientation;
 import frc.robot.autos.AutoConstants.EscapeRoute;
 import frc.robot.autos.AutoConstants.Grids;
-import frc.robot.autos.AutoConstants.Lanes;
 import frc.robot.autos.AutoConstants.SecondaryAction;
 import frc.robot.autos.AutoConstants.Waypoints;
-import frc.robot.autos.AutoConstants.Waypoints.Transitional;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -103,10 +102,8 @@ public class AutoRoutineBuilder {
 
   /** Pose where the bot is initially positioned */
   private Grids.ScoringPosition m_startingPosition;
-  /** Lane that the bot should use to escape the community/Grids */
-  private Lanes.ID m_escapeLane;
   /** Route the bot will follow to escape from the Community */
-  private EscapeRoute.ID m_escapeRoute;
+  private EscapeRoute.Route m_escapeRoute;
   /** Waypoint to travel to when escaping the community */
   private Waypoints.ID m_escapeWaypoint;
   /** What to do after escaping the community */
@@ -161,11 +158,9 @@ public class AutoRoutineBuilder {
   public Command build(
       RobotContainer botContainer,
       Grids.ScoringPosition startingPosition,
-      Lanes.ID escapeLane,
-      EscapeRoute.ID escapeRoute,
+      EscapeRoute.Route escapeRoute,
       Waypoints.ID escapeWaypoint) {
     m_startingPosition = startingPosition;
-    m_escapeLane = escapeLane;
     m_escapeRoute = escapeRoute;
     m_escapeWaypoint = escapeWaypoint;
 
@@ -208,51 +203,55 @@ public class AutoRoutineBuilder {
             initialHolRot); // Holonomic rotation
     pointList.add(initialWaypoint);
 
+    // Generate waypoints to move from the initial position to the corner associated with the
+    // selected route.
+
+    // Create a PathPoint for the corner of our escape route.  It won't be added to the list.  But,
+    // we may use it to create associated corner waypoints
+    // PathPointHelper routeCorner = new PathPointHelper(
+    //   "",
+    //         EscapeRoute.cornerMap.get(m_escapeRoute).position.getX(),
+    //         EscapeRoute.cornerMap.get(m_escapeRoute).position.getY(), // X, Y
+    //         populateLater, // Heading will get filled in later
+    //         initialHolRot); // Holonomic Rotation
+    // );
+
+    // If moving into the inner lane, create corner waypoints to navigate to the waypoint following
+
     // ------------------------------------------------------
     // Generate a point that moves the bot into the active
     // lane from the starting position
     PathPointHelper laneWaypoint =
         new PathPointHelper(
             "Inital Lane Waypoint",
-            m_escapeLane.xColumnCenter,
+            EscapeRoute.laneMap.get(m_escapeRoute).xColumnCenter,
             initialWaypoint.getY(), // X, Y
             populateLater, // Heading will get filled in later
             initialHolRot); // Holonomic Rotation
     pointList.add(laneWaypoint);
 
-    // Concatenate the name of the lane and the route to create a key for lookups
-    String laneRouteKey = m_escapeLane.name() + m_escapeRoute.name();
+    // Create a waypoint for the endpoint of the active escape route, but don't add it yet
+    EscapeRoute.Endpoint endpoint = EscapeRoute.endpointMap.get(m_escapeRoute);
 
-    // If the initial position is not on the same end of the Grids as the route, then we
-    // need to generate waypoints for a tight corner.
-    if (!((m_startingPosition == Grids.ScoringPosition.A)
-            && (m_escapeRoute == EscapeRoute.ID.SouthOfCS))
-        && !((m_startingPosition == Grids.ScoringPosition.I)
-            && (m_escapeRoute == EscapeRoute.ID.NorthOfCS))) {
-      List<Transitional> cornerWaypoints = Waypoints.cornerMap.get(laneRouteKey);
-      for (Transitional wp : cornerWaypoints) {
-        pointList.add(
-            new PathPointHelper(
-                "CornerWaypoint",
-                wp.coordinates.getX(),
-                wp.coordinates.getY(),
-                populateLater,
-                initialHolRot));
-      }
+    PathPointHelper endWaypoint =
+        new PathPointHelper(
+            "EscapeEndpoint",
+            endpoint.coordinates.getX(),
+            endpoint.coordinates.getY(),
+            BotOrientation.kFacingField,
+            initialHolRot);
+
+    // Generate any intermediate corner points needed to reach the target endpoint via a right-angle
+    // path
+    List<PathPointHelper> cornerPoints = generateCornerPoints(laneWaypoint, endWaypoint);
+    for (PathPointHelper cornerPoint : cornerPoints) {
+      pointList.add(cornerPoint);
     }
 
-    // Add the transitional waypoint for the active lane and route
-    Waypoints.Transitional transitionalWaypoint = Waypoints.transitionalMap.get(laneRouteKey);
-    pointList.add(
-        new PathPointHelper(
-            "EscapeEnd",
-            transitionalWaypoint.coordinates.getX(),
-            transitionalWaypoint.coordinates.getY(),
-            BotOrientation.kFacingField,
-            initialHolRot));
+    pointList.add(endWaypoint);
 
-    // Update each waypoint in the list so that it points to the waypoint following it.
-    alignPointHeadings(pointList);
+    // Make each waypoint in the list point to the waypoint that follows it
+    alignHeadings(pointList);
 
     // DEBUG: Print the list of path waypoints
     for (PathPointHelper wp : pointList) {
@@ -277,7 +276,50 @@ public class AutoRoutineBuilder {
     return m_cumulativeTrajectory;
   }
 
-  private static void alignPointHeadings(ArrayList<PathPointHelper> points) {
+  /**
+   * Generates a list of waypoints that create a 90-degree corner of a right-angle path between two
+   * waypoints.
+   *
+   * @param start Point of the starting location
+   * @param end Point giving the end location
+   */
+  private static List<PathPointHelper> generateCornerPoints(
+      PathPointHelper start, PathPointHelper end) {
+    List<PathPointHelper> cornerPoints = new ArrayList<PathPointHelper>();
+
+    // If the distance between start and end is less than half a bot width, there is no need for
+    // corners
+    if (Math.abs(start.getY() - end.getY()) <= BotDimensions.kHalfFootprintWidth) {
+      return cornerPoints;
+    }
+
+    // Create the inside of the corner
+    double cornerYAdjust =
+        (start.getY() < end.getY())
+            ? (-1.0 * BotDimensions.kHalfFootprintWidth)
+            : BotDimensions.kHalfFootprintWidth;
+    cornerPoints.add(
+        new PathPointHelper(
+            "CornerInside",
+            start.getX(),
+            (end.getY() + cornerYAdjust),
+            new Rotation2d(),
+            start.getHolonomicRotation()));
+
+    // Create the outside of the corner
+    cornerPoints.add(
+        new PathPointHelper(
+            "CornerOutside",
+            (start.getX() + BotDimensions.kHalfFootprintWidth),
+            end.getY(),
+            new Rotation2d(),
+            start.getHolonomicRotation()));
+
+    // Create the outside of the corner
+    return cornerPoints;
+  }
+
+  private static void alignHeadings(ArrayList<PathPointHelper> points) {
     for (int idx = 1; idx < points.size(); ++idx) {
       PathPointHelper point = points.get(idx - 1);
       PathPointHelper pointAfter = points.get(idx);
@@ -286,7 +328,6 @@ public class AutoRoutineBuilder {
       double dx = pointAfter.getX() - point.getX();
       double dy = pointAfter.getY() - point.getY();
       double theta = Math.atan2(dy, dx);
-      System.out.printf("******* <%s> theta=%.2f\n", point.name, theta);
 
       points.set(
           (idx - 1),
@@ -310,7 +351,7 @@ public class AutoRoutineBuilder {
 
     public String format() {
       return String.format(
-          "<%s> (x=%.2f, y=%.2f), theta=%.2f deg, holonomic=%.2f deg\n",
+          "<%s> (x=%.2f, y=%.2f), theta=%.2f deg, holonomic=%.2f deg",
           name,
           position.getX(),
           position.getY(),

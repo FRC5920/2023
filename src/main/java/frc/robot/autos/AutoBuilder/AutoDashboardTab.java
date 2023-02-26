@@ -94,11 +94,11 @@ public class AutoDashboardTab implements IDashboardTab {
   private final ChooserWithChangeDetection<Grids.ScoringPosition> m_initialPositionChooser =
       new ChooserWithChangeDetection<Grids.ScoringPosition>();
   /** Staging position/route chooser */
-  private final ChooserWithChangeDetection<Lanes.ID> m_laneChooser =
-      new ChooserWithChangeDetection<Lanes.ID>();
+  private final ChooserWithChangeDetection<Lanes.Lane> m_laneChooser =
+      new ChooserWithChangeDetection<Lanes.Lane>();
   /** Route chooser */
-  private final ChooserWithChangeDetection<EscapeRoute.ID> m_routeChooser =
-      new ChooserWithChangeDetection<EscapeRoute.ID>();
+  private final ChooserWithChangeDetection<EscapeRoute.Route> m_routeChooser =
+      new ChooserWithChangeDetection<EscapeRoute.Route>();
   /** Waypoint chooser */
   private final ChooserWithChangeDetection<Waypoints.ID> m_escapeWaypointChooser =
       new ChooserWithChangeDetection<Waypoints.ID>();
@@ -138,26 +138,12 @@ public class AutoDashboardTab implements IDashboardTab {
         .withSize(kChooserWidth, kChooserHeight)
         .withPosition(0 * kChooserWidth, kFieldHeightCells);
 
-    // Set up the lane chooser
-    populateChooser(m_laneChooser, Lanes.ID.getNames(), Lanes.ID.values());
-    m_tab
-        .add("Lane", m_laneChooser)
-        .withSize(kChooserWidth, kChooserHeight)
-        .withPosition(1 * kChooserWidth, kFieldHeightCells);
-
     // Set up a chooser for the route to follow out of the community
-    populateChooser(m_routeChooser, EscapeRoute.ID.getNames(), EscapeRoute.ID.values());
+    populateChooser(m_routeChooser, EscapeRoute.Route.getNames(), EscapeRoute.Route.values());
     m_tab
         .add("Route", m_routeChooser)
         .withSize(kChooserWidth, kChooserHeight)
         .withPosition(2 * kChooserWidth, kFieldHeightCells);
-
-    // Set up a chooser for the waypoint to move to outside the community
-    populateChooser(m_escapeWaypointChooser, Waypoints.ID.getNames(), Waypoints.ID.values());
-    m_tab
-        .add("FirstWaypoint", m_escapeWaypointChooser)
-        .withSize(kChooserWidth, kChooserHeight)
-        .withPosition(3 * kChooserWidth, kFieldHeightCells);
 
     // Set up a chooser for the secondary action to take
     populateChooser(m_secondaryActionChooser, SecondaryAction.getNames(), SecondaryAction.values());
@@ -165,6 +151,13 @@ public class AutoDashboardTab implements IDashboardTab {
         .add("Secondary Action", m_secondaryActionChooser)
         .withSize(kChooserWidth, kChooserHeight)
         .withPosition(4 * kChooserWidth, kFieldHeightCells);
+
+    // Set up a chooser for the waypoint to move to outside the community
+    populateChooser(m_escapeWaypointChooser, Waypoints.ID.getNames(), Waypoints.ID.values());
+    m_tab
+        .add("Waypoint", m_escapeWaypointChooser)
+        .withSize(kChooserWidth, kChooserHeight)
+        .withPosition(3 * kChooserWidth, kFieldHeightCells);
 
     // Create an auto routine builder
     m_builder = new AutoRoutineBuilder(botContainer);
@@ -202,7 +195,6 @@ public class AutoDashboardTab implements IDashboardTab {
       m_builder.build(
           botContainer,
           m_initialPositionChooser.getSelected(),
-          m_laneChooser.getSelected(),
           m_routeChooser.getSelected(),
           m_escapeWaypointChooser.getSelected());
 

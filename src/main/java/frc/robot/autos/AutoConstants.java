@@ -71,10 +71,10 @@ public class AutoConstants {
     private static final double kBumperWidthMeters = Units.inchesToMeters(0.75 + 2.5);
 
     /** Total width of the (square) robot footprint in meters */
-    private static final double kFootprintWidth = kDriveBaseWidthMeters + (2 * kBumperWidthMeters);
+    public static final double kFootprintWidth = kDriveBaseWidthMeters + (2 * kBumperWidthMeters);
 
     /** Half the robot footprint width (i.e. the center of the robot) */
-    private static final double kHalfFootprintWidth = kFootprintWidth / 2;
+    public static final double kHalfFootprintWidth = kFootprintWidth / 2;
   }
 
   /** Constants indicating the robot's rotational orientation */
@@ -121,9 +121,6 @@ public class AutoConstants {
       H(7),
       I(8);
 
-      private static final Map<String, ScoringPosition> nameMap =
-          Map.of("A", A, "B", B, "C", C, "D", D, "E", E, "F", F, "G", G, "H", H, "I", I);
-
       private final int id;
       public final Pose2d pose;
 
@@ -134,20 +131,8 @@ public class AutoConstants {
         pose = new Pose2d(x, y, BotOrientation.kFacingGrid);
       }
 
-      /** Get the human-readable name of the robot type */
-      @Override
-      public String toString() {
-        return this.name();
-      }
-
-      public static ScoringPosition fromName(String s) {
-        return nameMap.get(s);
-      }
-
       public static String[] getNames() {
-        String names[] = nameMap.keySet().toArray(new String[nameMap.size()]);
-        Arrays.sort(names);
-        return names;
+        return getEnumNames(ScoringPosition.class);
       }
     };
   }
@@ -161,9 +146,9 @@ public class AutoConstants {
     public static final double kFieldSideX = FieldConstants.Community.chargingStationOuterX;
 
     /** Y coordinate of the side of the charging station closest to the scoring table */
-    public static final double kSouthSideY = FieldConstants.Community.chargingStationLeftY;
+    public static final double kSouthSideY = FieldConstants.Community.chargingStationRightY;
     /** Y coordinate of the side of the charging station furthest from the Grids */
-    public static final double kNorthSideY = FieldConstants.Community.chargingStationRightY;
+    public static final double kNorthSideY = FieldConstants.Community.chargingStationLeftY;
 
     /** X coordinate of the center of the Charging Station */
     public static final double kCenterX = (kFieldSideX - kGridSideX) / 2.0;
@@ -227,50 +212,21 @@ public class AutoConstants {
      * @remarks Lanes are used to indicate imaginary lantes that run between the Grids and the
      *     Charging Station.
      */
-    public static enum ID {
+    public static enum Lane {
       Outer(0),
       Inner(1);
-
-      private static final Map<String, ID> nameMap = Map.of("Inner", Inner, "Outer", Outer);
 
       private final int id;
       public final double xColumnCenter; // X-coordinate of the lane's North-South section
 
-      private ID(int idx) {
+      private Lane(int idx) {
         id = idx;
         xColumnCenter = (id == 1) ? kInnerLaneColumnCenterX : kOuterLaneColumnCenterX;
       }
 
-      /** Get the human-readable name of the robot type */
-      @Override
-      public String toString() {
-        return this.name();
-      }
-
-      public static ID fromString(String s) {
-        return nameMap.get(s);
-      }
-
+      /** Returns a list of names of enum elements */
       public static String[] getNames() {
-        String names[] = nameMap.keySet().toArray(new String[nameMap.size()]);
-        Arrays.sort(names);
-        return names;
-      }
-
-      public double getYForRoute(EscapeRoute.ID route) {
-        double y = -1.0;
-        switch (route) {
-          case NorthOfCS: // North of CS
-            y = (id == Inner.id) ? kInnerLaneNorthCenterY : kOuterLaneNorthCenterY;
-            break;
-          case SouthOfCS: // South of CS
-            y = (id == Outer.id) ? kInnerLaneSouthCenterY : kOuterLaneSouthCenterY;
-            break;
-          case CenterOfCS: // Through CS
-            y = ChargingStation.kCenterY;
-            break;
-        }
-        return y;
+        return getEnumNames(Lane.class);
       }
     }
   }
@@ -278,172 +234,129 @@ public class AutoConstants {
   //////////////////////////////////////////////////////////////////////////////////////////////////
   /** Constants used to identify the route the bot will take out of the community */
   public static class EscapeRoute {
-    public static enum ID {
+
+    public static enum Route {
       /**
-       * This route takes the bot to the North of the charging station, on the side furthest from
-       * the scoring table
+       * This route takes the bot to the North of the charging station (the side furthest from the
+       * scoring table) via the OUTER lane
        */
-      NorthOfCS(0),
+      NorthOfCSViaOuterLane,
       /**
-       * This route takes the bot to the South of the charging station, on the side closest to the
-       * scoring table
+       * This route takes the bot to the North of the charging station (the side furthest from the
+       * scoring table) via the INNER lane
        */
-      SouthOfCS(1),
-      /** This route takes the bot through the center of the Charging Station */
-      CenterOfCS(2);
+      NorthOfCSViaInnerLane,
+      /**
+       * This route takes the bot to the South of the charging station (the side closest to the
+       * scoring table) via the OUTER lane
+       */
+      SouthOfCSViaOuterLane,
+      /**
+       * This route takes the bot to the South of the charging station (the side closest to the
+       * scoring table) via the OUTER lane
+       */
+      SouthOfCSViaInnerLane,
+      /** This route takes the bot through the center of the Charging Station via the OUTER lane */
+      ThroughCSViaOuterLane,
+      /** This route takes the bot through the center of the Charging Station via the INNER lane */
+      ThroughCSViaInnerLane;
 
-      private static final Map<String, ID> nameMap =
-          Map.of("NorthOfCS", NorthOfCS, "SouthOfCS", SouthOfCS, "CenterOfCS", CenterOfCS);
-
-      private final int id;
-
-      private ID(int idx) {
-        id = idx;
-      }
-
-      /** Get the human-readable name of the robot type */
-      @Override
-      public String toString() {
-        return this.name();
-      }
-
-      public static ID fromString(String s) {
-        return nameMap.get(s);
-      }
-
+      /** Returns a list of names of enum elements */
       public static String[] getNames() {
-        String names[] = nameMap.keySet().toArray(new String[nameMap.size()]);
-        Arrays.sort(names);
-        return names;
+        return getEnumNames(Route.class);
       }
     }
+
+    public static enum Corner {
+      // Outer lane North corner waypoints
+      OuterLaneNorthCorner(Lanes.kOuterLaneColumnCenterX, Lanes.kOuterLaneNorthCenterY),
+      OuterLaneSouthCorner(Lanes.kOuterLaneColumnCenterX, Lanes.kOuterLaneSouthCenterY),
+      OuterLaneCenterOfCS(Lanes.kOuterLaneColumnCenterX, ChargingStation.kCenterY),
+
+      InnerLaneNorthCorner(Lanes.kInnerLaneColumnCenterX, Lanes.kInnerLaneNorthCenterY),
+      InnerLaneSouthCorner(Lanes.kInnerLaneColumnCenterX, Lanes.kInnerLaneSouthCenterY),
+      InnerLaneCenterOfCS(Lanes.kInnerLaneColumnCenterX, ChargingStation.kCenterY);
+
+      public final Translation2d position;
+
+      private Corner(double x, double y) {
+        position = new Translation2d(x, y);
+      }
+    }
+
+    public static enum Endpoint {
+      /** End of the North OUTER lane aligned with Fieldward side of Charging Station */
+      OuterLaneNorthEndpoint(ChargingStation.kFieldSideX, Lanes.kOuterLaneNorthCenterY),
+      /** End of the North INNER lane aligned with Fieldward side of Charging Station */
+      InnerLaneNorthEndpoint(ChargingStation.kFieldSideX, Lanes.kInnerLaneNorthCenterY),
+
+      /** End of the South OUTER lane just past tape South of Charging Station */
+      OuterLaneSouthEndpoint(ChargingStation.kFieldSideX + 0.25, Lanes.kOuterLaneSouthCenterY),
+      /** End of the South INNER lane just past tape South of Charging Station */
+      InnerLaneSouthEndpoint(ChargingStation.kFieldSideX + 0.25, Lanes.kInnerLaneSouthCenterY),
+
+      /** End of the route through the Charging Station via the Outer lane */
+      ThroughCSEndpoint(ChargingStation.kFieldSideX + 0.25, ChargingStation.kCenterY);
+
+      public final Translation2d coordinates;
+
+      private Endpoint(double x, double y) {
+        coordinates = new Translation2d(x, y);
+      }
+    }
+
+    public static final Map<Route, Lanes.Lane> laneMap =
+        Map.of(
+            Route.NorthOfCSViaOuterLane, Lanes.Lane.Outer,
+            Route.NorthOfCSViaInnerLane, Lanes.Lane.Inner,
+            Route.SouthOfCSViaOuterLane, Lanes.Lane.Outer,
+            Route.SouthOfCSViaInnerLane, Lanes.Lane.Inner,
+            Route.ThroughCSViaOuterLane, Lanes.Lane.Outer,
+            Route.ThroughCSViaInnerLane, Lanes.Lane.Inner);
+
+    public static final Map<Route, Corner> cornerMap =
+        Map.of(
+            Route.NorthOfCSViaOuterLane, Corner.OuterLaneNorthCorner,
+            Route.NorthOfCSViaInnerLane, Corner.InnerLaneNorthCorner,
+            Route.SouthOfCSViaOuterLane, Corner.OuterLaneSouthCorner,
+            Route.SouthOfCSViaInnerLane, Corner.InnerLaneSouthCorner,
+            Route.ThroughCSViaOuterLane, Corner.OuterLaneCenterOfCS,
+            Route.ThroughCSViaInnerLane, Corner.InnerLaneCenterOfCS);
+
+    public static final Map<Route, Endpoint> endpointMap =
+        Map.of(
+            Route.NorthOfCSViaOuterLane, Endpoint.OuterLaneNorthEndpoint,
+            Route.NorthOfCSViaInnerLane, Endpoint.InnerLaneNorthEndpoint,
+            Route.SouthOfCSViaOuterLane, Endpoint.OuterLaneSouthEndpoint,
+            Route.SouthOfCSViaInnerLane, Endpoint.InnerLaneSouthEndpoint,
+            Route.ThroughCSViaOuterLane, Endpoint.ThroughCSEndpoint,
+            Route.ThroughCSViaInnerLane, Endpoint.ThroughCSEndpoint);
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////
   /** Constants used in conjunction with predefined waypoints used in auto routines */
   public static class Waypoints {
-    public static enum Transitional {
-      // Outer lane North corner waypoints
-      OuterNorthCornerBottom(
-          Lanes.kOuterLaneColumnCenterX,
-          Lanes.kOuterLaneNorthCenterY - BotDimensions.kHalfFootprintWidth),
-      OuterNorthCornerTop(
-          Lanes.kOuterLaneColumnCenterX + BotDimensions.kHalfFootprintWidth,
-          Lanes.kOuterLaneNorthCenterY),
-
-      // Inner lane North corner waypoints
-      InnerNorthCornerBottom(
-          Lanes.kInnerLaneColumnCenterX,
-          Lanes.kInnerLaneNorthCenterY - BotDimensions.kHalfFootprintWidth),
-      InnerNorthCornerTop(
-          Lanes.kInnerLaneColumnCenterX + BotDimensions.kHalfFootprintWidth,
-          Lanes.kInnerLaneNorthCenterY),
-
-      // Outer lane South corner waypoints
-      OuterSouthCornerBottom(
-          Lanes.kOuterLaneColumnCenterX,
-          Lanes.kOuterLaneSouthCenterY - BotDimensions.kHalfFootprintWidth),
-      OuterSouthCornerTop(
-          Lanes.kOuterLaneColumnCenterX + BotDimensions.kHalfFootprintWidth,
-          Lanes.kOuterLaneSouthCenterY),
-
-      // Inner lane South corner waypoints
-      InnerSouthCornerBottom(
-          Lanes.kInnerLaneColumnCenterX,
-          Lanes.kInnerLaneSouthCenterY - BotDimensions.kHalfFootprintWidth),
-      InnerSouthCornerTop(
-          Lanes.kInnerLaneColumnCenterX + BotDimensions.kHalfFootprintWidth,
-          Lanes.kInnerLaneSouthCenterY),
-
-      /**
-       * OUTER lane North of the charging station aligned with Fieldward side of Charging Station
-       */
-      OuterLaneNorthOfCS(ChargingStation.kFieldSideX, Lanes.kOuterLaneNorthCenterY),
-      /**
-       * INNER lane North of the charging station aligned with Fieldward side of Charging Station
-       */
-      InnerLaneNorthOfCS(ChargingStation.kFieldSideX, Lanes.kInnerLaneNorthCenterY),
-
-      /**
-       * OUTER lane South of the charging station aligned with Fieldward side of Charging Station
-       */
-      OuterLaneSouthOfCS(ChargingStation.kFieldSideX + 0.1, Lanes.kOuterLaneSouthCenterY),
-      /**
-       * INNER lane South of the charging station aligned with Fieldward side of Charging Station
-       */
-      InnerLaneSouthOfCS(ChargingStation.kFieldSideX + 0.1, Lanes.kInnerLaneSouthCenterY);
-
-      public final Translation2d coordinates;
-
-      private Transitional(double x, double y) {
-        coordinates = new Translation2d(x, y);
-      }
-    }
-
-    private static final List<Transitional> kOuterNorthCornerList =
-        List.of(Transitional.OuterNorthCornerBottom, Transitional.OuterNorthCornerTop);
-    private static final List<Transitional> kOuterSouthCornerList =
-        List.of(Transitional.OuterSouthCornerBottom, Transitional.OuterSouthCornerTop);
-
-    private static final List<Transitional> kInnerNorthCornerList =
-        List.of(Transitional.InnerNorthCornerTop, Transitional.InnerNorthCornerBottom);
-    private static final List<Transitional> kInnerSouthCornerList =
-        List.of(Transitional.InnerSouthCornerTop, Transitional.InnerSouthCornerBottom);
-
-    public static final Map<String, List<Transitional>> cornerMap =
-        Map.of(
-            (Lanes.ID.Outer.name() + EscapeRoute.ID.NorthOfCS.name()), kOuterNorthCornerList,
-            (Lanes.ID.Inner.name() + EscapeRoute.ID.NorthOfCS.name()), kInnerNorthCornerList,
-            (Lanes.ID.Outer.name() + EscapeRoute.ID.SouthOfCS.name()), kOuterSouthCornerList,
-            (Lanes.ID.Inner.name() + EscapeRoute.ID.SouthOfCS.name()), kInnerSouthCornerList);
-
-    public static final Map<String, Transitional> transitionalMap =
-        Map.of(
-            (Lanes.ID.Outer.name() + EscapeRoute.ID.NorthOfCS.name()),
-                Transitional.OuterLaneNorthOfCS,
-            (Lanes.ID.Inner.name() + EscapeRoute.ID.NorthOfCS.name()),
-                Transitional.InnerLaneNorthOfCS,
-            (Lanes.ID.Outer.name() + EscapeRoute.ID.SouthOfCS.name()),
-                Transitional.OuterLaneSouthOfCS,
-            (Lanes.ID.Inner.name() + EscapeRoute.ID.SouthOfCS.name()),
-                Transitional.InnerLaneSouthOfCS);
 
     public static enum ID {
       // Far North staging areas next to center line
-      U(2, 7.5, 7.5), // Furthest north next to center line
-      V(3, 7.5, 6.0), // Secondmost north next to center line
+      U(7.5, 7.5), // Furthest north next to center line
+      V(7.5, 6.0), // Secondmost north next to center line
 
       // Staging areas between charging station and cargo
-      X(4, 6.0, ChargingStation.kNorthSideY), // North of charging station
-      Y(5, 6.0, ChargingStation.kCenterY), // Centered on charging station
-      Z(6, 6.0, ChargingStation.kSouthSideY); // South of charging station
-
-      private static final Map<String, ID> nameMap = Map.of("U", U, "V", V, "X", X, "Y", Y, "Z", Z);
-
-      private final int id;
+      X(6.0, ChargingStation.kNorthSideY), // North of charging station
+      Y(6.0, ChargingStation.kCenterY), // Centered on charging station
+      Z(6.0, ChargingStation.kSouthSideY); // South of charging station
 
       /** Coordinates on the field */
       public final Translation2d coordinates;
 
-      private ID(int idx, double x, double y) {
-        id = idx;
+      private ID(double x, double y) {
         coordinates = new Translation2d(x, y);
       }
 
-      /** Get the human-readable name of the robot type */
-      @Override
-      public String toString() {
-        return this.name();
-      }
-
-      public static ID fromString(String s) {
-        return nameMap.get(s);
-      }
-
+      /** Returns a list of names of enum elements */
       public static String[] getNames() {
-        String names[] = nameMap.keySet().toArray(new String[nameMap.size()]);
-        Arrays.sort(names);
-        return names;
+        return getEnumNames(ID.class);
       }
     }
   }
@@ -461,73 +374,35 @@ public class AutoConstants {
     C3(2), // Centered on southern half of the charging station
     C4(3); // South of the charging station
 
-    private static final Map<String, CargoLocation> nameMap =
-        Map.of("C1", C1, "C2", C2, "C3", C3, "C4", C4);
-
-    private final int id;
-
     /** Coordinates on the field */
     public final Translation2d coordinates;
 
-    private CargoLocation(int idx) {
-      id = idx;
+    private CargoLocation(int id) {
       double x = FieldConstants.StagingLocations.translations[id].getX();
       double y = FieldConstants.StagingLocations.translations[id].getY();
       coordinates = new Translation2d(x, y);
     }
 
-    /** Get the human-readable name of the robot type */
-    @Override
-    public String toString() {
-      return this.name();
-    }
-
-    public static CargoLocation fromString(String s) {
-      return nameMap.get(s);
-    }
-
+    /** Returns a list of names of enum elements */
     public static String[] getNames() {
-      String names[] = nameMap.keySet().toArray(new String[nameMap.size()]);
-      Arrays.sort(names);
-      return names;
+      return getEnumNames(CargoLocation.class);
     }
   };
 
   /////////////////////////////////////////////////////////////////////////////
-  /**
-   * Staging points
-   *
-   * @remarks Staging points are used to indicate transitional points where the robot might be
-   *     positioned in an auto routine
-   */
+  /** An enumeration of secondary actions to take after escaping the community */
   public static enum SecondaryAction {
-    WaitAtLocation(0), // Go to a location and wait
-    Balance(1), // Balance on the charging station
-    AcquireCargo(2); // Acquire a piece of cargo
+    WaitAtLocation, // Go to a location and wait
+    Balance, // Balance on the charging station
+    AcquireCargo; // Acquire a piece of cargo
 
-    private static final Map<String, SecondaryAction> nameMap =
-        Map.of("WaitAtLocation", WaitAtLocation, "Balance", Balance, "AcquireCargo", AcquireCargo);
-
-    private final int id;
-
-    private SecondaryAction(int idx) {
-      id = idx;
-    }
-
-    /** Get the human-readable name of the robot type */
-    @Override
-    public String toString() {
-      return this.name();
-    }
-
-    public static SecondaryAction fromString(String s) {
-      return nameMap.get(s);
-    }
-
+    /** Returns a list of names of enum elements */
     public static String[] getNames() {
-      String names[] = nameMap.keySet().toArray(new String[nameMap.size()]);
-      Arrays.sort(names);
-      return names;
+      return getEnumNames(CargoLocation.class);
     }
   };
+
+  private static String[] getEnumNames(Class<? extends Enum<?>> e) {
+    return Arrays.stream(e.getEnumConstants()).map(Enum::name).toArray(String[]::new);
+  }
 }
