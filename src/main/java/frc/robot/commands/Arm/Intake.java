@@ -52,8 +52,10 @@
 package frc.robot.commands.Arm;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Arm.Arm.DoWhatWithGamePiece;
+import frc.robot.subsystems.Arm.Arm.GamePieceType;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 
 public class Intake extends CommandBase {
@@ -84,6 +86,9 @@ public class Intake extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     Arm.zeroHandRollers();
+    if (gamePiece == GamePieceType.Cube){
+      Arm.HandBackRoller.set(Constants.ArmConstants.kHoldCubeVelocity);
+    }
     m_BotStateSubsystem.storedGamePiece = gamePiece;
     new Reach(Arm.ArmExtenderPosition.StowedAway);
   }

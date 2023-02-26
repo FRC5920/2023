@@ -124,6 +124,7 @@ public final class Constants {
     public static final long kIntakeWaitTime = 5000;
     public static final double kFetchAngularP = 0.1;
     public static final double kFetchAngularD = 0.0;
+    public static final double kHoldCubeVelocity = 0.1;
   }
 
   public static final class SwerveDrivebaseConstants {
