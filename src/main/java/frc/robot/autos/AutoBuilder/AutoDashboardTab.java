@@ -165,6 +165,9 @@ public class AutoDashboardTab implements IDashboardTab {
         .add("Secondary Action", m_secondaryActionChooser)
         .withSize(kChooserWidth, kChooserHeight)
         .withPosition(4 * kChooserWidth, kFieldHeightCells);
+
+    // Create an auto routine builder
+    m_builder = new AutoRoutineBuilder(botContainer);
   }
 
   /**
@@ -195,15 +198,13 @@ public class AutoDashboardTab implements IDashboardTab {
         || m_routeChooser.hasChanged()
         || m_secondaryActionChooser.hasChanged()) {
       // Rebuild the auto routine
-      m_builder =
-          new AutoRoutineBuilder(
-              botContainer,
-              m_initialPositionChooser.getSelected(),
-              m_laneChooser.getSelected(),
-              m_routeChooser.getSelected(),
-              m_escapeWaypointChooser.getSelected());
 
-      m_builder.build(botContainer);
+      m_builder.build(
+          botContainer,
+          m_initialPositionChooser.getSelected(),
+          m_laneChooser.getSelected(),
+          m_routeChooser.getSelected(),
+          m_escapeWaypointChooser.getSelected());
 
       // Display the auto trajectory on the field
       m_field2d.getObject("EscapeTrajectory").setTrajectory(m_builder.getTrajectory());

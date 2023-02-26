@@ -57,6 +57,7 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
+import com.pathplanner.lib.server.PathPlannerServer;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -78,6 +79,9 @@ import java.util.List;
 
 /** A class used to build auto routines */
 public class AutoRoutineBuilder {
+  /** Port to host PathPlanner data on */
+  private static final int kPathPlannerServerPort = 22334;
+
   /** Proportional gain used for translation when following trajectories */
   private static final double kTranslationkP = 5.0;
   /** Integral gain used for translation when following trajectories */
@@ -98,13 +102,13 @@ public class AutoRoutineBuilder {
   private static final double kMaxEscapeAccelerationMetersPerSec2 = 3.0;
 
   /** Pose where the bot is initially positioned */
-  private final Grids.ScoringPosition m_startingPosition;
+  private Grids.ScoringPosition m_startingPosition;
   /** Lane that the bot should use to escape the community/Grids */
-  private final Lanes.ID m_escapeLane;
+  private Lanes.ID m_escapeLane;
   /** Route the bot will follow to escape from the Community */
-  private final EscapeRoute.ID m_escapeRoute;
+  private EscapeRoute.ID m_escapeRoute;
   /** Waypoint to travel to when escaping the community */
-  private final Waypoints.ID m_escapeWaypoint;
+  private Waypoints.ID m_escapeWaypoint;
   /** What to do after escaping the community */
   private SecondaryAction m_secondaryAction;
 
@@ -122,17 +126,11 @@ public class AutoRoutineBuilder {
   // An AutoBuilder to use for generating swerve trajectory commands */
   SwerveAutoBuilder m_autoBuilder;
 
-  AutoRoutineBuilder(
-      RobotContainer botContainer,
-      Grids.ScoringPosition startingPosition,
-      Lanes.ID escapeLane,
-      EscapeRoute.ID escapeRoute,
-      Waypoints.ID escapeWaypoint) {
-    m_startingPosition = startingPosition;
-    m_escapeLane = escapeLane;
-    m_escapeRoute = escapeRoute;
-    m_escapeWaypoint = escapeWaypoint;
+  AutoRoutineBuilder(RobotContainer botContainer) {
     Swerve swerveSubsystem = botContainer.swerveSubsystem;
+
+    // DEBUG: Start the PathPlanner server for debugging paths
+    PathPlannerServer.startServer(kPathPlannerServerPort);
 
     m_autoBuilder =
         new SwerveAutoBuilder(
@@ -160,12 +158,25 @@ public class AutoRoutineBuilder {
             );
   }
 
-  public Command build(RobotContainer botContainer) {
+  public Command build(
+      RobotContainer botContainer,
+      Grids.ScoringPosition startingPosition,
+      Lanes.ID escapeLane,
+      EscapeRoute.ID escapeRoute,
+      Waypoints.ID escapeWaypoint) {
+    m_startingPosition = startingPosition;
+    m_escapeLane = escapeLane;
+    m_escapeRoute = escapeRoute;
+    m_escapeWaypoint = escapeWaypoint;
+
     // Generate an escape trajectory for the given auto parameters
     generateEscapeTrajectory();
 
     // TODO: concatenate all trajectories together
     m_cumulativeTrajectory = m_escapeTrajectory;
+
+    // Send the cumulative trajectory to the PathPlanner server
+    PathPlannerServer.sendActivePath(m_cumulativeTrajectory.getStates());
 
     SequentialCommandGroup autoCommandGroup = new SequentialCommandGroup();
 
@@ -241,24 +252,17 @@ public class AutoRoutineBuilder {
             initialHolRot));
 
     // Update each waypoint in the list so that it points to the waypoint following it.
-    ArrayList<PathPoint> escapeList = new ArrayList<PathPoint>();
-    for (int idx = 1; idx < pointList.size(); ++idx) {
-      PathPointHelper wp = pointList.get(idx - 1);
-      PathPointHelper wpNext = pointList.get(idx);
+    alignPointHeadings(pointList);
 
-      // Calculate the angle between the two waypoints
-      double dx = wpNext.getX() - wp.getX();
-      double dy = wpNext.getY() - wp.getY();
-      double theta = Math.atan2(dy, dx);
-      System.out.printf("******* <%s> theta=%.2f\n", wp.name, theta);
-
-      escapeList.add(
-          new PathPoint(wp.getPosition(), new Rotation2d(theta), wp.getHolonomicRotation()));
-    }
-
-    // DEBUG: Print the list of generated waypoints
+    // DEBUG: Print the list of path waypoints
     for (PathPointHelper wp : pointList) {
       System.out.println(wp.format());
+    }
+
+    // Move helper points into a list of PathPoints because Java ArrayLists are not polymorphic
+    ArrayList<PathPoint> escapeList = new ArrayList<PathPoint>();
+    for (PathPointHelper point : pointList) {
+      escapeList.add(point);
     }
 
     // Create a trajectory from the waypoints
@@ -268,8 +272,31 @@ public class AutoRoutineBuilder {
     m_escapeTrajectory = PathPlanner.generatePath(escapePathConstraints, escapeList);
   }
 
+  /** Returns the overall trajectory of the generated auto routine */
   public Trajectory getTrajectory() {
     return m_cumulativeTrajectory;
+  }
+
+  private static void alignPointHeadings(ArrayList<PathPointHelper> points) {
+    for (int idx = 1; idx < points.size(); ++idx) {
+      PathPointHelper point = points.get(idx - 1);
+      PathPointHelper pointAfter = points.get(idx);
+
+      // Calculate the angle between the two waypoints
+      double dx = pointAfter.getX() - point.getX();
+      double dy = pointAfter.getY() - point.getY();
+      double theta = Math.atan2(dy, dx);
+      System.out.printf("******* <%s> theta=%.2f\n", point.name, theta);
+
+      points.set(
+          (idx - 1),
+          new PathPointHelper(
+              point.name,
+              point.getX(),
+              point.getY(),
+              Rotation2d.fromRadians(theta),
+              point.getHolonomicRotation()));
+    }
   }
 
   private static class PathPointHelper extends PathPoint {
