@@ -199,6 +199,7 @@ public class JoystickSubsystem extends SubsystemBase {
     driverController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.back.onTrue(new InstantCommand(this::doNothing, this));
     driverController.start.onTrue(new InstantCommand(this::doNothing, this));
+    driverController.leftTriggerAsButton.whileTrue(new InstantCommand(this::doNothing, this));
 
     // Map buttons on operator controller
     operatorController.A.onTrue(new InstantCommand(this::doNothing, this));
