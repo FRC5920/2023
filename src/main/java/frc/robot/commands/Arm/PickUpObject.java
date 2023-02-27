@@ -62,7 +62,10 @@ import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 public class PickUpObject extends SequentialCommandGroup {
   /** Creates a new PickUpCone. */
   public PickUpObject(
-      Arm armSubsystem, BotStateSubsystem myBotStateSubsystem, Arm.GamePieceType pickUpWhat, Pneumatics pneumaticSubsystem) {
+      Arm armSubsystem,
+      BotStateSubsystem myBotStateSubsystem,
+      Arm.GamePieceType pickUpWhat,
+      Pneumatics pneumaticSubsystem) {
     addRequirements(armSubsystem);
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());

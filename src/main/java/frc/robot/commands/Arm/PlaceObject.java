@@ -73,7 +73,6 @@ public class PlaceObject extends SequentialCommandGroup {
         new RotateArmAndIntake(PlaceWhere, s_Pneumatics),
         new Reach(PlaceHowFar),
         new Drop(PlaceWhat),
-        new StowArm()
-        );
+        new StowArm());
   }
 }

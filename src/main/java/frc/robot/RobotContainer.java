@@ -82,10 +82,9 @@ public class RobotContainer {
   public final JoystickSubsystem joystickSubsystem = new JoystickSubsystem();
   public final BotStateSubsystem botStateSubsystem = new BotStateSubsystem();
   public final Swerve swerveSubsystem;
-  public final static Pneumatics s_Pneumatics = new Pneumatics();
+  public static final Pneumatics s_Pneumatics = new Pneumatics();
   public final Arm armSubsystem = new Arm();
   public final boolean openLoop;
-
 
   @SuppressWarnings({"unused"})
   public final PoseEstimatorSubsystem poseEstimatorSubsystem;
@@ -98,8 +97,7 @@ public class RobotContainer {
       new PhotonCamera(Constants.VisionConstants.BackupCameraName);
 
   @SuppressWarnings({"unused"})
-  public
-  final PhotonCamera ArmCamera = new PhotonCamera(Constants.VisionConstants.ArmCameraName);
+  public final PhotonCamera ArmCamera = new PhotonCamera(Constants.VisionConstants.ArmCameraName);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -107,7 +105,6 @@ public class RobotContainer {
     openLoop = true;
     SwerveModuleIO swerveModuleIO[];
     GyroIO gyroIO;
-    
 
     // Instantiate active subsystems
     switch (Constants.getMode()) {

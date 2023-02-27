@@ -56,8 +56,8 @@ import frc.robot.subsystems.Arm.Arm;
 
 public class Reach extends CommandBase {
   /** Creates a new ExtendArmToRank. */
-
   private Arm.ArmExtenderPosition ReachDistance;
+
   Boolean isDone = false;
 
   public Reach(Arm.ArmExtenderPosition ReachHowFar) {

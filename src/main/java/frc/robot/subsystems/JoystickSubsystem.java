@@ -61,8 +61,6 @@ import frc.robot.RobotContainer;
 import frc.robot.commands.Arm.ContinuousGetObject;
 import frc.robot.commands.Arm.PlaceObject;
 import frc.robot.commands.Arm.RotateIntake;
-import frc.robot.commands.Arm.ZTarget;
-import frc.robot.commands.Balance;
 import frc.robot.subsystems.Arm.Arm;
 
 /** A subsystem providing/managing Xbox controllers for driving the robot manually */
@@ -121,7 +119,6 @@ public class JoystickSubsystem extends SubsystemBase {
     driverController
         .getTriggerProcessing(XboxController.Axis.kRightTrigger)
         .configure(triggerConfig);
-    
 
     // Configure operator controller stick and trigger processing
     operatorController = new ProcessedXboxController(ControllerId.kOperator.port);
@@ -154,45 +151,50 @@ public class JoystickSubsystem extends SubsystemBase {
   public void configureButtonBindings(RobotContainer botContainer) {
 
     // Map buttons on driver controller
-    driverController.A.onTrue(new PlaceObject(
-      botContainer.armSubsystem, 
-      botContainer.botStateSubsystem.storedGamePiece, 
-      Arm.Rank.Low, 
-      botContainer.s_Pneumatics, 
-      Arm.ArmExtenderPosition.OnFloor));
+    driverController.A.onTrue(
+        new PlaceObject(
+            botContainer.armSubsystem,
+            botContainer.botStateSubsystem.storedGamePiece,
+            Arm.Rank.Low,
+            botContainer.s_Pneumatics,
+            Arm.ArmExtenderPosition.OnFloor));
     driverController.B.onTrue(new InstantCommand(this::doNothing, this));
-    driverController.X.onTrue(new PlaceObject(
-      botContainer.armSubsystem, 
-      botContainer.botStateSubsystem.storedGamePiece, 
-      Arm.Rank.Medium, 
-      botContainer.s_Pneumatics, 
-      Arm.ArmExtenderPosition.MiddleRank));
-    driverController.Y.onTrue(new PlaceObject(
-      botContainer.armSubsystem, 
-      botContainer.botStateSubsystem.storedGamePiece, 
-      Arm.Rank.High, 
-      botContainer.s_Pneumatics, 
-      Arm.ArmExtenderPosition.TopRank));
-    driverController.leftBumper.whileTrue(new ContinuousGetObject(
-      Arm.GamePieceType.Cone, 
-      botContainer.ArmCamera, 
-      botContainer.swerveSubsystem, 
-      driverController, 
-      true, 
-      botContainer.openLoop, 
-      botContainer.armSubsystem, 
-      botContainer.botStateSubsystem, 
-      botContainer.s_Pneumatics));
-    operatorController.rightBumper.whileTrue(new ContinuousGetObject(
-      Arm.GamePieceType.Cube, 
-      botContainer.ArmCamera, 
-      botContainer.swerveSubsystem, 
-      driverController,  
-      true, 
-      botContainer.openLoop, 
-      botContainer.armSubsystem, 
-      botContainer.botStateSubsystem, 
-      botContainer.s_Pneumatics));
+    driverController.X.onTrue(
+        new PlaceObject(
+            botContainer.armSubsystem,
+            botContainer.botStateSubsystem.storedGamePiece,
+            Arm.Rank.Medium,
+            botContainer.s_Pneumatics,
+            Arm.ArmExtenderPosition.MiddleRank));
+    driverController.Y.onTrue(
+        new PlaceObject(
+            botContainer.armSubsystem,
+            botContainer.botStateSubsystem.storedGamePiece,
+            Arm.Rank.High,
+            botContainer.s_Pneumatics,
+            Arm.ArmExtenderPosition.TopRank));
+    driverController.leftBumper.whileTrue(
+        new ContinuousGetObject(
+            Arm.GamePieceType.Cone,
+            botContainer.ArmCamera,
+            botContainer.swerveSubsystem,
+            driverController,
+            true,
+            botContainer.openLoop,
+            botContainer.armSubsystem,
+            botContainer.botStateSubsystem,
+            botContainer.s_Pneumatics));
+    operatorController.rightBumper.whileTrue(
+        new ContinuousGetObject(
+            Arm.GamePieceType.Cube,
+            botContainer.ArmCamera,
+            botContainer.swerveSubsystem,
+            driverController,
+            true,
+            botContainer.openLoop,
+            botContainer.armSubsystem,
+            botContainer.botStateSubsystem,
+            botContainer.s_Pneumatics));
     driverController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.back.onTrue(new InstantCommand(this::doNothing, this));

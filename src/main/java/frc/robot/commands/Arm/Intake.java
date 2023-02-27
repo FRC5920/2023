@@ -86,7 +86,7 @@ public class Intake extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     Arm.zeroHandRollers();
-    if (gamePiece == GamePieceType.Cube){
+    if (gamePiece == GamePieceType.Cube) {
       Arm.HandBackRoller.set(Constants.ArmConstants.kHoldCubeVelocity);
     }
     m_BotStateSubsystem.storedGamePiece = gamePiece;
