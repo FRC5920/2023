@@ -198,7 +198,8 @@ public class JoystickSubsystem extends SubsystemBase {
             botContainer.s_Pneumatics));
     driverController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
-    driverController.back.onTrue(new InstantCommand(this::doNothing, this));
+    driverController.back.onTrue(
+      new InstantCommand(() -> botContainer.swerveSubsystem.zeroGyro()));
     driverController.leftTriggerAsButton.whileTrue(
         new SnapToGrid(
           botContainer.swerveSubsystem, 
