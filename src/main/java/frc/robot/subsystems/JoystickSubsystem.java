@@ -58,6 +58,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.Joystick.AxisProcChain;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.RobotContainer;
+import frc.robot.commands.SnapToGrid;
 import frc.robot.commands.Arm.ContinuousGetObject;
 import frc.robot.commands.Arm.PlaceObject;
 import frc.robot.commands.Arm.RotateIntake;
@@ -198,8 +199,8 @@ public class JoystickSubsystem extends SubsystemBase {
     driverController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.back.onTrue(new InstantCommand(this::doNothing, this));
-    driverController.start.onTrue(new InstantCommand(this::doNothing, this));
-    driverController.leftTriggerAsButton.whileTrue(new InstantCommand(this::doNothing, this));
+    driverController.leftTriggerAsButton.whileTrue(
+        new SnapToGrid(botContainer.swerveSubsystem, botContainer.joystickSubsystem, true, true));
 
     // Map buttons on operator controller
     operatorController.A.onTrue(new InstantCommand(this::doNothing, this));

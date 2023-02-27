@@ -66,6 +66,9 @@ import org.littletonrobotics.junction.LoggedRobot;
 
 public final class Constants {
 
+  /** multiplier for the speed in SnapToGrid command */
+  public static final double kGridCorrectionMultiplier = 0.5;
+
   public static final double robotPeriodSec = LoggedRobot.defaultPeriodSecs;
 
   /** Set the value of logPlaybackIsEnabled to true when replaying log files */
@@ -85,6 +88,7 @@ public final class Constants {
   public static class DriverConstants {
     public static final int kControllerPort = 0;
     public static final double stickDeadband = 0.1;
+    public static final double kDriverTriggerThreshold = 0.2;
   }
 
   public static class OperatorConstants {

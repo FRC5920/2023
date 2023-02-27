@@ -53,6 +53,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.lib.SwerveDrive.CTREConfigs;
@@ -149,7 +150,11 @@ public class Robot extends LoggedRobot {
 
     // Run the task scheduler
     CommandScheduler.getInstance().run();
-
+    SmartDashboard.putData(CommandScheduler.getInstance());
+    SmartDashboard.putBoolean(
+        "Left Trigger Value",
+        m_robotContainer.joystickSubsystem.driverController.leftTriggerAsButton.getAsBoolean());
+    SmartDashboard.putData(m_robotContainer.swerveSubsystem);
     // Check for logging faults
     s_logReceiverQueueAlert.set(Logger.getInstance().getReceiverQueueFault());
 

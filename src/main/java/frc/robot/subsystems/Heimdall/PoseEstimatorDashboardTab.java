@@ -128,11 +128,11 @@ public class PoseEstimatorDashboardTab implements IDashboardTab {
   /** Service dashboard tab widgets */
   @Override
   public void updateDashboard(RobotContainer botContainer) {
-    FieldObject2d estimatorPoseObject = m_field2d.getRobotObject();
-    estimatorPoseObject.setPose(m_PoseEstimatorSubsystem.getCurrentPose());
-
-    FieldObject2d swervePoseObject = m_field2d.getObject("Odometry");
+    FieldObject2d swervePoseObject = m_field2d.getRobotObject();
     swervePoseObject.setPose(botContainer.swerveSubsystem.getPose());
+
+    FieldObject2d estimatorPoseObject = m_field2d.getObject("Odometry");
+    estimatorPoseObject.setPose(m_PoseEstimatorSubsystem.getCurrentPose());
   }
 
   private static String formatPose2d(Pose2d pose) {
