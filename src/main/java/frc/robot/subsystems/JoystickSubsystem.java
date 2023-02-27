@@ -212,8 +212,8 @@ public class JoystickSubsystem extends SubsystemBase {
     operatorController.B.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.X.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.Y.onTrue(new InstantCommand(this::doNothing, this));
-    operatorController.leftBumper.whileTrue(new RotateIntake(RobotContainer.s_Pneumatics, true));
-    operatorController.rightBumper.whileTrue(new RotateIntake(RobotContainer.s_Pneumatics, false));
+    operatorController.leftBumper.whileTrue(new RotateIntake(botContainer.s_Pneumatics, true));
+    operatorController.rightBumper.whileTrue(new RotateIntake(botContainer.s_Pneumatics, false));
     operatorController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.back.onTrue(new InstantCommand(this::doNothing, this));

@@ -82,7 +82,7 @@ public class RobotContainer {
   public final JoystickSubsystem joystickSubsystem = new JoystickSubsystem();
   public final BotStateSubsystem botStateSubsystem = new BotStateSubsystem();
   public final Swerve swerveSubsystem;
-  public static final Pneumatics s_Pneumatics = new Pneumatics();
+  public final Pneumatics s_Pneumatics = new Pneumatics();
   public final Arm armSubsystem = new Arm();
   public final boolean openLoop;
 
