@@ -70,9 +70,6 @@ public class ZTarget extends CommandBase {
 
   private Swerve s_Swerve;
   private ProcessedXboxController controller;
-  private int translationAxis;
-  private int strafeAxis;
-  private int rotationAxis;
 
   PhotonCamera fetchCamera;
   double rotation;
@@ -112,8 +109,8 @@ public class ZTarget extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double yAxis = -controller.getRawAxis(translationAxis);
-    double xAxis = -controller.getRawAxis(strafeAxis);
+    double yAxis = -controller.getLeftY();
+    double xAxis = -controller.getLeftX();
 
     yAxis = (Math.abs(yAxis) < Constants.DriverConstants.stickDeadband) ? 0 : yAxis;
     xAxis = (Math.abs(xAxis) < Constants.DriverConstants.stickDeadband) ? 0 : xAxis;
