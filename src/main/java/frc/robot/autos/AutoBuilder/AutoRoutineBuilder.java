@@ -61,6 +61,7 @@ import com.pathplanner.lib.server.PathPlannerServer;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -69,6 +70,7 @@ import frc.robot.autos.AutoConstants.BotDimensions;
 import frc.robot.autos.AutoConstants.BotOrientation;
 import frc.robot.autos.AutoConstants.EscapeRoute;
 import frc.robot.autos.AutoConstants.Grids;
+import frc.robot.autos.AutoConstants.Lanes;
 import frc.robot.autos.AutoConstants.SecondaryAction;
 import frc.robot.autos.AutoConstants.Waypoints;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
@@ -198,56 +200,55 @@ public class AutoRoutineBuilder {
         new PathPointHelper(
             "Initial position",
             m_startingPosition.pose.getX(),
-            m_startingPosition.pose.getY(), // X, Y
+            m_startingPosition.pose.getY(),
             populateLater, // Heading
             initialHolRot); // Holonomic rotation
     pointList.add(initialWaypoint);
 
-    // Generate waypoints to move from the initial position to the corner associated with the
-    // selected route.
-
-    // Create a PathPoint for the corner of our escape route.  It won't be added to the list.  But,
-    // we may use it to create associated corner waypoints
-    // PathPointHelper routeCorner = new PathPointHelper(
-    //   "",
-    //         EscapeRoute.cornerMap.get(m_escapeRoute).position.getX(),
-    //         EscapeRoute.cornerMap.get(m_escapeRoute).position.getY(), // X, Y
-    //         populateLater, // Heading will get filled in later
-    //         initialHolRot); // Holonomic Rotation
-    // );
-
-    // If moving into the inner lane, create corner waypoints to navigate to the waypoint following
-
-    // ------------------------------------------------------
-    // Generate a point that moves the bot into the active
-    // lane from the starting position
-    PathPointHelper laneWaypoint =
+    // Create a PathPoint for the corner of our escape route.  It won't be used as a real waypoint.
+    // But, it may be needed to create corner waypoints
+    final EscapeRoute.Corner corner = EscapeRoute.cornerMap.get(m_escapeRoute);
+    PathPointHelper cornerPoint =
         new PathPointHelper(
-            "Inital Lane Waypoint",
-            EscapeRoute.laneMap.get(m_escapeRoute).xColumnCenter,
-            initialWaypoint.getY(), // X, Y
+            corner.name(),
+            corner.position.getX(),
+            corner.position.getY(),
             populateLater, // Heading will get filled in later
             initialHolRot); // Holonomic Rotation
-    pointList.add(laneWaypoint);
 
     // Create a waypoint for the endpoint of the active escape route, but don't add it yet
-    EscapeRoute.Endpoint endpoint = EscapeRoute.endpointMap.get(m_escapeRoute);
-
+    final EscapeRoute.Endpoint endpoint = EscapeRoute.endpointMap.get(m_escapeRoute);
     PathPointHelper endWaypoint =
         new PathPointHelper(
-            "EscapeEndpoint",
+            endpoint.name(),
             endpoint.coordinates.getX(),
             endpoint.coordinates.getY(),
             BotOrientation.kFacingField,
             initialHolRot);
 
-    // Generate any intermediate corner points needed to reach the target endpoint via a right-angle
-    // path
-    List<PathPointHelper> cornerPoints = generateCornerPoints(laneWaypoint, endWaypoint);
-    for (PathPointHelper cornerPoint : cornerPoints) {
-      pointList.add(cornerPoint);
+    // DEBUG: print the corner point
+    System.out.println(cornerPoint.format());
+
+    // If operating in the inner lane, generate waypoints to make a corner from
+    // the initial position onto the inside lane, moving toward the corner point
+    if (EscapeRoute.laneMap.get(m_escapeRoute) == Lanes.Lane.Inner) {
+      PathPointHelper intermediateCorner =
+          new PathPointHelper(
+              "InnerLaneIntermediate",
+              Lanes.kInnerLaneColumnCenterX,
+              initialWaypoint.getY(),
+              new Rotation2d(),
+              initialHolRot);
+      pointList.addAll(
+          generateRightAnglePathPoints(initialWaypoint, intermediateCorner, cornerPoint));
     }
 
+    // Generate Waypoints needed to reach the target endpoint via a right-angle path
+    pointList.addAll(
+        generateRightAnglePathPoints(
+            pointList.get(pointList.size() - 1), cornerPoint, endWaypoint));
+
+    // Add the end waypoint
     pointList.add(endWaypoint);
 
     // Make each waypoint in the list point to the waypoint that follows it
@@ -273,7 +274,8 @@ public class AutoRoutineBuilder {
 
   /** Returns the overall trajectory of the generated auto routine */
   public Trajectory getTrajectory() {
-    return m_cumulativeTrajectory;
+    return PathPlannerTrajectory.transformTrajectoryForAlliance(
+        m_cumulativeTrajectory, DriverStation.getAlliance());
   }
 
   /**
@@ -283,26 +285,49 @@ public class AutoRoutineBuilder {
    * @param start Point of the starting location
    * @param end Point giving the end location
    */
-  private static List<PathPointHelper> generateCornerPoints(
-      PathPointHelper start, PathPointHelper end) {
+  private static List<PathPointHelper> generateRightAnglePathPoints(
+      PathPointHelper start, PathPointHelper corner, PathPointHelper end) {
     List<PathPointHelper> cornerPoints = new ArrayList<PathPointHelper>();
 
-    // If the distance between start and end is less than half a bot width, there is no need for
-    // corners
-    if (Math.abs(start.getY() - end.getY()) <= BotDimensions.kHalfFootprintWidth) {
-      return cornerPoints;
-    }
+    // If the change in X or change in Y from the start point to the corner point is less than half
+    // a bot width, then don't generate any corner points
+    // double deltaX = Math.abs(corner.getX() - start.getX());
+    // double deltaY = Math.abs(corner.getY() - start.getY());
+    // if ((deltaX < BotDimensions.kHalfFootprintWidth)
+    //     || (deltaY < BotDimensions.kHalfFootprintWidth)) {
+    //   // DEBUG: print the points we're skipping corners for
+    //   System.out.printf("Skipping corners for start, end points:\n");
+    //   System.out.println(start.format());
+    //   System.out.println(start.format());
+    //   return cornerPoints;
+    // }
 
-    // Create the inside of the corner
-    double cornerYAdjust =
-        (start.getY() < end.getY())
-            ? (-1.0 * BotDimensions.kHalfFootprintWidth)
-            : BotDimensions.kHalfFootprintWidth;
+    final double xStart = start.getX();
+    final double yStart = start.getY();
+    final double xCorner = corner.getX();
+    final double yCorner = corner.getY();
+    final double xEnd = end.getX();
+    final double yEnd = end.getY();
+
+    final double epsilon = BotDimensions.kHalfFootprintWidth;
+    final double insideXOffset =
+        fEqual(xStart, xCorner, epsilon) ? 0.0 : (-1.0 * BotDimensions.kHalfFootprintWidth);
+    final double insideYOffset =
+        fEqual(yStart, yCorner, epsilon)
+            ? (Math.signum(yStart - yCorner) * BotDimensions.kHalfFootprintWidth)
+            : 0.0;
+    final double outsideXOffset =
+        fEqual(xEnd, xCorner, epsilon) ? (BotDimensions.kHalfFootprintWidth) : 0.0;
+    final double outsideYOffset =
+        fEqual(yEnd, yCorner, epsilon)
+            ? (Math.signum(yCorner - yEnd) * BotDimensions.kHalfFootprintWidth)
+            : 0.0;
+
     cornerPoints.add(
         new PathPointHelper(
             "CornerInside",
-            start.getX(),
-            (end.getY() + cornerYAdjust),
+            (xCorner + insideXOffset),
+            (yCorner + insideYOffset),
             new Rotation2d(),
             start.getHolonomicRotation()));
 
@@ -310,13 +335,17 @@ public class AutoRoutineBuilder {
     cornerPoints.add(
         new PathPointHelper(
             "CornerOutside",
-            (start.getX() + BotDimensions.kHalfFootprintWidth),
-            end.getY(),
+            (xCorner + outsideXOffset),
+            (yCorner + outsideYOffset),
             new Rotation2d(),
             start.getHolonomicRotation()));
 
     // Create the outside of the corner
     return cornerPoints;
+  }
+
+  private static boolean fEqual(double a, double b, double epsilon) {
+    return Math.abs(b - a) < epsilon;
   }
 
   private static void alignHeadings(ArrayList<PathPointHelper> points) {

@@ -151,9 +151,11 @@ public class AutoConstants {
     public static final double kNorthSideY = FieldConstants.Community.chargingStationLeftY;
 
     /** X coordinate of the center of the Charging Station */
-    public static final double kCenterX = (kFieldSideX - kGridSideX) / 2.0;
+    public static final double kCenterX =
+        (kFieldSideX - (FieldConstants.Community.chargingStationLength / 2));
     /** Y coordinate of the center of the Charging Station */
-    public static final double kCenterY = (kNorthSideY - kSouthSideY) / 2.0;
+    public static final double kCenterY =
+        (kSouthSideY + (FieldConstants.Community.chargingStationWidth / 2));
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -171,7 +173,7 @@ public class AutoConstants {
 
     /** Robot center X coordinate in the middle of the North-South section of the INNER lane */
     public static final double kInnerLaneColumnCenterX =
-        ChargingStation.kGridSideX - (BotDimensions.kHalfFootprintWidth) - kLaneMargin;
+        ChargingStation.kGridSideX - BotDimensions.kHalfFootprintWidth - kLaneMargin;
 
     /** Robot center X coordinate in the middle of the North-South section of the OUTER lane */
     public static final double kOuterLaneColumnCenterX =
@@ -398,7 +400,7 @@ public class AutoConstants {
 
     /** Returns a list of names of enum elements */
     public static String[] getNames() {
-      return getEnumNames(CargoLocation.class);
+      return getEnumNames(SecondaryAction.class);
     }
   };
 
