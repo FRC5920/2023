@@ -176,7 +176,8 @@ public class JoystickSubsystem extends SubsystemBase {
     driverController.leftBumper.whileTrue(new ContinuousGetObject(
       Arm.GamePieceType.Cone, 
       botContainer.ArmCamera, 
-      botContainer.swerveSubsystem, driverController, 
+      botContainer.swerveSubsystem, 
+      driverController, 
       0, 
       0, 
       0, 
@@ -188,7 +189,8 @@ public class JoystickSubsystem extends SubsystemBase {
     operatorController.rightBumper.whileTrue(new ContinuousGetObject(
       Arm.GamePieceType.Cube, 
       botContainer.ArmCamera, 
-      botContainer.swerveSubsystem, driverController, 
+      botContainer.swerveSubsystem, 
+      driverController, 
       0, 
       0, 
       0, 

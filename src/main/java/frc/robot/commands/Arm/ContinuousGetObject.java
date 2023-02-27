@@ -85,9 +85,6 @@ public class ContinuousGetObject extends ParallelCommandGroup {
             fetchCamera,
             s_Swerve,
             fetchDriver,
-            fetchTranslationAxis,
-            fetchStrafeAxis,
-            fetchRotationAxis,
             fetchFieldRelative,
             fetchOpenLoop),
         new PickUpObject(armSubsystem, myBotStateSubsystem, GetWhat, myPneumatics));

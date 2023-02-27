@@ -86,9 +86,6 @@ public class ZTarget extends CommandBase {
       PhotonCamera camera,
       Swerve s_Swerve,
       ProcessedXboxController controller,
-      int translationAxis,
-      int strafeAxis,
-      int rotationAxis,
       boolean fieldRelative,
       boolean openLoop) {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -96,9 +93,6 @@ public class ZTarget extends CommandBase {
     addRequirements(s_Swerve);
 
     this.controller = controller;
-    this.translationAxis = translationAxis;
-    this.strafeAxis = strafeAxis;
-    this.rotationAxis = rotationAxis;
     this.fieldRelative = fieldRelative;
     this.openLoop = openLoop;
     fetchCamera = camera;
