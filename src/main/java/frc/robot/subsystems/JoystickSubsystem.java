@@ -200,7 +200,11 @@ public class JoystickSubsystem extends SubsystemBase {
     driverController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.back.onTrue(new InstantCommand(this::doNothing, this));
     driverController.leftTriggerAsButton.whileTrue(
-        new SnapToGrid(botContainer.swerveSubsystem, botContainer.joystickSubsystem, true, true));
+        new SnapToGrid(
+          botContainer.swerveSubsystem, 
+          botContainer.joystickSubsystem, 
+          true, 
+          true));
 
     // Map buttons on operator controller
     operatorController.A.onTrue(new InstantCommand(this::doNothing, this));
