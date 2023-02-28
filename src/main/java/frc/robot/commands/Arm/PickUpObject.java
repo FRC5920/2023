@@ -70,8 +70,8 @@ public class PickUpObject extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-        new RotateArmAndIntake(Arm.Rank.Low, pneumaticSubsystem),
         new Reach(Arm.ArmExtenderPosition.OnFloor),
+        new RotateArmAndIntake(Arm.Rank.Low, pneumaticSubsystem),
         new Intake(pickUpWhat, myBotStateSubsystem));
   }
 }
