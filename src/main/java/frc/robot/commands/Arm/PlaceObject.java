@@ -70,7 +70,7 @@ public class PlaceObject extends SequentialCommandGroup {
     // addCommands(new FooCommand(), new BarCommand());
     addRequirements(armSubsystem);
     addCommands(
-        new RotateArmAndIntake(PlaceWhere, s_Pneumatics),
+        new RotateIntakeAndArm(PlaceWhere, s_Pneumatics),
         new Reach(PlaceHowFar),
         new Drop(PlaceWhat),
         new StowArm());

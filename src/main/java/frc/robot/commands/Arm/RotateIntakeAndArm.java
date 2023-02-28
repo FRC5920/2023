@@ -59,9 +59,9 @@ import frc.robot.subsystems.Pneumatics.Pneumatics;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class RotateArmAndIntake extends ParallelCommandGroup {
+public class RotateIntakeAndArm extends ParallelCommandGroup {
   /** Creates a new RotateArmAndIntake. */
-  public RotateArmAndIntake(Arm.Rank desiredRank, Pneumatics s_Pneumatics) {
+  public RotateIntakeAndArm(Arm.Rank desiredRank, Pneumatics s_Pneumatics) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
