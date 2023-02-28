@@ -58,6 +58,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Dashboard.IDashboardTab;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
@@ -89,9 +90,11 @@ public class PoseEstimatorDashboardTab implements IDashboardTab {
   /** 2d view of the field */
   private Field2d m_field2d;
 
-    /** PDH */
+  boolean VisionSystemOn;
+
+  /** PDH */
   // TODO: Update with CAN Constant info
-  PowerDistribution m_pdh = new PowerDistribution(63,ModuleType.kRev);
+  PowerDistribution m_pdh = new PowerDistribution(63, ModuleType.kRev);
 
   /** Creates an instance of the tab */
   PoseEstimatorDashboardTab(PoseEstimatorSubsystem poseEstimatorSubsystem) {
@@ -129,14 +132,9 @@ public class PoseEstimatorDashboardTab implements IDashboardTab {
         .addString("Swerve Odometry", () -> formatPose2d(swerveSubsystem.getPose()))
         .withSize(kPoseWidthCells, kPoseHeightCells)
         .withPosition(kPoseWidthCells * 1, kFieldHeightCells);
-/*
-        boolean VisionSystemOn = m_tab
-        .addBoolean("Vision System", m_pdh.getSwitchableChannel())
-        .withSize(kPoseWidthCells, kPoseHeightCells)
-        .withPosition(kPoseWidthCells * 1, kFieldHeightCells)
-        .getEntry();
-        m_pdh.setSwitchableChannel(VisionSystemOn);
-         */
+
+    /** Get the switchable channel state and display it to Shuffleboard. */
+    SmartDashboard.putBoolean("Vision On", m_pdh.getSwitchableChannel());
   }
 
   /** Service dashboard tab widgets */
@@ -147,6 +145,7 @@ public class PoseEstimatorDashboardTab implements IDashboardTab {
 
     FieldObject2d swervePoseObject = m_field2d.getObject("Odometry");
     swervePoseObject.setPose(botContainer.swerveSubsystem.getPose());
+    m_pdh.setSwitchableChannel(SmartDashboard.getBoolean("Set Vision", false));
   }
 
   private static String formatPose2d(Pose2d pose) {
