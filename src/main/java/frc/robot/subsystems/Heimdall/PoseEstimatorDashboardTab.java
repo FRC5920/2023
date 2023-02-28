@@ -52,6 +52,8 @@
 package frc.robot.subsystems.Heimdall;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -86,6 +88,10 @@ public class PoseEstimatorDashboardTab implements IDashboardTab {
 
   /** 2d view of the field */
   private Field2d m_field2d;
+
+    /** PDH */
+  // TODO: Update with CAN Constant info
+  PowerDistribution m_pdh = new PowerDistribution(63,ModuleType.kRev);
 
   /** Creates an instance of the tab */
   PoseEstimatorDashboardTab(PoseEstimatorSubsystem poseEstimatorSubsystem) {
@@ -123,6 +129,14 @@ public class PoseEstimatorDashboardTab implements IDashboardTab {
         .addString("Swerve Odometry", () -> formatPose2d(swerveSubsystem.getPose()))
         .withSize(kPoseWidthCells, kPoseHeightCells)
         .withPosition(kPoseWidthCells * 1, kFieldHeightCells);
+/*
+        boolean VisionSystemOn = m_tab
+        .addBoolean("Vision System", m_pdh.getSwitchableChannel())
+        .withSize(kPoseWidthCells, kPoseHeightCells)
+        .withPosition(kPoseWidthCells * 1, kFieldHeightCells)
+        .getEntry();
+        m_pdh.setSwitchableChannel(VisionSystemOn);
+         */
   }
 
   /** Service dashboard tab widgets */
