@@ -112,8 +112,8 @@ public class IntakeDashboardTab implements IDashboardTab {
     // Set motor speeds
     double frontMotorSpeed = m_frontMotorSpeedNTE.getDouble(0.0);
     double rearMotorSpeed = m_rearMotorSpeedNTE.getDouble(0.0);
-    m_intakeSubsystem.setFrontRollerRPM(frontMotorSpeed);
-    m_intakeSubsystem.DEBUG_runRearRoller(rearMotorSpeed);
+    // m_intakeSubsystem.setFrontRollerRPM(frontMotorSpeed);
+    // m_intakeSubsystem.DEBUG_runRearRoller(rearMotorSpeed);
   }
 
   /**

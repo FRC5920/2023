@@ -107,8 +107,8 @@ public class ArmDashboardTab implements IDashboardTab {
 
   /** Updates dashboard widgets with subsystem measurements and obtains dashboard input values */
   public void updateDashboard(RobotContainer botContainer) {
-    botContainer.armSubsystem.DEBUG_setAnglePosition(m_angleMotorPositionNTE.getDouble(0.0));
-    botContainer.armSubsystem.DEBUG_setExtenderPosition(m_extenderMotorPositionNTE.getDouble(0.0));
+    // botContainer.armSubsystem.DEBUG_setAnglePosition(m_angleMotorPositionNTE.getDouble(0.0));
+    // botContainer.armSubsystem.DEBUG_setExtenderPosition(m_extenderMotorPositionNTE.getDouble(0.0));
   }
 
   /**

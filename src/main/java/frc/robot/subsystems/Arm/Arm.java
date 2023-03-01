@@ -51,7 +51,6 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.subsystems.Arm;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
@@ -71,7 +70,7 @@ public class Arm extends SubsystemBase {
   static final double kAngleMotorCouplingDiameterMeters = Units.inchesToMeters(4);
 
   /** Gear ratio used to couple the angle motor to the arm mechanism */
-  static final double kAngleMotorGearRatio = 1/150; // TODO: set this constant
+  static final double kAngleMotorGearRatio = 1 / 150; // TODO: set this constant
 
   /** Diameter (meters) of the angle motor gear TODO: measure this value */
   static final double kExtenderMotorCouplingDiameterMeters = Units.inchesToMeters(2);
@@ -80,7 +79,10 @@ public class Arm extends SubsystemBase {
   static final double kExtenderMotorGearRatio = 1.0; // TODO: set this constant
 
   /** Motor controlling the angle of the arm */
-  private final WPI_TalonFX m_angleMotor = new WPI_TalonFX(kAngleMotorCANId);
+  private final WPI_TalonFX m_angleMotorMaster = new WPI_TalonFX(kAngleMotorCANId);
+
+  private static final WPI_TalonFX m_angleMotorSlave =
+      new WPI_TalonFX(Constants.ArmConstants.kArmYMotorSlavePort);
 
   /** Motor controlling the extension of the arm */
   private final WPI_TalonFX m_extenderMotor = new WPI_TalonFX(kExtenderMotorCANId);
@@ -106,16 +108,16 @@ public class Arm extends SubsystemBase {
 
   public void setAngle(AnglePreset preset) {
     // NOTE: we may need to apply a trapezoidal motion profile here
-    m_angleMotor.setSelectedSensorPosition(preset.encoderCount);
+    m_angleMotorMaster.setSelectedSensorPosition(preset.encoderCount);
   }
 
-  public void armForward(double percentOutput) {
-    m_angleMotor.set(ControlMode.PercentOutput, 1);
-  }
+  // public void armForward(double percentOutput) {
+  //   m_angleMotorMaster.set(ControlMode.PercentOutput, 1);
+  // }
 
-  public void armBackward(double percentOutput) {
-    m_angleMotor.set(ControlMode.PercentOutput, -1);
-  }
+  // public void armBackward(double percentOutput) {
+  //   m_angleMotorMaster.set(ControlMode.PercentOutput, -1);
+  // }
 
   /**
    * Debug routine to set the angle motor position in closed-loop mode
@@ -123,7 +125,7 @@ public class Arm extends SubsystemBase {
    * @param position Position to set the motor to in falcon encoder ticks
    */
   public void DEBUG_setAnglePosition(double position) {
-    m_angleMotor.set(TalonFXControlMode.Position, position);
+    // m_angleMotorMaster.set(TalonFXControlMode.Position, position);
   }
 
   /**
@@ -141,7 +143,8 @@ public class Arm extends SubsystemBase {
    * @param speedPercent Percentage of max output applied to the motor (0.0 to +/-1.0)
    */
   public void DEBUG_runAngleMotor(double speedPercent) {
-    m_angleMotor.set(speedPercent);
+    // m_angleMotorMaster.set(speedPercent);
+    m_angleMotorSlave.set(speedPercent);
   }
 
   /**
@@ -176,10 +179,10 @@ public class Arm extends SubsystemBase {
   @Override
   public void periodic() {
     // Gather telemetry for angle motor
-    m_telemetry.angleTelemetry.motorVolts = m_angleMotor.getMotorOutputVoltage();
-    m_telemetry.angleTelemetry.statorCurrentAmps = m_angleMotor.getStatorCurrent();
-    m_telemetry.angleTelemetry.temperatureCelcius = m_angleMotor.getTemperature();
-    m_telemetry.angleEncoderCount = m_angleMotor.getSelectedSensorPosition();
+    m_telemetry.angleTelemetry.motorVolts = m_angleMotorMaster.getMotorOutputVoltage();
+    m_telemetry.angleTelemetry.statorCurrentAmps = m_angleMotorMaster.getStatorCurrent();
+    m_telemetry.angleTelemetry.temperatureCelcius = m_angleMotorMaster.getTemperature();
+    m_telemetry.angleEncoderCount = m_angleMotorMaster.getSelectedSensorPosition();
     m_telemetry.angleDegrees = angleEncoderToDegrees(m_telemetry.angleEncoderCount);
 
     // Gather telemetry for extender motor
@@ -198,7 +201,11 @@ public class Arm extends SubsystemBase {
   /** Configures motors in the subsystem */
   private void configureMotors() {
     // set Arm angle settings
-    m_angleMotor.setNeutralMode(NeutralMode.Brake);
+    m_angleMotorMaster.setNeutralMode(NeutralMode.Brake);
+
+    // m_angleMotorSlave.follow(m_angleMotorMaster);
+    m_angleMotorSlave.setInverted(true);
+
     // set ArmExtender PID coefficients
     m_extenderMotor.config_kF(
         Constants.ArmConstants.kArmYPIDLoopIdx,
@@ -222,8 +229,8 @@ public class Arm extends SubsystemBase {
         Constants.ArmConstants.kArmYTimeoutMs);
     m_extenderMotor.configNominalOutputForward(0, Constants.ArmConstants.kArmYTimeoutMs);
     m_extenderMotor.configNominalOutputReverse(0, Constants.ArmConstants.kArmYTimeoutMs);
-    m_extenderMotor.configPeakOutputForward(1, Constants.ArmConstants.kArmYTimeoutMs);
-    m_extenderMotor.configPeakOutputReverse(-1, Constants.ArmConstants.kArmYTimeoutMs);
+    m_extenderMotor.configPeakOutputForward(50, Constants.ArmConstants.kArmYTimeoutMs);
+    m_extenderMotor.configPeakOutputReverse(-50, Constants.ArmConstants.kArmYTimeoutMs);
   }
 
   /** An enumeration of cargo types */
