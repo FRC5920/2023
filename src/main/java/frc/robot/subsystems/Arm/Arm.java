@@ -81,7 +81,7 @@ public class Arm extends SubsystemBase {
   /** Motor controlling the angle of the arm */
   private final WPI_TalonFX m_angleMotorMaster = new WPI_TalonFX(kAngleMotorCANId);
 
-  private static final WPI_TalonFX m_angleMotorSlave =
+  private final WPI_TalonFX m_angleMotorSlave =
       new WPI_TalonFX(Constants.ArmConstants.kArmYMotorSlavePort);
 
   /** Motor controlling the extension of the arm */
@@ -143,8 +143,7 @@ public class Arm extends SubsystemBase {
    * @param speedPercent Percentage of max output applied to the motor (0.0 to +/-1.0)
    */
   public void DEBUG_runAngleMotor(double speedPercent) {
-    // m_angleMotorMaster.set(speedPercent);
-    m_angleMotorSlave.set(speedPercent);
+    m_angleMotorMaster.set(speedPercent);
   }
 
   /**
@@ -203,8 +202,11 @@ public class Arm extends SubsystemBase {
     // set Arm angle settings
     m_angleMotorMaster.setNeutralMode(NeutralMode.Brake);
 
-    // m_angleMotorSlave.follow(m_angleMotorMaster);
+    m_angleMotorSlave.follow(m_angleMotorMaster);
     m_angleMotorSlave.setInverted(true);
+
+    // Reset the sensor encoders
+    m_angleMotorMaster.setSelectedSensorPosition(0);
 
     // set ArmExtender PID coefficients
     m_extenderMotor.config_kF(

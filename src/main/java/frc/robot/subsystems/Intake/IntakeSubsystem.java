@@ -63,7 +63,7 @@ import frc.robot.Constants.GamePieceType;
 
 /** Subsystem for managing the cargo intake at the end of the robot arm */
 public class IntakeSubsystem extends SubsystemBase {
-  static final int kFrontRollerMotorCANId = 6;
+  static final int kFrontRollerMotorCANId = Constants.ArmConstants.kHandFrontRollerPort;
   static final int kRearRollerMotorCANId = Constants.ArmConstants.kHandBackRollerPort;
 
   // FalconFX reports velocity in counts per 100ms
