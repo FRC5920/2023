@@ -53,6 +53,7 @@ package frc.robot.commands.Arm;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Pneumatics.Pneumatics;
+import frc.robot.subsystems.Pneumatics.Pneumatics.WristPosition;
 
 public class RotateIntake extends CommandBase {
   private boolean rotateLeft;
@@ -74,9 +75,9 @@ public class RotateIntake extends CommandBase {
   @Override
   public void execute() {
     if (rotateLeft) {
-      s_Pneumatics.goingForward();
+      s_Pneumatics.setWristPosition(WristPosition.Normal);
     } else {
-      s_Pneumatics.goingBackward();
+      s_Pneumatics.setWristPosition(WristPosition.Inverted);
     }
   }
 

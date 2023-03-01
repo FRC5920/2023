@@ -82,34 +82,6 @@ public final class Constants {
     return RobotBase.isReal() ? Mode.REAL : (kLogPlaybackIsEnabled ? Mode.REPLAY : Mode.SIM);
   }
 
-  public static class PneumaticsConstants {
-    public static final int kPDHCAN = 10;
-    public static final int kArmLeftRotatorPort = 0;
-    public static final int kArmRightRotatorPort = 1;
-  }
-
-  public static class ArmConstants {
-    public static final int kArmYMotorMasterPort = 5;
-    public static final int kArmYMotorSlavePort = 11;
-    public static final int kHandBottomRollerPort = 20;
-    public static final int kHandTopBackRollerPort = 21;
-    public static final int kArmExtenderPort = 20;
-    public static final int kArmStoredPosition = 0;
-    public static final int kArmIntakePosition = 500;
-    public static final int kArmPlaceHighPosition = 2500;
-    public static final int kArmPlaceMiddlePosition = 2600;
-    public static final int kArmRetracted = 0;
-    public static final int kArmExtendedHigh = 4000;
-    public static final int kArmExtendedMiddle = 3000;
-    public static final int kPIDLoopIdx = 0;
-    public static final int kTimeoutMs = 50;
-    public static final double kFF = 0;
-    public static final double kP = 0;
-    public static final double kI = 0;
-    public static final double kD = 0;
-    public static final double kIz = 0;
-  }
-
   public static class DriverConstants {
     public static final int kControllerPort = 0;
     public static final double stickDeadband = 0.1;

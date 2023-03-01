@@ -84,12 +84,20 @@ public class Pneumatics extends SubsystemBase {
     m_PWrist.set(kOff);
   }
 
-  public void goingForward() {
-    m_PWrist.set(kForward);
+  // Sets the desired wrist position
+  public void setWristPosition(WristPosition pos) {
+    m_PWrist.set(pos.value);
   }
 
-  public void goingBackward() {
-    m_PWrist.set(kReverse);
+  // Returns the present wrist position
+  public WristPosition getWristPosition() {
+    return (m_PWrist.get() == kForward) ? WristPosition.Normal : WristPosition.Inverted;
+  }
+
+  public void toggleWristPosition() {
+    Pneumatics.WristPosition position =
+        getWristPosition() == WristPosition.Normal ? WristPosition.Inverted : WristPosition.Normal;
+    setWristPosition(position);
   }
 
   @Override
@@ -97,4 +105,25 @@ public class Pneumatics extends SubsystemBase {
     // This method will be called once per scheduler run
 
   }
+
+  /** Wrist positions */
+  public enum WristPosition {
+    /** Normal position */
+    Normal(DoubleSolenoid.Value.kForward),
+
+    /** Wrist inverted */
+    Inverted(DoubleSolenoid.Value.kReverse);
+
+    public DoubleSolenoid.Value value;
+
+    private WristPosition(DoubleSolenoid.Value val) {
+      value = val;
+    }
+
+    /** Get the human-readable name of the position */
+    @Override
+    public String toString() {
+      return this.name();
+    }
+  };
 }

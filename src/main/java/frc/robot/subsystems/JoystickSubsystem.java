@@ -158,39 +158,34 @@ public class JoystickSubsystem extends SubsystemBase {
     m_intakeSubsystem = botContainer.m_Intake;
 
     // Map buttons on driver controller
-    driverController.A.onTrue(new InstantCommand(this::doNothing, this));
-    driverController.B.onTrue(new InstantCommand(this::doNothing, this));
-    driverController.X.onTrue(new InstantCommand(this::doNothing, this));
+    // driverController.A.onTrue(new InstantCommand(this::doNothing, this));
+    // driverController.B.onTrue(new InstantCommand(this::doNothing, this));
+    // driverController.X.onTrue(new InstantCommand(this::doNothing, this));
     driverController.Y.onTrue(new InstantCommand(() -> botContainer.swerveSubsystem.zeroGyro()));
-    driverController.leftBumper.whileTrue(new InstantCommand(this::doNothing, this));
-    driverController.rightBumper.whileTrue(new InstantCommand(this::doNothing, this));
-    driverController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
-    driverController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
-    driverController.back.onTrue(new InstantCommand(this::doNothing, this));
+    // driverController.leftBumper.whileTrue(new InstantCommand(this::doNothing, this));
+    // driverController.rightBumper.whileTrue(new InstantCommand(this::doNothing, this));
+    // driverController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
+    // driverController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
+    // driverController.back.onTrue(new InstantCommand(this::doNothing, this));
     driverController.start.whileTrue(new Balance(botContainer.swerveSubsystem));
 
     // Map buttons on operator controller
-    operatorController.A.onTrue(new InstantCommand());
-    operatorController.B.onTrue(new InstantCommand());
-    operatorController.X.onTrue(new InstantCommand());
-    operatorController.Y.onTrue(new InstantCommand(this::doNothing, this));
+    // operatorController.A.onTrue(new InstantCommand());
+    // operatorController.B.onTrue(new InstantCommand());
+    // operatorController.X.onTrue(new InstantCommand());
+    // operatorController.Y.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.leftBumper.whileTrue(new RotateIntake(RobotContainer.s_Pneumatics, true));
     operatorController.rightBumper.whileTrue(new RotateIntake(RobotContainer.s_Pneumatics, false));
-    operatorController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
-    operatorController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
-    operatorController.back.onTrue(new InstantCommand(this::doNothing, this));
-    operatorController.start.onTrue(new InstantCommand(this::doNothing, this));
-    operatorController.dPadUp.onTrue(new InstantCommand());
-    operatorController.dPadDown.onTrue(new InstantCommand());
+    // operatorController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
+    // operatorController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
+    // operatorController.back.onTrue(new InstantCommand(this::doNothing, this));
+    // operatorController.start.onTrue(new InstantCommand(this::doNothing, this));
+    // operatorController.dPadUp.onTrue(new InstantCommand());
+    // operatorController.dPadDown.onTrue(new InstantCommand());
   }
 
   @Override
-  public void periodic() {
-    m_armSubsystem.DEBUG_runAngleMotor(operatorController.getLeftY());
-    m_armSubsystem.DEBUG_runExtenderMotor(operatorController.getRightY());
-    m_intakeSubsystem.DEBUG_runFrontRoller(operatorController.getLeftTriggerAxis());
-    m_intakeSubsystem.DEBUG_runRearRoller(operatorController.getRightTriggerAxis());
-  }
+  public void periodic() {}
 
   /** Placeholder used for empty commands mapped to joystick */
   public void doNothing() {}

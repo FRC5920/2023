@@ -58,7 +58,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.subsystems.Arm.Pneumatics.WristPosition;
+import frc.robot.subsystems.Pneumatics.Pneumatics.WristPosition;
 
 public class Arm extends SubsystemBase {
   static final int kAngleMotorCANId = Constants.ArmConstants.kArmYMotorMasterPort;
@@ -71,7 +71,7 @@ public class Arm extends SubsystemBase {
   static final double kAngleMotorCouplingDiameterMeters = Units.inchesToMeters(4);
 
   /** Gear ratio used to couple the angle motor to the arm mechanism */
-  static final double kAngleMotorGearRatio = 1.0; // TODO: set this constant
+  static final double kAngleMotorGearRatio = 1/150; // TODO: set this constant
 
   /** Diameter (meters) of the angle motor gear TODO: measure this value */
   static final double kExtenderMotorCouplingDiameterMeters = Units.inchesToMeters(2);
@@ -201,29 +201,29 @@ public class Arm extends SubsystemBase {
     m_angleMotor.setNeutralMode(NeutralMode.Brake);
     // set ArmExtender PID coefficients
     m_extenderMotor.config_kF(
-        Constants.ArmConstants.kPIDLoopIdx,
-        Constants.ArmConstants.kFF,
-        Constants.ArmConstants.kTimeoutMs);
+        Constants.ArmConstants.kArmYPIDLoopIdx,
+        Constants.ArmConstants.kArmYFF,
+        Constants.ArmConstants.kArmYTimeoutMs);
     m_extenderMotor.config_kP(
-        Constants.ArmConstants.kPIDLoopIdx,
-        Constants.ArmConstants.kP,
-        Constants.ArmConstants.kTimeoutMs);
+        Constants.ArmConstants.kArmYPIDLoopIdx,
+        Constants.ArmConstants.kArmYP,
+        Constants.ArmConstants.kArmYTimeoutMs);
     m_extenderMotor.config_kI(
-        Constants.ArmConstants.kPIDLoopIdx,
-        Constants.ArmConstants.kI,
-        Constants.ArmConstants.kTimeoutMs);
+        Constants.ArmConstants.kArmYPIDLoopIdx,
+        Constants.ArmConstants.kArmYI,
+        Constants.ArmConstants.kArmYTimeoutMs);
     m_extenderMotor.config_kD(
-        Constants.ArmConstants.kPIDLoopIdx,
-        Constants.ArmConstants.kD,
-        Constants.ArmConstants.kTimeoutMs);
+        Constants.ArmConstants.kArmYPIDLoopIdx,
+        Constants.ArmConstants.kArmYD,
+        Constants.ArmConstants.kArmYTimeoutMs);
     m_extenderMotor.config_IntegralZone(
-        Constants.ArmConstants.kPIDLoopIdx,
-        Constants.ArmConstants.kIz,
-        Constants.ArmConstants.kTimeoutMs);
-    m_extenderMotor.configNominalOutputForward(0, Constants.ArmConstants.kTimeoutMs);
-    m_extenderMotor.configNominalOutputReverse(0, Constants.ArmConstants.kTimeoutMs);
-    m_extenderMotor.configPeakOutputForward(1, Constants.ArmConstants.kTimeoutMs);
-    m_extenderMotor.configPeakOutputReverse(-1, Constants.ArmConstants.kTimeoutMs);
+        Constants.ArmConstants.kArmYPIDLoopIdx,
+        Constants.ArmConstants.kArmYIz,
+        Constants.ArmConstants.kArmYTimeoutMs);
+    m_extenderMotor.configNominalOutputForward(0, Constants.ArmConstants.kArmYTimeoutMs);
+    m_extenderMotor.configNominalOutputReverse(0, Constants.ArmConstants.kArmYTimeoutMs);
+    m_extenderMotor.configPeakOutputForward(1, Constants.ArmConstants.kArmYTimeoutMs);
+    m_extenderMotor.configPeakOutputReverse(-1, Constants.ArmConstants.kArmYTimeoutMs);
   }
 
   /** An enumeration of cargo types */

@@ -55,8 +55,11 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.lib.Joystick.ProcessedXboxController;
 import frc.lib.SwerveDrive.CTREConfigs;
 import frc.lib.utility.Alert;
+import frc.robot.subsystems.Arm.Arm;
+import frc.robot.subsystems.Intake.IntakeSubsystem;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -209,7 +212,16 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    Arm armSubsystem = m_robotContainer.armSubsystem;
+    IntakeSubsystem intakeSubsystem = m_robotContainer.m_Intake;
+    ProcessedXboxController operatorController =
+        m_robotContainer.joystickSubsystem.operatorController;
+    armSubsystem.DEBUG_runAngleMotor(operatorController.getLeftY());
+    armSubsystem.DEBUG_runExtenderMotor(operatorController.getRightY());
+    intakeSubsystem.DEBUG_runFrontRoller(operatorController.getLeftTriggerAxis());
+    intakeSubsystem.DEBUG_runRearRoller(operatorController.getRightTriggerAxis());
+  }
 
   @Override
   public void testInit() {
