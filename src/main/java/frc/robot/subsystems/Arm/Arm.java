@@ -249,8 +249,7 @@ public class Arm extends SubsystemBase {
     // This method will be called once per scheduler run
 
     // TODO: Testing Code
-    ArmYMotorMaster.set(
-        TalonFXControlMode.PercentOutput, opXboxController.getLeftX(), null, HandRollerSpeed);
+    ArmYMotorMaster.set(TalonFXControlMode.PercentOutput, opXboxController.getLeftX());
     ArmExtender.set(TalonFXControlMode.PercentOutput, opXboxController.getRightY());
     //
 
