@@ -169,6 +169,20 @@ public class Swerve extends SubsystemBase {
     }
   }
 
+  public void runVelocity(ChassisSpeeds speeds) {
+
+    m_ChassisSpeeds = speeds;
+
+    // Calculate new desired swerve module states from the chassis speeds
+    SwerveModuleState[] newModuleStates = swerveKinematics.toSwerveModuleStates(m_ChassisSpeeds);
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        newModuleStates, Constants.SwerveDrivebaseConstants.maxSpeed);
+
+    // Apply the new desired module states
+    for (SwerveModule mod : mSwerveMods) {
+      mod.setDesiredState(newModuleStates[mod.moduleNumber], false);
+    }
+  }
   /** Stops swerve drive motion */
   public void stop() {
     drive(new Translation2d(0, 0).times(0), 0, true, true);
@@ -230,8 +244,12 @@ public class Swerve extends SubsystemBase {
 
   /** Returns the yaw measurement */
   public Rotation2d getYaw() {
-    Rotation2d yaw = Rotation2d.fromRadians(m_gyroMeasurements.yawRad);
-    return (Constants.SwerveDrivebaseConstants.invertGyro) ? yaw.minus(kAngle360) : yaw;
+    if (RobotBase.isSimulation()) {
+      return simOdometryPose.getRotation();
+    } else {
+      Rotation2d yaw = Rotation2d.fromRadians(m_gyroMeasurements.yawRad);
+      return (Constants.SwerveDrivebaseConstants.invertGyro) ? yaw.minus(kAngle360) : yaw;
+    }
   }
 
   /** Returns the roll measurement */
@@ -279,19 +297,17 @@ public class Swerve extends SubsystemBase {
                   speeds.omegaRadiansPerSecond * .02));
     }
 
-    /*
-    SmartDashboard.putNumber("Gyro", getYaw());
-    SmartDashboard.putNumber("Roll", getRoll());
-    SmartDashboard.putNumber("Pitch", getPitch());
-    for (SwerveModule mod : mSwerveMods) {
-      SmartDashboard.putNumber(
-          "Mod " + mod.moduleNumber + " Cancoder", mod.getAngle().getDegrees());
-      SmartDashboard.putNumber(
-          "Mod " + mod.moduleNumber + " Integrated", mod.getPosition().angle.getDegrees());
-      SmartDashboard.putNumber(
-          "Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
-    }
-    */
+    // SmartDashboard.putNumber("Gyro", getYaw());
+    // SmartDashboard.putNumber("Roll", getRoll());
+    // SmartDashboard.putNumber("Pitch", getPitch());
+    // for (SwerveModule mod : mSwerveMods) {
+    //  SmartDashboard.putNumber(
+    //      "Mod " + mod.moduleNumber + " Cancoder", mod.getAngle().getDegrees());
+    //  SmartDashboard.putNumber(
+    //      "Mod " + mod.moduleNumber + " Integrated", mod.getPosition().angle.getDegrees());
+    //  SmartDashboard.putNumber(
+    //      "Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
+    // }
   }
 
   public SwerveModuleIO.SwerveModuleIOTelemetry getIOTelemetry(ModuleId module) {

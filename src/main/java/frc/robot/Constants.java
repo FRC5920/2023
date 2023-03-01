@@ -120,6 +120,40 @@ public final class Constants {
     public static final double stickDeadband = 0.1;
   }
 
+  public static class ArmConstants {
+    public static final int kArmYMotorMasterPort = 7;
+    public static final int kArmYMotorSlavePort = 6;
+    public static final int kHandFrontRollerPort = 5;
+    public static final int kHandBackRollerPort = 20;
+    public static final int kArmExtenderPort = 8;
+
+    public static final int kArmStoredPosition = 0;
+    public static final int kArmIntakePosition = 500;
+    public static final int kArmPlaceHighPosition = 2500;
+    public static final int kArmPlaceMiddlePosition = 2600;
+    public static final int kArmRetracted = 0;
+    public static final int kArmExtendedHigh = 4000;
+    public static final int kArmExtendedMiddle = 3000;
+    public static final int kArmExtenderPIDLoopIdx = 0;
+    public static final int kArmExtenderTimeoutMs = 50;
+    public static final double kArmExtenderFF = 0;
+    public static final double kArmExtenderP = 0;
+    public static final double kArmExtenderI = 0;
+    public static final double kArmExtenderD = 0;
+    public static final double kArmExtenderIz = 0;
+    public static final int kArmYPIDLoopIdx = 0;
+    public static final int kArmYTimeoutMs = 50;
+    public static final double kArmYFF = 0;
+    public static final double kArmYP = 0;
+    public static final double kArmYI = 0;
+    public static final double kArmYD = 0;
+    public static final double kArmYIz = 0;
+    public static final long kDropWaitTime = 5000;
+    public static final long kIntakeWaitTime = 5000;
+    public static final double kFetchAngularP = 0.1;
+    public static final double kFetchAngularD = 0.0;
+  }
+
   public static final class SwerveDrivebaseConstants {
     public static final int pigeonID = 41;
     public static final boolean invertGyro = false; // Always ensure Gyro is CCW+ CW-
@@ -250,6 +284,12 @@ public final class Constants {
             kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
   }
 
+  public static class PneumaticsConstants {
+    public static final int kPDHCAN = 62;
+    public static final int kArmLeftRotatorPort = 0;
+    public static final int kArmRightRotatorPort = 1;
+  }
+
   public static class VisionConstants {
 
     public static final double fiducialAmbiguityLimit = 0.2;
@@ -257,16 +297,12 @@ public final class Constants {
     // TODO: get the actual location of the tag camera to the robot transform
     public static final Transform3d CAMERA_TO_ROBOT =
         new Transform3d(
-            new Translation3d(0.5, 0.0, 0.5),
-            new Rotation3d(
-                0, 0,
-                0)); // Cam mounted facing forward, half a meter forward of center, half a meter up
-    // from center.
+            new Translation3d(0.0952, 0.0, 0.2794), new Rotation3d(0, 0, Math.toRadians(180)));
 
     public static final Transform3d ROBOT_TO_CAMERA = CAMERA_TO_ROBOT.inverse();
     static final String TagCameraName = "Heimdall_Tag_Camera";
     static final String ArmCameraName = "Arm_Camera";
-    static final String BackupCameraName = "BackupCamera";
+    static final String BackupCameraName = "Heimdall_Backup_Cam";
   }
 
   /** A map of directories where log files should be stored */

@@ -51,89 +51,111 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.commands;
 
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
-import frc.robot.subsystems.runtimeState.BotStateSubsystem;
+import java.util.function.Supplier;
 
-public class Balance extends CommandBase {
+public class Drive2Pose extends CommandBase {
+  private final Swerve s_swerve;
+  private final Supplier<Pose2d> poseSupplier;
+  private final double driveKp = 0.1;
+  private final double driveKd = 0;
+  private final double thetaKp = 10;
+  private final double thetaKd = 0;
+  private final double driveMaxVelocity = 3.5;
+  private final double driveMaxAcceleration = 11;
+  private final double thetaMaxVelocity = Units.degreesToRadians(360.0);
+  private final double thetaMaxAcceleration = Units.degreesToRadians(720.0);
+  private final double driveTolerance = 0.01;
+  private final double thetaTolerance = Units.degreesToRadians(2.0);
 
-  private static final double SwerveP = 0.07;
-  private static final double SwerveI = 0.00;
-  private static final double SwervekD = 0.0;
-  private final PIDController xController = new PIDController(SwerveP, SwerveI, SwervekD);
-  private final PIDController yController = new PIDController(SwerveP, SwerveI, SwervekD);
-  private final PIDController omegaController = new PIDController(SwerveP, SwerveI, SwervekD);
+  private boolean running = false;
+  private final ProfiledPIDController driveController =
+      new ProfiledPIDController(0.0, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0), 0.02);
+  private final ProfiledPIDController thetaController =
+      new ProfiledPIDController(0.0, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0), 0.02);
 
-  private final Swerve drivetrainSubsystem;
-
-  /** Creates a new Balance. */
-  public Balance(Swerve drivetrainSubsystem) {
-    this.drivetrainSubsystem = drivetrainSubsystem;
-
-    xController.setTolerance(3);
-    yController.setTolerance(3);
-    omegaController.setTolerance(Units.degreesToRadians(3));
-    omegaController.enableContinuousInput(-Math.PI, Math.PI);
-
-    addRequirements(drivetrainSubsystem);
+  /** Drives to the specified pose under full software control. */
+  public Drive2Pose(Swerve s_swerve, Pose2d pose) {
+    this(s_swerve, () -> pose);
   }
 
-  // Called when the command is initially scheduled.
+  /** Drives to the specified pose under full software control. */
+  public Drive2Pose(Swerve s_swerve, Supplier<Pose2d> poseSupplier) {
+    this.s_swerve = s_swerve;
+    this.poseSupplier = poseSupplier;
+    addRequirements(s_swerve);
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+  }
+
   @Override
   public void initialize() {
-    // omegaController.reset(drivetrainSubsystem.getYaw().getRadians());
-    // xController.reset(drivetrainSubsystem.getRoll());
-    // yController.reset(drivetrainSubsystem.getPitch());
+    // Reset all controllers
+    var currentPose = s_swerve.getPose();
+    driveController.reset(
+        currentPose.getTranslation().getDistance(poseSupplier.get().getTranslation()));
+    thetaController.reset(currentPose.getRotation().getRadians());
   }
 
-  // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // drivetrainSubsystem.getPitch();
-    // drivetrainSubsystem.getRoll();
-    xController.setSetpoint(0);
-    yController.setSetpoint(0);
-    omegaController.setSetpoint(drivetrainSubsystem.getYaw().getRadians());
+    running = true;
 
-    // Drive to the target
-    var xSpeed = xController.calculate(-drivetrainSubsystem.getPitch().getDegrees());
-    if (xController.atSetpoint()) {
-      xSpeed = 0;
-    }
+    // Update from tunable numbers
+    driveController.setP(driveKp);
+    driveController.setD(driveKd);
+    driveController.setConstraints(
+        new TrapezoidProfile.Constraints(driveMaxVelocity, driveMaxAcceleration));
+    driveController.setTolerance(driveTolerance);
+    thetaController.setP(thetaKp);
+    thetaController.setD(thetaKd);
+    thetaController.setConstraints(
+        new TrapezoidProfile.Constraints(thetaMaxVelocity, thetaMaxAcceleration));
+    thetaController.setTolerance(thetaTolerance);
 
-    var ySpeed = yController.calculate(-drivetrainSubsystem.getRoll().getDegrees());
-    if (yController.atSetpoint()) {
-      ySpeed = 0;
-    }
+    // Get current and target pose
+    var currentPose = s_swerve.getPose();
+    var targetPose = poseSupplier.get();
 
-    var omegaSpeed = omegaController.calculate(drivetrainSubsystem.getYaw().getRadians());
-    if (omegaController.atSetpoint()) {
-      omegaSpeed = 0;
-    }
-    // https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/intro-and-chassis-speeds.html
-    drivetrainSubsystem.drive(
-        new Translation2d(ySpeed, xSpeed).times(BotStateSubsystem.MaxSpeed * .2),
-        omegaSpeed,
-        true,
-        true);
-
-    // https://www.instructables.com/Self-Balancing-Robot-Using-PID-Algorithm-STM-MC/
-    // https://docs.wpilib.org/en/stable/docs/software/advanced-controls/controllers/pidcontroller.html
-    // https://mcm-frc-docs.readthedocs.io/en/latest/docs/software/commandbased/profilepid-subsystems-commands.html
+    // Command speeds
+    double driveVelocityScalar =
+        driveController.calculate(
+            currentPose.getTranslation().getDistance(poseSupplier.get().getTranslation()), 0.0);
+    double thetaVelocity =
+        thetaController.calculate(
+            currentPose.getRotation().getRadians(), targetPose.getRotation().getRadians());
+    if (driveController.atGoal()) driveVelocityScalar = 0.0;
+    if (thetaController.atGoal()) thetaVelocity = 0.0;
+    var driveVelocity =
+        new Pose2d(
+                new Translation2d(),
+                currentPose.getTranslation().minus(targetPose.getTranslation()).getAngle())
+            .transformBy(translationToTransform(driveVelocityScalar, 0.0))
+            .getTranslation();
+    s_swerve.runVelocity(
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            driveVelocity.getX(), driveVelocity.getY(), thetaVelocity, currentPose.getRotation()));
   }
 
-  // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    drivetrainSubsystem.stop();
+    running = false;
+    s_swerve.stop();
   }
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return false;
+  public boolean atGoal() {
+    return running && driveController.atGoal() && thetaController.atGoal();
+  }
+
+  public static Transform2d translationToTransform(double x, double y) {
+    return new Transform2d(new Translation2d(x, y), new Rotation2d());
   }
 }
