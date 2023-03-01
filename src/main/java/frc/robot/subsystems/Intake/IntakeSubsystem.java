@@ -217,6 +217,7 @@ public class IntakeSubsystem extends SubsystemBase {
    */
   public void DEBUG_runRearRoller(double speedPercent) {
     // TODO: run the rear roller motor
+    m_rearRollerMotor.set(speedPercent);
   }
 
   /** Returns the subsystem's dashboard tab */
