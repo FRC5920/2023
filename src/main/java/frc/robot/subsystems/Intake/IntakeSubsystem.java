@@ -199,6 +199,8 @@ public class IntakeSubsystem extends SubsystemBase {
   /** Sets the speed of the rear roller in RPM */
   public void setRearRollerRPM(double rpm) {
     // TODO: set the target velocity of the rear roller motor
+//https://github.com/REVrobotics/SPARK-MAX-Examples/blob/master/Java/Velocity%20Closed%20Loop%20Control/src/main/java/frc/robot/Robot.java
+
   }
 
   /**
