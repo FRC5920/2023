@@ -103,13 +103,20 @@ public final class Constants {
     public static final int kHandBackRollerPort = 20;
     public static final int kArmExtenderPort = 8;
 
+    
     public static final int kArmStoredPosition = 0;
-    public static final int kArmIntakePosition = 500;
-    public static final int kArmPlaceHighPosition = 2500;
-    public static final int kArmPlaceMiddlePosition = 2600;
+    public static final int kArmIntakePosition = -1000;
+    public static final int kArmUprightPosition = -171331;
+    public static final int kArmPlaceMiddlePosition = -250000;
+    public static final int kArmPlaceHighPosition = -200000;
+    public static final int kArmMRotateMax = -340000;
+    
     public static final int kArmRetracted = 0;
-    public static final int kArmExtendedHigh = 4000;
-    public static final int kArmExtendedMiddle = 3000;
+    public static final int kArmExtendedLow = -5000;
+    public static final int kArmExtendedMiddle = -15000;
+    public static final int kArmExtendedHigh = -20000;
+    public static final int kArmExtendedMax = -27000;
+    
     public static final int kArmExtenderPIDLoopIdx = 0;
     public static final int kArmExtenderTimeoutMs = 50;
     public static final double kArmExtenderFF = 0;
