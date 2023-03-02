@@ -66,15 +66,15 @@ public class Intake extends SubsystemBase {
 
   public Intake() {
 
-    m_takeUpMotor = new WPI_TalonFX(6);
-    m_armMotor = new WPI_TalonFX(5);
-    myController = new XboxController(1);
+   // m_takeUpMotor = new WPI_TalonFX(6);
+   // m_armMotor = new WPI_TalonFX(5);
+   // myController = new XboxController(1);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    m_armMotor.setNeutralMode(NeutralMode.Brake);
-    m_armMotor.set(ControlMode.PercentOutput, myController.getRightY());
+    //m_armMotor.setNeutralMode(NeutralMode.Brake);
+    //m_armMotor.set(ControlMode.PercentOutput, myController.getRightY());
   }
 }
