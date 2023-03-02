@@ -172,7 +172,7 @@ public class SwerveDashboardTab implements IDashboardTab {
     // Add max speed slider
     m_maxSpeed =
         m_tab
-            .add("Max Speed", 0.75)
+            .add("Max Speed", 1)
             .withWidget(BuiltInWidgets.kNumberSlider) // specify the widget here
             .withProperties(
                 Map.of(
