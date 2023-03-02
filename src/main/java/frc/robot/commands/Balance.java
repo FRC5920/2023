@@ -55,6 +55,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 
@@ -115,7 +116,7 @@ public class Balance extends CommandBase {
     }
     // https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/intro-and-chassis-speeds.html
     drivetrainSubsystem.drive(
-        new Translation2d(ySpeed, xSpeed).times(BotStateSubsystem.MaxSpeed * .2),
+        new Translation2d(ySpeed, xSpeed).times(Constants.SwerveDrivebaseConstants.maxSpeed * .15),
         omegaSpeed,
         true,
         true);

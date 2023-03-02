@@ -65,9 +65,9 @@ public class BotStateSubsystem extends SubsystemBase {
   /** true when motor current limiting is enabled; else false */
   private boolean m_currentLimitingIsEnabled = false;
   /** speeds based on Shuffleboard */
-  public static double MaxSpeed = Constants.SwerveDrivebaseConstants.maxSpeed;
+  // public static double MaxSpeed = Constants.SwerveDrivebaseConstants.maxSpeed;
 
-  public static double MaxRotate = Constants.SwerveDrivebaseConstants.maxAngularVelocity;
+  // public static double MaxRotate = Constants.SwerveDrivebaseConstants.maxAngularVelocity;
 
   /** Creates an instance of the object */
   public BotStateSubsystem() {}

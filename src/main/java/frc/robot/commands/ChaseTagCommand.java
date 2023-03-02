@@ -63,6 +63,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.SwerveDrivebase.*;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 import java.util.function.Supplier;
@@ -183,7 +184,7 @@ public class ChaseTagCommand extends CommandBase {
       }
       // https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/intro-and-chassis-speeds.html
       drivetrainSubsystem.drive(
-          new Translation2d(ySpeed, xSpeed).times(BotStateSubsystem.MaxSpeed),
+          new Translation2d(ySpeed, xSpeed).times(Constants.SwerveDrivebaseConstants.maxSpeed),
           omegaSpeed,
           true,
           true);

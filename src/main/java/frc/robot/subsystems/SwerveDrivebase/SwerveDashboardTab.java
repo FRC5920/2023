@@ -196,9 +196,9 @@ public class SwerveDashboardTab implements IDashboardTab {
 
     if (RobotState.isDisabled()) {
       if (m_maxSpeed != null) {
-        BotStateSubsystem.MaxSpeed =
+        RobotContainer.MaxSpeed =
             Constants.SwerveDrivebaseConstants.maxSpeed * m_maxSpeed.getDouble(0);
-        BotStateSubsystem.MaxRotate =
+        RobotContainer.MaxRotate =
             Constants.SwerveDrivebaseConstants.maxAngularVelocity * m_maxSpeed.getDouble(0);
       }
     }
