@@ -71,9 +71,9 @@ public class DriveToWaypoint extends CommandBase {
   public static final double kDefaultRotationToleranceRadians = Units.degreesToRadians(5.0);
 
   /** Default gains applied to controlling position */
-  public static final PIDGains kDefaultPositionGains = new PIDGains(1, 0, 0);
+  public static final PIDGains kDefaultPositionGains = new PIDGains(8, 0, 0.2);
   /** Default gains applied to controlling position */
-  public static final PIDGains kDefaultRotationGains = new PIDGains(10, 0, 0);
+  public static final PIDGains kDefaultRotationGains = new PIDGains(10, 0, 0.2);
 
   /** Default max velocity used for position constraints */
   public static final double kDefaultMaxVelocity = 3.5;
