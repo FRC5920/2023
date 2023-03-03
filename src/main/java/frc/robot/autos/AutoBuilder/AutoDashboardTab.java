@@ -243,11 +243,9 @@ public class AutoDashboardTab implements IDashboardTab {
             .getObject(String.format("AutoTrajectory%d", idx))
             .setTrajectory(trajectories.get(idx));
       }
-    }
 
-    if (initialPositionChanged) {
       Pose2d pose = m_initialPositionChooser.getSelected().getPose();
-      botContainer.poseEstimatorSubsystem.setCurrentPose(pose);
+      botContainer.swerveSubsystem.resetOdometry(pose);
       SmartDashboard.putNumber("initialX", pose.getX());
       SmartDashboard.putNumber("initialY", pose.getY());
     }

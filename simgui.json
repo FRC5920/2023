@@ -17,6 +17,25 @@
     },
     "windows": {
       "/Shuffleboard/Auto Builder/Field": {
+        "AutoTrajectory0": {
+          "arrows": false,
+          "style": "Line"
+        },
+        "AutoTrajectory1": {
+          "arrows": false,
+          "style": "Line"
+        },
+        "AutoTrajectory2": {
+          "arrows": false,
+          "style": "Line"
+        },
+        "bottom": 544,
+        "height": 8.013679504394531,
+        "image": "/home/dave/git/VIKotics/2023/2023-field.png",
+        "left": 46,
+        "right": 1088,
+        "top": 36,
+        "width": 16.541748046875,
         "window": {
           "visible": true
         }

@@ -15,7 +15,7 @@ No matter which Alliance is active, the following conventions apply:
 - Gridward is the direction moving toward the Grids of the active alliance
 - Fieldward is the direction moving toward the center of the field
 
-### Grids 
+### Grids
 
 - Grids in the the community are assigned designators A-I.
 - Grid A is always the one on the side closest to the scoring table

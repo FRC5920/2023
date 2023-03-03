@@ -136,7 +136,7 @@ spotless {
     java {
         target fileTree(".") {
             include "**/*.java"
-            exclude "lib/thirdparty/**", "**/build/**", "**/build-*/**"
+            exclude "src/main/java/frc/lib/thirdparty/**", "**/build/**", "**/build-*/**"
         }
         toggleOffOn()
         importOrder()

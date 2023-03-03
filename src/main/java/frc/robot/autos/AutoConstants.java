@@ -55,7 +55,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
 import frc.lib.thirdparty.FRC6328.AllianceFlipUtil;
 import frc.lib.thirdparty.FRC6328.FieldConstants;
 import java.util.*;
@@ -92,14 +91,12 @@ public class AutoConstants {
 
     /** Returns a Rotation2d pointed toward the current Alliance's Grid */
     public static Rotation2d facingGrid() {
-      return new Rotation2d(
-          (DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? Math.PI : 0);
+      return new Rotation2d(Math.PI);
     }
 
     /** Returns a Rotation2d pointed toward the center of the field */
     public static Rotation2d facingField() {
-      return new Rotation2d(
-          (DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 0 : Math.PI);
+      return new Rotation2d(0.0);
     }
   }
 
@@ -280,10 +277,12 @@ public class AutoConstants {
 
       /** End of the South OUTER lane just past tape South of Charging Station */
       OuterLaneSouthEndpoint(
-          ChargingStation.kFieldSideX + 0.25, LaneConstants.kOuterLaneSouthCenterY),
+          ChargingStation.kFieldSideX + (0.75 * BotDimensions.kFootprintWidth),
+          LaneConstants.kOuterLaneSouthCenterY),
       /** End of the South INNER lane just past tape South of Charging Station */
       InnerLaneSouthEndpoint(
-          ChargingStation.kFieldSideX + 0.25, LaneConstants.kInnerLaneSouthCenterY),
+          ChargingStation.kFieldSideX + (0.75 * BotDimensions.kFootprintWidth),
+          LaneConstants.kInnerLaneSouthCenterY),
 
       /** End of the route through the Charging Station via the Outer lane */
       ThroughCSEndpoint(ChargingStation.kFieldSideX + 0.25, ChargingStation.kCenterY);
