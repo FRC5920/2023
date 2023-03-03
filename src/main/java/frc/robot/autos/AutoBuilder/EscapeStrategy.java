@@ -63,6 +63,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.utility.PIDGains;
+import frc.robot.autos.AutoConstants.BotDimensions;
 import frc.robot.autos.AutoConstants.BotOrientation;
 import frc.robot.autos.AutoConstants.EscapeRoute;
 import frc.robot.autos.AutoConstants.Grids;
@@ -248,7 +249,9 @@ public class EscapeStrategy {
 
     m_waypointList = new ArrayList<>();
     m_waypointList.add(initialWaypoint);
-    m_waypointList.add(initialLaneEndpoint);
+    if (initialLaneEndpoint.distance(initialWaypoint) > BotDimensions.kFootprintWidth) {
+      m_waypointList.add(initialLaneEndpoint);
+    }
     m_waypointList.add(cornerPoint);
     m_waypointList.add(endWaypoint);
 

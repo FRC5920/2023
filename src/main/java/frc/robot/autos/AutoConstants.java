@@ -148,7 +148,7 @@ public class AutoConstants {
       }
 
       public Pose2d getPose() {
-        return AllianceFlipUtil.apply(new Pose2d(position, BotOrientation.facingGrid()));
+        return AllianceFlipUtil.apply(new Pose2d(position, BotOrientation.facingField()));
       }
 
       public Translation2d getPosition() {

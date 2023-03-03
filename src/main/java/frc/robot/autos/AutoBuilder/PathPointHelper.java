@@ -93,4 +93,8 @@ public class PathPointHelper extends PathPoint {
   public Rotation2d getHolonomicRotation() {
     return holonomicRotation;
   }
+
+  public double distance(PathPointHelper other) {
+    return position.getDistance(other.position);
+  }
 }
