@@ -56,12 +56,14 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.utility.PIDGains;
-import frc.robot.autos.AutoConstants.BotOrientation;
 import frc.robot.autos.AutoConstants.ChargingStation;
 import frc.robot.autos.AutoConstants.Waypoints;
 import frc.robot.commands.Balance;
@@ -104,6 +106,8 @@ public class BalanceStrategy {
     return m_trajectories;
   }
 
+  public static void eatPose(Pose2d p) {}
+
   /** Generates a command sequence to drive to the Charging Station and balance */
   Command generateCommand(
       Swerve swerveSubsystem, PIDGains translationPIDGains, PIDGains rotationPIDGains) {
@@ -113,8 +117,8 @@ public class BalanceStrategy {
     SwerveAutoBuilder autoBuilder =
         new SwerveAutoBuilder(
             swerveSubsystem::getPose, // Pose2d supplier
-            swerveSubsystem
-                ::resetOdometry, // Pose2d consumer, used to reset odometry at the beginning of auto
+            BalanceStrategy
+                ::eatPose, // Pose2d consumer, used to reset odometry at the beginning of auto
             swerveSubsystem.getSwerveKinematics(), // SwerveDriveKinematics
             new PIDConstants(
                 translationPIDGains.kP,
@@ -156,30 +160,27 @@ public class BalanceStrategy {
     ArrayList<PathPlannerTrajectory> trajectoryList = new ArrayList<PathPlannerTrajectory>();
     List<PathPointHelper> pointList = new ArrayList<>();
 
-    Translation2d y = Waypoints.ID.X.getPosition();
+    Translation2d y = Waypoints.ID.Y.getPosition();
     Translation2d cs = ChargingStation.getCenter();
+
+    Rotation2d fieldFacing =
+        new Rotation2d(
+            (DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 0.0 : Math.PI);
+    Rotation2d gridFacing =
+        new Rotation2d(
+            (DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? Math.PI : 0.0);
 
     PathPointHelper initialPoint =
         new PathPointHelper(
             "Initial pose",
             m_initialLocation.getX(),
             m_initialLocation.getY(),
-            BotOrientation.facingField(),
-            BotOrientation.facingField());
+            fieldFacing,
+            fieldFacing);
     PathPointHelper stageAtY =
-        new PathPointHelper(
-            "Stage at Y",
-            y.getX(),
-            y.getY(),
-            BotOrientation.facingGrid(),
-            BotOrientation.facingGrid());
+        new PathPointHelper("Stage at Y", y.getX(), y.getY(), gridFacing, gridFacing);
     PathPointHelper centerOfCS =
-        new PathPointHelper(
-            "Center of CS",
-            cs.getX(),
-            cs.getY(),
-            BotOrientation.facingGrid(),
-            BotOrientation.facingGrid());
+        new PathPointHelper("Center of CS", cs.getX(), cs.getY(), gridFacing, gridFacing);
 
     trajectoryList.add(
         PathPlanner.generatePath(kDefaultPathConstraints, initialPoint, stageAtY, centerOfCS));

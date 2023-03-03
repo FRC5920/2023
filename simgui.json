@@ -29,6 +29,10 @@
           "arrows": false,
           "style": "Line"
         },
+        "AutoTrajectory3": {
+          "arrows": false,
+          "style": "Line"
+        },
         "bottom": 544,
         "height": 8.013679504394531,
         "image": "/home/dave/git/VIKotics/2023/2023-field.png",
