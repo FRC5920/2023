@@ -59,7 +59,6 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.utility.PIDTunerPanel;
 import frc.robot.RobotContainer;
 import frc.robot.autos.AutoConstants.EscapeRoute;
@@ -114,7 +113,11 @@ public class AutoDashboardTab implements IDashboardTab {
   /** Panel used to set rotation PID gains */
   private PIDTunerPanel m_rotationPIDPanel;
 
+  /** Used to detect when the present alliance changes */
   private Alliance m_lastAlliance;
+
+  /** Used to maintain a set of displayed Trajectories */
+  private HashMap<String, PathPlannerTrajectory> m_fieldTrajectories = new HashMap<>();
 
   /** Creates an instance of the tab */
   public AutoDashboardTab(AutoRoutineBuilder autoBuilder) {
@@ -235,18 +238,28 @@ public class AutoDashboardTab implements IDashboardTab {
           m_translationPIDPanel.getGains(),
           m_rotationPIDPanel.getGains());
 
-      // Display auto trajectories on the field
-      List<PathPlannerTrajectory> trajectories = m_builder.getTrajectories();
-      for (int idx = 0; idx < trajectories.size(); ++idx) {
-        m_field2d
-            .getObject(String.format("AutoTrajectory%d", idx))
-            .setTrajectory(trajectories.get(idx));
+      // Set all objects on the field to have an empty trajectory
+      for (String name : m_fieldTrajectories.keySet()) {
+        m_fieldTrajectories.put(name, new PathPlannerTrajectory());
       }
+
+      // Get trajectories for the active auto
+      List<PathPlannerTrajectory> trajectories = m_builder.getTrajectories();
+
+      // Add them to the map of field objects
+      for (int idx = 0; idx < trajectories.size(); ++idx) {
+        String name = String.format("AutoTrajectory%d", idx);
+        PathPlannerTrajectory traj = trajectories.get(idx);
+        m_fieldTrajectories.put(name, traj);
+      }
+
+      // Send all trajectories to the field
+      m_fieldTrajectories.forEach(
+          (String name, PathPlannerTrajectory traj) ->
+              m_field2d.getObject(name).setTrajectory(traj));
 
       Pose2d pose = m_initialPositionChooser.getSelected().getPose();
       botContainer.swerveSubsystem.resetOdometry(pose);
-      SmartDashboard.putNumber("initialX", pose.getX());
-      SmartDashboard.putNumber("initialY", pose.getY());
     }
 
     m_field2d.setRobotPose(botContainer.swerveSubsystem.getPose());

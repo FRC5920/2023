@@ -158,11 +158,10 @@ public class BalanceStrategy {
   /** Generates trajectories representing the bot's path to the charging station */
   private void generateTrajectories() {
     ArrayList<PathPlannerTrajectory> trajectoryList = new ArrayList<PathPlannerTrajectory>();
-    List<PathPointHelper> pointList = new ArrayList<>();
-
     Translation2d y = Waypoints.ID.Y.getPosition();
     Translation2d cs = ChargingStation.getCenter();
 
+    // PathPlanner doesn't automatically adjust rotations according to Alliance
     Rotation2d fieldFacing =
         new Rotation2d(
             (DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 0.0 : Math.PI);
@@ -175,8 +174,8 @@ public class BalanceStrategy {
             "Initial pose",
             m_initialLocation.getX(),
             m_initialLocation.getY(),
-            fieldFacing,
-            fieldFacing);
+            fieldFacing, // Heading needs to be facing field to get the right spline
+            gridFacing);
     PathPointHelper stageAtY =
         new PathPointHelper("Stage at Y", y.getX(), y.getY(), gridFacing, gridFacing);
     PathPointHelper centerOfCS =
