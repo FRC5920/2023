@@ -68,6 +68,9 @@ public final class Constants {
 
   public static final double robotPeriodSec = LoggedRobot.defaultPeriodSecs;
 
+  /** Set this to true to enable logging with AdvantageKit */
+  public static final boolean kLoggingIsEnabled = false;
+
   /** Set the value of logPlaybackIsEnabled to true when replaying log files */
   public static final boolean kLogPlaybackIsEnabled = false;
 
