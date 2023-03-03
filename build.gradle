@@ -136,7 +136,7 @@ spotless {
     java {
         target fileTree(".") {
             include "**/*.java"
-            exclude "**/build/**", "**/build-*/**"
+            exclude "src/main/java/frc/lib/thirdparty/**", "**/build/**", "**/build-*/**"
         }
         toggleOffOn()
         importOrder()
@@ -159,7 +159,7 @@ spotless {
     json {
         target fileTree(".") {
             include "**/*.json"
-            exclude "**/build/**", "**/build-*/**"
+            exclude "**2023-chargedup.json", "**/build/**", "**/build-*/**"
         }
         gson().indentWithSpaces(2)
     }

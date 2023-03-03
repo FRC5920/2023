@@ -49,112 +49,63 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.subsystems.Heimdall;
+package frc.lib.utility;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
-import frc.robot.RobotContainer;
-import frc.robot.subsystems.Dashboard.IDashboardTab;
-import frc.robot.subsystems.SwerveDrivebase.Swerve;
-import java.util.Map;
 
-/** A class supplying a Shuffleboard tab for configuring drive train parameters */
-public class PoseEstimatorDashboardTab implements IDashboardTab {
-  /** Title used for a dashboard tab that displays the field */
-  static final String kTabTitle = "PoseEstimator";
+/** A class that implements a dashboard panel for tuning PID values */
+public class PIDTunerPanel {
 
-  /** Width (in cells) of the field display */
-  static final int kFieldWidthCells = 21;
+  /** Width of the panel in cells */
+  public static final int kPanelWidthCells = 8;
 
-  /** Height (in cells) of the field display */
-  static final int kFieldHeightCells = 12;
+  /** Height of the panel in cells */
+  public static final int kPanelHeightCells = 6;
 
-  /** Width (in cells) of the pose value display */
-  static final int kPoseWidthCells = 5;
+  /** Width of a slider in the panel (cells) */
+  public static final int kSliderWidth = kPanelWidthCells - 1;
 
-  /** Height (in cells) of the pose value display */
-  static final int kPoseHeightCells = 2;
+  /** Height of a slider in the panel (cells) */
+  public static final int kSliderHeight = 1;
 
-  /** Handle to the pose estimator subsystem */
-  private final PoseEstimatorSubsystem m_PoseEstimatorSubsystem;
+  /** Internal PID controller used to provide a display panel */
+  private final PIDController m_pid;
 
-  /** The Shuffleboard tab to display in */
-  private ShuffleboardTab m_tab;
-
-  /** 2d view of the field */
-  private Field2d m_field2d;
-
-  /** Creates an instance of the tab */
-  PoseEstimatorDashboardTab(PoseEstimatorSubsystem poseEstimatorSubsystem) {
-    m_PoseEstimatorSubsystem = poseEstimatorSubsystem;
-    m_field2d = new Field2d();
-  }
+  /** Gain history for change detection */
+  private PIDGains m_gains;
 
   /**
-   * Create and initialize dashboard widgets
+   * Creates an instance of the panel on a given tab
    *
-   * @param botContainer Container that holds robot subsystems
+   * @param tab Tab to create the panel on
+   * @param title Title to display in the panel
+   * @param rowIndex Row index (cells) where the panel should be positioned on the tab
+   * @param colIndex Column index (cells) where the panel should be positioned on the tab
    */
-  @Override
-  public void initDashboard(RobotContainer botContainer) {
-    PoseEstimatorSubsystem poseSubsystem = botContainer.poseEstimatorSubsystem;
-    Swerve swerveSubsystem = botContainer.swerveSubsystem;
+  public PIDTunerPanel(
+      ShuffleboardTab tab, String title, int rowIndex, int colIndex, PIDGains gains) {
 
-    m_tab = Shuffleboard.getTab(kTabTitle);
+    m_pid = new PIDController(gains.kP, gains.kI, gains.kD);
+    m_gains = gains;
 
-    // Add the 2D view of the field
-    m_tab
-        .add("Field", m_field2d)
-        .withSize(kFieldWidthCells, kFieldHeightCells)
-        .withPosition(0, 0)
-        .withProperties(Map.of("Label position", "HIDDEN"));
-
-    // Add the pose estimator's pose
-    m_tab
-        .addString("Pose Estimator (m)", () -> formatPose2d(poseSubsystem.getCurrentPose(), false))
-        .withSize(kPoseWidthCells, kPoseHeightCells)
-        .withPosition(kPoseWidthCells * 0, kFieldHeightCells);
-    m_tab
-        .addString("Pose Estimator (in)", () -> formatPose2d(poseSubsystem.getCurrentPose(), true))
-        .withSize(kPoseWidthCells, kPoseHeightCells)
-        .withPosition(kPoseWidthCells * 0, kFieldHeightCells + kPoseHeightCells);
-
-    // Add the pose value
-    m_tab
-        .addString("Swerve Pose (m)", () -> formatPose2d(swerveSubsystem.getPose(), false))
-        .withSize(kPoseWidthCells, kPoseHeightCells)
-        .withPosition(kPoseWidthCells * 1, kFieldHeightCells);
-    m_tab
-        .addString("Swerve Pose (in)", () -> formatPose2d(swerveSubsystem.getPose(), true))
-        .withSize(kPoseWidthCells, kPoseHeightCells)
-        .withPosition(kPoseWidthCells * 1, kFieldHeightCells + kPoseHeightCells);
+    tab.add(title, m_pid).withPosition(colIndex, rowIndex);
   }
 
-  /** Service dashboard tab widgets */
-  @Override
-  public void updateDashboard(RobotContainer botContainer) {
-    FieldObject2d estimatorPoseObject = m_field2d.getRobotObject();
-    estimatorPoseObject.setPose(m_PoseEstimatorSubsystem.getCurrentPose());
-
-    FieldObject2d swervePoseObject = m_field2d.getObject("Odometry");
-    swervePoseObject.setPose(botContainer.swerveSubsystem.getPose());
+  /** Returns the PID gins */
+  public PIDGains getGains() {
+    return new PIDGains(m_pid.getP(), m_pid.getI(), m_pid.getD());
   }
 
-  private static String formatPose2d(Pose2d pose, boolean asInches) {
-    if (asInches) {
-      return String.format(
-          "(%.2f in, %.2f in) %.2f degrees",
-          Units.metersToInches(pose.getX()),
-          Units.metersToInches(pose.getY()),
-          pose.getRotation().getDegrees());
-    } else {
-      return String.format(
-          "(%.2f m, %.2f m) %.2f degrees",
-          pose.getX(), pose.getY(), pose.getRotation().getDegrees());
+  /** Returns true if the PID gains have been modified since hasChanged() was last called */
+  public boolean hasChanged() {
+    boolean changed = false;
+    PIDGains dashboardGains = new PIDGains(m_pid.getP(), m_pid.getI(), m_pid.getD());
+    if (!m_gains.isEqual(dashboardGains)) {
+      changed = true;
+      m_gains = dashboardGains;
     }
+
+    return changed;
   }
 }

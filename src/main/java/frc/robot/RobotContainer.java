@@ -59,6 +59,8 @@ import frc.lib.SwerveDrive.Pigeon2GyroIO;
 import frc.lib.SwerveDrive.SimGyroIO;
 import frc.lib.SwerveDrive.SimSwerveModuleIO;
 import frc.lib.SwerveDrive.SwerveModuleIO;
+import frc.robot.autos.AutoBuilder.AutoDashboardTab;
+import frc.robot.autos.AutoBuilder.AutoRoutineBuilder;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
@@ -100,6 +102,10 @@ public class RobotContainer {
 
   @SuppressWarnings({"unused"})
   private final PhotonCamera ArmCamera = new PhotonCamera(Constants.VisionConstants.ArmCameraName);
+
+  // Create an auto routine builder
+  AutoRoutineBuilder autoBuilder;
+  private final AutoDashboardTab autoDashboardTab;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -173,6 +179,10 @@ public class RobotContainer {
     poseEstimatorSubsystem = new PoseEstimatorSubsystem(TagCamera, swerveSubsystem);
     poseEstimatorSubsystem.registerDashboardTab(dashboardSubsystem);
 
+    autoBuilder = new AutoRoutineBuilder(swerveSubsystem);
+    autoDashboardTab = new AutoDashboardTab(autoBuilder);
+    dashboardSubsystem.add(autoDashboardTab);
+
     // Initialize all dashboard tabs
     dashboardSubsystem.initialize(this);
 
@@ -187,6 +197,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return new InstantCommand();
+    Command autoCommand = autoBuilder.getCommand();
+    return (autoCommand != null) ? autoCommand : new InstantCommand();
   }
 }

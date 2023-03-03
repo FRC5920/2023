@@ -75,8 +75,13 @@ public class SimSwerveModuleIO implements SwerveModuleIO {
 
   /** Gear ratio used to simulate the angle motor */
   private static final double kAngleMotorGearRatio = 150.0 / 7.0;
+
   /** Moment of inertia (kgm^2) used to simulate the angle motor */
   private static final double kAngleMotorMomentOfInertia = 0.004;
+
+  private static final double kAnglePIDkP = 5.0;
+  private static final double kAnglePIDkI = 0.0;
+  private static final double kAnglePIDkD = 0.0;
 
   /** Simulation of a module drive motor using a flywheel */
   private final FlywheelSim m_simDriveMotor =
@@ -87,7 +92,7 @@ public class SimSwerveModuleIO implements SwerveModuleIO {
       new FlywheelSim(DCMotor.getFalcon500(1), kAngleMotorGearRatio, kAngleMotorMomentOfInertia);
 
   private final PIDController m_anglePID =
-      new PIDController(1.0, 0.0, 0.0, Constants.robotPeriodSec);
+      new PIDController(kAnglePIDkP, kAnglePIDkI, kAnglePIDkD, Constants.robotPeriodSec);
 
   private double m_driveDistanceMeters = 0.0;
   private double m_angleRelativePositionRad = 0.0;
@@ -97,7 +102,13 @@ public class SimSwerveModuleIO implements SwerveModuleIO {
 
   /** Updates the set of loggable inputs */
   public void updateLoggedInputs(SwerveModuleIOTelemetry inputs) {
+    // Update the state of the simulated drive motor
     m_simDriveMotor.update(Constants.robotPeriodSec);
+
+    // Update the state of the simulated angle motor and its associated PID controller
+    double volts = m_anglePID.calculate(getAngle().getRadians());
+    m_angleMotorAppliedVolts = MathUtil.clamp(volts, kMinAppliedVolds, kMaxAppliedVolts);
+    m_simAngleMotor.setInputVoltage(m_angleMotorAppliedVolts);
     m_simAngleMotor.update(Constants.robotPeriodSec);
 
     // Calculate the distance driven during the current interval based on current velocity
@@ -116,12 +127,6 @@ public class SimSwerveModuleIO implements SwerveModuleIO {
     double angleDiffRad = m_simAngleMotor.getAngularVelocityRadPerSec() * Constants.robotPeriodSec;
     m_angleRelativePositionRad += angleDiffRad;
     m_angleAbsolutePositionRad += angleDiffRad;
-    // while (m_angleAbsolutePositionRad < 0) {
-    //   m_angleAbsolutePositionRad += 2.0 * Math.PI;
-    // }
-    // while (m_angleAbsolutePositionRad > 2.0 * Math.PI) {
-    //   m_angleAbsolutePositionRad -= 2.0 * Math.PI;
-    // }
 
     inputs.anglePositionRad = m_angleRelativePositionRad;
     inputs.angleAbsolutePositionRad = m_angleAbsolutePositionRad;
