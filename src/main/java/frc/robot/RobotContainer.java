@@ -79,7 +79,7 @@ public class RobotContainer {
 
   public static double MaxSpeed = Constants.SwerveDrivebaseConstants.maxSpeed;
   public static double MaxRotate = Constants.SwerveDrivebaseConstants.maxAngularVelocity;
-  
+
   // --------------------- Robot Subsystems ----------------------------
   public final DashboardSubsystem dashboardSubsystem = new DashboardSubsystem();
   public final JoystickSubsystem joystickSubsystem = new JoystickSubsystem();

@@ -57,7 +57,6 @@ import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.JoystickSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
-import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 
 public class TeleopSwerve extends CommandBase {
   private double rotation;

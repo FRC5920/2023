@@ -198,7 +198,7 @@ public final class Constants {
 
     /* Module Specific Constants */
     /* Front Left Module - Module 0 */
-    public static final class Mod0 { 
+    public static final class Mod0 {
       public static final int driveMotorID = 21;
       public static final int angleMotorID = 22;
       public static final int canCoderID = 23;
@@ -208,7 +208,7 @@ public final class Constants {
     }
 
     /* Front Right Module - Module 1 */
-    public static final class Mod1 { 
+    public static final class Mod1 {
       public static final int driveMotorID = 1;
       public static final int angleMotorID = 2;
       public static final int canCoderID = 3;
@@ -218,7 +218,7 @@ public final class Constants {
     }
 
     /* Back Left Module - Module 2 */
-    public static final class Mod2 { 
+    public static final class Mod2 {
       public static final int driveMotorID = 31;
       public static final int angleMotorID = 32;
       public static final int canCoderID = 33;
@@ -228,7 +228,7 @@ public final class Constants {
     }
 
     /* Back Right Module - Module 3 */
-    public static final class Mod3 { 
+    public static final class Mod3 {
       public static final int driveMotorID = 11;
       public static final int angleMotorID = 12;
       public static final int canCoderID = 13;

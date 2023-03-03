@@ -157,8 +157,9 @@ public class JoystickSubsystem extends SubsystemBase {
     driverController.rightBumper.whileTrue(new RunPneumatics(RobotContainer.s_Pneumatics, false));
     driverController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
-    driverController.back.onTrue(new InstantCommand(() -> botContainer.swerveSubsystem.zeroGyro())); //left little
-    driverController.start.whileTrue(new Balance(botContainer.swerveSubsystem));  //right little
+    driverController.back.onTrue(
+        new InstantCommand(() -> botContainer.swerveSubsystem.zeroGyro())); // left little
+    driverController.start.whileTrue(new Balance(botContainer.swerveSubsystem)); // right little
 
     // Map buttons on operator controller
     operatorController.A.onTrue(new InstantCommand(this::doNothing, this));

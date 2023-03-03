@@ -68,7 +68,6 @@ import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Dashboard.IDashboardTab;
 import frc.robot.subsystems.SwerveDrivebase.Swerve.ModuleId;
-import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 import java.util.Map;
 
 /** A class supplying a Shuffleboard tab for configuring drive train parameters */
