@@ -74,8 +74,8 @@ public class Drive2Pose extends CommandBase {
   private final double driveMaxAcceleration = 11;
   private final double thetaMaxVelocity = Units.degreesToRadians(360.0);
   private final double thetaMaxAcceleration = Units.degreesToRadians(720.0);
-  private final double driveTolerance = 0.01;
-  private final double thetaTolerance = Units.degreesToRadians(2.0);
+  private final double driveTolerance = 0.05;
+  private final double thetaTolerance = Units.degreesToRadians(10.0);
 
   private boolean running = false;
   private final ProfiledPIDController driveController =

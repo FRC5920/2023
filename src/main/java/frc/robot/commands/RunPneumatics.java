@@ -49,21 +49,20 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.commands.Arm;
+package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Pneumatics.Pneumatics;
 
-public class RotateIntake extends CommandBase {
-  private boolean rotateLeft;
-  private Pneumatics s_Pneumatics;
+public class RunPneumatics extends CommandBase {
+  Pneumatics PneumaticsSubsystem;
+  boolean activatePistons;
 
-  /** Creates a new RotateIntake. */
-  public RotateIntake(Pneumatics s_Pneumatics, boolean RotateLeft) {
-    this.s_Pneumatics = s_Pneumatics;
-    this.rotateLeft = RotateLeft;
-    // Use addRequirements() here to declare subsystem dependencies.
+  /** Creates a new RunPneumatics. */
+  public RunPneumatics(Pneumatics s_Pneumatics, boolean PistonsForward) {
     addRequirements(s_Pneumatics);
+    this.PneumaticsSubsystem = s_Pneumatics;
+    this.activatePistons = PistonsForward;
   }
 
   // Called when the command is initially scheduled.
@@ -73,10 +72,10 @@ public class RotateIntake extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (rotateLeft) {
-      s_Pneumatics.goingForward();
+    if (activatePistons) {
+      PneumaticsSubsystem.goingForward();
     } else {
-      s_Pneumatics.goingBackward();
+      PneumaticsSubsystem.goingBackward();
     }
   }
 

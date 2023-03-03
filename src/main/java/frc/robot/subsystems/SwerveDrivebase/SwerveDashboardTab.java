@@ -68,7 +68,6 @@ import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Dashboard.IDashboardTab;
 import frc.robot.subsystems.SwerveDrivebase.Swerve.ModuleId;
-import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 import java.util.Map;
 
 /** A class supplying a Shuffleboard tab for configuring drive train parameters */
@@ -172,7 +171,7 @@ public class SwerveDashboardTab implements IDashboardTab {
     // Add max speed slider
     m_maxSpeed =
         m_tab
-            .add("Max Speed", 0.75)
+            .add("Max Speed", 1)
             .withWidget(BuiltInWidgets.kNumberSlider) // specify the widget here
             .withProperties(
                 Map.of(
@@ -196,9 +195,9 @@ public class SwerveDashboardTab implements IDashboardTab {
 
     if (RobotState.isDisabled()) {
       if (m_maxSpeed != null) {
-        BotStateSubsystem.MaxSpeed =
+        RobotContainer.MaxSpeed =
             Constants.SwerveDrivebaseConstants.maxSpeed * m_maxSpeed.getDouble(0);
-        BotStateSubsystem.MaxRotate =
+        RobotContainer.MaxRotate =
             Constants.SwerveDrivebaseConstants.maxAngularVelocity * m_maxSpeed.getDouble(0);
       }
     }

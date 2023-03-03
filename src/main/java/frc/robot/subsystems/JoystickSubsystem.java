@@ -58,8 +58,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.Joystick.AxisProcChain;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.RobotContainer;
-import frc.robot.commands.Arm.RotateIntake;
 import frc.robot.commands.Balance;
+import frc.robot.commands.RunPneumatics;
 
 /** A subsystem providing/managing Xbox controllers for driving the robot manually */
 public class JoystickSubsystem extends SubsystemBase {
@@ -152,21 +152,22 @@ public class JoystickSubsystem extends SubsystemBase {
     driverController.A.onTrue(new InstantCommand(this::doNothing, this));
     driverController.B.onTrue(new InstantCommand(this::doNothing, this));
     driverController.X.onTrue(new InstantCommand(this::doNothing, this));
-    driverController.Y.onTrue(new InstantCommand(() -> botContainer.swerveSubsystem.zeroGyro()));
-    driverController.leftBumper.whileTrue(new InstantCommand(this::doNothing, this));
-    driverController.rightBumper.whileTrue(new InstantCommand(this::doNothing, this));
+    driverController.Y.onTrue(new InstantCommand(this::doNothing, this));
+    driverController.leftBumper.whileTrue(new RunPneumatics(RobotContainer.s_Pneumatics, true));
+    driverController.rightBumper.whileTrue(new RunPneumatics(RobotContainer.s_Pneumatics, false));
     driverController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
-    driverController.back.onTrue(new InstantCommand(this::doNothing, this));
-    driverController.start.whileTrue(new Balance(botContainer.swerveSubsystem));
+    driverController.back.onTrue(
+        new InstantCommand(() -> botContainer.swerveSubsystem.zeroGyro())); // left little
+    driverController.start.whileTrue(new Balance(botContainer.swerveSubsystem)); // right little
 
     // Map buttons on operator controller
     operatorController.A.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.B.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.X.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.Y.onTrue(new InstantCommand(this::doNothing, this));
-    operatorController.leftBumper.whileTrue(new RotateIntake(RobotContainer.s_Pneumatics, true));
-    operatorController.rightBumper.whileTrue(new RotateIntake(RobotContainer.s_Pneumatics, false));
+    operatorController.leftBumper.whileTrue(new InstantCommand(this::doNothing, this));
+    operatorController.rightBumper.whileTrue(new InstantCommand(this::doNothing, this));
     operatorController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.back.onTrue(new InstantCommand(this::doNothing, this));
