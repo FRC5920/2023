@@ -72,6 +72,9 @@ import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 public class Swerve extends SubsystemBase {
+  /** Set to true to enable a dashboard tab for the Swerve subsystem */
+  public static final boolean kDashboardTabIsEnabled = false;
+
   private static final Rotation2d kAngleZero = new Rotation2d(0.0);
   private static final Rotation2d kAngle360 = Rotation2d.fromDegrees(360);
 
@@ -88,7 +91,7 @@ public class Swerve extends SubsystemBase {
   private Pose2d simOdometryPose = new Pose2d();
 
   /** Dashboard tab displayed in Shuffleboard */
-  private final SwerveDashboardTab m_dashboardTab = new SwerveDashboardTab();
+  private final SwerveDashboardTab m_dashboardTab;
 
   /**
    * Creates an instance of the swerve module
@@ -104,6 +107,8 @@ public class Swerve extends SubsystemBase {
       SwerveModuleIO frontRightIO,
       SwerveModuleIO rearLeftIO,
       SwerveModuleIO rearRightIO) {
+
+    m_dashboardTab = (kDashboardTabIsEnabled) ? new SwerveDashboardTab() : null;
 
     swerveKinematics =
         new SwerveDriveKinematics(
@@ -316,7 +321,9 @@ public class Swerve extends SubsystemBase {
 
   /** Register the subsystem's dashboard tab */
   public void registerDashboardTab(DashboardSubsystem dashboardSubsystem) {
-    dashboardSubsystem.add(m_dashboardTab);
+    if (m_dashboardTab != null) {
+      dashboardSubsystem.add(m_dashboardTab);
+    }
   }
 
   /** Swerve module ID's */
