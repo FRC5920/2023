@@ -285,7 +285,9 @@ public class AutoConstants {
           LaneConstants.kInnerLaneSouthCenterY),
 
       /** End of the route through the Charging Station via the Outer lane */
-      ThroughCSEndpoint(ChargingStation.kFieldSideX + 0.25, ChargingStation.kCenterY);
+      ThroughCSEndpoint(
+          ChargingStation.kFieldSideX + (0.75 * BotDimensions.kFootprintWidth),
+          ChargingStation.kCenterY);
 
       private final Translation2d position;
 
