@@ -78,12 +78,15 @@ import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
 public class PoseEstimatorSubsystem extends SubsystemBase {
+  /** Set to true to enable a dashboard tab for the subsystem */
+  public static final boolean kDashboardTabIsEnabled = false;
+
   private PhotonPoseEstimator photonPoseEstimator;
   private final PhotonCamera photonCamera;
   private final Swerve s_swerveSubsystem;
   private final AprilTagFieldLayout ATfieldLayout;
 
-  private final PoseEstimatorDashboardTab m_dashboardTab = new PoseEstimatorDashboardTab(this);
+  private final PoseEstimatorDashboardTab m_dashboardTab;
 
   // Kalman Filter Configuration. These can be "tuned-to-taste" based on how much
   // you trust your various sensors. Smaller numbers will cause the filter to
@@ -106,6 +109,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
   private double previousPipelineTimestamp = 0;
 
   public PoseEstimatorSubsystem(PhotonCamera photonCamera, Swerve s_swerveSubsystem) {
+    m_dashboardTab = (kDashboardTabIsEnabled) ? new PoseEstimatorDashboardTab(this) : null;
     this.photonCamera = photonCamera;
     this.s_swerveSubsystem = s_swerveSubsystem;
     AprilTagFieldLayout fieldLayout = null;
@@ -141,7 +145,9 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
 
   /** Register the subsystem's dashboard tab */
   public void registerDashboardTab(DashboardSubsystem dashboardSubsystem) {
-    dashboardSubsystem.add(m_dashboardTab);
+    if (m_dashboardTab != null) {
+      dashboardSubsystem.add(m_dashboardTab);
+    }
   }
 
   @Override
