@@ -59,6 +59,11 @@ import frc.lib.thirdparty.FRC6328.AllianceFlipUtil;
 import frc.lib.thirdparty.FRC6328.FieldConstants;
 import java.util.*;
 
+/**
+ * AutoConstants provides a namespace for constants used to create auto routines.
+ *
+ * @remarks All physical constants (locations, distances, etc.) are given as SI units.
+ */
 public class AutoConstants {
 
   /** Physical attributes of the robot */
@@ -176,9 +181,13 @@ public class AutoConstants {
     private static final double kCenterY =
         (kSouthSideY + (FieldConstants.Community.chargingStationWidth / 2));
 
-    public static Translation2d kGridSideNorth = new Translation2d(kGridSideX, kNorthSideY);
-    public static Translation2d kFieldSideSouth = new Translation2d(kGridSideX, kNorthSideY);
-    public static Translation2d kCenter = new Translation2d(kCenterX, kCenterY);
+    private static Translation2d kGridSideNorth = new Translation2d(kGridSideX, kNorthSideY);
+    private static Translation2d kFieldSideSouth = new Translation2d(kGridSideX, kNorthSideY);
+    private static Translation2d kCenter = new Translation2d(kCenterX, kCenterY);
+
+    public static Translation2d getCenter() {
+      return AllianceFlipUtil.apply(kCenter);
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -408,10 +417,15 @@ public class AutoConstants {
       Z(6.0, ChargingStation.kSouthSideY); // South of charging station
 
       /** Coordinates on the field */
-      public final Translation2d coordinates;
+      private final Translation2d position;
 
       private ID(double x, double y) {
-        coordinates = new Translation2d(x, y);
+        position = new Translation2d(x, y);
+      }
+
+      /** Returns the location of the waypoint */
+      public Translation2d getPosition() {
+        return AllianceFlipUtil.apply(position);
       }
 
       /** Returns a list of names of enum elements */

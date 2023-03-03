@@ -65,7 +65,6 @@ import frc.robot.RobotContainer;
 import frc.robot.autos.AutoConstants.EscapeRoute;
 import frc.robot.autos.AutoConstants.Grids;
 import frc.robot.autos.AutoConstants.SecondaryAction;
-import frc.robot.autos.AutoConstants.Waypoints;
 import frc.robot.subsystems.Dashboard.IDashboardTab;
 import java.util.*;
 
@@ -102,13 +101,12 @@ public class AutoDashboardTab implements IDashboardTab {
   /** Route chooser */
   private final ChooserWithChangeDetection<EscapeRoute.Route> m_routeChooser =
       new ChooserWithChangeDetection<EscapeRoute.Route>();
-  /** Waypoint chooser */
-  private final ChooserWithChangeDetection<Waypoints.ID> m_targetWaypointChooser =
-      new ChooserWithChangeDetection<Waypoints.ID>();
-
-  /** Cargo position chooser */
+  /** Secondary action chooser */
   private final ChooserWithChangeDetection<SecondaryAction> m_secondaryActionChooser =
       new ChooserWithChangeDetection<SecondaryAction>();
+  /** Waypoint chooser */
+  // private final ChooserWithChangeDetection<Waypoints.ID> m_targetWaypointChooser =
+  //     new ChooserWithChangeDetection<Waypoints.ID>();
 
   /** Panel used to set translation PID gains */
   private PIDTunerPanel m_translationPIDPanel;
@@ -157,11 +155,11 @@ public class AutoDashboardTab implements IDashboardTab {
         .withPosition(3 * kChooserWidth, 0);
 
     // Set up a chooser for the waypoint to move to outside the community
-    populateChooser(m_targetWaypointChooser, Waypoints.ID.getNames(), Waypoints.ID.values());
-    m_tab
-        .add("Waypoint", m_targetWaypointChooser)
-        .withSize(kChooserWidth, kChooserHeight)
-        .withPosition(4 * kChooserWidth, 0);
+    // populateChooser(m_targetWaypointChooser, Waypoints.ID.getNames(), Waypoints.ID.values());
+    // m_tab
+    //     .add("Waypoint", m_targetWaypointChooser)
+    //     .withSize(kChooserWidth, kChooserHeight)
+    //     .withPosition(4 * kChooserWidth, 0);
 
     // Add the 2D view of the field
     m_tab
@@ -214,7 +212,7 @@ public class AutoDashboardTab implements IDashboardTab {
     boolean initialPositionChanged = m_initialPositionChooser.hasChanged();
     boolean routeHasChanged = m_routeChooser.hasChanged();
     boolean selectedActionChanged = m_secondaryActionChooser.hasChanged();
-    boolean targetWaypointChanged = m_targetWaypointChooser.hasChanged();
+    boolean targetWaypointChanged = false; // m_targetWaypointChooser.hasChanged();
     boolean translationPIDChanged = m_translationPIDPanel.hasChanged();
     boolean rotationPIDChanged = m_rotationPIDPanel.hasChanged();
 
@@ -233,6 +231,7 @@ public class AutoDashboardTab implements IDashboardTab {
           botContainer,
           m_initialPositionChooser.getSelected(),
           m_routeChooser.getSelected(),
+          m_secondaryActionChooser.getSelected(),
           m_translationPIDPanel.getGains(),
           m_rotationPIDPanel.getGains());
 

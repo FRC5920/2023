@@ -57,6 +57,11 @@
           "visible": true
         }
       },
+      "/Shuffleboard/Auto Builder/Secondary Action": {
+        "window": {
+          "visible": true
+        }
+      },
       "/Shuffleboard/Auto Builder/Translation PID": {
         "window": {
           "visible": true
