@@ -2,15 +2,32 @@
 
 FRC 5290: VIKotics
 
-## Autonomous Routine Waypoints
+## Autonomous Routine Conventions
 
-Autonomous routines shall be specified using pre-defined waypoints:
+![Auto Routine Conventions Illustration](./_auto-routines/auto-conventions.svg "Conventions for autonomous routines")
 
-| Waypoint Names |  Description |
-|----------------|--------------|
-| A-H            | Initial position at substation |
-| sublane        | Lane closest to substations in the space between charging station and substations
-| chargelane     | Lane closest to the charging station in the space between charging station and substations
+### Directions
+
+No matter which Alliance is active, the following conventions apply:
+
+- North is the direction moving away from the Scoring Table
+- South is the direction moving toward the Scoring Table
+- Gridward is the direction moving toward the Grids of the active alliance
+- Fieldward is the direction moving toward the center of the field
+
+### Grids 
+
+- Grids in the the community are assigned designators A-I.
+- Grid A is always the one on the side closest to the scoring table
+
+### Lanes
+
+- The space in the community surrounding the Charging Station is divided in
+half to produce two distinct lanes:
+-- The __Inner__ lane wraps around the Charging Station
+-- The __Outer__ lane follows the edge of the field next to the scoring table,
+the Grids, and the divider.
+
 
 ## References
 
