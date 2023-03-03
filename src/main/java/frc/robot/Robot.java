@@ -97,11 +97,6 @@ public class Robot extends LoggedRobot {
   /** True after the autonomous command duration has been printed */
   private boolean m_autoCompletionIsPrinted;
 
-  // DoublePublisher xPub;
-  // DoubleSubscriber xSub;
-  // double x = 0;
-
-  // GenericEntry maxSpeed = tab.add("Speed Limit", 1).getEntry();
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -110,20 +105,24 @@ public class Robot extends LoggedRobot {
   public void robotInit() {
     ctreConfigs = new CTREConfigs();
 
-    Logger logger = Logger.getInstance();
+    if (Constants.kLoggingIsEnabled) {
+      Logger logger = Logger.getInstance();
 
-    // Log git and build info
-    logBuildInfo(logger);
+      // Log git and build info
+      logBuildInfo(logger);
 
-    // Set up logging
-    configureLogging(logger);
+      // Set up logging
+      configureLogging(logger);
 
-    // Start AdvantageKit logger
-    setUseTiming(Constants.getMode() != Constants.Mode.REPLAY);
-    logger.start();
+      // Start AdvantageKit logger
+      setUseTiming(Constants.getMode() != Constants.Mode.REPLAY);
+      logger.start();
 
-    // Set up logging of active commands in the scheduler
-    setupActiveCommandLogging(logger);
+      // Set up logging of active commands in the scheduler
+      setupActiveCommandLogging(logger);
+    } else {
+      Logger.getInstance().end();
+    }
 
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
@@ -150,8 +149,10 @@ public class Robot extends LoggedRobot {
     // Run the task scheduler
     CommandScheduler.getInstance().run();
 
-    // Check for logging faults
-    s_logReceiverQueueAlert.set(Logger.getInstance().getReceiverQueueFault());
+    if (Constants.kLoggingIsEnabled) {
+      // Check for logging faults
+      s_logReceiverQueueAlert.set(Logger.getInstance().getReceiverQueueFault());
+    }
 
     // Print the duration of autonomous commands as they are executed
     if (m_autonomousCommand != null) {

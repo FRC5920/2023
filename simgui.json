@@ -30,6 +30,13 @@
       "/Shuffleboard/Vision/Field": "Field2d",
       "/SmartDashboard/turn Intake Left": "Command",
       "/SmartDashboard/turn Intake Right": "Command"
+    },
+    "windows": {
+      "/Shuffleboard/PoseEstimator/Field": {
+        "window": {
+          "visible": true
+        }
+      }
     }
   },
   "NetworkTables": {
