@@ -53,8 +53,10 @@ package frc.robot.autos.AutoBuilder;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -64,6 +66,7 @@ import frc.robot.RobotContainer;
 import frc.robot.autos.AutoConstants.EscapeRoute;
 import frc.robot.autos.AutoConstants.Grids;
 import frc.robot.autos.AutoConstants.SecondaryAction;
+import frc.robot.autos.DriveToWaypoint;
 import frc.robot.subsystems.Dashboard.IDashboardTab;
 import java.util.*;
 
@@ -93,6 +96,9 @@ public class AutoDashboardTab implements IDashboardTab {
 
   /** 2d view of the field */
   private Field2d m_field2d;
+
+  /** Initial position chooser */
+  private GenericEntry m_bumpChoice;
 
   /** Initial position chooser */
   private final ChooserWithChangeDetection<Grids.ScoringPosition> m_initialPositionChooser =
@@ -155,7 +161,16 @@ public class AutoDashboardTab implements IDashboardTab {
     m_tab
         .add("Secondary Action", m_secondaryActionChooser)
         .withSize(kChooserWidth, kChooserHeight)
-        .withPosition(3 * kChooserWidth, 0);
+        .withPosition(2 * kChooserWidth, 0);
+
+    // Set up the bump choice
+    m_bumpChoice =
+        m_tab
+            .add("Bump Score", true)
+            .withWidget(BuiltInWidgets.kToggleButton)
+            .withSize(kChooserWidth, kChooserHeight)
+            .withPosition(3 * kChooserWidth, 0)
+            .getEntry();
 
     // Set up a chooser for the waypoint to move to outside the community
     // populateChooser(m_targetWaypointChooser, Waypoints.ID.getNames(), Waypoints.ID.values());
@@ -174,18 +189,10 @@ public class AutoDashboardTab implements IDashboardTab {
     m_translationPIDPanel =
         new PIDTunerPanel(
             m_tab, "Translation PID", 0, kFieldWidthCells, DriveToWaypoint.kDefaultPositionGains);
-    // new frc.lib.utility.PIDGains(
-    //     AutoRoutineBuilder.kDefaultTranslationkP,
-    //     AutoRoutineBuilder.kDefaultTranslationkI,
-    //     AutoRoutineBuilder.kDefaultTranslationkD));
 
     m_rotationPIDPanel =
         new PIDTunerPanel(
             m_tab, "Rotation PID", 0, kFieldWidthCells, DriveToWaypoint.kDefaultRotationGains);
-    // new frc.lib.utility.PIDGains(
-    //     AutoRoutineBuilder.kDefaultRotationkP,
-    //     AutoRoutineBuilder.kDefaultRotationkI,
-    //     AutoRoutineBuilder.kDefaultRotationkD));
   }
 
   /**
@@ -236,7 +243,8 @@ public class AutoDashboardTab implements IDashboardTab {
           m_routeChooser.getSelected(),
           m_secondaryActionChooser.getSelected(),
           m_translationPIDPanel.getGains(),
-          m_rotationPIDPanel.getGains());
+          m_rotationPIDPanel.getGains(),
+          m_bumpChoice.getBoolean(true));
 
       // Set all objects on the field to have an empty trajectory
       for (String name : m_fieldTrajectories.keySet()) {

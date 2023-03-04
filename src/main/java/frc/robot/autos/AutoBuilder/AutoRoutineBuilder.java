@@ -64,6 +64,7 @@ import frc.robot.autos.AutoConstants.EscapeRoute;
 import frc.robot.autos.AutoConstants.Grids;
 import frc.robot.autos.AutoConstants.SecondaryAction;
 import frc.robot.autos.AutoConstants.Waypoints;
+import frc.robot.autos.BumpScore;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import frc.robot.subsystems.SwerveDrivebase.Swerve.WheelPreset;
 import java.util.ArrayList;
@@ -118,11 +119,13 @@ public class AutoRoutineBuilder {
       EscapeRoute.Route escapeRoute,
       SecondaryAction secondaryAction,
       PIDGains translationPIDGains,
-      PIDGains rotationPIDGains) {
+      PIDGains rotationPIDGains,
+      boolean doBumpScore) {
     m_cumulativeTrajectory = new ArrayList<PathPlannerTrajectory>();
 
     SequentialCommandGroup autoCommandGroup = new SequentialCommandGroup();
     Pose2d startPosition = startingPosition.getPose();
+
     autoCommandGroup.addCommands(
         // First, a command to reset the robot pose to the initial position
         new InstantCommand(
@@ -131,6 +134,10 @@ public class AutoRoutineBuilder {
               botContainer.poseEstimatorSubsystem.setCurrentPose(startPosition);
               botContainer.swerveSubsystem.setWheelPreset(WheelPreset.Forward);
             }));
+
+    if (doBumpScore) {
+      autoCommandGroup.addCommands(new BumpScore(startingPosition, botContainer.swerveSubsystem));
+    }
 
     EscapeStrategy escapeStrategy =
         new EscapeStrategy(

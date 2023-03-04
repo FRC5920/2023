@@ -67,6 +67,7 @@ import frc.robot.autos.AutoConstants.BotDimensions;
 import frc.robot.autos.AutoConstants.BotOrientation;
 import frc.robot.autos.AutoConstants.EscapeRoute;
 import frc.robot.autos.AutoConstants.Grids;
+import frc.robot.autos.DriveToWaypoint;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import java.util.ArrayList;
 import java.util.HashMap;
