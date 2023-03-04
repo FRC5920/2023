@@ -128,7 +128,9 @@
       "Shuffleboard": {
         "PoseEstimator": {
           "open": true
-        },
+        }
+      },
+      "SmartDashboard": {
         "open": true
       }
     }
