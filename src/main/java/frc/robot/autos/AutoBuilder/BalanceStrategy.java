@@ -76,10 +76,10 @@ import java.util.List;
 public class BalanceStrategy {
 
   /** Maximum velocity when driving to Charging Station */
-  public static final double kMaxVelocity = 4.0;
+  public static final double kMaxVelocity = 5.0;
 
   /** Maximum velocity when driving to Charging Station */
-  public static final double kMaxAcceleration = 3.0;
+  public static final double kMaxAcceleration = 4.0;
 
   // Create a trajectory from the waypoints
   private static final PathConstraints kDefaultPathConstraints =
@@ -175,11 +175,11 @@ public class BalanceStrategy {
             m_initialLocation.getX(),
             m_initialLocation.getY(),
             fieldFacing, // Heading needs to be facing field to get the right spline
-            gridFacing);
+            fieldFacing);
     PathPointHelper stageAtY =
-        new PathPointHelper("Stage at Y", y.getX(), y.getY(), gridFacing, gridFacing);
+        new PathPointHelper("Stage at Y", y.getX(), y.getY(), gridFacing, fieldFacing);
     PathPointHelper centerOfCS =
-        new PathPointHelper("Center of CS", cs.getX(), cs.getY(), gridFacing, gridFacing);
+        new PathPointHelper("Center of CS", cs.getX(), cs.getY(), gridFacing, fieldFacing);
 
     trajectoryList.add(
         PathPlanner.generatePath(kDefaultPathConstraints, initialPoint, stageAtY, centerOfCS));
