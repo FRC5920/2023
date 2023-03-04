@@ -93,7 +93,7 @@ public class BumpScore extends SequentialCommandGroup {
     Rotation2d initialRot = initialPose.getRotation();
 
     boolean isBlueAlliance = DriverStation.getAlliance() == DriverStation.Alliance.Blue;
-    double waypointAOffset = 1.0 * (isBlueAlliance ? 1.0 : -1.0);
+    double waypointAOffset = 0.5 * (isBlueAlliance ? 1.0 : -1.0);
     double xA = initialX + waypointAOffset;
     Pose2d waypointA = new Pose2d(new Translation2d(xA, initialY), initialRot);
     System.out.printf("Drive to Waypoint A: x=%.2f y=%.2f\n", xA, initialY);
