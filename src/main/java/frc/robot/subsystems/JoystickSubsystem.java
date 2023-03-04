@@ -213,8 +213,8 @@ public class JoystickSubsystem extends SubsystemBase {
             true,
             true,
             RobotContainer.MaxSpeed,
-            RobotContainer.MaxRotate));
-    }
+            RobotContainer.MaxRotate,
+            botContainer.autoDashboardTab.getField2d()));
 
     if (kOperatorControllerIsEnabled) {
       // Map buttons on operator controller

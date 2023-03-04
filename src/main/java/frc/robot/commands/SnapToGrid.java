@@ -51,18 +51,26 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.commands;
 
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPoint;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.autos.AutoConstants.Grids;
 import frc.robot.subsystems.JoystickSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
+import java.util.HashMap;
 
 public class SnapToGrid extends CommandBase {
   /** Y values comprising grid lines */
-  private final double kGridYValues[] =
+  public static final double kGridYValues[] =
       new double[] {
         Grids.ScoringPosition.A.getPosition().getY(),
         Grids.ScoringPosition.B.getPosition().getY(),
@@ -101,13 +109,17 @@ public class SnapToGrid extends CommandBase {
   /** PID controller used to drive toward the snap value */
   private final PIDController m_snapPID = new PIDController(kP, kI, kD);
 
+  private GridFieldLinesHelper m_gridFieldLineHelper;
+
+  /** Creates an instance of the command */
   public SnapToGrid(
       Swerve swerveSubsystem,
       JoystickSubsystem joystickSubsystem,
       boolean fieldRelative,
       boolean openLoop,
       double maxSpeed,
-      double maxRotation) {
+      double maxRotation,
+      Field2d field) {
     m_swerveSubsystem = swerveSubsystem;
     addRequirements(swerveSubsystem);
     m_maxSpeed = maxSpeed;
@@ -116,11 +128,14 @@ public class SnapToGrid extends CommandBase {
     m_fieldRelative = fieldRelative;
     m_openLoop = openLoop;
     m_snapPID.setTolerance(kErrorTolerance);
+    m_gridFieldLineHelper = new GridFieldLinesHelper(field);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    m_gridFieldLineHelper.display();
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -144,9 +159,9 @@ public class SnapToGrid extends CommandBase {
       }
 
       // Calculate a speed value to drive the Y value to the nearest grid
-      double snapDeltaY = Math.signum(deltaX) * m_snapPID.calculate(currentY, m_snapValue);
+      double snapDeltaY = -1.0 * deltaX * m_snapPID.calculate(currentY, m_snapValue);
       // Cap snap delta to joystick speed range
-      snapDeltaY = Math.min(snapDeltaY, 1.0);
+      snapDeltaY = Math.signum(snapDeltaY) * Math.min(Math.abs(snapDeltaY), 1.0);
 
       SmartDashboard.putNumber("S2G-snapValue", m_snapValue);
 
@@ -173,7 +188,9 @@ public class SnapToGrid extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    m_gridFieldLineHelper.hide();
+  }
 
   // Returns true when the command should end.
   @Override
@@ -214,6 +231,40 @@ public class SnapToGrid extends CommandBase {
       }
 
       return result;
+    }
+  }
+
+  private static class GridFieldLinesHelper {
+    private static final double kGridValues[] = SnapToGrid.kGridYValues;
+    private static final double kFieldWidth = Units.inchesToMeters(315.5) * 2;
+    private final HashMap<String, PathPlannerTrajectory> m_gridLineMap = new HashMap<>();
+    private final Field2d m_field2d;
+
+    public GridFieldLinesHelper(Field2d field) {
+      m_field2d = field;
+      double fieldWidth = kFieldWidth;
+      PathConstraints constraints = new PathConstraints(0.5, 0.5);
+      Rotation2d rot = new Rotation2d(0.0);
+      for (double gridY : kGridValues) {
+        PathPoint start = new PathPoint(new Translation2d(0.0, gridY), rot);
+        PathPoint end = new PathPoint(new Translation2d(fieldWidth, gridY), rot);
+        String name = String.format("GridY%.2f", gridY);
+        PathPlannerTrajectory traj = PathPlanner.generatePath(constraints, start, end);
+        m_gridLineMap.put(name, traj);
+      }
+    }
+
+    public void display() {
+      for (HashMap.Entry<String, PathPlannerTrajectory> set : m_gridLineMap.entrySet()) {
+        m_field2d.getObject(set.getKey()).setTrajectory(set.getValue());
+      }
+    }
+
+    public void hide() {
+      PathPlannerTrajectory emptyTraj = new PathPlannerTrajectory();
+      for (HashMap.Entry<String, PathPlannerTrajectory> set : m_gridLineMap.entrySet()) {
+        m_field2d.getObject(set.getKey()).setTrajectory(emptyTraj);
+      }
     }
   }
 }

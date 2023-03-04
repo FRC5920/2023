@@ -258,4 +258,21 @@ public class AutoDashboardTab implements IDashboardTab {
   public AutoRoutineBuilder getAutoBuilder() {
     return m_builder;
   }
+
+  /** Returns the field displayed in the dashboard tab */
+  public Field2d getField2d() {
+    return m_field2d;
+  }
+
+  private static class ChooserWithChangeDetection<V> extends SendableChooser<V> {
+    private V m_lastValue;
+    private boolean m_initialChangeFlag = true;
+
+    public boolean hasChanged() {
+      boolean changed = m_initialChangeFlag || (m_lastValue != getSelected());
+      m_initialChangeFlag = false;
+      m_lastValue = getSelected();
+      return changed;
+    }
+  }
 }

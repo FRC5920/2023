@@ -102,7 +102,7 @@ public class RobotContainer {
 
   // Create an auto routine builder
   AutoRoutineBuilder autoBuilder;
-  private final AutoDashboardTab autoDashboardTab;
+  public final AutoDashboardTab autoDashboardTab;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
