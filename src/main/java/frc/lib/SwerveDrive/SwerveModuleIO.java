@@ -77,6 +77,9 @@ public interface SwerveModuleIO {
     public double angleAppliedVolts = 0.0;
     public double angleCurrentAmps = 0.0;
     public double angleTempCelcius = 0.0;
+
+    public double requestedSpeedMetersPerSec = 0.0;
+    public double requestedAngleDegrees = 0.0;
   }
 
   /** Updates the set of loggable inputs */

@@ -100,6 +100,9 @@ public class SimSwerveModuleIO implements SwerveModuleIO {
   private double m_driveMotorAppliedVolts = 0.0;
   private double m_angleMotorAppliedVolts = 0.0;
 
+  public double m_requestedSpeedMetersPerSec = 0.0;
+  public double m_requestedAngleDegrees = 0.0;
+
   /** Updates the set of loggable inputs */
   public void updateLoggedInputs(SwerveModuleIOTelemetry inputs) {
     // Update the state of the simulated drive motor
@@ -134,6 +137,9 @@ public class SimSwerveModuleIO implements SwerveModuleIO {
     inputs.angleAppliedVolts = m_angleMotorAppliedVolts;
     inputs.angleCurrentAmps = Math.abs(m_simAngleMotor.getCurrentDrawAmps());
     inputs.angleTempCelcius = 0.0;
+
+    inputs.requestedSpeedMetersPerSec = m_requestedSpeedMetersPerSec;
+    inputs.requestedAngleDegrees = m_requestedAngleDegrees;
   }
 
   /**
@@ -144,6 +150,7 @@ public class SimSwerveModuleIO implements SwerveModuleIO {
    */
   @Override
   public void setSpeed(double speedMetersPerSecond, boolean isOpenLoop) {
+    m_requestedSpeedMetersPerSec = speedMetersPerSecond;
     double m_driveMotorVelocityRadPerSec =
         speedMetersPerSecond * 2.0 * Math.PI / kWheelCircumferenceMeters;
     m_driveMotorAppliedVolts =
@@ -158,6 +165,7 @@ public class SimSwerveModuleIO implements SwerveModuleIO {
    */
   @Override
   public void setAngle(Rotation2d angle) {
+    m_requestedAngleDegrees = angle.getDegrees();
     double volts = m_anglePID.calculate(getAngle().getRadians(), angle.getRadians());
     m_angleMotorAppliedVolts = MathUtil.clamp(volts, kMinAppliedVolds, kMaxAppliedVolts);
     m_simAngleMotor.setInputVoltage(m_angleMotorAppliedVolts);

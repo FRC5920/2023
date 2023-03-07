@@ -217,7 +217,11 @@ public class SwerveDashboardTab implements IDashboardTab {
     private final GenericEntry angleCurrent;
     private final GenericEntry angleTemp;
 
+    private final GenericEntry requestedSpeed;
+    private final GenericEntry requestedAngle;
+
     private final SwerveModuleVisualizer m_swerveVisualizer;
+    private final ModuleId m_moduleID;
 
     /**
      * Creates a Shuffleboard layout for displaying telemetry of a swerve module
@@ -227,6 +231,7 @@ public class SwerveDashboardTab implements IDashboardTab {
      */
     public ModuleTelemetryLayout(
         ShuffleboardTab tab, ModuleId moduleId, int sizeColumns, int sizeRows) {
+      m_moduleID = moduleId;
       m_swerveVisualizer = new SwerveModuleVisualizer();
 
       // Create a grid layout to add subgrouped widgets to
@@ -328,6 +333,15 @@ public class SwerveDashboardTab implements IDashboardTab {
               .withPosition(0, 4)
               .withSize(sizeColumns + 1, telemetryFieldHeight)
               .getEntry();
+
+      requestedSpeed =
+          tab.add(String.format("%sReqSpeed", m_moduleID.name()), 0)
+              .withWidget(BuiltInWidgets.kNumberBar)
+              .getEntry();
+      requestedAngle =
+          tab.add(String.format("%sReqAngle", m_moduleID.name()), 0)
+              .withWidget(BuiltInWidgets.kNumberBar)
+              .getEntry();
     }
 
     /**
@@ -348,6 +362,8 @@ public class SwerveDashboardTab implements IDashboardTab {
       angleVolts.setDouble(telemetry.angleAppliedVolts);
       angleCurrent.setDouble(telemetry.angleCurrentAmps);
       angleTemp.setDouble(telemetry.angleTempCelcius);
+      requestedSpeed.setDouble(telemetry.requestedSpeedMetersPerSec);
+      requestedAngle.setDouble(telemetry.requestedAngleDegrees);
     }
 
     ShuffleboardLayout getLayout() {

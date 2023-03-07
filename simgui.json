@@ -39,10 +39,7 @@
         "left": 46,
         "right": 1088,
         "top": 36,
-        "width": 16.541748046875,
-        "window": {
-          "visible": true
-        }
+        "width": 16.541748046875
       },
       "/Shuffleboard/Auto Builder/Initial Position": {
         "window": {
@@ -81,7 +78,214 @@
         "PoseEstimator": {
           "open": true
         },
+        "SwerveDrive": {
+          "FrontLeft": {
+            "Angle": {
+              "open": true
+            },
+            "Drive": {
+              "open": true
+            },
+            "open": true
+          },
+          "FrontRight": {
+            "Drive": {
+              "open": true
+            },
+            "open": true
+          },
+          "RearLeft": {
+            "Drive": {
+              "open": true
+            },
+            "open": true
+          },
+          "RearRight": {
+            "Drive": {
+              "open": true
+            },
+            "open": true
+          },
+          "open": true
+        },
         "open": true
+      },
+      "SmartDashboard": {
+        "Alerts": {
+          "open": true
+        }
+      }
+    }
+  },
+  "Plot": {
+    "Plot <0>": {
+      "plots": [
+        {
+          "axis": [
+            {
+              "autoFit": true
+            }
+          ],
+          "height": 261,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "digital": "Analog",
+              "id": "NT:/Shuffleboard/SwerveDrive/kFrontLeftReqSpeed",
+              "name": "Requested Speed (m/s)"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "digital": "Auto",
+              "id": "NT:/Shuffleboard/SwerveDrive/FrontLeft/Drive/Current",
+              "name": "Drive Motor Current (A)"
+            },
+            {
+              "color": [
+                0.3333333432674408,
+                0.658823549747467,
+                0.4078431725502014,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/SwerveDrive/kFrontLeftReqAngle",
+              "name": "Requested Angle (deg)"
+            },
+            {
+              "color": [
+                0.7686275243759155,
+                0.30588236451148987,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/SwerveDrive/FrontLeft/Angle/Current",
+              "name": "Angle Motor Current (Amps)"
+            }
+          ]
+        }
+      ],
+      "window": {
+        "name": "Front Left"
+      }
+    },
+    "Plot <1>": {
+      "plots": [
+        {
+          "axis": [
+            {
+              "autoFit": true
+            }
+          ],
+          "height": 261,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/SwerveDrive/kFrontRightReqSpeed",
+              "name": "Requested Speed"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/SwerveDrive/FrontRight/Drive/Current",
+              "name": "Current"
+            }
+          ]
+        }
+      ],
+      "window": {
+        "name": "Front Right"
+      }
+    },
+    "Plot <2>": {
+      "plots": [
+        {
+          "axis": [
+            {
+              "autoFit": true
+            }
+          ],
+          "height": 255,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/SwerveDrive/kRearLeftReqSpeed",
+              "name": "Requested Speed"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/SwerveDrive/RearLeft/Drive/Current",
+              "name": "Current"
+            }
+          ]
+        }
+      ],
+      "window": {
+        "name": "Rear Left"
+      }
+    },
+    "Plot <3>": {
+      "plots": [
+        {
+          "axis": [
+            {
+              "autoFit": true
+            }
+          ],
+          "height": 255,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/SwerveDrive/kRearRightReqSpeed",
+              "name": "Requested Speed"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/SwerveDrive/RearRight/Drive/Current",
+              "name": "Current"
+            }
+          ]
+        }
+      ],
+      "window": {
+        "name": "Rear Right"
       }
     }
   }
