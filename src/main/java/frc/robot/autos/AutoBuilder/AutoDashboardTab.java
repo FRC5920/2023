@@ -58,14 +58,14 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.lib.dashboard.WidgetsWithChangeDetection.ChooserWithChangeDetection;
+import frc.lib.dashboard.WidgetsWithChangeDetection.ToggleButtonWithChangeDetection;
 import frc.lib.utility.PIDTunerPanel;
 import frc.robot.RobotContainer;
 import frc.robot.autos.AutoConstants.EscapeRoute;
 import frc.robot.autos.AutoConstants.Grids;
 import frc.robot.autos.AutoConstants.SecondaryAction;
-import frc.robot.autos.AutoConstants.Waypoints;
+import frc.robot.autos.DriveToWaypoint;
 import frc.robot.subsystems.Dashboard.IDashboardTab;
 import java.util.*;
 
@@ -97,18 +97,20 @@ public class AutoDashboardTab implements IDashboardTab {
   private Field2d m_field2d;
 
   /** Initial position chooser */
+  private ToggleButtonWithChangeDetection m_bumpChoice;
+
+  /** Initial position chooser */
   private final ChooserWithChangeDetection<Grids.ScoringPosition> m_initialPositionChooser =
       new ChooserWithChangeDetection<Grids.ScoringPosition>();
   /** Route chooser */
   private final ChooserWithChangeDetection<EscapeRoute.Route> m_routeChooser =
       new ChooserWithChangeDetection<EscapeRoute.Route>();
-  /** Waypoint chooser */
-  private final ChooserWithChangeDetection<Waypoints.ID> m_targetWaypointChooser =
-      new ChooserWithChangeDetection<Waypoints.ID>();
-
-  /** Cargo position chooser */
+  /** Secondary action chooser */
   private final ChooserWithChangeDetection<SecondaryAction> m_secondaryActionChooser =
       new ChooserWithChangeDetection<SecondaryAction>();
+  /** Waypoint chooser */
+  // private final ChooserWithChangeDetection<Waypoints.ID> m_targetWaypointChooser =
+  //     new ChooserWithChangeDetection<Waypoints.ID>();
 
   /** Panel used to set translation PID gains */
   private PIDTunerPanel m_translationPIDPanel;
@@ -116,7 +118,11 @@ public class AutoDashboardTab implements IDashboardTab {
   /** Panel used to set rotation PID gains */
   private PIDTunerPanel m_rotationPIDPanel;
 
+  /** Used to detect when the present alliance changes */
   private Alliance m_lastAlliance;
+
+  /** Used to maintain a set of displayed Trajectories */
+  private HashMap<String, PathPlannerTrajectory> m_fieldTrajectories = new HashMap<>();
 
   /** Creates an instance of the tab */
   public AutoDashboardTab(AutoRoutineBuilder autoBuilder) {
@@ -135,33 +141,41 @@ public class AutoDashboardTab implements IDashboardTab {
     m_lastAlliance = DriverStation.getAlliance();
 
     // Set up the initial position chooser
-    populateChooser(
-        m_initialPositionChooser, Grids.ScoringPosition.getNames(), Grids.ScoringPosition.values());
+    m_initialPositionChooser.loadOptions(
+        Grids.ScoringPosition.getNames(), Grids.ScoringPosition.values(), 0);
     m_tab
         .add("Initial Position", m_initialPositionChooser)
         .withSize(kChooserWidth, kChooserHeight)
         .withPosition(0 * kChooserWidth, 0);
 
     // Set up a chooser for the route to follow out of the community
-    populateChooser(m_routeChooser, EscapeRoute.Route.getNames(), EscapeRoute.Route.values());
+    m_routeChooser.loadOptions(EscapeRoute.Route.getNames(), EscapeRoute.Route.values(), 0);
     m_tab
         .add("Route", m_routeChooser)
         .withSize(kChooserWidth, kChooserHeight)
         .withPosition(1 * kChooserWidth, 0);
 
     // Set up a chooser for the secondary action to take
-    populateChooser(m_secondaryActionChooser, SecondaryAction.getNames(), SecondaryAction.values());
+    m_secondaryActionChooser.loadOptions(SecondaryAction.getNames(), SecondaryAction.values(), 0);
     m_tab
         .add("Secondary Action", m_secondaryActionChooser)
         .withSize(kChooserWidth, kChooserHeight)
-        .withPosition(3 * kChooserWidth, 0);
+        .withPosition(2 * kChooserWidth, 0);
+
+    // Set up the bump choice
+    m_bumpChoice = new ToggleButtonWithChangeDetection(m_tab, "Bump Score", true);
+    m_bumpChoice
+        .getWidget()
+        .withSize(kChooserWidth, kChooserHeight)
+        .withPosition(3 * kChooserWidth, 0)
+        .getEntry();
 
     // Set up a chooser for the waypoint to move to outside the community
-    populateChooser(m_targetWaypointChooser, Waypoints.ID.getNames(), Waypoints.ID.values());
-    m_tab
-        .add("Waypoint", m_targetWaypointChooser)
-        .withSize(kChooserWidth, kChooserHeight)
-        .withPosition(4 * kChooserWidth, 0);
+    // populateChooser(m_targetWaypointChooser, Waypoints.ID.getNames(), Waypoints.ID.values());
+    // m_tab
+    //     .add("Waypoint", m_targetWaypointChooser)
+    //     .withSize(kChooserWidth, kChooserHeight)
+    //     .withPosition(4 * kChooserWidth, 0);
 
     // Add the 2D view of the field
     m_tab
@@ -173,37 +187,10 @@ public class AutoDashboardTab implements IDashboardTab {
     m_translationPIDPanel =
         new PIDTunerPanel(
             m_tab, "Translation PID", 0, kFieldWidthCells, DriveToWaypoint.kDefaultPositionGains);
-    // new frc.lib.utility.PIDGains(
-    //     AutoRoutineBuilder.kDefaultTranslationkP,
-    //     AutoRoutineBuilder.kDefaultTranslationkI,
-    //     AutoRoutineBuilder.kDefaultTranslationkD));
 
     m_rotationPIDPanel =
         new PIDTunerPanel(
             m_tab, "Rotation PID", 0, kFieldWidthCells, DriveToWaypoint.kDefaultRotationGains);
-    // new frc.lib.utility.PIDGains(
-    //     AutoRoutineBuilder.kDefaultRotationkP,
-    //     AutoRoutineBuilder.kDefaultRotationkI,
-    //     AutoRoutineBuilder.kDefaultRotationkD));
-  }
-
-  /**
-   * Populates a String chooser
-   *
-   * @param chooser The chooser to populate
-   * @param choices An array of strings representing the choices
-   * @post The chooser will be populated with the given choices and the default value will be set to
-   *     the first choice
-   */
-  private static <V> void populateChooser(
-      SendableChooser<V> chooser, String choices[], V values[]) {
-    for (int i = 0; i < choices.length; ++i) {
-      String choice = choices[i];
-      V value = values[i];
-      chooser.addOption(choice, value);
-    }
-
-    chooser.setDefaultOption(choices[0], values[0]);
   }
 
   /** Service dashboard tab widgets */
@@ -214,7 +201,7 @@ public class AutoDashboardTab implements IDashboardTab {
     boolean initialPositionChanged = m_initialPositionChooser.hasChanged();
     boolean routeHasChanged = m_routeChooser.hasChanged();
     boolean selectedActionChanged = m_secondaryActionChooser.hasChanged();
-    boolean targetWaypointChanged = m_targetWaypointChooser.hasChanged();
+    boolean targetWaypointChanged = false; // m_targetWaypointChooser.hasChanged();
     boolean translationPIDChanged = m_translationPIDPanel.hasChanged();
     boolean rotationPIDChanged = m_rotationPIDPanel.hasChanged();
 
@@ -224,7 +211,8 @@ public class AutoDashboardTab implements IDashboardTab {
         || selectedActionChanged
         || targetWaypointChanged
         || translationPIDChanged
-        || rotationPIDChanged) {
+        || rotationPIDChanged
+        || m_bumpChoice.hasChanged()) {
 
       m_lastAlliance = currentAlliance;
 
@@ -233,21 +221,33 @@ public class AutoDashboardTab implements IDashboardTab {
           botContainer,
           m_initialPositionChooser.getSelected(),
           m_routeChooser.getSelected(),
+          m_secondaryActionChooser.getSelected(),
           m_translationPIDPanel.getGains(),
-          m_rotationPIDPanel.getGains());
+          m_rotationPIDPanel.getGains(),
+          m_bumpChoice.getValue());
 
-      // Display auto trajectories on the field
-      List<PathPlannerTrajectory> trajectories = m_builder.getTrajectories();
-      for (int idx = 0; idx < trajectories.size(); ++idx) {
-        m_field2d
-            .getObject(String.format("AutoTrajectory%d", idx))
-            .setTrajectory(trajectories.get(idx));
+      // Set all objects on the field to have an empty trajectory
+      for (String name : m_fieldTrajectories.keySet()) {
+        m_fieldTrajectories.put(name, new PathPlannerTrajectory());
       }
+
+      // Get trajectories for the active auto
+      List<PathPlannerTrajectory> trajectories = m_builder.getTrajectories();
+
+      // Add them to the map of field objects
+      for (int idx = 0; idx < trajectories.size(); ++idx) {
+        String name = String.format("AutoTrajectory%d", idx);
+        PathPlannerTrajectory traj = trajectories.get(idx);
+        m_fieldTrajectories.put(name, traj);
+      }
+
+      // Send all trajectories to the field
+      m_fieldTrajectories.forEach(
+          (String name, PathPlannerTrajectory traj) ->
+              m_field2d.getObject(name).setTrajectory(traj));
 
       Pose2d pose = m_initialPositionChooser.getSelected().getPose();
       botContainer.swerveSubsystem.resetOdometry(pose);
-      SmartDashboard.putNumber("initialX", pose.getX());
-      SmartDashboard.putNumber("initialY", pose.getY());
     }
 
     m_field2d.setRobotPose(botContainer.swerveSubsystem.getPose());
@@ -256,17 +256,5 @@ public class AutoDashboardTab implements IDashboardTab {
   /** Returns the current auto routine builder */
   public AutoRoutineBuilder getAutoBuilder() {
     return m_builder;
-  }
-
-  private static class ChooserWithChangeDetection<V> extends SendableChooser<V> {
-    private V m_lastValue;
-    private boolean m_initialChangeFlag = true;
-
-    public boolean hasChanged() {
-      boolean changed = m_initialChangeFlag || (m_lastValue != getSelected());
-      m_initialChangeFlag = false;
-      m_lastValue = getSelected();
-      return changed;
-    }
   }
 }

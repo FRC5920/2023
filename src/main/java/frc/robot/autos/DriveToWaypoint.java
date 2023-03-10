@@ -49,7 +49,7 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.autos.AutoBuilder;
+package frc.robot.autos;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -104,18 +104,18 @@ public class DriveToWaypoint extends CommandBase {
    * Drives to the specified pose under full software control
    *
    * @param swerveSubsystem Swerve drive subsystem used to drive
-   * @param pose The pose to drive to
+   * @param waypoint The pose to drive to
    * @param positionToleranceMeters Position tolerance to control to (meters)
    * @param rotationToleranceRad Rotation tolerance to control to (radians)
    */
   public DriveToWaypoint(
       Swerve swerveSubsystem,
-      Pose2d pose,
+      Pose2d waypoint,
       double positionToleranceMeters,
       double rotationToleranceRad) {
     this(
         swerveSubsystem,
-        pose,
+        waypoint,
         positionToleranceMeters,
         rotationToleranceRad,
         kDefaultPositionGains,

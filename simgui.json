@@ -29,9 +29,13 @@
           "arrows": false,
           "style": "Line"
         },
+        "AutoTrajectory3": {
+          "arrows": false,
+          "style": "Line"
+        },
         "bottom": 544,
         "height": 8.013679504394531,
-        "image": "/home/dave/git/VIKotics/2023/2023-field.png",
+        "image": "2023-field.png",
         "left": 46,
         "right": 1088,
         "top": 36,
@@ -48,6 +52,7 @@
       },
       "/Shuffleboard/Auto Builder/Rotation PID": {
         "window": {
+          "name": "Rotation PID",
           "visible": true
         }
       },
@@ -57,8 +62,14 @@
           "visible": true
         }
       },
+      "/Shuffleboard/Auto Builder/Secondary Action": {
+        "window": {
+          "visible": true
+        }
+      },
       "/Shuffleboard/Auto Builder/Translation PID": {
         "window": {
+          "name": "Translation PID",
           "visible": true
         }
       }

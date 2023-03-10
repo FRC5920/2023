@@ -49,52 +49,81 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.autos.AutoBuilder;
+package frc.robot.autos;
 
-import com.pathplanner.lib.PathPoint;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.lib.utility.PIDGains;
+import frc.robot.autos.AutoConstants.Grids;
+import frc.robot.subsystems.SwerveDrivebase.Swerve;
 
-/** A helper class that extends PathPoint to provide a printable waypoint */
-public class PathPointHelper extends PathPoint {
-  public final String name;
+/**
+ * This command provides the following behavior: From an initial Grid position, the robot will drive
+ * forward at high acceleration to an intermediate position (Waypoint A), causing a piece of cargo
+ * loaded on the edge of the back of the robot to roll off. Then, it will back up to the grid to
+ * push the cargo in.
+ */
+public class BumpScore extends SequentialCommandGroup {
+  /** Tolerance for position */
+  public static final double kPositionTolerance = 0.05;
 
-  public PathPointHelper(String nameStr, double x, double y, Rotation2d theta, Rotation2d holRot) {
-    super(new Translation2d(x, y), theta, holRot);
-    name = nameStr;
-  }
+  /** PID gains for position */
+  public static final PIDGains kPositionPIDGains = new PIDGains(8, 0, 0.2);
 
-  public String format() {
-    return String.format(
-        "<%s> (x=%6f, y=%.6f), theta=%d deg, holonomic=%d deg",
-        name,
-        position.getX(),
-        position.getY(),
-        (int) heading.getDegrees(),
-        (int) holonomicRotation.getDegrees());
-  }
+  /** Default gains applied to controlling position */
+  public static final PIDGains kRotationGains = new PIDGains(10, 0, 0.2);
 
-  public double getX() {
-    return position.getX();
-  }
+  /** Default max velocity used for position constraints */
+  public static final double kMaxVelocity = 6.0;
+  /** Default max acceleration used for position constraints */
+  public static final double kMaxAcceleration = 11;
+  /** Default control constraints used for the position controller */
+  public static final TrapezoidProfile.Constraints kPositionConstraints =
+      new TrapezoidProfile.Constraints(kMaxVelocity, kMaxAcceleration);
 
-  public double getY() {
-    return position.getY();
-  }
+  /** Creates a new BumpScore. */
+  public BumpScore(Grids.ScoringPosition scoringPosition, Swerve swerveSubsystem) {
+    Pose2d initialPose = scoringPosition.getPose();
+    double initialX = initialPose.getTranslation().getX();
+    double initialY = initialPose.getTranslation().getY();
+    Rotation2d initialRot = initialPose.getRotation();
 
-  public Translation2d getPosition() {
-    return position;
-  }
+    boolean isBlueAlliance = DriverStation.getAlliance() == DriverStation.Alliance.Blue;
+    double waypointAOffset = 0.5 * (isBlueAlliance ? 1.0 : -1.0);
+    double xA = initialX + waypointAOffset;
+    Pose2d waypointA = new Pose2d(new Translation2d(xA, initialY), initialRot);
+    System.out.printf("Drive to Waypoint A: x=%.2f y=%.2f\n", xA, initialY);
 
-  public Rotation2d getHeading() {
-    return heading;
-  }
+    double offsetTowardGrid = 0.0 * (isBlueAlliance ? -1.0 : 1.0);
+    double xBackup = initialX + offsetTowardGrid;
+    Pose2d backupWaypoint = new Pose2d(new Translation2d(xBackup, initialY), initialRot);
+    System.out.printf("Drive back to: x=%.2f y=%.2f\n", xBackup, initialY);
 
-  public Rotation2d getHolonomicRotation() {
-    return holonomicRotation;
-  }
-
-  public double distance(PathPointHelper other) {
-    return position.getDistance(other.position);
+    // Add your commands in the addCommands() call, e.g.
+    // addCommands(new FooCommand(), new BarCommand());
+    addCommands(
+        new DriveToWaypoint(
+            swerveSubsystem,
+            waypointA,
+            kPositionTolerance,
+            DriveToWaypoint.kDefaultRotationToleranceRadians,
+            kPositionPIDGains,
+            kRotationGains,
+            kPositionConstraints,
+            DriveToWaypoint.kDefaultRotationConstraints),
+        new DriveToWaypoint(
+                swerveSubsystem,
+                backupWaypoint,
+                kPositionTolerance,
+                DriveToWaypoint.kDefaultRotationToleranceRadians,
+                kPositionPIDGains,
+                kRotationGains,
+                kPositionConstraints,
+                DriveToWaypoint.kDefaultRotationConstraints)
+            .withTimeout(2.0));
   }
 }
