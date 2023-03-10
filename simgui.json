@@ -44,6 +44,7 @@
       "/Shuffleboard/Auto Builder/Secondary Action": "String Chooser",
       "/Shuffleboard/Auto Builder/Translation PID": "PIDController",
       "/Shuffleboard/Auto Builder/Waypoint": "String Chooser",
+      "/Shuffleboard/Intake Subsystem/Speed PID": "PIDController",
       "/Shuffleboard/PoseEstimator/Field": "Field2d",
       "/Shuffleboard/SwerveDrive/FrontLeft/Angle/Degrees": "Gyro",
       "/Shuffleboard/SwerveDrive/FrontRight/Angle/Degrees": "Gyro",

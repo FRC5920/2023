@@ -51,11 +51,14 @@
 \-----------------------------------------------------------------------------*/
 package frc.lib.dashboard;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import frc.lib.utility.PIDGains;
+import java.util.Map;
 import java.util.function.Supplier;
 
 /** Add your docs here. */
@@ -176,6 +179,104 @@ public class WidgetsWithChangeDetection {
 
     public boolean getValue() {
       return m_netTableEntry.getBoolean(m_defaultValue);
+    }
+  }
+
+  /** SliderWithChangeDetection provides a dashboard slider with change detection */
+  public static class SliderWithChangeDetection {
+    private final SimpleWidget m_widget;
+    private final GenericEntry m_netTableEntry;
+    private final double m_defaultValue;
+    private final ChangeDetector<Double> m_changeDetector;
+
+    /**
+     * Creates an instance of the object on a given dashboard tab
+     *
+     * @param tab Dashboard tab to add the widget to
+     * @param title Title to give to the widget
+     * @param defaultValue Default value of the widget
+     * @param min Minimum value of the slider
+     * @param max Maximum value of the slider
+     */
+    public SliderWithChangeDetection(
+        ShuffleboardTab tab, String title, double defaultValue, double min, double max) {
+      m_widget = tab.add(title, defaultValue);
+      m_widget
+          .withWidget(BuiltInWidgets.kNumberSlider)
+          .withProperties(Map.of("min", min, "max", max));
+
+      m_netTableEntry = m_widget.getEntry();
+      m_defaultValue = defaultValue;
+      m_changeDetector =
+          new ChangeDetector<Double>(() -> (m_netTableEntry.getDouble(m_defaultValue)));
+    }
+
+    public boolean hasChanged() {
+      return m_changeDetector.hasChanged();
+    }
+
+    public SimpleWidget getWidget() {
+      return m_widget;
+    }
+
+    public double getValue() {
+      return m_netTableEntry.getDouble(m_defaultValue);
+    }
+  }
+
+  /** A class that implements a dashboard panel for tuning PID values */
+  public static class PIDTunerPanel {
+
+    /** Width of the panel in cells */
+    public static final int kPanelWidthCells = 8;
+
+    /** Height of the panel in cells */
+    public static final int kPanelHeightCells = 6;
+
+    /** Width of a slider in the panel (cells) */
+    public static final int kSliderWidth = kPanelWidthCells - 1;
+
+    /** Height of a slider in the panel (cells) */
+    public static final int kSliderHeight = 1;
+
+    /** Internal PID controller used to provide a display panel */
+    private final PIDController m_pid;
+
+    /** Gain history for change detection */
+    private PIDGains m_gains;
+
+    /**
+     * Creates an instance of the panel on a given tab
+     *
+     * @param tab Tab to create the panel on
+     * @param title Title to display in the panel
+     * @param rowIndex Row index (cells) where the panel should be positioned on the tab
+     * @param colIndex Column index (cells) where the panel should be positioned on the tab
+     */
+    public PIDTunerPanel(
+        ShuffleboardTab tab, String title, int rowIndex, int colIndex, PIDGains gains) {
+
+      m_pid = new PIDController(gains.kP, gains.kI, gains.kD);
+      m_gains = gains;
+
+      tab.add(title, m_pid).withPosition(colIndex, rowIndex);
+    }
+
+    /** Returns the PID gins */
+    public PIDGains getGains() {
+      return new PIDGains(m_pid.getP(), m_pid.getI(), m_pid.getD());
+    }
+
+    /** Returns true if the PID gains have been modified since hasChanged() was last called */
+    public boolean hasChanged() {
+      boolean changed = false;
+      PIDGains dashboardGains = new PIDGains(m_pid.getP(), m_pid.getI(), m_pid.getD());
+      if (!m_gains.isEqual(dashboardGains)) {
+        changed = true;
+        m_gains = dashboardGains;
+      }
+
+      return changed;
     }
   }
 }

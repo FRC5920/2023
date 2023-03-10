@@ -65,7 +65,7 @@ import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 import frc.robot.subsystems.Heimdall.*;
-import frc.robot.subsystems.Intake.Intake;
+import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 import org.photonvision.PhotonCamera;
@@ -86,7 +86,7 @@ public class RobotContainer {
   public static final JoystickSubsystem joystickSubsystem = new JoystickSubsystem();
   public final BotStateSubsystem botStateSubsystem = new BotStateSubsystem();
   public final Swerve swerveSubsystem;
-  public final Intake m_Intake = new Intake();
+  public final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   // public static final Pneumatics s_Pneumatics = new Pneumatics();
 
   @SuppressWarnings({"unused"})
@@ -183,6 +183,8 @@ public class RobotContainer {
     autoBuilder = new AutoRoutineBuilder(swerveSubsystem);
     autoDashboardTab = new AutoDashboardTab(autoBuilder);
     dashboardSubsystem.add(autoDashboardTab);
+
+    intakeSubsystem.registerDashboardTab(dashboardSubsystem);
 
     // Initialize all dashboard tabs
     dashboardSubsystem.initialize(this);
