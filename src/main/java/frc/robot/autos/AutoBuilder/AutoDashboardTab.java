@@ -53,14 +53,13 @@ package frc.robot.autos.AutoBuilder;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import frc.lib.dashboard.WidgetsWithChangeDetection.ChooserWithChangeDetection;
+import frc.lib.dashboard.WidgetsWithChangeDetection.ToggleButtonWithChangeDetection;
 import frc.lib.utility.PIDTunerPanel;
 import frc.robot.RobotContainer;
 import frc.robot.autos.AutoConstants.EscapeRoute;
@@ -98,7 +97,7 @@ public class AutoDashboardTab implements IDashboardTab {
   private Field2d m_field2d;
 
   /** Initial position chooser */
-  private GenericEntry m_bumpChoice;
+  private ToggleButtonWithChangeDetection m_bumpChoice;
 
   /** Initial position chooser */
   private final ChooserWithChangeDetection<Grids.ScoringPosition> m_initialPositionChooser =
@@ -142,35 +141,34 @@ public class AutoDashboardTab implements IDashboardTab {
     m_lastAlliance = DriverStation.getAlliance();
 
     // Set up the initial position chooser
-    populateChooser(
-        m_initialPositionChooser, Grids.ScoringPosition.getNames(), Grids.ScoringPosition.values());
+    m_initialPositionChooser.loadOptions(
+        Grids.ScoringPosition.getNames(), Grids.ScoringPosition.values(), 0);
     m_tab
         .add("Initial Position", m_initialPositionChooser)
         .withSize(kChooserWidth, kChooserHeight)
         .withPosition(0 * kChooserWidth, 0);
 
     // Set up a chooser for the route to follow out of the community
-    populateChooser(m_routeChooser, EscapeRoute.Route.getNames(), EscapeRoute.Route.values());
+    m_routeChooser.loadOptions(EscapeRoute.Route.getNames(), EscapeRoute.Route.values(), 0);
     m_tab
         .add("Route", m_routeChooser)
         .withSize(kChooserWidth, kChooserHeight)
         .withPosition(1 * kChooserWidth, 0);
 
     // Set up a chooser for the secondary action to take
-    populateChooser(m_secondaryActionChooser, SecondaryAction.getNames(), SecondaryAction.values());
+    m_secondaryActionChooser.loadOptions(SecondaryAction.getNames(), SecondaryAction.values(), 0);
     m_tab
         .add("Secondary Action", m_secondaryActionChooser)
         .withSize(kChooserWidth, kChooserHeight)
         .withPosition(2 * kChooserWidth, 0);
 
     // Set up the bump choice
-    m_bumpChoice =
-        m_tab
-            .add("Bump Score", true)
-            .withWidget(BuiltInWidgets.kToggleButton)
-            .withSize(kChooserWidth, kChooserHeight)
-            .withPosition(3 * kChooserWidth, 0)
-            .getEntry();
+    m_bumpChoice = new ToggleButtonWithChangeDetection(m_tab, "Bump Score", true);
+    m_bumpChoice
+        .getWidget()
+        .withSize(kChooserWidth, kChooserHeight)
+        .withPosition(3 * kChooserWidth, 0)
+        .getEntry();
 
     // Set up a chooser for the waypoint to move to outside the community
     // populateChooser(m_targetWaypointChooser, Waypoints.ID.getNames(), Waypoints.ID.values());
@@ -195,25 +193,6 @@ public class AutoDashboardTab implements IDashboardTab {
             m_tab, "Rotation PID", 0, kFieldWidthCells, DriveToWaypoint.kDefaultRotationGains);
   }
 
-  /**
-   * Populates a String chooser
-   *
-   * @param chooser The chooser to populate
-   * @param choices An array of strings representing the choices
-   * @post The chooser will be populated with the given choices and the default value will be set to
-   *     the first choice
-   */
-  private static <V> void populateChooser(
-      SendableChooser<V> chooser, String choices[], V values[]) {
-    for (int i = 0; i < choices.length; ++i) {
-      String choice = choices[i];
-      V value = values[i];
-      chooser.addOption(choice, value);
-    }
-
-    chooser.setDefaultOption(choices[0], values[0]);
-  }
-
   /** Service dashboard tab widgets */
   @Override
   public void updateDashboard(RobotContainer botContainer) {
@@ -232,7 +211,8 @@ public class AutoDashboardTab implements IDashboardTab {
         || selectedActionChanged
         || targetWaypointChanged
         || translationPIDChanged
-        || rotationPIDChanged) {
+        || rotationPIDChanged
+        || m_bumpChoice.hasChanged()) {
 
       m_lastAlliance = currentAlliance;
 
@@ -244,7 +224,7 @@ public class AutoDashboardTab implements IDashboardTab {
           m_secondaryActionChooser.getSelected(),
           m_translationPIDPanel.getGains(),
           m_rotationPIDPanel.getGains(),
-          m_bumpChoice.getBoolean(true));
+          m_bumpChoice.getValue());
 
       // Set all objects on the field to have an empty trajectory
       for (String name : m_fieldTrajectories.keySet()) {
@@ -276,17 +256,5 @@ public class AutoDashboardTab implements IDashboardTab {
   /** Returns the current auto routine builder */
   public AutoRoutineBuilder getAutoBuilder() {
     return m_builder;
-  }
-
-  private static class ChooserWithChangeDetection<V> extends SendableChooser<V> {
-    private V m_lastValue;
-    private boolean m_initialChangeFlag = true;
-
-    public boolean hasChanged() {
-      boolean changed = m_initialChangeFlag || (m_lastValue != getSelected());
-      m_initialChangeFlag = false;
-      m_lastValue = getSelected();
-      return changed;
-    }
   }
 }

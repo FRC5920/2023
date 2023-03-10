@@ -196,7 +196,7 @@ public class AutoConstants {
 
     /** X coordinate of escape route endpoint */
     public static final double kEscapeEndpointX =
-        ChargingStation.kFieldSideX + (0.75 * BotDimensions.kFootprintWidth);
+        ChargingStation.kFieldSideX + (BotDimensions.kFootprintWidth);
 
     public static enum Route {
       /**
