@@ -88,7 +88,7 @@ public class RobotContainer {
   public final BotStateSubsystem botStateSubsystem = new BotStateSubsystem();
   public final Swerve swerveSubsystem;
   public final Intake m_Intake = new Intake();
-  public static final Pneumatics s_Pneumatics = new Pneumatics();
+  //public static final Pneumatics s_Pneumatics = new Pneumatics();
 
   @SuppressWarnings({"unused"})
   public final PoseEstimatorSubsystem poseEstimatorSubsystem;
@@ -96,9 +96,10 @@ public class RobotContainer {
   /* Cameras */
   private final PhotonCamera TagCamera = new PhotonCamera(Constants.VisionConstants.TagCameraName);
 
-  @SuppressWarnings({"unused"})
+  /*@SuppressWarnings({"unused"})
   private final PhotonCamera BackCamera =
       new PhotonCamera(Constants.VisionConstants.BackupCameraName);
+*/
 
   @SuppressWarnings({"unused"})
   private final PhotonCamera ArmCamera = new PhotonCamera(Constants.VisionConstants.ArmCameraName);

@@ -111,10 +111,10 @@ public class Swerve extends SubsystemBase {
 
     swerveKinematics =
         new SwerveDriveKinematics(
-            new Translation2d((-1 * wheelBaseMeters) / 2.0, ( -1 * trackWidthMeters) / 2.0),
-            new Translation2d((-1 * wheelBaseMeters) / 2.0, (1 * trackWidthMeters) / 2.0),
-            new Translation2d((1 * wheelBaseMeters) / 2.0, (-1 * trackWidthMeters) / 2.0),
-            new Translation2d((1 * wheelBaseMeters) / 2.0, (1 * trackWidthMeters) / 2.0));
+          new Translation2d(wheelBaseMeters / 2.0, trackWidthMeters / 2.0),
+          new Translation2d(wheelBaseMeters / 2.0, (-1 * trackWidthMeters) / 2.0),
+          new Translation2d((-1 * wheelBaseMeters) / 2.0, trackWidthMeters / 2.0),
+          new Translation2d((-1 * wheelBaseMeters) / 2.0, (-1 * trackWidthMeters) / 2.0));
 
     mSwerveMods =
         new SwerveModule[] {
