@@ -53,15 +53,29 @@ package frc.lib.utility;
 
 /** An object wrapping gains for a PID controller */
 public class PIDGains {
+  /** Feed-forward gain coefficient */
+  public double kFF = 0;
+  /** Proportional gain coefficient */
   public double kP = 0;
+  /** Integral gain coefficient */
   public double kI = 0;
+  /** Derivative gain coefficient */
   public double kD = 0;
 
   /** Default constructor sets all gains to zero */
   public PIDGains() {}
 
-  /** Construct with initial gains */
+  /** Construct with initial gains (zero feed-forward gain) */
   public PIDGains(double _kP, double _kI, double _kD) {
+    kFF = 0.0;
+    kP = _kP;
+    kI = _kI;
+    kD = _kD;
+  }
+
+  /** Construct with initial PID and feed-forward gains */
+  public PIDGains(double _kP, double _kI, double _kD, double _kFF) {
+    kFF = _kFF;
     kP = _kP;
     kI = _kI;
     kD = _kD;

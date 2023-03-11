@@ -49,7 +49,7 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.subsystems.Intake;
+package frc.robot.subsystems.ShooterPivot;
 
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
@@ -63,13 +63,13 @@ import frc.lib.dashboard.WidgetsWithChangeDetection.ToggleButtonWithChangeDetect
 import frc.lib.utility.PIDGains;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Dashboard.IDashboardTab;
-import frc.robot.subsystems.Intake.IntakeSubsystem.IntakeSubsystemTelemetry;
-import frc.robot.subsystems.Intake.IntakeSubsystem.MotorTelemetry;
+import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem.MotorTelemetry;
+import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem.ShooterPivotTelemetry;
 import java.util.Map;
 import java.util.function.Supplier;
 
 /** Dashboard tab for tuning the Arm subsystem */
-public class IntakeDashboardTab implements IDashboardTab {
+public class ShooterPivotDashboardTab implements IDashboardTab {
 
   /** Width of a motor telemetry panel */
   private static final int kTelemetryPanelWidthCells = 6;
@@ -87,13 +87,13 @@ public class IntakeDashboardTab implements IDashboardTab {
   private MotorTelemetryPanel m_slaveMotorPanel;
 
   /** The intake subsystem addressed by the dashboard */
-  private final IntakeSubsystem m_intakeSubsystem;
+  private final ShooterPivotSubsystem m_shooterSubsystem;
 
   /** Measurements populated by the subsystem */
-  private final IntakeSubsystemTelemetry m_telemetry;
+  private final ShooterPivotTelemetry m_telemetry;
 
   /** Slider used to set test motor speed for intake */
-  private SliderWithChangeDetection m_motorRPMSlider;
+  private SliderWithChangeDetection m_positionSlider;
 
   /** Toggle button used to enable/disable motor at speed */
   private ToggleButtonWithChangeDetection m_motorEnableToggle;
@@ -101,19 +101,19 @@ public class IntakeDashboardTab implements IDashboardTab {
   /** PID tuner panel */
   private PIDTunerPanel m_pidTuner;
 
-  private PIDGains m_pidGains = IntakeSubsystem.kDefaultPIDGains;
+  private PIDGains m_pidGains = ShooterPivotSubsystem.kDefaultPIDGains;
 
   /** Create an instance of the tab */
-  public IntakeDashboardTab(IntakeSubsystem subsystem) {
-    m_intakeSubsystem = subsystem;
-    m_telemetry = new IntakeSubsystemTelemetry();
+  public ShooterPivotDashboardTab(ShooterPivotSubsystem subsystem) {
+    m_shooterSubsystem = subsystem;
+    m_telemetry = new ShooterPivotTelemetry();
     m_masterMotorPanel = null;
     m_slaveMotorPanel = null;
   }
 
   /** Called to initialize the dashboard tab */
   public void initDashboard(RobotContainer botContainer) {
-    final String kTabTitle = "Intake";
+    final String kTabTitle = "ShooterPivot";
     m_tab = Shuffleboard.getTab(kTabTitle);
 
     m_masterMotorPanel =
@@ -137,15 +137,15 @@ public class IntakeDashboardTab implements IDashboardTab {
             kTelemetryPanelHeightCells);
 
     m_pidTuner =
-        new PIDTunerPanel(m_tab, "Speed PID", kTelemetryPanelHeightCells + 4, 0, m_pidGains);
+        new PIDTunerPanel(m_tab, "Position PID", kTelemetryPanelHeightCells + 4, 0, m_pidGains);
 
-    m_motorRPMSlider = new SliderWithChangeDetection(m_tab, "Test Speed (RPM)", 100, -5000, 5000);
-    m_motorRPMSlider
+    m_positionSlider = new SliderWithChangeDetection(m_tab, "Test Position (Deg)", 100, -35, 135);
+    m_positionSlider
         .getWidget()
         .withPosition(3, kTelemetryPanelHeightCells + 4)
         .withSize(kTelemetryPanelWidthCells + 4, 3);
 
-    m_motorEnableToggle = new ToggleButtonWithChangeDetection(m_tab, "Enable", false);
+    m_motorEnableToggle = new ToggleButtonWithChangeDetection(m_tab, "Apply", false);
     m_motorEnableToggle
         .getWidget()
         .withPosition(3 + (kTelemetryPanelWidthCells + 4), kTelemetryPanelHeightCells + 4)
@@ -157,21 +157,18 @@ public class IntakeDashboardTab implements IDashboardTab {
 
     // Update PID gains if they have changed
     if (m_pidTuner.hasChanged()) {
-      m_intakeSubsystem.setPIDGains(m_pidTuner.getGains());
+      m_shooterSubsystem.setPIDGains(m_pidTuner.getGains());
     }
 
     // Test the motor speed if any widgets have changed
-    if (m_motorEnableToggle.hasChanged() || m_motorRPMSlider.hasChanged()) {
-      boolean intakeIsActivated = m_motorEnableToggle.getValue();
-      if (intakeIsActivated) {
-        m_intakeSubsystem.setIntakeRPM(m_motorRPMSlider.getValue());
-      } else {
-        m_intakeSubsystem.stopIntake();
+    if (m_motorEnableToggle.hasChanged() || m_positionSlider.hasChanged()) {
+      if (m_motorEnableToggle.getValue()) {
+        m_shooterSubsystem.setAngleDegrees(m_positionSlider.getValue());
       }
     }
 
     // Update telemetry
-    m_intakeSubsystem.getTelemetry(m_telemetry);
+    m_shooterSubsystem.getTelemetry(m_telemetry);
   }
 
   public static class MotorTelemetryPanel {
@@ -199,7 +196,7 @@ public class IntakeDashboardTab implements IDashboardTab {
           .withSize(widthCells, heightCells)
           .withPosition(panelColumn, panelRow)
           .withProperties(
-              Map.of("Label position", "LEFT", "Number of columns", 1, "Number of rows", 4));
+              Map.of("Label position", "LEFT", "Number of columns", 1, "Number of rows", 5));
 
       // Set up a widget to display motor current value in amps
       layout
@@ -231,15 +228,25 @@ public class IntakeDashboardTab implements IDashboardTab {
           .withWidget(BuiltInWidgets.kTextView)
           .withPosition(0, 2);
 
-      // Set up a widget to display the motor RPM
+      // Set up a widget to display the sensor position
       layout
           .addDouble(
-              "RPM",
+              "Ticks",
               () -> {
-                return telemetrySupplier.get().motorRPM;
+                return telemetrySupplier.get().sensorPositionTicks;
               })
           .withWidget(BuiltInWidgets.kTextView)
           .withPosition(0, 3);
+
+      // Set up a widget to display the position in degrees
+      layout
+          .addDouble(
+              "Degrees",
+              () -> {
+                return telemetrySupplier.get().positionDegrees;
+              })
+          .withWidget(BuiltInWidgets.kTextView)
+          .withPosition(0, 4);
     }
   }
 
