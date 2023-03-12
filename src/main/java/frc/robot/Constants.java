@@ -272,12 +272,15 @@ public final class Constants {
     // TODO: get the actual location of the tag camera to the robot transform
     public static final Transform3d CAMERA_TO_ROBOT =
         new Transform3d(
-            new Translation3d(0.0952, 0.0, 0.2794), new Rotation3d(0, 0, Math.toRadians(180)));
+            new Translation3d(0.220625, 0.0, 0.1725), new Rotation3d(0, 0, Math.toRadians(180)));
 
     public static final Transform3d ROBOT_TO_CAMERA = CAMERA_TO_ROBOT.inverse();
     static final String TagCameraName = "Heimdall_Tag_Camera";
-    static final String ArmCameraName = "Arm_Camera";
-    static final String BackupCameraName = "Heimdall_Backup_Cam";
+    static final String ArmCameraName = "HD_USB_Camera";
+    // pipeline indexes
+    public static final int kConePipelineIndex = 1;
+    public static final int kCubePipelineIndex = 0;
+    public static final int kDriverCameraPipelineIndex = -1;
   }
 
   /** A map of directories where log files should be stored */
