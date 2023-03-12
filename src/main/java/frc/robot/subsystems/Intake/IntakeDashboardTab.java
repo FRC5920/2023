@@ -136,8 +136,7 @@ public class IntakeDashboardTab implements IDashboardTab {
             kTelemetryPanelWidthCells,
             kTelemetryPanelHeightCells);
 
-    m_pidTuner =
-        new PIDTunerPanel(m_tab, "Speed PID", kTelemetryPanelHeightCells + 4, 0, m_pidGains);
+    m_pidTuner = new PIDTunerPanel(m_tab, "Velocity PID", 5, 17, m_pidGains);
 
     m_motorRPMSlider =
         new SliderWithChangeDetection(m_tab, "Test Speed (RPM)", 100, -5000, 5000, 10);

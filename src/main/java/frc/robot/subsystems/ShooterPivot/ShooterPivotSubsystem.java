@@ -101,6 +101,7 @@ public class ShooterPivotSubsystem extends SubsystemBase {
   private static final double kFalconTicksPerDegree = kFalconTicksPerRevolution / 360.0;
 
   private static final int kPIDLoopIdx = 0;
+  private static final int kTimeoutMs = 30;
 
   /** Motors that drive the pivot angle */
   private final WPI_TalonFX m_masterMotor = new WPI_TalonFX(kPivotMasterMotorCANId);
@@ -151,20 +152,6 @@ public class ShooterPivotSubsystem extends SubsystemBase {
   }
 
   /**
-   * Sets the shooter pivot to a preset angle
-   *
-   * @param preset Preset angle to set the pivot to
-   */
-  public void setAnglePreset(PivotPreset preset) {
-    setAngleDegrees(preset.angleDegrees);
-  }
-
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-  }
-
-  /**
    * Moves the pivot to a specified angle in degrees
    *
    * @param degrees Angle in degrees to move the shooter pivot to
@@ -177,8 +164,35 @@ public class ShooterPivotSubsystem extends SubsystemBase {
     m_masterMotor.set(TalonFXControlMode.MotionMagic, falconTicks);
   }
 
+  /**
+   * Sets the shooter pivot to a preset angle
+   *
+   * @param preset Preset angle to set the pivot to
+   */
+  public void setAnglePreset(PivotPreset preset) {
+    setAngleDegrees(preset.angleDegrees);
+  }
+
+  /**
+   * Returns true if the present pivot position is at a given angle
+   *
+   * @param angleDeg Position to check for
+   * @param toleranceDeg Maximum distance (degrees) in either direction from angleDeg that is
+   *     tolerated as being "close enough"
+   */
+  public boolean isAtAngle(double angleDeg, double toleranceDeg) {
+    double targetPosition = m_masterMotor.getClosedLoopTarget(kPIDLoopIdx);
+    double presentPosition = m_masterMotor.getSelectedSensorPosition(kPIDLoopIdx);
+    return Math.abs(targetPosition - presentPosition) < toleranceDeg;
+  }
+
+  @Override
+  public void periodic() {
+    // This method will be called once per scheduler run
+  }
+
   /** Resets the encoder count in pivot motors */
-  public void zeroSensorPosition() {
+  public void zeroPivotPosition() {
     m_masterMotor.setSelectedSensorPosition(0);
     m_slaveMotor.setSelectedSensorPosition(0);
   }
@@ -197,63 +211,6 @@ public class ShooterPivotSubsystem extends SubsystemBase {
     if (kEnableDashboardTab) {
       dashboardSubsystem.add(m_dashboardTab);
     }
-  }
-
-  /** Configure motors in the subsystem */
-  private void configureMotors() {
-
-    // Reset motors to factory defaults
-    m_masterMotor.configFactoryDefault();
-    m_slaveMotor.configFactoryDefault();
-
-    // Configure intake motors
-    m_slaveMotor.follow(m_masterMotor);
-    m_masterMotor.setInverted(false);
-    m_slaveMotor.setInverted(true);
-
-    // Configure closed-loop control
-    configureMotorControl(m_masterMotor, m_pivotPIDGains, kMaxMotorOutputPercent);
-    configureMotorControl(m_slaveMotor, m_pivotPIDGains, kMaxMotorOutputPercent);
-
-    // Zero the internal sensor position on startup
-    zeroSensorPosition();
-  }
-
-  private static void configureMotorControl(
-      WPI_TalonFX motor, PIDGains gains, double maxOutputPercent) {
-    final int kPIDLoopIdx = 0;
-    final int kTimeoutMs = 30;
-
-    // Set up neutral mode behavior
-    motor.setNeutralMode(NeutralMode.Brake);
-    // Set deadband to super small 0.001 (0.1 %) the default deadband is 0.04 (4 %)
-    motor.configNeutralDeadband(0.01, kTimeoutMs);
-
-    /* Config the peak and nominal outputs, 12V means full */
-    motor.configNominalOutputForward(0, kTimeoutMs);
-    motor.configNominalOutputReverse(0, kTimeoutMs);
-    motor.configPeakOutputForward(maxOutputPercent, kTimeoutMs);
-    motor.configPeakOutputReverse(-1.0 * maxOutputPercent, kTimeoutMs);
-
-    // Set up closed loop control
-    motor.configSelectedFeedbackSensor(
-        TalonFXFeedbackDevice.IntegratedSensor, kPIDLoopIdx, kTimeoutMs);
-    motor.setSensorPhase(true);
-    motor.configAllowableClosedloopError(0, degreesToFalconTicks(2), kTimeoutMs);
-
-    // Select a motion profile slot
-    int kSlotIdx = 0;
-    motor.selectProfileSlot(kSlotIdx, kPIDLoopIdx);
-
-    // Set up PID gains
-    applyPIDGains(motor, kDefaultPIDGains);
-    motor.config_IntegralZone(kPIDLoopIdx, kDefaultPivotPID_Iz);
-
-    // Set acceleration and cruise velocity
-    motor.configMotionCruiseVelocity(
-        degreesToFalconTicks(kMotionCruiseVelocityDegPerSec), kTimeoutMs);
-    motor.configMotionAcceleration(degreesToFalconTicks(kMotionAccelerationDegPerSec2), kTimeoutMs);
-    motor.configMotionSCurveStrength(kMotionSmoothing);
   }
 
   /**
@@ -340,11 +297,64 @@ public class ShooterPivotSubsystem extends SubsystemBase {
    * @param gains Gains to apply
    */
   private static void applyPIDGains(WPI_TalonFX motor, PIDGains gains) {
-    final int timeoutMs = 10;
-    final int kPIDLoopIdx = 0;
-    motor.config_kF(kPIDLoopIdx, gains.kFF, timeoutMs);
-    motor.config_kP(kPIDLoopIdx, gains.kP, timeoutMs);
-    motor.config_kI(kPIDLoopIdx, gains.kI, timeoutMs);
-    motor.config_kD(kPIDLoopIdx, gains.kD, timeoutMs);
+    motor.config_kF(kPIDLoopIdx, gains.kFF, kTimeoutMs);
+    motor.config_kP(kPIDLoopIdx, gains.kP, kTimeoutMs);
+    motor.config_kI(kPIDLoopIdx, gains.kI, kTimeoutMs);
+    motor.config_kD(kPIDLoopIdx, gains.kD, kTimeoutMs);
+  }
+
+  /** Configure motors in the subsystem */
+  private void configureMotors() {
+
+    // Reset motors to factory defaults
+    m_masterMotor.configFactoryDefault();
+    m_slaveMotor.configFactoryDefault();
+
+    // Configure intake motors
+    m_slaveMotor.follow(m_masterMotor);
+    m_masterMotor.setInverted(false);
+    m_slaveMotor.setInverted(true);
+
+    // Configure closed-loop control
+    configureMotorControl(m_masterMotor, m_pivotPIDGains, kMaxMotorOutputPercent);
+    configureMotorControl(m_slaveMotor, m_pivotPIDGains, kMaxMotorOutputPercent);
+
+    // Zero the internal sensor position on startup
+    zeroPivotPosition();
+  }
+
+  private static void configureMotorControl(
+      WPI_TalonFX motor, PIDGains gains, double maxOutputPercent) {
+
+    // Set up neutral mode behavior
+    motor.setNeutralMode(NeutralMode.Brake);
+    // Set deadband to super small 0.001 (0.1 %) the default deadband is 0.04 (4 %)
+    motor.configNeutralDeadband(0.01, kTimeoutMs);
+
+    /* Config the peak and nominal outputs, 12V means full */
+    motor.configNominalOutputForward(0, kTimeoutMs);
+    motor.configNominalOutputReverse(0, kTimeoutMs);
+    motor.configPeakOutputForward(maxOutputPercent, kTimeoutMs);
+    motor.configPeakOutputReverse(-1.0 * maxOutputPercent, kTimeoutMs);
+
+    // Set up closed loop control
+    motor.configSelectedFeedbackSensor(
+        TalonFXFeedbackDevice.IntegratedSensor, kPIDLoopIdx, kTimeoutMs);
+    motor.setSensorPhase(true);
+    motor.configAllowableClosedloopError(0, degreesToFalconTicks(2), kTimeoutMs);
+
+    // Select a motion profile slot
+    int kSlotIdx = 0;
+    motor.selectProfileSlot(kSlotIdx, kPIDLoopIdx);
+
+    // Set up PID gains
+    applyPIDGains(motor, kDefaultPIDGains);
+    motor.config_IntegralZone(kPIDLoopIdx, kDefaultPivotPID_Iz);
+
+    // Set acceleration and cruise velocity
+    motor.configMotionCruiseVelocity(
+        degreesToFalconTicks(kMotionCruiseVelocityDegPerSec), kTimeoutMs);
+    motor.configMotionAcceleration(degreesToFalconTicks(kMotionAccelerationDegPerSec2), kTimeoutMs);
+    motor.configMotionSCurveStrength(kMotionSmoothing);
   }
 }

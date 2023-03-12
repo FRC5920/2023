@@ -52,10 +52,12 @@
 package frc.robot.subsystems.Intake;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
+import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.math.Conversions;
 import frc.lib.utility.PIDGains;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 
@@ -83,13 +85,10 @@ public class IntakeSubsystem extends SubsystemBase {
       new PIDGains(kDefaultPID_kP, kDefaultPID_kI, kDefaultPID_kD, kDefaultPID_kFF);
 
   /** Peak output (%) that intake motors should run */
-  private static final double kMaxMotorOutputPercent = 0.5;
+  private static final double kMaxMotorOutputPercent = 0.2;
 
-  // FalconFX reports velocity in counts per 100ms
-  // 1 revolution = 2048 counts
-  // 1 minutes = 60 * 10 * 100ms
-  // conversion is  600  / 2048
-  private final double kFalconTicksToRPM = 600.0 / 2048.0;
+  private static final int kPIDLoopIdx = 0;
+  private static final int kTimeoutMs = 30;
 
   /** Motors that drive the intake rollers */
   private final WPI_TalonFX m_masterMotor = new WPI_TalonFX(kIntakeMasterMotorCANId);
@@ -105,11 +104,11 @@ public class IntakeSubsystem extends SubsystemBase {
   final IntakeDashboardTab m_dashboardTab;
 
   public enum IntakePreset {
-    CubeIntake(0, -100.0),
-    ConeIntake(1, -300.0),
-    PlaceLow(2, 300),
-    PlaceMid(3, 600),
-    PlaceHigh(4, 1000);
+    CubeIntake(0, -700.0),
+    ConeIntake(1, -800.0),
+    PlaceLow(2, 700),
+    PlaceMid(3, 1000),
+    PlaceHigh(4, 1300);
 
     public final int index;
     public final double motorRPM;
@@ -140,28 +139,16 @@ public class IntakeSubsystem extends SubsystemBase {
     setIntakeRPM(0.0);
   }
 
-  /** Called by the scheduler to service the subsystem */
-  @Override
-  public void periodic() {}
-
   /**
-   * Sets the intake motor speed in RPM
+   * Sets the intake motor speed to a given RPM
    *
-   * @param rpm Speed to run the intake at in RPM
+   * @param rpm Speed (RPM) to run the intake at
+   * @remarks Negative RPM values pull a game piece in; positive push it out.
    */
   public void setIntakeRPM(double rpm) {
     // Convert RPM to falcon sensor velocity
-    double falconVelocity = rpm / kIntakeGearRatio / kFalconTicksToRPM;
+    double falconVelocity = Conversions.RPMToFalcon(rpm, kIntakeGearRatio);
     m_masterMotor.set(ControlMode.Velocity, falconVelocity);
-  }
-
-  /**
-   * Runs the intake motors directly at a percentage of maximum output
-   *
-   * @param speedPercent Speed to run the motor: 0.0 (stop) to 1.0 (forward) or (-1.0) (reverse)
-   */
-  public void DEBUG_setMotorPercent(double speedPercent) {
-    m_intakeMotorGroup.set(speedPercent);
   }
 
   /** Returns the subsystem's dashboard tab */
@@ -169,27 +156,6 @@ public class IntakeSubsystem extends SubsystemBase {
     if (kEnableDashboardTab) {
       dashboardSubsystem.add(m_dashboardTab);
     }
-  }
-
-  /** Configure motors in the subsystem */
-  private void configureMotors() {
-    final int kPIDLoopIdx = 0;
-    final int kTimeoutMs = 30;
-
-    // Configure intake motors
-    m_slaveMotor.follow(m_masterMotor);
-
-    m_masterMotor.setNeutralMode(NeutralMode.Coast);
-    applyPIDGains(m_masterMotor, kDefaultPIDGains);
-    m_masterMotor.config_IntegralZone(kPIDLoopIdx, kDefaultPID_Iz);
-    m_masterMotor.configPeakOutputForward(kMaxMotorOutputPercent, kTimeoutMs);
-    m_masterMotor.configPeakOutputReverse(-1.0 * kMaxMotorOutputPercent, kTimeoutMs);
-
-    m_slaveMotor.setNeutralMode(NeutralMode.Coast);
-    applyPIDGains(m_slaveMotor, kDefaultPIDGains);
-    m_slaveMotor.config_IntegralZone(kPIDLoopIdx, kDefaultPID_Iz);
-    m_slaveMotor.configPeakOutputForward(kMaxMotorOutputPercent, kTimeoutMs);
-    m_slaveMotor.configPeakOutputReverse(-1.0 * kMaxMotorOutputPercent, kTimeoutMs);
   }
 
   /**
@@ -230,23 +196,81 @@ public class IntakeSubsystem extends SubsystemBase {
    * @param telemetry Telemetry to populate with measurements from the subsystem
    */
   public void getTelemetry(IntakeSubsystemTelemetry telemetry) {
-    // Gather telemetry from front roller motor
-    telemetry.masterMotor.motorRPM = m_masterMotor.getSelectedSensorVelocity() * kFalconTicksToRPM;
+    telemetry.masterMotor.motorRPM =
+        Conversions.falconToRPM(
+            m_masterMotor.getSelectedSensorVelocity(kPIDLoopIdx), kIntakeGearRatio);
     telemetry.masterMotor.motorVolts = m_masterMotor.getMotorOutputVoltage();
     telemetry.masterMotor.statorCurrentAmps = m_masterMotor.getStatorCurrent();
     telemetry.masterMotor.temperatureCelcius = m_masterMotor.getTemperature();
-    telemetry.slaveMotor.motorRPM = m_masterMotor.getSelectedSensorVelocity() * kFalconTicksToRPM;
-    telemetry.slaveMotor.motorVolts = m_masterMotor.getMotorOutputVoltage();
-    telemetry.slaveMotor.statorCurrentAmps = m_masterMotor.getStatorCurrent();
-    telemetry.slaveMotor.temperatureCelcius = m_masterMotor.getTemperature();
+    telemetry.slaveMotor.motorRPM =
+        Conversions.falconToRPM(
+            m_slaveMotor.getSelectedSensorVelocity(kPIDLoopIdx), kIntakeGearRatio);
+    telemetry.slaveMotor.motorVolts = m_slaveMotor.getMotorOutputVoltage();
+    telemetry.slaveMotor.statorCurrentAmps = m_slaveMotor.getStatorCurrent();
+    telemetry.slaveMotor.temperatureCelcius = m_slaveMotor.getTemperature();
   }
 
+  /**
+   * Applies PID gains to a motor
+   *
+   * @param motor Motor to apply gains to
+   * @param gains PID gains to apply
+   */
   private static void applyPIDGains(WPI_TalonFX motor, PIDGains gains) {
-    final int timeoutMs = 10;
-    final int kPIDLoopIdx = 0;
-    motor.config_kF(kPIDLoopIdx, gains.kFF, timeoutMs);
-    motor.config_kP(kPIDLoopIdx, gains.kP, timeoutMs);
-    motor.config_kI(kPIDLoopIdx, gains.kI, timeoutMs);
-    motor.config_kD(kPIDLoopIdx, gains.kD, timeoutMs);
+    motor.config_kF(kPIDLoopIdx, gains.kFF, kTimeoutMs);
+    motor.config_kP(kPIDLoopIdx, gains.kP, kTimeoutMs);
+    motor.config_kI(kPIDLoopIdx, gains.kI, kTimeoutMs);
+    motor.config_kD(kPIDLoopIdx, gains.kD, kTimeoutMs);
   }
+
+  /**
+   * Runs the intake motors directly at a percentage of maximum output
+   *
+   * @param speedPercent Speed to run the motor: 0.0 (stop) to 1.0 (forward) or (-1.0) (reverse)
+   */
+  public void DEBUG_setMotorPercent(double speedPercent) {
+    m_intakeMotorGroup.set(speedPercent * kMaxMotorOutputPercent);
+  }
+
+  /** Configure motors in the subsystem */
+  private void configureMotors() {
+
+    // Reset motors to factory defaults
+    m_masterMotor.configFactoryDefault();
+    m_slaveMotor.configFactoryDefault();
+
+    // Configure master to follow slave
+    m_slaveMotor.follow(m_masterMotor);
+
+    // Configure motor direction such that positive values push out and negative pull in
+    m_masterMotor.setInverted(true);
+    m_slaveMotor.setInverted(TalonFXInvertType.OpposeMaster);
+
+    // Configure motor control
+    configureMotorControl(m_masterMotor, m_speedPIDGains, kMaxMotorOutputPercent);
+    configureMotorControl(m_slaveMotor, m_speedPIDGains, kMaxMotorOutputPercent);
+  }
+
+  private static void configureMotorControl(
+      WPI_TalonFX motor, PIDGains gains, double maxOutputPercent) {
+    // Configure neutral deadband to be tighter than the default
+    motor.configNeutralDeadband(0.001);
+
+    // Configure the motor to use its internal velocity sensor
+    motor.configSelectedFeedbackSensor(
+        TalonFXFeedbackDevice.IntegratedSensor, kPIDLoopIdx, kTimeoutMs);
+
+    // Configure peak and nominal outputs
+    motor.configNominalOutputForward(0, kTimeoutMs);
+    motor.configNominalOutputReverse(0, kTimeoutMs);
+    motor.configPeakOutputForward(maxOutputPercent, kTimeoutMs);
+    motor.configPeakOutputReverse(-1.0 * maxOutputPercent, kTimeoutMs);
+
+    applyPIDGains(motor, gains);
+    motor.config_IntegralZone(kPIDLoopIdx, kDefaultPID_Iz);
+  }
+
+  /** Called by the scheduler to service the subsystem */
+  @Override
+  public void periodic() {}
 }
