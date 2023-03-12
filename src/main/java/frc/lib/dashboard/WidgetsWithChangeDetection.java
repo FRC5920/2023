@@ -58,7 +58,6 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.lib.utility.PIDGains;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -67,7 +66,6 @@ public class WidgetsWithChangeDetection {
 
   public static class ChangeDetector<V> {
     private Supplier<V> m_valueSupplier;
-    private Comparator<V> m_compareFn;
 
     /** Initial return value from hasChanged() */
     private boolean m_forceInitialChange;
@@ -80,15 +78,14 @@ public class WidgetsWithChangeDetection {
      * called.
      */
     public ChangeDetector(Supplier<V> valueSupplier) {
-      this(valueSupplier, true, (lhs, rhs) -> (lhs.equals(rhs)) ? 0 : -1);
+      this(valueSupplier, true);
     }
 
     /**
      * Creates an instance of the object that will optionally return true the first time
      * hasChanged() is called.
      */
-    public ChangeDetector(
-        Supplier<V> valueSupplier, boolean forceInitialChange, Comparator<V> compareFn) {
+    public ChangeDetector(Supplier<V> valueSupplier, boolean forceInitialChange) {
       m_valueSupplier = valueSupplier;
       m_lastValue = valueSupplier.get();
       m_forceInitialChange = forceInitialChange;
@@ -97,7 +94,7 @@ public class WidgetsWithChangeDetection {
     public boolean hasChanged() {
       V currentVal = m_valueSupplier.get();
       boolean changed = false;
-      if ((currentVal != null) && (m_lastValue != null)) {
+      if (m_forceInitialChange || ((currentVal != null) && (m_lastValue != null))) {
         changed = !m_lastValue.equals(currentVal);
       }
       m_lastValue = currentVal;
@@ -219,8 +216,7 @@ public class WidgetsWithChangeDetection {
       m_netTableEntry = m_widget.getEntry();
       m_defaultValue = defaultValue;
       m_changeDetector =
-          new ChangeDetector<Double>(
-              () -> m_netTableEntry.getDouble(m_defaultValue), true, Double::compare);
+          new ChangeDetector<Double>(() -> m_netTableEntry.getDouble(m_defaultValue), true);
     }
 
     public boolean hasChanged() {

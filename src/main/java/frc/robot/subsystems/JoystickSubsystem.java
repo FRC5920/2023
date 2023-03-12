@@ -61,8 +61,8 @@ import frc.robot.Constants.GameTarget;
 import frc.robot.RobotContainer;
 import frc.robot.commands.Balance;
 import frc.robot.commands.zTarget;
-import frc.robot.commands.Shooter.IntakeGamepiece;
-import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem.PivotPreset;
+import frc.robot.commands.Shooter.AcquireGamepieceForTransit;
+import frc.robot.subsystems.ShooterPivot.PivotPresets;
 
 /** A subsystem providing/managing Xbox controllers for driving the robot manually */
 public class JoystickSubsystem extends SubsystemBase {
@@ -184,26 +184,29 @@ public class JoystickSubsystem extends SubsystemBase {
     // Map buttons on operator controller
     operatorController.A.onTrue(
         new InstantCommand(
-            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPreset.ShortShotLow)));
+            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.ShortShotLow)));
     operatorController.B.onTrue(
         new InstantCommand(
-            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPreset.ShortShotMid)));
+            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.ShortShotMid)));
     operatorController.X.onTrue(
         new InstantCommand(
-            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPreset.Transport)));
+            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.Transport)));
     operatorController.Y.onTrue(
         new InstantCommand(
-            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPreset.ShortShotHigh)));
+            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.ShortShotHigh)));
     operatorController.leftBumper.whileTrue(
-        new IntakeGamepiece(botContainer.intakeSubsystem, botContainer.shooterPivotSubsystem));
+        new AcquireGamepieceForTransit(
+                botContainer.intakeSubsystem, botContainer.shooterPivotSubsystem)
+            .finallyDo(
+                (ignored) -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.Park)));
     operatorController.rightBumper.whileTrue(
         new InstantCommand(
-            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPreset.Acquire)));
+            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.Acquire)));
     operatorController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.back.onTrue(
         new InstantCommand(
-            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPreset.Park)));
+            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.Park)));
     operatorController.start.onTrue(
         new InstantCommand(() -> botContainer.shooterPivotSubsystem.zeroPivotPosition()));
   }

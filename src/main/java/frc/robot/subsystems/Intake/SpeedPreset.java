@@ -51,34 +51,16 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.subsystems.Intake;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import java.util.function.Supplier;
+/** Preset speeds for use with the Intake subsystem */
+public enum SpeedPreset {
+  Acquire(-10.0),
+  CloseShotLow(20.0),
+  CloseShotMid(40.0),
+  CloseShotHigh(50.0);
 
-/** Tests an intake preset */
-public class TestCommand extends CommandBase {
-  /** Tolerance used when determining if the intake has reached a given preset RPM */
-  static final double kTargetRPMToleranceDeg = 2.0;
-  /** IntakeSubsystem the command operates on */
-  private final IntakeSubsystem m_subsystem;
-  /** Supplier that provides the target RPM value */
-  private final Supplier<Double> m_speedSupplier;
+  public final double motorSpeed;
 
-  /** Creates a new TestCommands. */
-  public TestCommand(IntakeSubsystem intakeSubsystem, Supplier<Double> speedSupplier) {
-    m_subsystem = intakeSubsystem;
-    m_speedSupplier = speedSupplier;
-  }
-
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    double speed = m_speedSupplier.get();
-    m_subsystem.setSpeedPercent(speed);
-  }
-
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    m_subsystem.stopIntake();
+  private SpeedPreset(double speedPercent) {
+    motorSpeed = speedPercent;
   }
 }

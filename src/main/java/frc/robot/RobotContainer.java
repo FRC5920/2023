@@ -92,7 +92,6 @@ public class RobotContainer {
 
   // public static final Pneumatics s_Pneumatics = new Pneumatics();
 
-  @SuppressWarnings({"unused"})
   public final PoseEstimatorSubsystem poseEstimatorSubsystem;
 
   /* Cameras */

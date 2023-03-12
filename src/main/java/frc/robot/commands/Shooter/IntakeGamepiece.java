@@ -55,8 +55,7 @@ import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
-import frc.robot.subsystems.Intake.IntakeSubsystem.IntakePreset;
-import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
+import frc.robot.subsystems.Intake.SpeedPreset;
 
 public class IntakeGamepiece extends CommandBase {
   private static final int kNumFilterTaps = (int) (0.20 / Constants.robotPeriodSec);
@@ -74,16 +73,15 @@ public class IntakeGamepiece extends CommandBase {
   private State m_state = State.RampUpMotor;
 
   /** Creates a new IntakeGamepiece. */
-  public IntakeGamepiece(
-      IntakeSubsystem intakeSubsystem, ShooterPivotSubsystem shooterPivotSubsystem) {
-    addRequirements(intakeSubsystem, shooterPivotSubsystem);
+  public IntakeGamepiece(IntakeSubsystem intakeSubsystem) {
+    addRequirements(intakeSubsystem);
     m_intakeSubsystem = intakeSubsystem;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_intakeSubsystem.activatePreset(IntakePreset.CubeIntake);
+    m_intakeSubsystem.activatePreset(SpeedPreset.Acquire);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -103,9 +101,9 @@ public class IntakeGamepiece extends CommandBase {
 
     switch (m_state) {
       case RampUpMotor:
-        double averageSpeed = m_speedAverager.calculate(m_intakeSubsystem.getMotorSpeed());
+        double averageSpeed = m_speedAverager.calculate(m_intakeSubsystem.getSpeedPercent());
         m_state =
-            (averageSpeed >= IntakePreset.CubeIntake.motorSpeed * 0.80)
+            (averageSpeed >= SpeedPreset.Acquire.motorSpeed * 0.80)
                 ? State.IntakeGamepiece
                 : State.RampUpMotor;
         break;

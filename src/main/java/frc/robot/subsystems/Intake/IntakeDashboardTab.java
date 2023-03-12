@@ -56,9 +56,7 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import frc.lib.dashboard.WidgetsWithChangeDetection.PIDTunerPanel;
 import frc.lib.dashboard.WidgetsWithChangeDetection.SliderWithChangeDetection;
-import frc.lib.utility.PIDGains;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Dashboard.IDashboardTab;
 import frc.robot.subsystems.Intake.IntakeSubsystem.IntakeSubsystemTelemetry;
@@ -78,34 +76,22 @@ public class IntakeDashboardTab implements IDashboardTab {
   /** Shuffleboard tab to display */
   private ShuffleboardTab m_tab;
 
-  /** Telemetry display for the master motor */
-  private MotorTelemetryPanel m_masterMotorPanel;
-
-  /** Telemetry display for the slave motor */
-  private MotorTelemetryPanel m_slaveMotorPanel;
-
   /** The intake subsystem addressed by the dashboard */
   private final IntakeSubsystem m_intakeSubsystem;
 
   /** Measurements populated by the subsystem */
   private final IntakeSubsystemTelemetry m_telemetry;
 
-  /** PID tuner panel */
-  private PIDTunerPanel m_pidTuner;
-
-  private PIDGains m_pidGains = IntakeSubsystem.kDefaultPIDGains;
-
-  // Commands for testing
+  /** A command for testing intake speed */
   private TestCommand m_intakeTestCommand;
 
+  /** A slider for testing intake speed */
   SliderWithChangeDetection m_intakeSpeedSlider;
 
   /** Create an instance of the tab */
   public IntakeDashboardTab(IntakeSubsystem subsystem) {
     m_intakeSubsystem = subsystem;
     m_telemetry = new IntakeSubsystemTelemetry();
-    m_masterMotorPanel = null;
-    m_slaveMotorPanel = null;
   }
 
   /** Called to initialize the dashboard tab */
@@ -113,55 +99,37 @@ public class IntakeDashboardTab implements IDashboardTab {
     final String kTabTitle = "Intake";
     m_tab = Shuffleboard.getTab(kTabTitle);
 
-    m_masterMotorPanel =
-        new MotorTelemetryPanel(
-            m_tab,
-            "Master motor",
-            () -> m_telemetry.masterMotor,
-            0,
-            0 * kTelemetryPanelWidthCells,
-            kTelemetryPanelWidthCells,
-            kTelemetryPanelHeightCells);
+    // Create telemetry panels for master and slave motors
+    new MotorTelemetryPanel(
+        m_tab,
+        "Master motor",
+        () -> m_telemetry.masterMotor,
+        0,
+        0 * kTelemetryPanelWidthCells,
+        kTelemetryPanelWidthCells,
+        kTelemetryPanelHeightCells);
 
-    m_slaveMotorPanel =
-        new MotorTelemetryPanel(
-            m_tab,
-            "Slave motor",
-            () -> m_telemetry.slaveMotor,
-            0,
-            1 * kTelemetryPanelWidthCells + 2,
-            kTelemetryPanelWidthCells,
-            kTelemetryPanelHeightCells);
-
-    m_pidTuner = new PIDTunerPanel(m_tab, "Velocity PID", 0, 17, m_pidGains);
+    new MotorTelemetryPanel(
+        m_tab,
+        "Slave motor",
+        () -> m_telemetry.slaveMotor,
+        0,
+        1 * kTelemetryPanelWidthCells + 2,
+        kTelemetryPanelWidthCells,
+        kTelemetryPanelHeightCells);
 
     m_intakeSpeedSlider =
         new SliderWithChangeDetection(
-            m_tab,
-            "Intake Speed (percent)",
-            IntakeSubsystem.IntakePreset.CubeIntake.motorSpeed,
-            0,
-            100,
-            1);
+            m_tab, "Intake Speed (percent)", SpeedPreset.Acquire.motorSpeed, 0, 100, 1);
     m_intakeSpeedSlider.getWidget().withPosition(4, 10).withSize(5, 2);
 
     m_intakeTestCommand =
         new TestCommand(m_intakeSubsystem, () -> m_intakeSpeedSlider.getValue() / 100.0);
     m_tab.add(m_intakeTestCommand).withPosition(0, 10);
-
-    // botContainer.joystickSubsystem.operatorController.leftBumper.whileTrue(
-    //     new TestCommand(m_intakeSubsystem, () -> m_intakeSpeedSlider.getValue() / 100.0));
   }
 
   /** Updates dashboard widgets with subsystem measurements and obtains dashboard input values */
   public void updateDashboard(RobotContainer botContainer) {
-
-    // Update PID gains if they have changed
-    if (m_pidTuner.hasChanged()) {
-      System.out.println("<IntakeDashboardTab::updateDashboard> Update intake PID Gains");
-      m_intakeSubsystem.setPIDGains(m_pidTuner.getGains());
-    }
-
     // Update telemetry
     m_intakeSubsystem.getTelemetry(m_telemetry);
   }
@@ -226,9 +194,9 @@ public class IntakeDashboardTab implements IDashboardTab {
       // Set up a widget to display the motor RPM
       layout
           .addDouble(
-              "RPM",
+              "Speed (percent)",
               () -> {
-                return telemetrySupplier.get().motorRPM;
+                return telemetrySupplier.get().speedPercent;
               })
           .withWidget(BuiltInWidgets.kTextView)
           .withPosition(0, 3);

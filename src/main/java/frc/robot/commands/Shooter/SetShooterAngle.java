@@ -49,36 +49,42 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.subsystems.Intake;
+package frc.robot.commands.Shooter;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import java.util.function.Supplier;
+import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 
-/** Tests an intake preset */
-public class TestCommand extends CommandBase {
-  /** Tolerance used when determining if the intake has reached a given preset RPM */
-  static final double kTargetRPMToleranceDeg = 2.0;
-  /** IntakeSubsystem the command operates on */
-  private final IntakeSubsystem m_subsystem;
-  /** Supplier that provides the target RPM value */
-  private final Supplier<Double> m_speedSupplier;
+public class SetShooterAngle extends CommandBase {
+  /** Tolerance in degrees for the commanded pivot position */
+  private static final double kAngleToleranceDeg = 3.0;
 
-  /** Creates a new TestCommands. */
-  public TestCommand(IntakeSubsystem intakeSubsystem, Supplier<Double> speedSupplier) {
-    m_subsystem = intakeSubsystem;
-    m_speedSupplier = speedSupplier;
+  /** Subsystem the command operates on */
+  private final ShooterPivotSubsystem m_shooterPivotSubsystem;
+
+  private final double m_pivotDegrees;
+
+  /** Creates a new SetShooterPosition. */
+  public SetShooterAngle(ShooterPivotSubsystem shooterPivotSubsystem, double pivotDegrees) {
+    m_shooterPivotSubsystem = shooterPivotSubsystem;
+    m_pivotDegrees = pivotDegrees;
+    addRequirements(shooterPivotSubsystem);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    double speed = m_speedSupplier.get();
-    m_subsystem.setSpeedPercent(speed);
+    m_shooterPivotSubsystem.setAngleDegrees(m_pivotDegrees);
   }
 
-  // Called once the command ends or is interrupted.
+  // Returns true when the command should end.
   @Override
-  public void end(boolean interrupted) {
-    m_subsystem.stopIntake();
+  public boolean isFinished() {
+    double presentAngleDeg = m_shooterPivotSubsystem.getAngleDegrees();
+    double delta = Math.abs(presentAngleDeg - m_pivotDegrees);
+    SmartDashboard.putNumber("PivotTarget", m_pivotDegrees);
+    SmartDashboard.putNumber("PivotAngle", presentAngleDeg);
+    SmartDashboard.putNumber("PivotDelta", delta);
+    return delta < kAngleToleranceDeg;
   }
 }

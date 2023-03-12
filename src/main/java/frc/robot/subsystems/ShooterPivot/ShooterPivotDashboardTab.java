@@ -79,12 +79,6 @@ public class ShooterPivotDashboardTab implements IDashboardTab {
   /** Shuffleboard tab to display */
   private ShuffleboardTab m_tab;
 
-  /** Telemetry display for the master motor */
-  private MotorTelemetryPanel m_masterMotorPanel;
-
-  /** Telemetry display for the slave motor */
-  private MotorTelemetryPanel m_slaveMotorPanel;
-
   /** The subsystem addressed by the dashboard */
   private final ShooterPivotSubsystem m_shooterSubsystem;
 
@@ -108,8 +102,6 @@ public class ShooterPivotDashboardTab implements IDashboardTab {
   public ShooterPivotDashboardTab(ShooterPivotSubsystem subsystem) {
     m_shooterSubsystem = subsystem;
     m_telemetry = new ShooterPivotTelemetry();
-    m_masterMotorPanel = null;
-    m_slaveMotorPanel = null;
   }
 
   /** Called to initialize the dashboard tab */
@@ -117,25 +109,24 @@ public class ShooterPivotDashboardTab implements IDashboardTab {
     final String kTabTitle = "ShooterPivot";
     m_tab = Shuffleboard.getTab(kTabTitle);
 
-    m_masterMotorPanel =
-        new MotorTelemetryPanel(
-            m_tab,
-            "Master motor",
-            () -> m_telemetry.masterMotor,
-            0,
-            0 * kTelemetryPanelWidthCells,
-            kTelemetryPanelWidthCells,
-            kTelemetryPanelHeightCells);
+    // Create panels to display motor telemetry
+    new MotorTelemetryPanel(
+        m_tab,
+        "Master motor",
+        () -> m_telemetry.masterMotor,
+        0,
+        0 * kTelemetryPanelWidthCells,
+        kTelemetryPanelWidthCells,
+        kTelemetryPanelHeightCells);
 
-    m_slaveMotorPanel =
-        new MotorTelemetryPanel(
-            m_tab,
-            "Slave motor",
-            () -> m_telemetry.slaveMotor,
-            0,
-            1 * kTelemetryPanelWidthCells + 2,
-            kTelemetryPanelWidthCells,
-            kTelemetryPanelHeightCells);
+    new MotorTelemetryPanel(
+        m_tab,
+        "Slave motor",
+        () -> m_telemetry.slaveMotor,
+        0,
+        1 * kTelemetryPanelWidthCells + 2,
+        kTelemetryPanelWidthCells,
+        kTelemetryPanelHeightCells);
 
     m_kffSlider =
         new SliderWithChangeDetection(

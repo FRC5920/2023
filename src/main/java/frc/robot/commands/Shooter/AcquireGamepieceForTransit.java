@@ -49,36 +49,20 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.subsystems.Intake;
+package frc.robot.commands.Shooter;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import java.util.function.Supplier;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.subsystems.Intake.IntakeSubsystem;
+import frc.robot.subsystems.ShooterPivot.PivotPresets;
+import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 
-/** Tests an intake preset */
-public class TestCommand extends CommandBase {
-  /** Tolerance used when determining if the intake has reached a given preset RPM */
-  static final double kTargetRPMToleranceDeg = 2.0;
-  /** IntakeSubsystem the command operates on */
-  private final IntakeSubsystem m_subsystem;
-  /** Supplier that provides the target RPM value */
-  private final Supplier<Double> m_speedSupplier;
+public class AcquireGamepieceForTransit extends SequentialCommandGroup {
+  /** Creates a new instance of the command */
+  public AcquireGamepieceForTransit(
+      IntakeSubsystem intakeSubsystem, ShooterPivotSubsystem shooterPivotSubsystem) {
 
-  /** Creates a new TestCommands. */
-  public TestCommand(IntakeSubsystem intakeSubsystem, Supplier<Double> speedSupplier) {
-    m_subsystem = intakeSubsystem;
-    m_speedSupplier = speedSupplier;
-  }
-
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    double speed = m_speedSupplier.get();
-    m_subsystem.setSpeedPercent(speed);
-  }
-
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    m_subsystem.stopIntake();
+    addCommands(
+        new SetShooterAngle(shooterPivotSubsystem, PivotPresets.Acquire.angleDegrees),
+        new IntakeGamepiece(intakeSubsystem));
   }
 }

@@ -49,36 +49,32 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.subsystems.Intake;
+package frc.robot.subsystems.ShooterPivot;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import java.util.function.Supplier;
+/** Preset pivot angles */
+public enum PivotPresets {
+  /** Angle used to park the intake */
+  Park(0.0),
+  /** Angle used to acquire a game piece */
+  Acquire(180.0),
+  /** Angle used when transporting a game piece */
+  Transport(60),
+  /** Angle used for a short-range shot to the low grid */
+  ShortShotLow(170),
+  /** Angle used for a short-range shot to the middle grid */
+  ShortShotMid(135),
+  /** Angle used for a short-range shot to the high grid */
+  ShortShotHigh(125),
+  /** Angle used for a long-range shot to the low grid */
+  LongShotLow(170),
+  /** Angle used for a long-range shot to the middle grid */
+  LongShotMid(150),
+  /** Angle used for a long-range shot to the high grid */
+  LongShotHigh(135);
 
-/** Tests an intake preset */
-public class TestCommand extends CommandBase {
-  /** Tolerance used when determining if the intake has reached a given preset RPM */
-  static final double kTargetRPMToleranceDeg = 2.0;
-  /** IntakeSubsystem the command operates on */
-  private final IntakeSubsystem m_subsystem;
-  /** Supplier that provides the target RPM value */
-  private final Supplier<Double> m_speedSupplier;
+  public final double angleDegrees;
 
-  /** Creates a new TestCommands. */
-  public TestCommand(IntakeSubsystem intakeSubsystem, Supplier<Double> speedSupplier) {
-    m_subsystem = intakeSubsystem;
-    m_speedSupplier = speedSupplier;
-  }
-
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    double speed = m_speedSupplier.get();
-    m_subsystem.setSpeedPercent(speed);
-  }
-
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    m_subsystem.stopIntake();
+  private PivotPresets(double angle) {
+    angleDegrees = angle;
   }
 }
