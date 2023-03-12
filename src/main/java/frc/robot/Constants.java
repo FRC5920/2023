@@ -321,4 +321,22 @@ public final class Constants {
       return this.name();
     }
   };
+
+  ///////////////
+  public enum GameTarget {
+    Cone(1),
+    Cube(0),
+    DriveView(-1),
+    AprilTag2D(2);
+
+    public final int PipelineIndex;
+
+    private GameTarget(int count) {
+      this.PipelineIndex = count;
+    }
+
+    public int PipelineIndex() {
+      return PipelineIndex;
+    }
+  }
 }
