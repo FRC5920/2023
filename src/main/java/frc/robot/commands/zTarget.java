@@ -57,6 +57,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.Constants.GameTarget;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 import org.photonvision.PhotonCamera;
@@ -71,39 +72,35 @@ public class zTarget extends CommandBase {
   private Swerve s_Swerve;
   private ProcessedXboxController controller;
 
-  PhotonCamera fetchCamera;
+  PhotonCamera TargetingCamera;
   double rotation;
   PIDController turnController =
       new PIDController(
           Constants.ArmConstants.kFetchAngularP, 0, Constants.ArmConstants.kFetchAngularD);
-  Arm.GamePieceType fetchTarget;
+  GameTarget zTargetWhat;
 
   public ZTarget(
-      Arm.GamePieceType FetchWhat,
+      GameTarget TargetWhat,
       PhotonCamera camera,
       Swerve s_Swerve,
-      ProcessedXboxController controller,
+      JoystickSubsystem joystickSubsystem,
       boolean fieldRelative,
       boolean openLoop) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.s_Swerve = s_Swerve;
     addRequirements(s_Swerve);
 
-    this.controller = controller;
+    this.controller = joystickSubsystem.driverController;
     this.fieldRelative = fieldRelative;
     this.openLoop = openLoop;
-    fetchCamera = camera;
-    fetchTarget = FetchWhat;
+    this.TargetingCamera = camera;
+    this.zTargetWhat = TargetWhat;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if (fetchTarget == Arm.GamePieceType.Cone) {
-      fetchCamera.setPipelineIndex(Constants.VisionConstants.kConePipelineIndex);
-    } else {
-      fetchCamera.setPipelineIndex(Constants.VisionConstants.kCubePipelineIndex);
-    }
+    TargetingCamera.setPipelineIndex(zTargetWhat.PipelineIndex);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -115,7 +112,7 @@ public class zTarget extends CommandBase {
     yAxis = (Math.abs(yAxis) < Constants.DriverConstants.stickDeadband) ? 0 : yAxis;
     xAxis = (Math.abs(xAxis) < Constants.DriverConstants.stickDeadband) ? 0 : xAxis;
 
-    var result = fetchCamera.getLatestResult();
+    var result = TargetingCamera.getLatestResult();
 
     if (result.hasTargets()) {
       // Calculate angular turn power
@@ -133,7 +130,7 @@ public class zTarget extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    fetchCamera.setPipelineIndex(Constants.VisionConstants.kDriverCameraPipelineIndex);
+    TargetingCamera.setPipelineIndex(GameTarget.DriveView.PipelineIndex());
   }
 
   // Returns true when the command should end.
