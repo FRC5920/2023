@@ -51,36 +51,42 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.subsystems.Intake;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import java.util.function.Supplier;
 
 /** Tests an intake preset */
-public class TestRPMCommand extends CommandBase {
+public class TestCommand extends CommandBase {
+  public static final double kMaxRunTimeSec = 10.0;
+
   /** Tolerance used when determining if the intake has reached a given preset RPM */
   static final double kTargetRPMToleranceDeg = 2.0;
   /** IntakeSubsystem the command operates on */
   private final IntakeSubsystem m_subsystem;
   /** Supplier that provides the target RPM value */
-  private final Supplier<Double> m_rpmSupplier;
+  private final Supplier<Double> m_speedSupplier;
+
+  private double m_startTime;
 
   /** Creates a new TestCommands. */
-  public TestRPMCommand(IntakeSubsystem intakeSubsystem, Supplier<Double> rpmSupplier) {
+  public TestCommand(IntakeSubsystem intakeSubsystem, Supplier<Double> speedSupplier) {
     m_subsystem = intakeSubsystem;
-    m_rpmSupplier = rpmSupplier;
+    m_speedSupplier = speedSupplier;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    double rpm = m_rpmSupplier.get();
-    System.out.printf("<TestRPMCommand> Set intake speed to %.0f RPM\n", rpm);
-    m_subsystem.setRPM(rpm);
+    double speed = m_speedSupplier.get();
+    System.out.printf("<TestCommand> Set intake speed to %.0f\n", speed);
+    m_subsystem.setSpeedPercent(speed);
+    m_startTime = Timer.getFPGATimestamp();
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    System.out.printf("<TestRPMCommand> stop intake\n");
+    System.out.printf("<TestCommand> stop intake\n");
     m_subsystem.stopIntake();
   }
 }

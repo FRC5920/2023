@@ -51,7 +51,6 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.subsystems.Intake;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
@@ -71,21 +70,23 @@ public class IntakeSubsystem extends SubsystemBase {
   public static final int kIntakeSlaveMotorCANId = 41;
 
   /** Gear ratio used to couple intake motor axles to rollers */
-  public static final double kIntakeGearRatio = 1.0 / 5.0;
+  public static final double kIntakeGearRatio = 1.0 / 3.33;
 
   /** Default speed PID coefficients */
   public static final double kDefaultPID_kFF = 0.22;
 
   public static final double kDefaultPID_kP = 0.22;
-  public static final double kDefaultPID_kI = 0.002;
-  public static final double kDefaultPID_kD = 0;
+  public static final double kDefaultPID_kI = 0.000;
+  public static final double kDefaultPID_kD = 0.05;
   public static final double kDefaultPID_Iz = 100;
 
   public static final PIDGains kDefaultPIDGains =
       new PIDGains(kDefaultPID_kP, kDefaultPID_kI, kDefaultPID_kD, kDefaultPID_kFF);
 
   /** Peak output (%) that intake motors should run */
-  private static final double kMaxMotorOutputPercent = 0.2;
+  private static final double kMaxMotorOutputPercent = 0.75;
+  /** Time required to ramp from neutral to full scale motor output */
+  private static final double kOpenLoopRampSec = 0.5;
 
   private static final int kPIDLoopIdx = 0;
   private static final int kTimeoutMs = 30;
@@ -104,18 +105,18 @@ public class IntakeSubsystem extends SubsystemBase {
   final IntakeDashboardTab m_dashboardTab;
 
   public enum IntakePreset {
-    CubeIntake(0, -700.0),
-    ConeIntake(1, -800.0),
-    CloseShotLow(2, 700),
-    CloseShotMid(3, 1000),
-    CloseShotHigh(4, 1300);
+    CubeIntake(0, -10.0),
+    ConeIntake(1, -20.0),
+    CloseShotLow(2, 20.0),
+    CloseShotMid(3, 40.0),
+    CloseShotHigh(4, 50.0);
 
     public final int index;
-    public final double motorRPM;
+    public final double motorSpeed;
 
-    private IntakePreset(int idx, double rpm) {
+    private IntakePreset(int idx, double speedPercent) {
       index = idx;
-      motorRPM = rpm;
+      motorSpeed = speedPercent;
     }
   }
 
@@ -131,24 +132,23 @@ public class IntakeSubsystem extends SubsystemBase {
    * @param preset Preset to set the intake motors to
    */
   public void activatePreset(IntakePreset preset) {
-    setRPM(preset.motorRPM);
+    setSpeedPercent(preset.motorSpeed);
   }
 
   /**
    * Sets the intake motor speed to a given RPM
    *
-   * @param rpm Speed (RPM) to run the intake at
-   * @remarks Negative RPM values pull a game piece in; positive push it out.
+   * @param rpm Speed (percent of full scale output) to run the intake at
+   * @remarks Negative values pull a game piece in; positive push it out.
    */
-  public void setRPM(double rpm) {
+  public void setSpeedPercent(double percent) {
     // Convert RPM to falcon sensor velocity
-    double falconVelocity = Conversions.RPMToFalcon(rpm, kIntakeGearRatio);
-    m_masterMotor.set(ControlMode.Velocity, falconVelocity);
+    m_masterMotor.set(percent);
   }
 
   /** Deactivates intake motors */
   public void stopIntake() {
-    setRPM(0.0);
+    setSpeedPercent(0.0);
   }
 
   /** Returns the subsystem's dashboard tab */
@@ -169,6 +169,11 @@ public class IntakeSubsystem extends SubsystemBase {
     applyPIDGains(m_slaveMotor, gains);
   }
 
+  /** Returns the present motor speed */
+  public double getMotorSpeed() {
+    return m_masterMotor.get();
+  }
+
   /** Telemetry gathered from intake motors */
   public static class MotorTelemetry {
     /** Velocity of the motor in revolutions per minute (RPM) */
@@ -182,6 +187,11 @@ public class IntakeSubsystem extends SubsystemBase {
 
     /** Motor temperature measurement (Celcius) from the motor */
     double temperatureCelcius = 0.0;
+  }
+
+  /** Returns the present motor current reading in amps */
+  public double getMotorCurrentAmps() {
+    return m_masterMotor.getStatorCurrent();
   }
 
   /** Measurements gathered in the Arm subsystem */
@@ -268,6 +278,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     applyPIDGains(motor, gains);
     motor.config_IntegralZone(kPIDLoopIdx, kDefaultPID_Iz);
+    motor.configOpenloopRamp(kOpenLoopRampSec);
   }
 
   /** Called by the scheduler to service the subsystem */

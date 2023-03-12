@@ -51,7 +51,6 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.subsystems.Intake;
 
-import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -97,7 +96,7 @@ public class IntakeDashboardTab implements IDashboardTab {
   private PIDGains m_pidGains = IntakeSubsystem.kDefaultPIDGains;
 
   // Commands for testing
-  private TestRPMCommand m_intakeTestCommand;
+  private TestCommand m_intakeTestCommand;
 
   SliderWithChangeDetection m_intakeSpeedSlider;
 
@@ -139,16 +138,19 @@ public class IntakeDashboardTab implements IDashboardTab {
     m_intakeSpeedSlider =
         new SliderWithChangeDetection(
             m_tab,
-            "Cube Intake RPM",
-            IntakeSubsystem.IntakePreset.CubeIntake.motorRPM,
+            "Intake Speed (percent)",
+            IntakeSubsystem.IntakePreset.CubeIntake.motorSpeed,
+            0,
             100,
-            4000,
-            10);
+            1);
     m_intakeSpeedSlider.getWidget().withPosition(4, 10).withSize(5, 2);
 
     m_intakeTestCommand =
-        new TestRPMCommand(m_intakeSubsystem, () -> m_intakeSpeedSlider.getValue());
+        new TestCommand(m_intakeSubsystem, () -> m_intakeSpeedSlider.getValue() / 100.0);
     m_tab.add(m_intakeTestCommand).withPosition(0, 10);
+
+    // botContainer.joystickSubsystem.operatorController.leftBumper.whileTrue(
+    //     new TestCommand(m_intakeSubsystem, () -> m_intakeSpeedSlider.getValue() / 100.0));
   }
 
   /** Updates dashboard widgets with subsystem measurements and obtains dashboard input values */
@@ -231,31 +233,5 @@ public class IntakeDashboardTab implements IDashboardTab {
           .withWidget(BuiltInWidgets.kTextView)
           .withPosition(0, 3);
     }
-  }
-
-  /**
-   * Creates a panel for intake speed
-   *
-   * @param panelRow Row position of the panel on the dashboard
-   * @param panelCol Column position of the panel on the dashboard
-   * @param widthCells Width of the panel in cells
-   * @param heightCells Height of the panel in cells
-   */
-  private GenericEntry createMotorSpeedSlider(
-      String panelTitle, int row, int column, int widthCells, int heightCells) {
-
-    Map<String, Object> speedSliderMap =
-        Map.of("min", 0.00, "max", 3000.0, "Block increment", 10.0);
-    // Set up a slider to control motor speed during intake
-    GenericEntry ntEntry =
-        m_tab
-            .add(panelTitle, 0.0)
-            .withWidget(BuiltInWidgets.kNumberSlider)
-            .withProperties(speedSliderMap) // slider min/max/increment
-            .withPosition(column, row)
-            .withSize(widthCells, heightCells)
-            .getEntry();
-
-    return ntEntry;
   }
 }

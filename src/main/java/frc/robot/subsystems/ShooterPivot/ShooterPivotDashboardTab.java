@@ -139,7 +139,7 @@ public class ShooterPivotDashboardTab implements IDashboardTab {
 
     m_kffSlider =
         new SliderWithChangeDetection(
-            m_tab, "kFF", ShooterPivotSubsystem.kDefaultPivotPID_kFF, 0, 1, 0.001);
+            m_tab, "kFF", ShooterPivotSubsystem.kDefaultPivotPID_kFF, 0, 3, 0.001);
     m_kffSlider.getWidget().withPosition(17, 0).withSize(kTelemetryPanelWidthCells + 4, 3);
 
     m_positionSlider = new SliderWithChangeDetection(m_tab, "Test Position (Deg)", 0, 0, 200, 1.0);

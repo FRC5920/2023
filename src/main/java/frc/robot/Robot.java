@@ -214,10 +214,6 @@ public class Robot extends LoggedRobot {
   public void teleopPeriodic() {
     ProcessedXboxController operatorController =
         m_robotContainer.joystickSubsystem.operatorController;
-
-    if (operatorController.leftBumper.getAsBoolean()) {
-      m_robotContainer.intakeSubsystem.DEBUG_setMotorPercent(operatorController.getRightY());
-    }
   }
 
   @Override

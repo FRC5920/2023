@@ -71,12 +71,12 @@ public class ShooterPivotSubsystem extends SubsystemBase {
   public static final int kPivotSlaveMotorCANId = 31;
 
   /** Gear ratio used to couple pivot motor axles to pivot drive */
-  public static final double kPivotGearRatio = 1.0 / 7.0;
+  public static final double kPivotGearRatio = 1.0 / 21.0;
 
   /** Default pivot PID coefficients */
-  public static final double kDefaultPivotPID_kFF = 0.0;
+  public static final double kDefaultPivotPID_kFF = 0.3;
 
-  public static final double kDefaultPivotPID_kP = 0.35;
+  public static final double kDefaultPivotPID_kP = 0.145;
   public static final double kDefaultPivotPID_kI = 0.0;
   public static final double kDefaultPivotPID_kD = 0.05;
   public static final double kDefaultPivotPID_Iz = 0.01;
@@ -120,7 +120,7 @@ public class ShooterPivotSubsystem extends SubsystemBase {
     /** Angle used to park the intake */
     Park(0, 0.0),
     /** Angle used to acquire a game piece */
-    Acquire(1, 193.0),
+    Acquire(1, 180.0),
     /** Angle used when transporting a game piece */
     Transport(2, 70),
     /** Angle used for a short-range shot to the low grid */
@@ -341,7 +341,7 @@ public class ShooterPivotSubsystem extends SubsystemBase {
     motor.configSelectedFeedbackSensor(
         TalonFXFeedbackDevice.IntegratedSensor, kPIDLoopIdx, kTimeoutMs);
     motor.setSensorPhase(true);
-    motor.configAllowableClosedloopError(0, degreesToFalconTicks(2), kTimeoutMs);
+    motor.configAllowableClosedloopError(0, degreesToFalconTicks(5), kTimeoutMs);
 
     // Select a motion profile slot
     int kSlotIdx = 0;

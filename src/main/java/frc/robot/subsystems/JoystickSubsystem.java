@@ -61,6 +61,7 @@ import frc.robot.Constants.GameTarget;
 import frc.robot.RobotContainer;
 import frc.robot.commands.Balance;
 import frc.robot.commands.zTarget;
+import frc.robot.commands.Shooter.IntakeGamepiece;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem.PivotPreset;
 
 /** A subsystem providing/managing Xbox controllers for driving the robot manually */
@@ -193,7 +194,8 @@ public class JoystickSubsystem extends SubsystemBase {
     operatorController.Y.onTrue(
         new InstantCommand(
             () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPreset.ShortShotHigh)));
-    operatorController.leftBumper.whileTrue(new InstantCommand(this::doNothing, this));
+    operatorController.leftBumper.whileTrue(
+        new IntakeGamepiece(botContainer.intakeSubsystem, botContainer.shooterPivotSubsystem));
     operatorController.rightBumper.whileTrue(
         new InstantCommand(
             () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPreset.Acquire)));
