@@ -46,6 +46,8 @@
       "/Shuffleboard/Auto Builder/Waypoint": "String Chooser",
       "/Shuffleboard/Intake Subsystem/Speed PID": "PIDController",
       "/Shuffleboard/Intake/Speed PID": "PIDController",
+      "/Shuffleboard/Intake/TestRPMCommand": "Command",
+      "/Shuffleboard/Intake/Velocity PID": "PIDController",
       "/Shuffleboard/PoseEstimator/Field": "Field2d",
       "/Shuffleboard/ShooterPivot/Position PID": "PIDController",
       "/Shuffleboard/SwerveDrive/FrontLeft/Angle/Degrees": "Gyro",
@@ -108,6 +110,11 @@
       "/Shuffleboard/Auto Builder/Translation PID": {
         "window": {
           "name": "Translation PID",
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Intake/TestRPMCommand": {
+        "window": {
           "visible": true
         }
       }

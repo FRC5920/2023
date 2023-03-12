@@ -106,9 +106,9 @@ public class IntakeSubsystem extends SubsystemBase {
   public enum IntakePreset {
     CubeIntake(0, -700.0),
     ConeIntake(1, -800.0),
-    PlaceLow(2, 700),
-    PlaceMid(3, 1000),
-    PlaceHigh(4, 1300);
+    CloseShotLow(2, 700),
+    CloseShotMid(3, 1000),
+    CloseShotHigh(4, 1300);
 
     public final int index;
     public final double motorRPM;
@@ -130,13 +130,8 @@ public class IntakeSubsystem extends SubsystemBase {
    *
    * @param preset Preset to set the intake motors to
    */
-  private void runIntake(IntakePreset preset) {
-    setIntakeRPM(preset.motorRPM);
-  }
-
-  /** Deactivates intake motors */
-  public void stopIntake() {
-    setIntakeRPM(0.0);
+  public void activatePreset(IntakePreset preset) {
+    setRPM(preset.motorRPM);
   }
 
   /**
@@ -145,10 +140,15 @@ public class IntakeSubsystem extends SubsystemBase {
    * @param rpm Speed (RPM) to run the intake at
    * @remarks Negative RPM values pull a game piece in; positive push it out.
    */
-  public void setIntakeRPM(double rpm) {
+  public void setRPM(double rpm) {
     // Convert RPM to falcon sensor velocity
     double falconVelocity = Conversions.RPMToFalcon(rpm, kIntakeGearRatio);
     m_masterMotor.set(ControlMode.Velocity, falconVelocity);
+  }
+
+  /** Deactivates intake motors */
+  public void stopIntake() {
+    setRPM(0.0);
   }
 
   /** Returns the subsystem's dashboard tab */

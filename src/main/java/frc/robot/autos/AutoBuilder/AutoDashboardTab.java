@@ -214,6 +214,7 @@ public class AutoDashboardTab implements IDashboardTab {
         || rotationPIDChanged
         || m_bumpChoice.hasChanged()) {
 
+      System.out.println("<AutoDashboardTab::updateDashboard> processing dashboard value change");
       m_lastAlliance = currentAlliance;
 
       // Rebuild the auto routine

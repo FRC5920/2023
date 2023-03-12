@@ -59,7 +59,6 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.lib.dashboard.WidgetsWithChangeDetection.PIDTunerPanel;
 import frc.lib.dashboard.WidgetsWithChangeDetection.SliderWithChangeDetection;
-import frc.lib.dashboard.WidgetsWithChangeDetection.ToggleButtonWithChangeDetection;
 import frc.lib.utility.PIDGains;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Dashboard.IDashboardTab;
@@ -92,16 +91,15 @@ public class IntakeDashboardTab implements IDashboardTab {
   /** Measurements populated by the subsystem */
   private final IntakeSubsystemTelemetry m_telemetry;
 
-  /** Slider used to set test motor speed for intake */
-  private SliderWithChangeDetection m_motorRPMSlider;
-
-  /** Toggle button used to enable/disable motor at speed */
-  private ToggleButtonWithChangeDetection m_motorEnableToggle;
-
   /** PID tuner panel */
   private PIDTunerPanel m_pidTuner;
 
   private PIDGains m_pidGains = IntakeSubsystem.kDefaultPIDGains;
+
+  // Commands for testing
+  private TestRPMCommand m_intakeTestCommand;
+
+  SliderWithChangeDetection m_intakeSpeedSlider;
 
   /** Create an instance of the tab */
   public IntakeDashboardTab(IntakeSubsystem subsystem) {
@@ -136,20 +134,21 @@ public class IntakeDashboardTab implements IDashboardTab {
             kTelemetryPanelWidthCells,
             kTelemetryPanelHeightCells);
 
-    m_pidTuner = new PIDTunerPanel(m_tab, "Velocity PID", 5, 17, m_pidGains);
+    m_pidTuner = new PIDTunerPanel(m_tab, "Velocity PID", 0, 17, m_pidGains);
 
-    m_motorRPMSlider =
-        new SliderWithChangeDetection(m_tab, "Test Speed (RPM)", 100, -5000, 5000, 10);
-    m_motorRPMSlider
-        .getWidget()
-        .withPosition(3, kTelemetryPanelHeightCells + 4)
-        .withSize(kTelemetryPanelWidthCells + 4, 3);
+    m_intakeSpeedSlider =
+        new SliderWithChangeDetection(
+            m_tab,
+            "Cube Intake RPM",
+            IntakeSubsystem.IntakePreset.CubeIntake.motorRPM,
+            100,
+            4000,
+            10);
+    m_intakeSpeedSlider.getWidget().withPosition(4, 10).withSize(5, 2);
 
-    m_motorEnableToggle = new ToggleButtonWithChangeDetection(m_tab, "Enable", false);
-    m_motorEnableToggle
-        .getWidget()
-        .withPosition(3 + (kTelemetryPanelWidthCells + 4), kTelemetryPanelHeightCells + 4)
-        .withSize(3, 3);
+    m_intakeTestCommand =
+        new TestRPMCommand(m_intakeSubsystem, () -> m_intakeSpeedSlider.getValue());
+    m_tab.add(m_intakeTestCommand).withPosition(0, 10);
   }
 
   /** Updates dashboard widgets with subsystem measurements and obtains dashboard input values */
@@ -157,17 +156,8 @@ public class IntakeDashboardTab implements IDashboardTab {
 
     // Update PID gains if they have changed
     if (m_pidTuner.hasChanged()) {
+      System.out.println("<IntakeDashboardTab::updateDashboard> Update intake PID Gains");
       m_intakeSubsystem.setPIDGains(m_pidTuner.getGains());
-    }
-
-    // Test the motor speed if any widgets have changed
-    if (m_motorEnableToggle.hasChanged() || m_motorRPMSlider.hasChanged()) {
-      boolean intakeIsActivated = m_motorEnableToggle.getValue();
-      if (intakeIsActivated) {
-        m_intakeSubsystem.setIntakeRPM(m_motorRPMSlider.getValue());
-      } else {
-        m_intakeSubsystem.stopIntake();
-      }
     }
 
     // Update telemetry

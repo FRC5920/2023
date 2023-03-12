@@ -162,6 +162,7 @@ public class ShooterPivotDashboardTab implements IDashboardTab {
 
     // Update PID gains if they have changed
     if (m_pidTuner.hasChanged() || m_kffSlider.hasChanged()) {
+      System.out.println("<AutoDashboardTab::updateDashboard> processing PID value change");
       PIDGains gains = m_pidTuner.getGains();
       gains.kFF = m_kffSlider.getValue();
       m_shooterSubsystem.setPIDGains(gains);
@@ -169,6 +170,7 @@ public class ShooterPivotDashboardTab implements IDashboardTab {
 
     // Test the motor speed if any widgets have changed
     if (m_motorEnableToggle.hasChanged() || m_positionSlider.hasChanged()) {
+      System.out.println("<AutoDashboardTab::updateDashboard> processing Motor speed change");
       double setpoint = m_motorEnableToggle.getValue() ? m_positionSlider.getValue() : 0.0;
       m_shooterSubsystem.setAngleDegrees(setpoint);
     }

@@ -49,46 +49,38 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.lib.utility;
+package frc.robot.subsystems.Intake;
 
-/** An object wrapping gains for a PID controller */
-public class PIDGains {
-  /** Feed-forward gain coefficient */
-  public double kFF = 0;
-  /** Proportional gain coefficient */
-  public double kP = 0;
-  /** Integral gain coefficient */
-  public double kI = 0;
-  /** Derivative gain coefficient */
-  public double kD = 0;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import java.util.function.Supplier;
 
-  /** Default constructor sets all gains to zero */
-  public PIDGains() {}
+/** Tests an intake preset */
+public class TestRPMCommand extends CommandBase {
+  /** Tolerance used when determining if the intake has reached a given preset RPM */
+  static final double kTargetRPMToleranceDeg = 2.0;
+  /** IntakeSubsystem the command operates on */
+  private final IntakeSubsystem m_subsystem;
+  /** Supplier that provides the target RPM value */
+  private final Supplier<Double> m_rpmSupplier;
 
-  /** Construct with initial gains (zero feed-forward gain) */
-  public PIDGains(double _kP, double _kI, double _kD) {
-    kFF = 0.0;
-    kP = _kP;
-    kI = _kI;
-    kD = _kD;
+  /** Creates a new TestCommands. */
+  public TestRPMCommand(IntakeSubsystem intakeSubsystem, Supplier<Double> rpmSupplier) {
+    m_subsystem = intakeSubsystem;
+    m_rpmSupplier = rpmSupplier;
   }
 
-  /** Construct with initial PID and feed-forward gains */
-  public PIDGains(double _kP, double _kI, double _kD, double _kFF) {
-    kFF = _kFF;
-    kP = _kP;
-    kI = _kI;
-    kD = _kD;
+  // Called when the command is initially scheduled.
+  @Override
+  public void initialize() {
+    double rpm = m_rpmSupplier.get();
+    System.out.printf("<TestRPMCommand> Set intake speed to %.0f RPM\n", rpm);
+    m_subsystem.setRPM(rpm);
   }
 
-  /**
-   * Returns true if the object's gains are equal to another PIDGains
-   *
-   * @param other Other PIDGains object to compare for equality
-   */
-  public boolean isEqual(PIDGains other) {
-    return (0 == Double.compare(kP, other.kP))
-        && (0 == Double.compare(kI, other.kI))
-        && (0 == Double.compare(kD, other.kD));
+  // Called once the command ends or is interrupted.
+  @Override
+  public void end(boolean interrupted) {
+    System.out.printf("<TestRPMCommand> stop intake\n");
+    m_subsystem.stopIntake();
   }
 }
