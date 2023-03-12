@@ -102,7 +102,7 @@ public class IntakeSubsystem extends SubsystemBase {
   private PIDGains m_speedPIDGains = kDefaultPIDGains;
 
   /** Dashboard tab for the intake subsystem */
-  final IntakeDashboardTab m_dashboardTab = new IntakeDashboardTab(this);
+  final IntakeDashboardTab m_dashboardTab;
 
   public enum IntakePreset {
     CubeIntake(0, -100.0),
@@ -122,6 +122,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   /** Creates an instance of the subsystem */
   public IntakeSubsystem() {
+    m_dashboardTab = (kEnableDashboardTab) ? new IntakeDashboardTab(this) : null;
     configureMotors();
   }
 
@@ -136,7 +137,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   /** Deactivates intake motors */
   public void stopIntake() {
-    m_intakeMotorGroup.set(0.0);
+    setIntakeRPM(0.0);
   }
 
   /** Called by the scheduler to service the subsystem */

@@ -53,8 +53,11 @@ package frc.robot.subsystems.ShooterPivot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.utility.PIDGains;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
@@ -68,31 +71,36 @@ public class ShooterPivotSubsystem extends SubsystemBase {
   public static final int kPivotSlaveMotorCANId = 31;
 
   /** Gear ratio used to couple pivot motor axles to pivot drive */
-  public static final double kPivotGearRatio = 1.0 / 1.0;
+  public static final double kPivotGearRatio = 1.0 / 7.0;
 
   /** Default pivot PID coefficients */
-  public static final double kDefaultPivotPID_kFF = 0.22;
+  public static final double kDefaultPivotPID_kFF = 0.0;
 
-  public static final double kDefaultPivotPID_kP = 0.22;
-  public static final double kDefaultPivotPID_kI = 0.002;
-  public static final double kDefaultPivotPID_kD = 0;
-  public static final double kDefaultPivotPID_Iz = 100;
+  public static final double kDefaultPivotPID_kP = 0.35;
+  public static final double kDefaultPivotPID_kI = 0.0;
+  public static final double kDefaultPivotPID_kD = 0.05;
+  public static final double kDefaultPivotPID_Iz = 0.01;
 
   public static final PIDGains kDefaultPIDGains =
       new PIDGains(
           kDefaultPivotPID_kP, kDefaultPivotPID_kI, kDefaultPivotPID_kD, kDefaultPivotPID_kFF);
 
+  public static final double kMotionCruiseVelocityDegPerSec = 30.0;
+  public static final double kMotionAccelerationDegPerSec2 = 15.0;
+  public static final int kMotionSmoothing = 8;
+
   /** Peak output (%) that intake motors should run */
-  private static final double kMaxMotorOutputPercent = 0.2;
+  private static final double kMaxMotorOutputPercent = 1.0;
 
   // FalconFX reports position in sensor ticks
   // 1 revolution = 2048 counts
-  private final double kFalconTicksPerRevolution = 2048.0;
+  private static final double kFalconTicksPerRevolution = 2048.0;
 
   // Conversion factor for FalconFX sensor ticks to degrees
-  private final double kFalconTicksPerDegree = kFalconTicksPerRevolution / 180.0;
+  private static final double kDegreesPerFalconTick = 360.0 / kFalconTicksPerRevolution;
+  private static final double kFalconTicksPerDegree = kFalconTicksPerRevolution / 360.0;
 
-  private final int kPIDLoopIdx = 0;
+  private static final int kPIDLoopIdx = 0;
 
   /** Motors that drive the pivot angle */
   private final WPI_TalonFX m_masterMotor = new WPI_TalonFX(kPivotMasterMotorCANId);
@@ -105,25 +113,27 @@ public class ShooterPivotSubsystem extends SubsystemBase {
   private PIDGains m_pivotPIDGains = kDefaultPIDGains;
 
   /** Dashboard tab for the shooter pivot subsystem */
-  final ShooterPivotDashboardTab m_dashboardTab = new ShooterPivotDashboardTab(this);
+  final ShooterPivotDashboardTab m_dashboardTab;
 
   public enum PivotPreset {
+    /** Angle used to park the intake */
+    Park(0, 0.0),
     /** Angle used to acquire a game piece */
-    Acquire(0, 0),
+    Acquire(1, 193.0),
     /** Angle used when transporting a game piece */
-    Transport(1, 45),
+    Transport(2, 70),
     /** Angle used for a short-range shot to the low grid */
-    ShortShotLow(2, 0),
+    ShortShotLow(3, 170),
     /** Angle used for a short-range shot to the middle grid */
-    ShortShotMid(3, 50),
+    ShortShotMid(4, 135),
     /** Angle used for a short-range shot to the high grid */
-    ShortShotHigh(4, 60),
+    ShortShotHigh(5, 125),
     /** Angle used for a long-range shot to the low grid */
-    LongShotLow(5, 20),
+    LongShotLow(6, 170),
     /** Angle used for a long-range shot to the middle grid */
-    LongShotMid(6, 30),
+    LongShotMid(7, 150),
     /** Angle used for a long-range shot to the high grid */
-    LongShotHigh(7, 45);
+    LongShotHigh(8, 135);
 
     public final int index;
     public final double angleDegrees;
@@ -136,6 +146,7 @@ public class ShooterPivotSubsystem extends SubsystemBase {
 
   /** Creates a new ShooterPivot. */
   public ShooterPivotSubsystem() {
+    m_dashboardTab = (kEnableDashboardTab) ? new ShooterPivotDashboardTab(this) : null;
     configureMotors();
   }
 
@@ -144,7 +155,7 @@ public class ShooterPivotSubsystem extends SubsystemBase {
    *
    * @param preset Preset angle to set the pivot to
    */
-  private void runIntake(PivotPreset preset) {
+  public void setAnglePreset(PivotPreset preset) {
     setAngleDegrees(preset.angleDegrees);
   }
 
@@ -160,8 +171,16 @@ public class ShooterPivotSubsystem extends SubsystemBase {
    */
   public void setAngleDegrees(double degrees) {
     // Convert RPM to falcon sensor velocity
-    double falconTicks = degrees * kFalconTicksPerDegree * kPivotGearRatio;
-    m_masterMotor.set(ControlMode.Position, falconTicks);
+    double falconTicks = degreesToFalconTicks(degrees);
+    SmartDashboard.putNumber("CommandedDegrees", degrees);
+    SmartDashboard.putNumber("CommandedTicks", falconTicks);
+    m_masterMotor.set(TalonFXControlMode.MotionMagic, falconTicks);
+  }
+
+  /** Resets the encoder count in pivot motors */
+  public void zeroSensorPosition() {
+    m_masterMotor.setSelectedSensorPosition(0);
+    m_slaveMotor.setSelectedSensorPosition(0);
   }
 
   /**
@@ -170,7 +189,7 @@ public class ShooterPivotSubsystem extends SubsystemBase {
    * @param speedPercent Speed to run the motor: 0.0 (stop) to 1.0 (forward) or (-1.0) (reverse)
    */
   public void DEBUG_runPivotMotor(double speedPercent) {
-    m_pivotMotorGroup.set(speedPercent);
+    m_masterMotor.set(ControlMode.PercentOutput, speedPercent * kMaxMotorOutputPercent);
   }
 
   /** Returns the subsystem's dashboard tab */
@@ -182,24 +201,59 @@ public class ShooterPivotSubsystem extends SubsystemBase {
 
   /** Configure motors in the subsystem */
   private void configureMotors() {
-    final int kPIDLoopIdx = 0;
-    final int kTimeoutMs = 30;
+
+    // Reset motors to factory defaults
+    m_masterMotor.configFactoryDefault();
+    m_slaveMotor.configFactoryDefault();
 
     // Configure intake motors
     m_slaveMotor.follow(m_masterMotor);
-    m_masterMotor.setNeutralMode(NeutralMode.Brake);
-    applyPIDGains(m_masterMotor, kDefaultPIDGains);
-    m_masterMotor.config_IntegralZone(kPIDLoopIdx, kDefaultPivotPID_Iz);
-    m_masterMotor.configPeakOutputForward(kMaxMotorOutputPercent, kTimeoutMs);
-    m_masterMotor.configPeakOutputReverse(-1.0 * kMaxMotorOutputPercent, kTimeoutMs);
+    m_masterMotor.setInverted(false);
+    m_slaveMotor.setInverted(true);
 
-    // Configure pivot motors
-    m_slaveMotor.follow(m_masterMotor);
-    m_slaveMotor.setNeutralMode(NeutralMode.Brake);
-    applyPIDGains(m_slaveMotor, kDefaultPIDGains);
-    m_slaveMotor.config_IntegralZone(kPIDLoopIdx, kDefaultPivotPID_Iz);
-    m_slaveMotor.configPeakOutputForward(kMaxMotorOutputPercent, kTimeoutMs);
-    m_slaveMotor.configPeakOutputReverse(-1.0 * kMaxMotorOutputPercent, kTimeoutMs);
+    // Configure closed-loop control
+    configureMotorControl(m_masterMotor, m_pivotPIDGains, kMaxMotorOutputPercent);
+    configureMotorControl(m_slaveMotor, m_pivotPIDGains, kMaxMotorOutputPercent);
+
+    // Zero the internal sensor position on startup
+    zeroSensorPosition();
+  }
+
+  private static void configureMotorControl(
+      WPI_TalonFX motor, PIDGains gains, double maxOutputPercent) {
+    final int kPIDLoopIdx = 0;
+    final int kTimeoutMs = 30;
+
+    // Set up neutral mode behavior
+    motor.setNeutralMode(NeutralMode.Brake);
+    // Set deadband to super small 0.001 (0.1 %) the default deadband is 0.04 (4 %)
+    motor.configNeutralDeadband(0.01, kTimeoutMs);
+
+    /* Config the peak and nominal outputs, 12V means full */
+    motor.configNominalOutputForward(0, kTimeoutMs);
+    motor.configNominalOutputReverse(0, kTimeoutMs);
+    motor.configPeakOutputForward(maxOutputPercent, kTimeoutMs);
+    motor.configPeakOutputReverse(-1.0 * maxOutputPercent, kTimeoutMs);
+
+    // Set up closed loop control
+    motor.configSelectedFeedbackSensor(
+        TalonFXFeedbackDevice.IntegratedSensor, kPIDLoopIdx, kTimeoutMs);
+    motor.setSensorPhase(true);
+    motor.configAllowableClosedloopError(0, degreesToFalconTicks(2), kTimeoutMs);
+
+    // Select a motion profile slot
+    int kSlotIdx = 0;
+    motor.selectProfileSlot(kSlotIdx, kPIDLoopIdx);
+
+    // Set up PID gains
+    applyPIDGains(motor, kDefaultPIDGains);
+    motor.config_IntegralZone(kPIDLoopIdx, kDefaultPivotPID_Iz);
+
+    // Set acceleration and cruise velocity
+    motor.configMotionCruiseVelocity(
+        degreesToFalconTicks(kMotionCruiseVelocityDegPerSec), kTimeoutMs);
+    motor.configMotionAcceleration(degreesToFalconTicks(kMotionAccelerationDegPerSec2), kTimeoutMs);
+    motor.configMotionSCurveStrength(kMotionSmoothing);
   }
 
   /**
@@ -246,19 +300,45 @@ public class ShooterPivotSubsystem extends SubsystemBase {
   public void getTelemetry(ShooterPivotTelemetry telemetry) {
     // Gather telemetry from front roller motor
     telemetry.masterMotor.sensorPositionTicks = m_masterMotor.getSelectedSensorPosition();
-    telemetry.masterMotor.sensorPositionTicks =
-        telemetry.masterMotor.sensorPositionTicks / kFalconTicksPerDegree;
+    telemetry.masterMotor.positionDegrees =
+        falconTicksToDegrees(telemetry.masterMotor.sensorPositionTicks);
     telemetry.masterMotor.motorVolts = m_masterMotor.getMotorOutputVoltage();
     telemetry.masterMotor.statorCurrentAmps = m_masterMotor.getStatorCurrent();
     telemetry.masterMotor.temperatureCelcius = m_masterMotor.getTemperature();
     telemetry.slaveMotor.sensorPositionTicks = m_masterMotor.getSelectedSensorPosition();
-    telemetry.slaveMotor.sensorPositionTicks =
-        telemetry.slaveMotor.sensorPositionTicks / kFalconTicksPerDegree;
+    telemetry.slaveMotor.positionDegrees =
+        falconTicksToDegrees(telemetry.slaveMotor.sensorPositionTicks);
     telemetry.slaveMotor.motorVolts = m_masterMotor.getMotorOutputVoltage();
     telemetry.slaveMotor.statorCurrentAmps = m_masterMotor.getStatorCurrent();
     telemetry.slaveMotor.temperatureCelcius = m_masterMotor.getTemperature();
   }
 
+  /**
+   * Converts an angle in degrees to Falcon ticks
+   *
+   * @param degrees Angle in degrees to convert
+   * @return Equivalent value in Falcon ticks
+   */
+  static double degreesToFalconTicks(double degrees) {
+    return degrees / kPivotGearRatio * kFalconTicksPerDegree;
+  }
+
+  /**
+   * Converts a Falcon ticks value to an equivalent angle in degrees
+   *
+   * @param falconTicks Falcon ticks value to convert
+   * @return Equivalent value in degrees
+   */
+  static double falconTicksToDegrees(double falconTicks) {
+    return falconTicks * kPivotGearRatio * kDegreesPerFalconTick;
+  }
+
+  /**
+   * applyPIDGains applies PID gains to a given motor
+   *
+   * @param motor Motor to apply gains to
+   * @param gains Gains to apply
+   */
   private static void applyPIDGains(WPI_TalonFX motor, PIDGains gains) {
     final int timeoutMs = 10;
     final int kPIDLoopIdx = 0;

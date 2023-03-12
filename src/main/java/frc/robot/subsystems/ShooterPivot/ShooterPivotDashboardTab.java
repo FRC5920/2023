@@ -51,7 +51,6 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.subsystems.ShooterPivot;
 
-import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -86,18 +85,20 @@ public class ShooterPivotDashboardTab implements IDashboardTab {
   /** Telemetry display for the slave motor */
   private MotorTelemetryPanel m_slaveMotorPanel;
 
-  /** The intake subsystem addressed by the dashboard */
+  /** The subsystem addressed by the dashboard */
   private final ShooterPivotSubsystem m_shooterSubsystem;
 
   /** Measurements populated by the subsystem */
   private final ShooterPivotTelemetry m_telemetry;
 
-  /** Slider used to set test motor speed for intake */
+  /** Slider used to set pivot motor position */
   private SliderWithChangeDetection m_positionSlider;
 
   /** Toggle button used to enable/disable motor at speed */
   private ToggleButtonWithChangeDetection m_motorEnableToggle;
 
+  /** Slider used to set feed-forward value for motor controller */
+  private SliderWithChangeDetection m_kffSlider;
   /** PID tuner panel */
   private PIDTunerPanel m_pidTuner;
 
@@ -136,10 +137,12 @@ public class ShooterPivotDashboardTab implements IDashboardTab {
             kTelemetryPanelWidthCells,
             kTelemetryPanelHeightCells);
 
-    m_pidTuner =
-        new PIDTunerPanel(m_tab, "Position PID", kTelemetryPanelHeightCells + 4, 0, m_pidGains);
+    m_kffSlider =
+        new SliderWithChangeDetection(
+            m_tab, "kFF", ShooterPivotSubsystem.kDefaultPivotPID_kFF, 0, 1, 0.001);
+    m_kffSlider.getWidget().withPosition(17, 0).withSize(kTelemetryPanelWidthCells + 4, 3);
 
-    m_positionSlider = new SliderWithChangeDetection(m_tab, "Test Position (Deg)", 100, -35, 135);
+    m_positionSlider = new SliderWithChangeDetection(m_tab, "Test Position (Deg)", 0, 0, 200, 1.0);
     m_positionSlider
         .getWidget()
         .withPosition(3, kTelemetryPanelHeightCells + 4)
@@ -150,21 +153,24 @@ public class ShooterPivotDashboardTab implements IDashboardTab {
         .getWidget()
         .withPosition(3 + (kTelemetryPanelWidthCells + 4), kTelemetryPanelHeightCells + 4)
         .withSize(3, 3);
+
+    m_pidTuner = new PIDTunerPanel(m_tab, "Position PID", 5, 17, m_pidGains);
   }
 
   /** Updates dashboard widgets with subsystem measurements and obtains dashboard input values */
   public void updateDashboard(RobotContainer botContainer) {
 
     // Update PID gains if they have changed
-    if (m_pidTuner.hasChanged()) {
-      m_shooterSubsystem.setPIDGains(m_pidTuner.getGains());
+    if (m_pidTuner.hasChanged() || m_kffSlider.hasChanged()) {
+      PIDGains gains = m_pidTuner.getGains();
+      gains.kFF = m_kffSlider.getValue();
+      m_shooterSubsystem.setPIDGains(gains);
     }
 
     // Test the motor speed if any widgets have changed
     if (m_motorEnableToggle.hasChanged() || m_positionSlider.hasChanged()) {
-      if (m_motorEnableToggle.getValue()) {
-        m_shooterSubsystem.setAngleDegrees(m_positionSlider.getValue());
-      }
+      double setpoint = m_motorEnableToggle.getValue() ? m_positionSlider.getValue() : 0.0;
+      m_shooterSubsystem.setAngleDegrees(setpoint);
     }
 
     // Update telemetry
@@ -248,31 +254,5 @@ public class ShooterPivotDashboardTab implements IDashboardTab {
           .withWidget(BuiltInWidgets.kTextView)
           .withPosition(0, 4);
     }
-  }
-
-  /**
-   * Creates a panel for intake speed
-   *
-   * @param panelRow Row position of the panel on the dashboard
-   * @param panelCol Column position of the panel on the dashboard
-   * @param widthCells Width of the panel in cells
-   * @param heightCells Height of the panel in cells
-   */
-  private GenericEntry createMotorSpeedSlider(
-      String panelTitle, int row, int column, int widthCells, int heightCells) {
-
-    Map<String, Object> speedSliderMap =
-        Map.of("min", 0.00, "max", 3000.0, "Block increment", 10.0);
-    // Set up a slider to control motor speed during intake
-    GenericEntry ntEntry =
-        m_tab
-            .add(panelTitle, 0.0)
-            .withWidget(BuiltInWidgets.kNumberSlider)
-            .withProperties(speedSliderMap) // slider min/max/increment
-            .withPosition(column, row)
-            .withSize(widthCells, heightCells)
-            .getEntry();
-
-    return ntEntry;
   }
 }

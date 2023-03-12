@@ -139,7 +139,8 @@ public class IntakeDashboardTab implements IDashboardTab {
     m_pidTuner =
         new PIDTunerPanel(m_tab, "Speed PID", kTelemetryPanelHeightCells + 4, 0, m_pidGains);
 
-    m_motorRPMSlider = new SliderWithChangeDetection(m_tab, "Test Speed (RPM)", 100, -5000, 5000);
+    m_motorRPMSlider =
+        new SliderWithChangeDetection(m_tab, "Test Speed (RPM)", 100, -5000, 5000, 10);
     m_motorRPMSlider
         .getWidget()
         .withPosition(3, kTelemetryPanelHeightCells + 4)

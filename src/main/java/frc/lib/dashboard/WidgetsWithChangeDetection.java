@@ -93,7 +93,10 @@ public class WidgetsWithChangeDetection {
 
     public boolean hasChanged() {
       V currentVal = m_valueSupplier.get();
-      boolean changed = m_lastValue != currentVal;
+      boolean changed = false;
+      if ((currentVal != null) && (m_lastValue != null)) {
+        changed = !m_lastValue.equals(currentVal);
+      }
       m_lastValue = currentVal;
       return changed;
     }
@@ -199,11 +202,16 @@ public class WidgetsWithChangeDetection {
      * @param max Maximum value of the slider
      */
     public SliderWithChangeDetection(
-        ShuffleboardTab tab, String title, double defaultValue, double min, double max) {
+        ShuffleboardTab tab,
+        String title,
+        double defaultValue,
+        double min,
+        double max,
+        double increment) {
       m_widget = tab.add(title, defaultValue);
       m_widget
           .withWidget(BuiltInWidgets.kNumberSlider)
-          .withProperties(Map.of("min", min, "max", max));
+          .withProperties(Map.of("min", min, "max", max, "Block increment", increment));
 
       m_netTableEntry = m_widget.getEntry();
       m_defaultValue = defaultValue;

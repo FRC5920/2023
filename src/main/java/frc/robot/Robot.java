@@ -55,8 +55,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.lib.Joystick.ProcessedXboxController;
 import frc.lib.SwerveDrive.CTREConfigs;
 import frc.lib.utility.Alert;
+import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -210,7 +212,15 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    ProcessedXboxController operatorController =
+        m_robotContainer.joystickSubsystem.operatorController;
+    ShooterPivotSubsystem shooterPivotSubsystem = m_robotContainer.shooterPivotSubsystem;
+
+    if (operatorController.B.getAsBoolean()) {
+      shooterPivotSubsystem.DEBUG_runPivotMotor(operatorController.getRightY() * 0.2);
+    }
+  }
 
   @Override
   public void testInit() {
