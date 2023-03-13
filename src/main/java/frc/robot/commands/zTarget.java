@@ -128,7 +128,7 @@ public class zTarget extends CommandBase {
       rotation = -controller.getRightX();
     }
     translation = new Translation2d(yAxis, xAxis).times(RobotContainer.MaxSpeed);
-    rotation *= RobotContainer.MaxRotate;
+    rotation *= -1 * RobotContainer.MaxRotate;
     s_Swerve.drive(translation, rotation, fieldRelative, openLoop);
   }
 
