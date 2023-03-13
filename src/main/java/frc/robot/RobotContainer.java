@@ -66,7 +66,6 @@ import frc.robot.subsystems.*;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 import frc.robot.subsystems.Heimdall.*;
 import frc.robot.subsystems.Intake.Intake;
-//import frc.robot.subsystems.Pneumatics.Pneumatics;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 import org.photonvision.PhotonCamera;
@@ -84,11 +83,11 @@ public class RobotContainer {
 
   // --------------------- Robot Subsystems ----------------------------
   public final DashboardSubsystem dashboardSubsystem = new DashboardSubsystem();
-  public final static JoystickSubsystem joystickSubsystem = new JoystickSubsystem();
+  public static final JoystickSubsystem joystickSubsystem = new JoystickSubsystem();
   public final BotStateSubsystem botStateSubsystem = new BotStateSubsystem();
   public final Swerve swerveSubsystem;
   public final Intake m_Intake = new Intake();
-  //public static final Pneumatics s_Pneumatics = new Pneumatics();
+  // public static final Pneumatics s_Pneumatics = new Pneumatics();
 
   @SuppressWarnings({"unused"})
   public final PoseEstimatorSubsystem poseEstimatorSubsystem;
@@ -97,12 +96,13 @@ public class RobotContainer {
   public final PhotonCamera TagCamera = new PhotonCamera(Constants.VisionConstants.TagCameraName);
 
   /*@SuppressWarnings({"unused"})
-  private final PhotonCamera BackCamera =
-      new PhotonCamera(Constants.VisionConstants.BackupCameraName);
-*/
+    private final PhotonCamera BackCamera =
+        new PhotonCamera(Constants.VisionConstants.BackupCameraName);
+  */
 
   @SuppressWarnings({"unused"})
-  public final static PhotonCamera ArmCamera = new PhotonCamera(Constants.VisionConstants.ArmCameraName);
+  public static final PhotonCamera ArmCamera =
+      new PhotonCamera(Constants.VisionConstants.ArmCameraName);
 
   // Create an auto routine builder
   AutoRoutineBuilder autoBuilder;
