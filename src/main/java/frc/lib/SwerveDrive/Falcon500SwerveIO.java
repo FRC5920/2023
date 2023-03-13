@@ -243,6 +243,10 @@ public class Falcon500SwerveIO implements SwerveModuleIO {
     m_driveMotor.setInverted(Constants.SwerveDrivebaseConstants.driveMotorInvert);
     m_driveMotor.setNeutralMode(Constants.SwerveDrivebaseConstants.driveNeutralMode);
     m_driveMotor.setSelectedSensorPosition(0);
+    m_driveMotor.configOpenloopRamp(
+        0.001 * Constants.SwerveDrivebaseConstants.kDriveMotorRampMilliseconds);
+    m_driveMotor.configClosedloopRamp(
+        0.001 * Constants.SwerveDrivebaseConstants.kDriveMotorRampMilliseconds);
   }
 
   public Rotation2d getCanCoder() {

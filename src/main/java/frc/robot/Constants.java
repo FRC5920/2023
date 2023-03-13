@@ -153,6 +153,12 @@ public final class Constants {
     /* Angle Encoder Invert */
     public static final boolean canCoderInvert = chosenModule.canCoderInvert;
 
+    /**
+     * Swerve drive motors will ramp from zero to maximum output in the time (in milliseconds) given
+     * by this constant.
+     */
+    public static final double kDriveMotorRampMilliseconds = 150.0;
+
     /* Swerve Current Limiting */
     public static final int angleContinuousCurrentLimit = 25;
     public static final int anglePeakCurrentLimit = 40;
