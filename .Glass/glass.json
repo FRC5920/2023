@@ -1,0 +1,127 @@
+{
+  "NetworkTables": {
+    "Retained Values": {
+      "open": false
+    },
+    "transitory": {
+      "Shuffleboard": {
+        "Intake": {
+          "Master motor": {
+            "open": true
+          }
+        },
+        "ShooterPivot": {
+          "Master motor": {
+            "open": true
+          },
+          "open": true
+        }
+      },
+      "SmartDashboard": {
+        "open": true
+      }
+    },
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Auto Builder/Field": "Field2d",
+      "/Shuffleboard/Auto Builder/Initial Position": "String Chooser",
+      "/Shuffleboard/Auto Builder/Rotation PID": "PIDController",
+      "/Shuffleboard/Auto Builder/Route": "String Chooser",
+      "/Shuffleboard/Auto Builder/Secondary Action": "String Chooser",
+      "/Shuffleboard/Auto Builder/Translation PID": "PIDController",
+      "/Shuffleboard/Intake/TestCommand": "Command",
+      "/Shuffleboard/Intake/TestRPMCommand": "Command",
+      "/Shuffleboard/Intake/Velocity PID": "PIDController",
+      "/Shuffleboard/ShooterPivot/Position PID": "PIDController"
+    },
+    "windows": {
+      "/Shuffleboard/Intake/TestCommand": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Intake/Velocity PID": {
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables Settings": {
+    "mode": "Client (NT4)",
+    "port4": 5810,
+    "serverTeam": "127.0.0.1",
+    "visible": false
+  },
+  "Plots": {
+    "Plot <0>": {
+      "plots": [
+        {
+          "axis": [
+            {
+              "autoFit": true
+            }
+          ],
+          "height": 209,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Intake/Master motor/RPM"
+            }
+          ]
+        }
+      ]
+    },
+    "Plot <1>": {
+      "plots": [
+        {
+          "axis": [
+            {
+              "autoFit": true
+            }
+          ],
+          "height": 229,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Intake/Master motor/Current"
+            }
+          ]
+        }
+      ]
+    },
+    "Plot <2>": {
+      "plots": [
+        {
+          "axis": [
+            {
+              "autoFit": true
+            }
+          ],
+          "height": 190,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Intake/Master motor/Current"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

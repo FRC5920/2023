@@ -69,15 +69,12 @@ public class zTarget extends CommandBase {
   private boolean openLoop;
   private Swerve s_Swerve;
   private ProcessedXboxController controller;
-  private static final double SwerveP = 0.07;
+  private static final double SwerveP = 5;
   private static final double SwerveI = 0.00;
-  private static final double SwervekD = 0.0;
+  private static final double SwervekD = 0.2;
 
   PhotonCamera TargetingCamera;
   double rotation;
-  // PIDController turnController =
-  //     new PIDController(
-  //         Constants.ArmConstants.kFetchAngularP, 0, Constants.ArmConstants.kFetchAngularD);
   GameTarget zTargetWhat;
   private final PIDController omegaController = new PIDController(SwerveP, SwerveI, SwervekD);
 
@@ -98,15 +95,16 @@ public class zTarget extends CommandBase {
     this.TargetingCamera = camera;
     this.zTargetWhat = TargetWhat;
 
-    omegaController.setTolerance(Units.degreesToRadians(3));
+    omegaController.setTolerance(Units.degreesToRadians(5));
     omegaController.enableContinuousInput(-Math.PI, Math.PI);
-    omegaController.setSetpoint(Units.degreesToRadians(0));
+    omegaController.setSetpoint(0);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    TargetingCamera.setPipelineIndex(zTargetWhat.PipelineIndex);
+    // TargetingCamera.setPipelineIndex(zTargetWhat.PipelineIndex);
+    TargetingCamera.setPipelineIndex(1);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -123,7 +121,8 @@ public class zTarget extends CommandBase {
     if (result.hasTargets()) {
       // Calculate angular turn power
       // -1.0 required to ensure positive PID controller effort _increases_ yaw
-      rotation = -omegaController.calculate(result.getBestTarget().getYaw(), 0);
+      rotation =
+          -omegaController.calculate(Units.degreesToRadians(result.getBestTarget().getYaw()));
     } else {
       // If we have no targets, rotate according to joystick as normal.
       rotation = -controller.getRightX();
@@ -136,7 +135,7 @@ public class zTarget extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    TargetingCamera.setPipelineIndex(GameTarget.DriveView.PipelineIndex());
+    // TargetingCamera.setPipelineIndex(GameTarget.DriveView.PipelineIndex());
   }
 
   // Returns true when the command should end.

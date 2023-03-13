@@ -162,7 +162,14 @@ public class JoystickSubsystem extends SubsystemBase {
             RobotContainer.joystickSubsystem,
             true,
             true));
-    driverController.rightBumper.whileTrue(new InstantCommand(this::doNothing, this));
+    driverController.rightBumper.whileTrue(
+        new zTarget(
+            GameTarget.AprilTag2D,
+            RobotContainer.ArmCamera,
+            botContainer.swerveSubsystem,
+            RobotContainer.joystickSubsystem,
+            true,
+            true));
     // driverController.leftBumper.whileTrue(new RunPneumatics(RobotContainer.s_Pneumatics, true));
     // driverController.rightBumper.whileTrue(new RunPneumatics(RobotContainer.s_Pneumatics,
     // false));
