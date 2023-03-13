@@ -53,40 +53,45 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.GameTarget;
+import frc.robot.subsystems.JoystickSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 import org.photonvision.PhotonCamera;
 
 public class zTarget extends CommandBase {
-  /** Creates a new Fetch. */
   private Translation2d translation;
-
   private boolean fieldRelative;
   private boolean openLoop;
-
   private Swerve s_Swerve;
   private ProcessedXboxController controller;
+  private static final double SwerveP = 0.07;
+  private static final double SwerveI = 0.00;
+  private static final double SwervekD = 0.0;
 
   PhotonCamera TargetingCamera;
   double rotation;
-  PIDController turnController =
-      new PIDController(
-          Constants.ArmConstants.kFetchAngularP, 0, Constants.ArmConstants.kFetchAngularD);
+ // PIDController turnController =
+ //     new PIDController(
+ //         Constants.ArmConstants.kFetchAngularP, 0, Constants.ArmConstants.kFetchAngularD);
   GameTarget zTargetWhat;
+  private final PIDController omegaController = new PIDController(SwerveP, SwerveI, SwervekD);
 
-  public ZTarget(
+
+  public zTarget(
       GameTarget TargetWhat,
       PhotonCamera camera,
       Swerve s_Swerve,
       JoystickSubsystem joystickSubsystem,
       boolean fieldRelative,
       boolean openLoop) {
-    // Use addRequirements() here to declare subsystem dependencies.
+
     this.s_Swerve = s_Swerve;
     addRequirements(s_Swerve);
 
@@ -95,6 +100,11 @@ public class zTarget extends CommandBase {
     this.openLoop = openLoop;
     this.TargetingCamera = camera;
     this.zTargetWhat = TargetWhat;
+
+    omegaController.setTolerance(Units.degreesToRadians(3));
+    omegaController.enableContinuousInput(-Math.PI, Math.PI);
+    omegaController.setSetpoint(Units.degreesToRadians(0));
+
   }
 
   // Called when the command is initially scheduled.
@@ -117,7 +127,7 @@ public class zTarget extends CommandBase {
     if (result.hasTargets()) {
       // Calculate angular turn power
       // -1.0 required to ensure positive PID controller effort _increases_ yaw
-      rotation = -turnController.calculate(result.getBestTarget().getYaw(), 0);
+      rotation = -omegaController.calculate(result.getBestTarget().getYaw(), 0);
     } else {
       // If we have no targets, rotate according to joystick as normal.
       rotation = -controller.getRightX();

@@ -58,8 +58,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.Joystick.AxisProcChain;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.RobotContainer;
+import frc.robot.Constants.GameTarget;
 import frc.robot.commands.Balance;
 import frc.robot.commands.RunPneumatics;
+import frc.robot.commands.zTarget;
 
 /** A subsystem providing/managing Xbox controllers for driving the robot manually */
 public class JoystickSubsystem extends SubsystemBase {
@@ -153,7 +155,7 @@ public class JoystickSubsystem extends SubsystemBase {
     driverController.B.onTrue(new InstantCommand(this::doNothing, this));
     driverController.X.onTrue(new InstantCommand(this::doNothing, this));
     driverController.Y.onTrue(new InstantCommand(this::doNothing, this));
-    driverController.leftBumper.whileTrue(new InstantCommand(this::doNothing, this));
+    driverController.leftBumper.whileTrue(new zTarget(GameTarget.Cube, RobotContainer.ArmCamera, RobotContainer.swerveSubsystem, RobotContainer.joystickSubsystem, true, true));
     driverController.rightBumper.whileTrue(new InstantCommand(this::doNothing, this));
     //driverController.leftBumper.whileTrue(new RunPneumatics(RobotContainer.s_Pneumatics, true));
     //driverController.rightBumper.whileTrue(new RunPneumatics(RobotContainer.s_Pneumatics, false));

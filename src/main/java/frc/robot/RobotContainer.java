@@ -84,7 +84,7 @@ public class RobotContainer {
 
   // --------------------- Robot Subsystems ----------------------------
   public final DashboardSubsystem dashboardSubsystem = new DashboardSubsystem();
-  public final JoystickSubsystem joystickSubsystem = new JoystickSubsystem();
+  public final static JoystickSubsystem joystickSubsystem = new JoystickSubsystem();
   public final BotStateSubsystem botStateSubsystem = new BotStateSubsystem();
   public final Swerve swerveSubsystem;
   public final Intake m_Intake = new Intake();
@@ -94,7 +94,7 @@ public class RobotContainer {
   public final PoseEstimatorSubsystem poseEstimatorSubsystem;
 
   /* Cameras */
-  private final PhotonCamera TagCamera = new PhotonCamera(Constants.VisionConstants.TagCameraName);
+  public final PhotonCamera TagCamera = new PhotonCamera(Constants.VisionConstants.TagCameraName);
 
   /*@SuppressWarnings({"unused"})
   private final PhotonCamera BackCamera =
@@ -102,7 +102,7 @@ public class RobotContainer {
 */
 
   @SuppressWarnings({"unused"})
-  private final PhotonCamera ArmCamera = new PhotonCamera(Constants.VisionConstants.ArmCameraName);
+  public final static PhotonCamera ArmCamera = new PhotonCamera(Constants.VisionConstants.ArmCameraName);
 
   // Create an auto routine builder
   AutoRoutineBuilder autoBuilder;
