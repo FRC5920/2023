@@ -122,7 +122,7 @@ public class zTarget extends CommandBase {
       // Calculate angular turn power
       // -1.0 required to ensure positive PID controller effort _increases_ yaw
       rotation =
-          -omegaController.calculate(Units.degreesToRadians(result.getBestTarget().getYaw()));
+          omegaController.calculate(Units.degreesToRadians(result.getBestTarget().getYaw()));
     } else {
       // If we have no targets, rotate according to joystick as normal.
       rotation = -controller.getRightX();
