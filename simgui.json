@@ -45,11 +45,17 @@
       "/Shuffleboard/Auto Builder/Translation PID": "PIDController",
       "/Shuffleboard/Auto Builder/Waypoint": "String Chooser",
       "/Shuffleboard/Intake Subsystem/Speed PID": "PIDController",
+      "/Shuffleboard/Intake/Intake Gamepiece": "Command",
+      "/Shuffleboard/Intake/ParallelRaceGroup": "Command",
+      "/Shuffleboard/Intake/Run Intake (perpetual)": "Command",
+      "/Shuffleboard/Intake/Shoot Intake": "Command",
       "/Shuffleboard/Intake/Speed PID": "PIDController",
+      "/Shuffleboard/Intake/TestCommand": "Command",
       "/Shuffleboard/Intake/TestRPMCommand": "Command",
       "/Shuffleboard/Intake/Velocity PID": "PIDController",
       "/Shuffleboard/PoseEstimator/Field": "Field2d",
       "/Shuffleboard/ShooterPivot/Position PID": "PIDController",
+      "/Shuffleboard/ShooterPivot/TestCommand": "Command",
       "/Shuffleboard/SwerveDrive/FrontLeft/Angle/Degrees": "Gyro",
       "/Shuffleboard/SwerveDrive/FrontRight/Angle/Degrees": "Gyro",
       "/Shuffleboard/SwerveDrive/RearLeft/Angle/Degrees": "Gyro",
@@ -102,19 +108,15 @@
           "visible": true
         }
       },
-      "/Shuffleboard/Auto Builder/Secondary Action": {
-        "window": {
-          "visible": true
-        }
-      },
       "/Shuffleboard/Auto Builder/Translation PID": {
         "window": {
           "name": "Translation PID",
           "visible": true
         }
       },
-      "/Shuffleboard/Intake/TestRPMCommand": {
+      "/Shuffleboard/Intake/Intake Gamepiece": {
         "window": {
+          "name": "Intake and stop",
           "visible": true
         }
       }

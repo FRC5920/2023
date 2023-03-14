@@ -51,8 +51,8 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.commands.Shooter;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.ShooterPivot.PivotPresets;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 
 public class SetShooterAngle extends CommandBase {
@@ -64,11 +64,24 @@ public class SetShooterAngle extends CommandBase {
 
   private final double m_pivotDegrees;
 
-  /** Creates a new SetShooterPosition. */
+  /**
+   * Creates a new instance of the command that sets the pivot to a specified angle
+   *
+   * @param pivotDegrees Angle to move the shooter pivot to
+   */
   public SetShooterAngle(ShooterPivotSubsystem shooterPivotSubsystem, double pivotDegrees) {
     m_shooterPivotSubsystem = shooterPivotSubsystem;
     m_pivotDegrees = pivotDegrees;
     addRequirements(shooterPivotSubsystem);
+  }
+
+  /**
+   * Creates a new instance of the command that sets the pivot to a specified angle preset
+   *
+   * @param pivotDegrees Angle preset to move the shooter pivot to
+   */
+  public SetShooterAngle(ShooterPivotSubsystem shooterPivotSubsystem, PivotPresets preset) {
+    this(shooterPivotSubsystem, preset.angleDegrees);
   }
 
   // Called when the command is initially scheduled.
@@ -82,9 +95,9 @@ public class SetShooterAngle extends CommandBase {
   public boolean isFinished() {
     double presentAngleDeg = m_shooterPivotSubsystem.getAngleDegrees();
     double delta = Math.abs(presentAngleDeg - m_pivotDegrees);
-    SmartDashboard.putNumber("PivotTarget", m_pivotDegrees);
-    SmartDashboard.putNumber("PivotAngle", presentAngleDeg);
-    SmartDashboard.putNumber("PivotDelta", delta);
+    // SmartDashboard.putNumber("PivotTarget", m_pivotDegrees);
+    // SmartDashboard.putNumber("PivotAngle", presentAngleDeg);
+    // SmartDashboard.putNumber("PivotDelta", delta);
     return delta < kAngleToleranceDeg;
   }
 }

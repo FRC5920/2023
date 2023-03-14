@@ -54,8 +54,8 @@ package frc.robot.commands.Shooter;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.Intake.IntakePreset;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
-import frc.robot.subsystems.Intake.SpeedPreset;
 
 public class IntakeGamepiece extends CommandBase {
   private static final int kNumFilterTaps = (int) (0.20 / Constants.robotPeriodSec);
@@ -81,7 +81,7 @@ public class IntakeGamepiece extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_intakeSubsystem.activatePreset(SpeedPreset.Acquire);
+    m_intakeSubsystem.activatePreset(IntakePreset.Acquire);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -103,7 +103,7 @@ public class IntakeGamepiece extends CommandBase {
       case RampUpMotor:
         double averageSpeed = m_speedAverager.calculate(m_intakeSubsystem.getSpeedPercent());
         m_state =
-            (averageSpeed >= SpeedPreset.Acquire.motorSpeed * 0.80)
+            (averageSpeed >= IntakePreset.Acquire.motorSpeed * 0.80)
                 ? State.IntakeGamepiece
                 : State.RampUpMotor;
         break;

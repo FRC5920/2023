@@ -51,18 +51,33 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.commands.Shooter;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.ShooterPivot.PivotPresets;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 
-public class AcquireGamepieceForTransit extends SequentialCommandGroup {
-  /** Creates a new instance of the command */
-  public AcquireGamepieceForTransit(
-      IntakeSubsystem intakeSubsystem, ShooterPivotSubsystem shooterPivotSubsystem) {
+public class Acquire extends SequentialCommandGroup {
 
-    addCommands(
-        new SetShooterAngle(shooterPivotSubsystem, PivotPresets.Acquire.angleDegrees),
-        new IntakeGamepiece(intakeSubsystem));
+  public static CommandBase acquireAndPark(
+      ShooterPivotSubsystem shooterPivotSubsystem, IntakeSubsystem intakeSubsystem) {
+    return Commands.sequence(
+        new SetShooterAngle(shooterPivotSubsystem, PivotPresets.Acquire),
+        new IntakeGamepiece(intakeSubsystem),
+        new SetShooterAngle(shooterPivotSubsystem, PivotPresets.Park));
+  }
+
+  /**
+   * Generate a command that parks the shooter
+   *
+   * @remarks This command doesn't actually register the ShooterPivotSubsystem it uses. This is done
+   *     intentionally so that the park command can be quickly overridden by another command without
+   *     having to complete the park sequence (e.g. to shoot a cube)
+   */
+  public static Command parkShooter(ShooterPivotSubsystem shooterPivotSubsystem) {
+    return new InstantCommand(() -> shooterPivotSubsystem.setAnglePreset(PivotPresets.Park));
   }
 }

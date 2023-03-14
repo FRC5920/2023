@@ -60,9 +60,13 @@ import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.Constants.GameTarget;
 import frc.robot.RobotContainer;
 import frc.robot.commands.Balance;
-import frc.robot.commands.Shooter.AcquireGamepieceForTransit;
+import frc.robot.commands.Shooter.Acquire;
+import frc.robot.commands.Shooter.Shoot;
 import frc.robot.commands.zTarget;
+import frc.robot.subsystems.Intake.IntakePreset;
+import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.ShooterPivot.PivotPresets;
+import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 
 /** A subsystem providing/managing Xbox controllers for driving the robot manually */
 public class JoystickSubsystem extends SubsystemBase {
@@ -150,10 +154,20 @@ public class JoystickSubsystem extends SubsystemBase {
    * @param botContainer Object providing access to robot subsystems
    */
   public void configureButtonBindings(RobotContainer botContainer) {
+    ShooterPivotSubsystem shooterPivot = botContainer.shooterPivotSubsystem;
+    IntakeSubsystem intake = botContainer.intakeSubsystem;
 
     // Map buttons on driver controller
-    driverController.A.onTrue(new InstantCommand(this::doNothing, this));
-    driverController.B.onTrue(new InstantCommand(this::doNothing, this));
+    driverController.A.onTrue(
+        Shoot.pivotAndShoot(
+            shooterPivot, intake, PivotPresets.CloseShotLow, IntakePreset.CloseShotLow));
+    driverController.B.onTrue(
+        Shoot.pivotAndShoot(
+            shooterPivot, intake, PivotPresets.CloseShotMid, IntakePreset.CloseShotMid));
+    driverController.Y.onTrue(
+        Shoot.pivotAndShoot(
+            shooterPivot, intake, PivotPresets.CloseShotHigh, IntakePreset.CloseShotHigh));
+
     driverController.X.onTrue(new InstantCommand(this::doNothing, this));
     driverController.Y.onTrue(new InstantCommand(this::doNothing, this));
     driverController.leftBumper.whileTrue(
@@ -172,6 +186,7 @@ public class JoystickSubsystem extends SubsystemBase {
             botContainer.joystickSubsystem,
             true,
             true));
+
     driverController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.back.onTrue(
@@ -181,21 +196,18 @@ public class JoystickSubsystem extends SubsystemBase {
     // Map buttons on operator controller
     operatorController.A.onTrue(
         new InstantCommand(
-            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.ShortShotLow)));
+            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.CloseShotLow)));
     operatorController.B.onTrue(
         new InstantCommand(
-            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.ShortShotMid)));
+            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.CloseShotMid)));
     operatorController.X.onTrue(
         new InstantCommand(
             () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.Transport)));
     operatorController.Y.onTrue(
         new InstantCommand(
-            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.ShortShotHigh)));
+            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.CloseShotHigh)));
     operatorController.leftBumper.whileTrue(
-        new AcquireGamepieceForTransit(
-                botContainer.intakeSubsystem, botContainer.shooterPivotSubsystem)
-            .finallyDo(
-                (ignored) -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.Park)));
+        Acquire.acquireAndPark(botContainer.shooterPivotSubsystem, botContainer.intakeSubsystem));
     operatorController.rightBumper.whileTrue(
         new InstantCommand(
             () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.Acquire)));

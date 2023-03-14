@@ -49,11 +49,9 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.subsystems.Intake;
+package frc.robot.subsystems.ShooterPivot;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import java.util.function.Supplier;
 
 /** Tests an intake preset */
@@ -61,39 +59,30 @@ public class TestCommand extends CommandBase {
   /** Tolerance used when determining if the intake has reached a given preset RPM */
   static final double kTargetRPMToleranceDeg = 2.0;
   /** IntakeSubsystem the command operates on */
-  private final IntakeSubsystem m_subsystem;
+  private final ShooterPivotSubsystem m_subsystem;
   /** Supplier that provides the target RPM value */
-  private final Supplier<Double> m_speedSupplier;
+  private final Supplier<Double> m_angleSupplier;
 
-  /** Creates a new TestCommands. */
-  public TestCommand(IntakeSubsystem intakeSubsystem, Supplier<Double> speedSupplier) {
-    m_subsystem = intakeSubsystem;
-    m_speedSupplier = speedSupplier;
+  /**
+   * Creates a new TestCommand
+   *
+   * @param subsystem The subsystem to operate on
+   * @param angleSupplier Supplier providing an angle to move the pivot to
+   */
+  public TestCommand(ShooterPivotSubsystem subsystem, Supplier<Double> angleSupplier) {
+    m_subsystem = subsystem;
+    m_angleSupplier = angleSupplier;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    double speed = m_speedSupplier.get();
-    m_subsystem.setSpeedPercent(speed);
+    m_subsystem.setAngleDegrees(m_angleSupplier.get());
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_subsystem.stopIntake();
-  }
-
-  /**
-   * Runs the intake at a supplied speed setting for a given duration in seconds
-   *
-   * @param intakeSubsystem Intake to operate on
-   * @param speedSupplier Supplier that gives the speed to run at
-   * @param durationSec Number of seconds to run the shooter for
-   */
-  public static CommandBase runForDuration(
-      IntakeSubsystem intakeSubsystem, Supplier<Double> speedSupplier, double durationSec) {
-    return Commands.sequence(new TestCommand(intakeSubsystem, speedSupplier))
-        .raceWith(new WaitCommand(durationSec));
+    m_subsystem.setAnglePreset(PivotPresets.Park);
   }
 }

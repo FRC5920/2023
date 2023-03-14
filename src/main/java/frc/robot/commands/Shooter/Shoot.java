@@ -49,51 +49,85 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.subsystems.Intake;
+package frc.robot.commands.Shooter;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import java.util.function.Supplier;
+import frc.robot.subsystems.Intake.IntakePreset;
+import frc.robot.subsystems.Intake.IntakeSubsystem;
+import frc.robot.subsystems.ShooterPivot.PivotPresets;
+import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 
-/** Tests an intake preset */
-public class TestCommand extends CommandBase {
-  /** Tolerance used when determining if the intake has reached a given preset RPM */
-  static final double kTargetRPMToleranceDeg = 2.0;
-  /** IntakeSubsystem the command operates on */
-  private final IntakeSubsystem m_subsystem;
-  /** Supplier that provides the target RPM value */
-  private final Supplier<Double> m_speedSupplier;
+public class Shoot {
 
-  /** Creates a new TestCommands. */
-  public TestCommand(IntakeSubsystem intakeSubsystem, Supplier<Double> speedSupplier) {
-    m_subsystem = intakeSubsystem;
-    m_speedSupplier = speedSupplier;
+  public static Command pivotAndShoot(
+      ShooterPivotSubsystem shooterPivotSubsystem,
+      IntakeSubsystem intakeSubsystem,
+      PivotPresets pivotPreset,
+      IntakePreset speedPreset) {
+    return Commands.sequence(
+        new SetShooterAngle(shooterPivotSubsystem, pivotPreset),
+        shootAtSpeed(intakeSubsystem, speedPreset, 1.5));
   }
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    double speed = m_speedSupplier.get();
-    m_subsystem.setSpeedPercent(speed);
-  }
-
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    m_subsystem.stopIntake();
+  public static Command pivotAndShoot(
+      ShooterPivotSubsystem shooterPivotSubsystem,
+      IntakeSubsystem intakeSubsystem,
+      double pivotDegrees,
+      double shooterSpeedPercent) {
+    return Commands.sequence(
+        new SetShooterAngle(shooterPivotSubsystem, pivotDegrees),
+        shootAtSpeed(intakeSubsystem, shooterSpeedPercent, 1.5));
   }
 
   /**
-   * Runs the intake at a supplied speed setting for a given duration in seconds
+   * Returns a command that runs the shooter at a given preset speed
    *
-   * @param intakeSubsystem Intake to operate on
-   * @param speedSupplier Supplier that gives the speed to run at
-   * @param durationSec Number of seconds to run the shooter for
+   * @param intakeSubsystem The intake subsystem used to shoot
+   * @param speedPreset Preset speed used for shooting
+   * @param durationSec Amount of time in seconds to run the intake when shooting
    */
-  public static CommandBase runForDuration(
-      IntakeSubsystem intakeSubsystem, Supplier<Double> speedSupplier, double durationSec) {
-    return Commands.sequence(new TestCommand(intakeSubsystem, speedSupplier))
-        .raceWith(new WaitCommand(durationSec));
+  public static Command shootAtSpeed(
+      IntakeSubsystem intakeSubsystem, IntakePreset speedPreset, double durationSec) {
+    return shootAtSpeed(intakeSubsystem, speedPreset.motorSpeed, durationSec);
+  }
+
+  /**
+   * Returns a command that runs the shooter at a given percentage of full speed
+   *
+   * @param intakeSubsystem The intake subsystem used to shoot
+   * @param speedPreset Speed to run the shooter at as a percentage of full scale
+   * @param durationSec Amount of time in seconds to run the intake when shooting
+   */
+  public static Command shootAtSpeed(
+      IntakeSubsystem intakeSubsystem, double speedPercent, double durationSec) {
+    return Commands.sequence(
+        new RunIntake(intakeSubsystem, speedPercent).raceWith(new WaitCommand(durationSec)));
+  }
+
+  private static class RunIntake extends CommandBase {
+    private final IntakeSubsystem m_intakeSubsystem;
+    private final double m_speedPercent;
+
+    /** Creates a new ShootCube. */
+    private RunIntake(IntakeSubsystem intakeSubsystem, double speedPercent) {
+      m_intakeSubsystem = intakeSubsystem;
+      m_speedPercent = speedPercent;
+      addRequirements(intakeSubsystem);
+    }
+
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {
+      m_intakeSubsystem.setSpeedPercent(m_speedPercent);
+    }
+
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {
+      m_intakeSubsystem.stopIntake();
+    }
   }
 }
