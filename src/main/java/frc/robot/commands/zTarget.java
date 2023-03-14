@@ -103,13 +103,13 @@ public class zTarget extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    // TargetingCamera.setPipelineIndex(zTargetWhat.PipelineIndex);
-    TargetingCamera.setPipelineIndex(1);
+    TargetingCamera.setPipelineIndex(zTargetWhat.PipelineIndex);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    //TargetingCamera.setPipelineIndex(zTargetWhat.PipelineIndex);
     // Get translation and rotation from the joystick controller
     double yAxis = -controller.getLeftY();
     double xAxis = -controller.getLeftX();
@@ -146,7 +146,7 @@ public class zTarget extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    // TargetingCamera.setPipelineIndex(GameTarget.DriveView.PipelineIndex());
+     TargetingCamera.setPipelineIndex(-1);
   }
 
   // Returns true when the command should end.
