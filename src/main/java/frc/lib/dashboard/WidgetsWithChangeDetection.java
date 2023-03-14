@@ -94,8 +94,9 @@ public class WidgetsWithChangeDetection {
     public boolean hasChanged() {
       V currentVal = m_valueSupplier.get();
       boolean changed = false;
-      if (m_forceInitialChange || ((currentVal != null) && (m_lastValue != null))) {
-        changed = !m_lastValue.equals(currentVal);
+      if (((currentVal != null) && (m_lastValue != null))) {
+        changed = m_forceInitialChange || !m_lastValue.equals(currentVal);
+        m_forceInitialChange = false;
       }
       m_lastValue = currentVal;
       return changed;

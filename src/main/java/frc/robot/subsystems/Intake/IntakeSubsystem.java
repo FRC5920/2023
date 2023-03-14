@@ -69,7 +69,7 @@ public class IntakeSubsystem extends SubsystemBase {
   public static final double kIntakeGearRatio = 1.0 / 3.33;
 
   /** Peak output (%) that intake motors should run */
-  private static final double kMaxMotorOutputPercent = 0.75;
+  private static final double kMaxMotorOutputPercent = 1.0;
   /** Time required to ramp from neutral to full scale motor output */
   private static final double kOpenLoopRampSec = 0.5;
 

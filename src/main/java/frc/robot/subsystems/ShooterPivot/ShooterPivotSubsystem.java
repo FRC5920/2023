@@ -67,23 +67,27 @@ public class ShooterPivotSubsystem extends SubsystemBase {
   public static final int kPivotMasterMotorCANId = 30;
   public static final int kPivotSlaveMotorCANId = 31;
 
-  /** Gear ratio used to couple pivot motor axles to pivot drive */
-  public static final double kPivotGearRatio = 1.0 / 21.0;
+  /** Gear ratio used to couple pivot motor axles to primary chain sprocket */
+  public static final double kPrimaryGearRatio = 1.0 / 21.0;
+  /** Gear ratio used to couple secondary chain sprocket to pivot */
+  public static final double kSecondaryGearRatio = 15.0 / 12.0;
+  /** The combined gear ratio */
+  public static final double kPivotGearRatio = kPrimaryGearRatio * kSecondaryGearRatio;
 
   /** Default pivot PID coefficients */
   public static final double kDefaultPivotPID_kFF = 0.3;
 
-  public static final double kDefaultPivotPID_kP = 0.145;
+  public static final double kDefaultPivotPID_kP = 0.25;
   public static final double kDefaultPivotPID_kI = 0.0;
-  public static final double kDefaultPivotPID_kD = 0.05;
+  public static final double kDefaultPivotPID_kD = 0.005;
   public static final double kDefaultPivotPID_Iz = 0.01;
 
   public static final PIDGains kDefaultPIDGains =
       new PIDGains(
           kDefaultPivotPID_kP, kDefaultPivotPID_kI, kDefaultPivotPID_kD, kDefaultPivotPID_kFF);
 
-  public static final double kMotionCruiseVelocityDegPerSec = 30.0;
-  public static final double kMotionAccelerationDegPerSec2 = 15.0;
+  public static final double kMotionCruiseVelocityDegPerSec = 40.0;
+  public static final double kMotionAccelerationDegPerSec2 = 25.0;
   public static final int kMotionSmoothing = 8;
 
   /** Peak output (%) that intake motors should run */

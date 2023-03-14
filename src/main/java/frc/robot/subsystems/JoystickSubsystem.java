@@ -60,8 +60,8 @@ import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.Constants.GameTarget;
 import frc.robot.RobotContainer;
 import frc.robot.commands.Balance;
-import frc.robot.commands.zTarget;
 import frc.robot.commands.Shooter.AcquireGamepieceForTransit;
+import frc.robot.commands.zTarget;
 import frc.robot.subsystems.ShooterPivot.PivotPresets;
 
 /** A subsystem providing/managing Xbox controllers for driving the robot manually */
@@ -159,22 +159,19 @@ public class JoystickSubsystem extends SubsystemBase {
     driverController.leftBumper.whileTrue(
         new zTarget(
             GameTarget.Cube,
-            RobotContainer.ArmCamera,
+            botContainer.ArmCamera,
             botContainer.swerveSubsystem,
-            RobotContainer.joystickSubsystem,
+            botContainer.joystickSubsystem,
             true,
             true));
     driverController.rightBumper.whileTrue(
         new zTarget(
             GameTarget.AprilTag2D,
-            RobotContainer.ArmCamera,
+            botContainer.ArmCamera,
             botContainer.swerveSubsystem,
-            RobotContainer.joystickSubsystem,
+            botContainer.joystickSubsystem,
             true,
             true));
-    // driverController.leftBumper.whileTrue(new RunPneumatics(RobotContainer.s_Pneumatics, true));
-    // driverController.rightBumper.whileTrue(new RunPneumatics(RobotContainer.s_Pneumatics,
-    // false));
     driverController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.back.onTrue(
