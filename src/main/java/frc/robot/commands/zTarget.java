@@ -70,7 +70,7 @@ public class zTarget extends CommandBase {
   private boolean openLoop;
   private Swerve s_Swerve;
   private ProcessedXboxController controller;
-  private static final double SwerveP = 0.8;
+  private static final double SwerveP = 1.0;
   private static final double SwerveI = 0.0;
   private static final double SwervekD = 0.0;
 
@@ -102,14 +102,13 @@ public class zTarget extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    TargetingCamera.setPipelineIndex(zTargetWhat.PipelineIndex);
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    //TargetingCamera.setPipelineIndex(zTargetWhat.PipelineIndex);
+
+    TargetingCamera.setPipelineIndex(zTargetWhat.PipelineIndex);
     // Get translation and rotation from the joystick controller
     double yAxis = -controller.getLeftY();
     double xAxis = -controller.getLeftX();
@@ -146,12 +145,13 @@ public class zTarget extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-     TargetingCamera.setPipelineIndex(-1);
+    // TargetingCamera.setPipelineIndex(-1);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    // TargetingCamera.setPipelineIndex(-1);
     return false;
   }
 }

@@ -324,9 +324,8 @@ public final class Constants {
 
   ///////////////
   public enum GameTarget {
-    Cone(1),
     Cube(0),
-    AprilTag2D(2);
+    AprilTag2D(1);
 
     public final int PipelineIndex;
 
