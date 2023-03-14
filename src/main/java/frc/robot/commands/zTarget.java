@@ -54,14 +54,15 @@ package frc.robot.commands;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.lib.Joystick.ProcessedXboxController;
-import frc.robot.Constants;
 import frc.robot.Constants.GameTarget;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.JoystickSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonPipelineResult;
 
 public class zTarget extends CommandBase {
   private Translation2d translation;
@@ -69,12 +70,11 @@ public class zTarget extends CommandBase {
   private boolean openLoop;
   private Swerve s_Swerve;
   private ProcessedXboxController controller;
-  private static final double SwerveP = 5;
-  private static final double SwerveI = 0.00;
-  private static final double SwervekD = 0.2;
+  private static final double SwerveP = 0.8;
+  private static final double SwerveI = 0.0;
+  private static final double SwervekD = 0.0;
 
   PhotonCamera TargetingCamera;
-  double rotation;
   GameTarget zTargetWhat;
   private final PIDController omegaController = new PIDController(SwerveP, SwerveI, SwervekD);
 
@@ -110,26 +110,37 @@ public class zTarget extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    // Get translation and rotation from the joystick controller
     double yAxis = -controller.getLeftY();
     double xAxis = -controller.getLeftX();
+    double rotationRad = -controller.getRightX();
 
-    yAxis = (Math.abs(yAxis) < Constants.DriverConstants.stickDeadband) ? 0 : yAxis;
-    xAxis = (Math.abs(xAxis) < Constants.DriverConstants.stickDeadband) ? 0 : xAxis;
+    PhotonPipelineResult result = TargetingCamera.getLatestResult();
 
-    var result = TargetingCamera.getLatestResult();
-
+    // If vision has acquired a target, we will overwrite the rotation with a value
+    // that will rotate the bot toward the target
     if (result.hasTargets()) {
+
       // Calculate angular turn power
       // -1.0 required to ensure positive PID controller effort _increases_ yaw
-      rotation =
-          omegaController.calculate(Units.degreesToRadians(result.getBestTarget().getYaw()));
-    } else {
-      // If we have no targets, rotate according to joystick as normal.
-      rotation = -controller.getRightX();
+      // Current measurement is the yaw relative to the bot.
+      // omegaController has a setpoint of zero.  So, it's trying to reduce the
+      // yaw to zero.
+      double angleToTargetDeg = result.getBestTarget().getYaw();
+      double yawToTargetRad = Units.degreesToRadians(angleToTargetDeg);
+      double zRotationRad = omegaController.calculate(yawToTargetRad);
+      // zRotation = -1.0 * Math.signum(rotationRad) * Math.min(1.0, Math.abs(rotationRad));
+      SmartDashboard.putNumber("zTarget/degreesToTarget", angleToTargetDeg);
+      SmartDashboard.putNumber("zTarget/yawToTargetRad", yawToTargetRad);
+      SmartDashboard.putNumber("zTarget/controllerRad", zRotationRad);
+
+      rotationRad = zRotationRad; // NOTE: may need to cap this at a maximum...
     }
+
     translation = new Translation2d(yAxis, xAxis).times(RobotContainer.MaxSpeed);
-    rotation *= -1 * RobotContainer.MaxRotate;
-    s_Swerve.drive(translation, rotation, fieldRelative, openLoop);
+    rotationRad *= RobotContainer.MaxRotate;
+    SmartDashboard.putNumber("zTarget/commandedOutput", rotationRad);
+    s_Swerve.drive(translation, rotationRad, fieldRelative, openLoop);
   }
 
   // Called once the command ends or is interrupted.
