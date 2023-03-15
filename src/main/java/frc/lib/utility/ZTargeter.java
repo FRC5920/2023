@@ -120,6 +120,7 @@ public class ZTargeter {
   /** This method must be called to initialize the camera used by the ZTargeter */
   public void initialize() {
     m_camera.setPipelineIndex(m_gamepieceType.PipelineIndex);
+    System.out.println("Z-Target: Targetting " +  String.valueOf(m_gamepieceType));
   }
 
   /**

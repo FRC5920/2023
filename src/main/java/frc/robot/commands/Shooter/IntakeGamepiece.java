@@ -88,6 +88,7 @@ public class IntakeGamepiece extends CommandBase {
   public void initialize() {
     m_intakeSubsystem.activatePreset(IntakePreset.Acquire);
     m_currentAverager.reset();
+    System.out.println("Intake: Starting Intake");
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -98,6 +99,7 @@ public class IntakeGamepiece extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     m_intakeSubsystem.stopIntake();
+    System.out.println("Intake: Stopping");
   }
 
   // Returns true when the command should end.

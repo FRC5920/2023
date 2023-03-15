@@ -123,6 +123,8 @@ public class Shoot {
     @Override
     public void initialize() {
       m_intakeSubsystem.setSpeedPercent(m_speedPercent);
+
+    System.out.println("Shooter: Firing at " +  String.valueOf(m_speedPercent));
     }
 
     // Called once the command ends or is interrupted.

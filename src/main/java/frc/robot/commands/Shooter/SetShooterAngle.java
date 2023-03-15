@@ -88,6 +88,7 @@ public class SetShooterAngle extends CommandBase {
   @Override
   public void initialize() {
     m_shooterPivotSubsystem.setAngleDegrees(m_pivotDegrees);
+    System.out.println("Shooter: Pivoting to " +  String.valueOf(m_pivotDegrees));
   }
 
   // Returns true when the command should end.

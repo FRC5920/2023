@@ -64,6 +64,7 @@ public class Acquire extends SequentialCommandGroup {
 
   public static CommandBase acquireAndPark(
       ShooterPivotSubsystem shooterPivotSubsystem, IntakeSubsystem intakeSubsystem) {
+        System.out.println("Shooter: Deploying");
     return new SetShooterAngle(shooterPivotSubsystem, PivotPresets.Acquire)
         .alongWith(
             Commands.waitUntil(() -> shooterPivotSubsystem.getAngleDegrees() > 45.0)
@@ -79,6 +80,7 @@ public class Acquire extends SequentialCommandGroup {
    *     having to complete the park sequence (e.g. to shoot a cube)
    */
   public static Command parkShooter(ShooterPivotSubsystem shooterPivotSubsystem) {
+    System.out.println("Shooter: Parking");
     return new InstantCommand(() -> shooterPivotSubsystem.setAnglePreset(PivotPresets.Park));
   }
 }
