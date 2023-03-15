@@ -38,6 +38,7 @@
       "/LiveWindow/Ungrouped/PIDController[9]": "PIDController",
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
       "/Shuffleboard/Auto Builder/Field": "Field2d",
+      "/Shuffleboard/Auto Builder/Initial Action": "String Chooser",
       "/Shuffleboard/Auto Builder/Initial Position": "String Chooser",
       "/Shuffleboard/Auto Builder/Rotation PID": "PIDController",
       "/Shuffleboard/Auto Builder/Route": "String Chooser",

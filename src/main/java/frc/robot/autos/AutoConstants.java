@@ -461,7 +461,20 @@ public class AutoConstants {
     public static String[] getNames() {
       return getEnumNames(CargoLocation.class);
     }
-  };
+  }
+
+  public static enum InitialAction {
+    Nothing,
+    BumpScore,
+    ShootLow,
+    ShootMid,
+    ShootHigh;
+
+    /** Returns a list of names of enum elements */
+    public static String[] getNames() {
+      return getEnumNames(InitialAction.class);
+    }
+  }
 
   /////////////////////////////////////////////////////////////////////////////
   /** An enumeration of secondary actions to take after escaping the community */

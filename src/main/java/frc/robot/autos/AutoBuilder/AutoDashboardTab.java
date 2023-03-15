@@ -64,6 +64,7 @@ import frc.lib.dashboard.WidgetsWithChangeDetection.ToggleButtonWithChangeDetect
 import frc.robot.RobotContainer;
 import frc.robot.autos.AutoConstants.EscapeRoute;
 import frc.robot.autos.AutoConstants.Grids;
+import frc.robot.autos.AutoConstants.InitialAction;
 import frc.robot.autos.AutoConstants.SecondaryAction;
 import frc.robot.autos.DriveToWaypoint;
 import frc.robot.subsystems.Dashboard.IDashboardTab;
@@ -96,8 +97,6 @@ public class AutoDashboardTab implements IDashboardTab {
   /** 2d view of the field */
   private Field2d m_field2d;
 
-  /** Initial position chooser */
-  private ToggleButtonWithChangeDetection m_bumpChoice;
 
   /** Initial position chooser */
   private final ChooserWithChangeDetection<Grids.ScoringPosition> m_initialPositionChooser =
@@ -108,6 +107,9 @@ public class AutoDashboardTab implements IDashboardTab {
   /** Secondary action chooser */
   private final ChooserWithChangeDetection<SecondaryAction> m_secondaryActionChooser =
       new ChooserWithChangeDetection<SecondaryAction>();
+  /* Initial action chooser */
+  private final ChooserWithChangeDetection<InitialAction> m_initialActionChooser =
+      new ChooserWithChangeDetection<InitialAction>();
   /** Waypoint chooser */
   // private final ChooserWithChangeDetection<Waypoints.ID> m_targetWaypointChooser =
   //     new ChooserWithChangeDetection<Waypoints.ID>();
@@ -153,22 +155,20 @@ public class AutoDashboardTab implements IDashboardTab {
     m_tab
         .add("Route", m_routeChooser)
         .withSize(kChooserWidth, kChooserHeight)
-        .withPosition(1 * kChooserWidth, 0);
+        .withPosition(2 * kChooserWidth, 0);
 
     // Set up a chooser for the secondary action to take
     m_secondaryActionChooser.loadOptions(SecondaryAction.getNames(), SecondaryAction.values(), 0);
     m_tab
         .add("Secondary Action", m_secondaryActionChooser)
         .withSize(kChooserWidth, kChooserHeight)
-        .withPosition(2 * kChooserWidth, 0);
+        .withPosition(3 * kChooserWidth, 0);
 
-    // Set up the bump choice
-    m_bumpChoice = new ToggleButtonWithChangeDetection(m_tab, "Bump Score", true);
-    m_bumpChoice
-        .getWidget()
+    m_initialActionChooser.loadOptions(InitialAction.getNames(), InitialAction.values(), 2);
+    m_tab
+        .add("Initial Action", m_initialActionChooser)
         .withSize(kChooserWidth, kChooserHeight)
-        .withPosition(3 * kChooserWidth, 0)
-        .getEntry();
+        .withPosition(1 * kChooserWidth, 0);
 
     // Set up a chooser for the waypoint to move to outside the community
     // populateChooser(m_targetWaypointChooser, Waypoints.ID.getNames(), Waypoints.ID.values());
@@ -204,6 +204,7 @@ public class AutoDashboardTab implements IDashboardTab {
     boolean targetWaypointChanged = false; // m_targetWaypointChooser.hasChanged();
     boolean translationPIDChanged = m_translationPIDPanel.hasChanged();
     boolean rotationPIDChanged = m_rotationPIDPanel.hasChanged();
+    boolean initialActionChanged = m_initialActionChooser.hasChanged();
 
     if ((m_lastAlliance != currentAlliance)
         || initialPositionChanged
@@ -212,7 +213,7 @@ public class AutoDashboardTab implements IDashboardTab {
         || targetWaypointChanged
         || translationPIDChanged
         || rotationPIDChanged
-        || m_bumpChoice.hasChanged()) {
+        || initialActionChanged) {
 
       System.out.println("<AutoDashboardTab::updateDashboard> processing dashboard value change");
       m_lastAlliance = currentAlliance;
@@ -225,7 +226,7 @@ public class AutoDashboardTab implements IDashboardTab {
           m_secondaryActionChooser.getSelected(),
           m_translationPIDPanel.getGains(),
           m_rotationPIDPanel.getGains(),
-          m_bumpChoice.getValue());
+          false);
 
       // Set all objects on the field to have an empty trajectory
       for (String name : m_fieldTrajectories.keySet()) {
