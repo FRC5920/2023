@@ -55,6 +55,7 @@
       "/Shuffleboard/Intake/Velocity PID": "PIDController",
       "/Shuffleboard/PoseEstimator/Field": "Field2d",
       "/Shuffleboard/ShooterPivot/Position PID": "PIDController",
+      "/Shuffleboard/ShooterPivot/SetPivot": "Command",
       "/Shuffleboard/ShooterPivot/TestCommand": "Command",
       "/Shuffleboard/SwerveDrive/FrontLeft/Angle/Degrees": "Gyro",
       "/Shuffleboard/SwerveDrive/FrontRight/Angle/Degrees": "Gyro",
