@@ -61,7 +61,7 @@ public enum PivotPresets {
   Transport(60),
 
   /** Angle used for a short-range shot to the low grid */
-  CloseShotLow(120),
+  CloseShotLow(170),
   /** Angle used for a short-range shot to the middle grid */
   CloseShotMid(120),
   /** Angle used for a short-range shot to the high grid */

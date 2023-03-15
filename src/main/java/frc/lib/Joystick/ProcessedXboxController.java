@@ -53,6 +53,7 @@ package frc.lib.Joystick;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.HashMap;
 
 /////////////////////////////////////////////////////////////////////////////
@@ -94,6 +95,12 @@ public class ProcessedXboxController extends XboxController {
   public final JoystickButton back;
   /** Xbox controller 'Start' button */
   public final JoystickButton start;
+
+  /** Left trigger as a button */
+  public Trigger leftTriggerAsButton;
+
+  /** Right trigger as a button */
+  public Trigger rightTriggerAsButton;
 
   /**
    * Creates a JoystickController instance that communicates with an Xbox controller on a specified
@@ -137,6 +144,8 @@ public class ProcessedXboxController extends XboxController {
     rightStickPress = new JoystickButton(this, XboxController.Button.kRightStick.value);
     back = new JoystickButton(this, XboxController.Button.kBack.value);
     start = new JoystickButton(this, XboxController.Button.kStart.value);
+    leftTriggerAsButton = new Trigger(() -> this.getLeftTriggerAxis() > 0.5);
+    rightTriggerAsButton = new Trigger(() -> this.getRightTriggerAxis() > 0.5);
   }
 
   /** Return a mutable reference to the processing chain applied to a specified stick */

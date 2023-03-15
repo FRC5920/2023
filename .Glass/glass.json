@@ -8,7 +8,8 @@
         "Intake": {
           "Master motor": {
             "open": true
-          }
+          },
+          "open": true
         },
         "ShooterPivot": {
           "Master motor": {
@@ -92,12 +93,7 @@
     "Plot <1>": {
       "plots": [
         {
-          "axis": [
-            {
-              "autoFit": true
-            }
-          ],
-          "height": 211,
+          "height": 513,
           "series": [
             {
               "color": [

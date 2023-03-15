@@ -52,6 +52,7 @@
 package frc.robot.commands.Shooter;
 
 import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Intake.IntakePreset;
@@ -59,11 +60,14 @@ import frc.robot.subsystems.Intake.IntakeSubsystem;
 
 public class IntakeGamepiece extends CommandBase {
   private static final int kNumFilterTaps = (int) (0.20 / Constants.robotPeriodSec);
-  private static final double kCurrentThresholdAmps = 20.0;
+  private static final double kCurrentThresholdAmps = 55.0;
+  private static final double kMotorSlewRate = 0.1;
 
   private final IntakeSubsystem m_intakeSubsystem;
   private LinearFilter m_speedAverager = LinearFilter.movingAverage(kNumFilterTaps);
   private LinearFilter m_currentAverager = LinearFilter.movingAverage(kNumFilterTaps);
+  private SlewRateLimiter m_slewRateLimiter =
+      new SlewRateLimiter(kMotorSlewRate, kMotorSlewRate, 0.0);
 
   private enum State {
     RampUpMotor,
@@ -82,6 +86,7 @@ public class IntakeGamepiece extends CommandBase {
   @Override
   public void initialize() {
     m_intakeSubsystem.activatePreset(IntakePreset.Acquire);
+    m_currentAverager.reset();
   }
 
   // Called every time the scheduler runs while the command is scheduled.

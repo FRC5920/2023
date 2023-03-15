@@ -168,8 +168,8 @@ public class JoystickSubsystem extends SubsystemBase {
         Shoot.pivotAndShoot(
             shooterPivot, intake, PivotPresets.CloseShotHigh, IntakePreset.CloseShotHigh));
 
-    driverController.X.onTrue(new InstantCommand(this::doNothing, this));
-    driverController.Y.onTrue(new InstantCommand(this::doNothing, this));
+    driverController.X.whileTrue(Acquire.acquireAndPark(shooterPivot, intake));
+
     driverController.leftBumper.whileTrue(
         new zTarget(
             GameTarget.Cube,
@@ -195,22 +195,21 @@ public class JoystickSubsystem extends SubsystemBase {
 
     // Map buttons on operator controller
     operatorController.A.onTrue(
-        new InstantCommand(
-            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.CloseShotLow)));
+        Shoot.pivotAndShoot(
+            shooterPivot, intake, PivotPresets.CloseShotLow, IntakePreset.CloseShotLow));
     operatorController.B.onTrue(
-        new InstantCommand(
-            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.CloseShotMid)));
-    operatorController.X.onTrue(
-        new InstantCommand(
-            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.Transport)));
+        Shoot.pivotAndShoot(
+            shooterPivot, intake, PivotPresets.CloseShotMid, IntakePreset.CloseShotMid));
     operatorController.Y.onTrue(
-        new InstantCommand(
-            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.CloseShotHigh)));
+        Shoot.pivotAndShoot(
+            shooterPivot, intake, PivotPresets.CloseShotHigh, IntakePreset.CloseShotHigh));
+
     operatorController.leftBumper.whileTrue(
         Acquire.acquireAndPark(botContainer.shooterPivotSubsystem, botContainer.intakeSubsystem));
-    operatorController.rightBumper.whileTrue(
-        new InstantCommand(
-            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.Acquire)));
+    operatorController.rightBumper.whileTrue(new InstantCommand());
+
+    operatorController.leftTriggerAsButton.whileTrue(Acquire.acquireAndPark(shooterPivot, intake));
+
     operatorController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.back.onTrue(

@@ -61,6 +61,7 @@ import frc.robot.subsystems.ShooterPivot.PivotPresets;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 
 public class Shoot {
+  public static final double kShootDurationSec = 0.5;
 
   public static Command pivotAndShoot(
       ShooterPivotSubsystem shooterPivotSubsystem,
@@ -69,7 +70,7 @@ public class Shoot {
       IntakePreset speedPreset) {
     return Commands.sequence(
         new SetShooterAngle(shooterPivotSubsystem, pivotPreset),
-        shootAtSpeed(intakeSubsystem, speedPreset, 1.5));
+        shootAtSpeed(intakeSubsystem, speedPreset, kShootDurationSec));
   }
 
   public static Command pivotAndShoot(
