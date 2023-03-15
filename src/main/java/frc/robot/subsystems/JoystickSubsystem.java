@@ -86,9 +86,9 @@ public class JoystickSubsystem extends SubsystemBase {
   }
 
   // ---------- Joystick Processing Constants -----------------
-  public static final double kDriverLeftStickSensitivity = 0.3;
+  public static final double kDriverLeftStickSensitivity = 0.5;
   public static final double kDriverLeftStickDeadbands[] = {0.1, 0.95};
-  public static final double kDriverRightStickSensitivity = 0.3;
+  public static final double kDriverRightStickSensitivity = 0.5;
   public static final double kDriverRightStickDeadbands[] = {0.1, 0.95};
   public static final double kDriverTriggerSensitivity = 1.0;
   public static final double kDriverTriggerDeadbands[] = {0.1, 0.95};
@@ -179,17 +179,25 @@ public class JoystickSubsystem extends SubsystemBase {
 
       driverController.X.whileTrue(Acquire.acquireAndPark(shooterPivot, intake));
 
-      driverController.rightTriggerAsButton.whileTrue(
-          new DriveWithZTargeting(
+      driverController.rightBumper.whileTrue(
+          DriveWithZTargeting.zTargetDriveWithIntake(
               GameTarget.Cube,
+              botContainer.ArmCamera,
+              botContainer.swerveSubsystem,
+              botContainer.joystickSubsystem,
+              shooterPivot,
+              intake,
+              true,
+              true));
+
+      driverController.leftBumper.whileTrue(
+          new DriveWithZTargeting(
+              GameTarget.AprilTag2D,
               botContainer.ArmCamera,
               botContainer.swerveSubsystem,
               botContainer.joystickSubsystem,
               true,
               true));
-
-      driverController.leftBumper.onTrue(new InstantCommand());
-      driverController.rightBumper.whileTrue(new InstantCommand());
 
       driverController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
       driverController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));

@@ -59,8 +59,9 @@ import frc.robot.subsystems.Intake.IntakePreset;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 
 public class IntakeGamepiece extends CommandBase {
-  private static final int kNumFilterTaps = (int) (0.20 / Constants.robotPeriodSec);
-  private static final double kCurrentThresholdAmps = 55.0;
+  private static final double kAverageWindowSec = 0.2;
+  private static final int kNumFilterTaps = (int) (kAverageWindowSec / Constants.robotPeriodSec);
+  private static final double kCurrentThresholdAmps = 65.0;
   private static final double kMotorSlewRate = 0.1;
 
   private final IntakeSubsystem m_intakeSubsystem;

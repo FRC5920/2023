@@ -69,11 +69,11 @@ public class ZTargeter {
   public static final boolean kEnableDashboardDebug = true;
 
   /** Default proportional gain used for the rotation PID controller */
-  public static final double kDefault_kP = 1.0;
+  public static final double kDefault_kP = 0.7;
   /** Default integral gain used for the rotation PID controller */
   public static final double kDefault_kI = 0.0;
   /** Default derivative gain used for the rotation PID controller */
-  public static final double kDefault_kD = 0.0;
+  public static final double kDefault_kD = 0.07;
 
   /** Camera used to target the gamepiece */
   private final PhotonCamera m_camera;
@@ -132,6 +132,7 @@ public class ZTargeter {
   public Rotation2d getRotationToTarget() {
     Rotation2d result = null;
 
+    m_camera.setPipelineIndex(m_gamepieceType.PipelineIndex);
     PhotonPipelineResult pipelineResult = m_camera.getLatestResult();
 
     // If vision has acquired a target, we will overwrite the rotation with a value
