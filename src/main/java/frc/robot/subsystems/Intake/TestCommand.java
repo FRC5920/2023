@@ -51,30 +51,34 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.subsystems.Intake;
 
-// import com.ctre.phoenix.motorcontrol.ControlMode;
-// import com.ctre.phoenix.motorcontrol.NeutralMode;
-// import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-// import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import java.util.function.Supplier;
 
-public class Intake extends SubsystemBase {
-  /** Creates a new Intake. */
-  // WPI_TalonFX m_armMotor;
+/** Tests an intake preset */
+public class TestCommand extends CommandBase {
+  /** Tolerance used when determining if the intake has reached a given preset RPM */
+  static final double kTargetRPMToleranceDeg = 2.0;
+  /** IntakeSubsystem the command operates on */
+  private final IntakeSubsystem m_subsystem;
+  /** Supplier that provides the target RPM value */
+  private final Supplier<Double> m_speedSupplier;
 
-  // WPI_TalonFX m_takeUpMotor;
-  // XboxController myController;
-
-  public Intake() {
-
-    // m_takeUpMotor = new WPI_TalonFX(6);
-    // m_armMotor = new WPI_TalonFX(5);
-    // myController = new XboxController(1);
+  /** Creates a new TestCommands. */
+  public TestCommand(IntakeSubsystem intakeSubsystem, Supplier<Double> speedSupplier) {
+    m_subsystem = intakeSubsystem;
+    m_speedSupplier = speedSupplier;
   }
 
+  // Called when the command is initially scheduled.
   @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-    // m_armMotor.setNeutralMode(NeutralMode.Brake);
-    // m_armMotor.set(ControlMode.PercentOutput, myController.getRightY());
+  public void initialize() {
+    double speed = m_speedSupplier.get();
+    m_subsystem.setSpeedPercent(speed);
+  }
+
+  // Called once the command ends or is interrupted.
+  @Override
+  public void end(boolean interrupted) {
+    m_subsystem.stopIntake();
   }
 }

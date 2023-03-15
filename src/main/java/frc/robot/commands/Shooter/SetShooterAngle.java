@@ -49,46 +49,42 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.lib.utility;
+package frc.robot.commands.Shooter;
 
-/** An object wrapping gains for a PID controller */
-public class PIDGains {
-  /** Feed-forward gain coefficient */
-  public double kFF = 0;
-  /** Proportional gain coefficient */
-  public double kP = 0;
-  /** Integral gain coefficient */
-  public double kI = 0;
-  /** Derivative gain coefficient */
-  public double kD = 0;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 
-  /** Default constructor sets all gains to zero */
-  public PIDGains() {}
+public class SetShooterAngle extends CommandBase {
+  /** Tolerance in degrees for the commanded pivot position */
+  private static final double kAngleToleranceDeg = 3.0;
 
-  /** Construct with initial gains (zero feed-forward gain) */
-  public PIDGains(double _kP, double _kI, double _kD) {
-    kFF = 0.0;
-    kP = _kP;
-    kI = _kI;
-    kD = _kD;
+  /** Subsystem the command operates on */
+  private final ShooterPivotSubsystem m_shooterPivotSubsystem;
+
+  private final double m_pivotDegrees;
+
+  /** Creates a new SetShooterPosition. */
+  public SetShooterAngle(ShooterPivotSubsystem shooterPivotSubsystem, double pivotDegrees) {
+    m_shooterPivotSubsystem = shooterPivotSubsystem;
+    m_pivotDegrees = pivotDegrees;
+    addRequirements(shooterPivotSubsystem);
   }
 
-  /** Construct with initial PID and feed-forward gains */
-  public PIDGains(double _kP, double _kI, double _kD, double _kFF) {
-    kFF = _kFF;
-    kP = _kP;
-    kI = _kI;
-    kD = _kD;
+  // Called when the command is initially scheduled.
+  @Override
+  public void initialize() {
+    m_shooterPivotSubsystem.setAngleDegrees(m_pivotDegrees);
   }
 
-  /**
-   * Returns true if the object's gains are equal to another PIDGains
-   *
-   * @param other Other PIDGains object to compare for equality
-   */
-  public boolean isEqual(PIDGains other) {
-    return (0 == Double.compare(kP, other.kP))
-        && (0 == Double.compare(kI, other.kI))
-        && (0 == Double.compare(kD, other.kD));
+  // Returns true when the command should end.
+  @Override
+  public boolean isFinished() {
+    double presentAngleDeg = m_shooterPivotSubsystem.getAngleDegrees();
+    double delta = Math.abs(presentAngleDeg - m_pivotDegrees);
+    SmartDashboard.putNumber("PivotTarget", m_pivotDegrees);
+    SmartDashboard.putNumber("PivotAngle", presentAngleDeg);
+    SmartDashboard.putNumber("PivotDelta", delta);
+    return delta < kAngleToleranceDeg;
   }
 }

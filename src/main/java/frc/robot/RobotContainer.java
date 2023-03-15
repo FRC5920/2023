@@ -65,7 +65,8 @@ import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 import frc.robot.subsystems.Heimdall.*;
-import frc.robot.subsystems.Intake.Intake;
+import frc.robot.subsystems.Intake.IntakeSubsystem;
+import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
 import org.photonvision.PhotonCamera;
@@ -83,26 +84,19 @@ public class RobotContainer {
 
   // --------------------- Robot Subsystems ----------------------------
   public final DashboardSubsystem dashboardSubsystem = new DashboardSubsystem();
-  public static final JoystickSubsystem joystickSubsystem = new JoystickSubsystem();
+  public final JoystickSubsystem joystickSubsystem = new JoystickSubsystem();
   public final BotStateSubsystem botStateSubsystem = new BotStateSubsystem();
   public final Swerve swerveSubsystem;
-  public final Intake m_Intake = new Intake();
+  public final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+  public final ShooterPivotSubsystem shooterPivotSubsystem = new ShooterPivotSubsystem();
+
   // public static final Pneumatics s_Pneumatics = new Pneumatics();
 
-  @SuppressWarnings({"unused"})
   public final PoseEstimatorSubsystem poseEstimatorSubsystem;
 
   /* Cameras */
   public final PhotonCamera TagCamera = new PhotonCamera(Constants.VisionConstants.TagCameraName);
-
-  /*@SuppressWarnings({"unused"})
-    private final PhotonCamera BackCamera =
-        new PhotonCamera(Constants.VisionConstants.BackupCameraName);
-  */
-
-  @SuppressWarnings({"unused"})
-  public static final PhotonCamera ArmCamera =
-      new PhotonCamera(Constants.VisionConstants.ArmCameraName);
+  public final PhotonCamera ArmCamera = new PhotonCamera(Constants.VisionConstants.ArmCameraName);
 
   // Create an auto routine builder
   AutoRoutineBuilder autoBuilder;
@@ -183,6 +177,9 @@ public class RobotContainer {
     autoBuilder = new AutoRoutineBuilder(swerveSubsystem);
     autoDashboardTab = new AutoDashboardTab(autoBuilder);
     dashboardSubsystem.add(autoDashboardTab);
+
+    intakeSubsystem.registerDashboardTab(dashboardSubsystem);
+    shooterPivotSubsystem.registerDashboardTab(dashboardSubsystem);
 
     // Initialize all dashboard tabs
     dashboardSubsystem.initialize(this);

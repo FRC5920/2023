@@ -60,7 +60,9 @@ import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.Constants.GameTarget;
 import frc.robot.RobotContainer;
 import frc.robot.commands.Balance;
+import frc.robot.commands.Shooter.AcquireGamepieceForTransit;
 import frc.robot.commands.zTarget;
+import frc.robot.subsystems.ShooterPivot.PivotPresets;
 
 /** A subsystem providing/managing Xbox controllers for driving the robot manually */
 public class JoystickSubsystem extends SubsystemBase {
@@ -157,22 +159,19 @@ public class JoystickSubsystem extends SubsystemBase {
     driverController.leftBumper.whileTrue(
         new zTarget(
             GameTarget.Cube,
-            RobotContainer.ArmCamera,
+            botContainer.ArmCamera,
             botContainer.swerveSubsystem,
-            RobotContainer.joystickSubsystem,
+            botContainer.joystickSubsystem,
             true,
             true));
     driverController.rightBumper.whileTrue(
         new zTarget(
             GameTarget.AprilTag2D,
-            RobotContainer.ArmCamera,
+            botContainer.ArmCamera,
             botContainer.swerveSubsystem,
-            RobotContainer.joystickSubsystem,
+            botContainer.joystickSubsystem,
             true,
             true));
-    // driverController.leftBumper.whileTrue(new RunPneumatics(RobotContainer.s_Pneumatics, true));
-    // driverController.rightBumper.whileTrue(new RunPneumatics(RobotContainer.s_Pneumatics,
-    // false));
     driverController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
     driverController.back.onTrue(
@@ -180,21 +179,39 @@ public class JoystickSubsystem extends SubsystemBase {
     driverController.start.whileTrue(new Balance(botContainer.swerveSubsystem)); // right little
 
     // Map buttons on operator controller
-    operatorController.A.onTrue(new InstantCommand(this::doNothing, this));
-    operatorController.B.onTrue(new InstantCommand(this::doNothing, this));
-    operatorController.X.onTrue(new InstantCommand(this::doNothing, this));
-    operatorController.Y.onTrue(new InstantCommand(this::doNothing, this));
-    operatorController.leftBumper.whileTrue(new InstantCommand(this::doNothing, this));
-    operatorController.rightBumper.whileTrue(new InstantCommand(this::doNothing, this));
+    operatorController.A.onTrue(
+        new InstantCommand(
+            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.ShortShotLow)));
+    operatorController.B.onTrue(
+        new InstantCommand(
+            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.ShortShotMid)));
+    operatorController.X.onTrue(
+        new InstantCommand(
+            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.Transport)));
+    operatorController.Y.onTrue(
+        new InstantCommand(
+            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.ShortShotHigh)));
+    operatorController.leftBumper.whileTrue(
+        new AcquireGamepieceForTransit(
+                botContainer.intakeSubsystem, botContainer.shooterPivotSubsystem)
+            .finallyDo(
+                (ignored) -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.Park)));
+    operatorController.rightBumper.whileTrue(
+        new InstantCommand(
+            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.Acquire)));
     operatorController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
     operatorController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
-    operatorController.back.onTrue(new InstantCommand(this::doNothing, this));
-    operatorController.start.onTrue(new InstantCommand(this::doNothing, this));
+    operatorController.back.onTrue(
+        new InstantCommand(
+            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.Park)));
+    operatorController.start.onTrue(
+        new InstantCommand(() -> botContainer.shooterPivotSubsystem.zeroPivotPosition()));
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+
   }
 
   /** Placeholder used for empty commands mapped to joystick */

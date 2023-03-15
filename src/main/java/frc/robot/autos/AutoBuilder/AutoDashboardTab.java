@@ -59,8 +59,8 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.lib.dashboard.WidgetsWithChangeDetection.ChooserWithChangeDetection;
+import frc.lib.dashboard.WidgetsWithChangeDetection.PIDTunerPanel;
 import frc.lib.dashboard.WidgetsWithChangeDetection.ToggleButtonWithChangeDetection;
-import frc.lib.utility.PIDTunerPanel;
 import frc.robot.RobotContainer;
 import frc.robot.autos.AutoConstants.EscapeRoute;
 import frc.robot.autos.AutoConstants.Grids;
@@ -214,6 +214,7 @@ public class AutoDashboardTab implements IDashboardTab {
         || rotationPIDChanged
         || m_bumpChoice.hasChanged()) {
 
+      System.out.println("<AutoDashboardTab::updateDashboard> processing dashboard value change");
       m_lastAlliance = currentAlliance;
 
       // Rebuild the auto routine

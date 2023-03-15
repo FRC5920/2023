@@ -49,46 +49,34 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.lib.utility;
+package frc.robot.subsystems.ShooterPivot;
 
-/** An object wrapping gains for a PID controller */
-public class PIDGains {
-  /** Feed-forward gain coefficient */
-  public double kFF = 0;
-  /** Proportional gain coefficient */
-  public double kP = 0;
-  /** Integral gain coefficient */
-  public double kI = 0;
-  /** Derivative gain coefficient */
-  public double kD = 0;
+/** Preset pivot angles */
+public enum PivotPresets {
+  /** Angle used to park the intake */
+  Park(0.0),
+  /** Angle used to acquire a game piece */
+  Acquire(185.0),
+  /** Angle used when transporting a game piece */
+  Transport(60),
 
-  /** Default constructor sets all gains to zero */
-  public PIDGains() {}
+  /** Angle used for a short-range shot to the low grid */
+  ShortShotLow(120),
+  /** Angle used for a short-range shot to the middle grid */
+  ShortShotMid(120),
+  /** Angle used for a short-range shot to the high grid */
+  ShortShotHigh(115),
 
-  /** Construct with initial gains (zero feed-forward gain) */
-  public PIDGains(double _kP, double _kI, double _kD) {
-    kFF = 0.0;
-    kP = _kP;
-    kI = _kI;
-    kD = _kD;
-  }
+  /** Angle used for a long-range shot to the low grid */
+  LongShotLow(170),
+  /** Angle used for a long-range shot to the middle grid */
+  LongShotMid(150),
+  /** Angle used for a long-range shot to the high grid */
+  LongShotHigh(135);
 
-  /** Construct with initial PID and feed-forward gains */
-  public PIDGains(double _kP, double _kI, double _kD, double _kFF) {
-    kFF = _kFF;
-    kP = _kP;
-    kI = _kI;
-    kD = _kD;
-  }
+  public final double angleDegrees;
 
-  /**
-   * Returns true if the object's gains are equal to another PIDGains
-   *
-   * @param other Other PIDGains object to compare for equality
-   */
-  public boolean isEqual(PIDGains other) {
-    return (0 == Double.compare(kP, other.kP))
-        && (0 == Double.compare(kI, other.kI))
-        && (0 == Double.compare(kD, other.kD));
+  private PivotPresets(double angle) {
+    angleDegrees = angle;
   }
 }

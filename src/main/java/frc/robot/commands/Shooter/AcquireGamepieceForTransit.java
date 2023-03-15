@@ -49,46 +49,20 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.lib.utility;
+package frc.robot.commands.Shooter;
 
-/** An object wrapping gains for a PID controller */
-public class PIDGains {
-  /** Feed-forward gain coefficient */
-  public double kFF = 0;
-  /** Proportional gain coefficient */
-  public double kP = 0;
-  /** Integral gain coefficient */
-  public double kI = 0;
-  /** Derivative gain coefficient */
-  public double kD = 0;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.subsystems.Intake.IntakeSubsystem;
+import frc.robot.subsystems.ShooterPivot.PivotPresets;
+import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 
-  /** Default constructor sets all gains to zero */
-  public PIDGains() {}
+public class AcquireGamepieceForTransit extends SequentialCommandGroup {
+  /** Creates a new instance of the command */
+  public AcquireGamepieceForTransit(
+      IntakeSubsystem intakeSubsystem, ShooterPivotSubsystem shooterPivotSubsystem) {
 
-  /** Construct with initial gains (zero feed-forward gain) */
-  public PIDGains(double _kP, double _kI, double _kD) {
-    kFF = 0.0;
-    kP = _kP;
-    kI = _kI;
-    kD = _kD;
-  }
-
-  /** Construct with initial PID and feed-forward gains */
-  public PIDGains(double _kP, double _kI, double _kD, double _kFF) {
-    kFF = _kFF;
-    kP = _kP;
-    kI = _kI;
-    kD = _kD;
-  }
-
-  /**
-   * Returns true if the object's gains are equal to another PIDGains
-   *
-   * @param other Other PIDGains object to compare for equality
-   */
-  public boolean isEqual(PIDGains other) {
-    return (0 == Double.compare(kP, other.kP))
-        && (0 == Double.compare(kI, other.kI))
-        && (0 == Double.compare(kD, other.kD));
+    addCommands(
+        new SetShooterAngle(shooterPivotSubsystem, PivotPresets.Acquire.angleDegrees),
+        new IntakeGamepiece(intakeSubsystem));
   }
 }
