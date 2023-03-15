@@ -58,7 +58,6 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.lib.dashboard.WidgetsWithChangeDetection.PIDTunerPanel;
 import frc.lib.dashboard.WidgetsWithChangeDetection.SliderWithChangeDetection;
-import frc.lib.dashboard.WidgetsWithChangeDetection.ToggleButtonWithChangeDetection;
 import frc.lib.utility.PIDGains;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Dashboard.IDashboardTab;
@@ -88,8 +87,8 @@ public class ShooterPivotDashboardTab implements IDashboardTab {
   /** Slider used to set pivot motor position */
   private SliderWithChangeDetection m_positionSlider;
 
-  /** Toggle button used to enable/disable motor at speed */
-  private ToggleButtonWithChangeDetection m_motorEnableToggle;
+  /** Test command used to activate the pivot position */
+  private TestCommand m_testCommand;
 
   /** Slider used to set feed-forward value for motor controller */
   private SliderWithChangeDetection m_kffSlider;
@@ -139,9 +138,9 @@ public class ShooterPivotDashboardTab implements IDashboardTab {
         .withPosition(3, kTelemetryPanelHeightCells + 4)
         .withSize(kTelemetryPanelWidthCells + 4, 3);
 
-    m_motorEnableToggle = new ToggleButtonWithChangeDetection(m_tab, "Apply", false);
-    m_motorEnableToggle
-        .getWidget()
+    m_testCommand = new TestCommand(m_shooterSubsystem, () -> m_positionSlider.getValue());
+    m_tab
+        .add("SetPivot", m_testCommand)
         .withPosition(3 + (kTelemetryPanelWidthCells + 4), kTelemetryPanelHeightCells + 4)
         .withSize(3, 3);
 
@@ -157,13 +156,6 @@ public class ShooterPivotDashboardTab implements IDashboardTab {
       PIDGains gains = m_pidTuner.getGains();
       gains.kFF = m_kffSlider.getValue();
       m_shooterSubsystem.setPIDGains(gains);
-    }
-
-    // Test the motor speed if any widgets have changed
-    if (m_motorEnableToggle.hasChanged() || m_positionSlider.hasChanged()) {
-      System.out.println("<AutoDashboardTab::updateDashboard> processing Motor speed change");
-      double setpoint = m_motorEnableToggle.getValue() ? m_positionSlider.getValue() : 0.0;
-      m_shooterSubsystem.setAngleDegrees(setpoint);
     }
 
     // Update telemetry

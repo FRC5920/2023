@@ -62,10 +62,12 @@ import frc.lib.SwerveDrive.SwerveModuleIO;
 import frc.robot.autos.AutoBuilder.AutoDashboardTab;
 import frc.robot.autos.AutoBuilder.AutoRoutineBuilder;
 import frc.robot.commands.*;
+import frc.robot.commands.Shooter.SetShooterAngle;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 import frc.robot.subsystems.Heimdall.*;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
+import frc.robot.subsystems.ShooterPivot.PivotPresets;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
@@ -177,6 +179,10 @@ public class RobotContainer {
     autoBuilder = new AutoRoutineBuilder(swerveSubsystem);
     autoDashboardTab = new AutoDashboardTab(autoBuilder);
     dashboardSubsystem.add(autoDashboardTab);
+
+    // Set up a default command on the shooter pivot subsystem that automatically parks the shooter
+    shooterPivotSubsystem.setDefaultCommand(
+        new SetShooterAngle(shooterPivotSubsystem, PivotPresets.Park));
 
     intakeSubsystem.registerDashboardTab(dashboardSubsystem);
     shooterPivotSubsystem.registerDashboardTab(dashboardSubsystem);

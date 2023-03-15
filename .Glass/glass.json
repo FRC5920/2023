@@ -8,14 +8,16 @@
         "Intake": {
           "Master motor": {
             "open": true
-          }
+          },
+          "open": true
         },
         "ShooterPivot": {
           "Master motor": {
             "open": true
           },
           "open": true
-        }
+        },
+        "open": true
       },
       "SmartDashboard": {
         "open": true
@@ -29,18 +31,29 @@
       "/Shuffleboard/Auto Builder/Route": "String Chooser",
       "/Shuffleboard/Auto Builder/Secondary Action": "String Chooser",
       "/Shuffleboard/Auto Builder/Translation PID": "PIDController",
+      "/Shuffleboard/Intake/Intake Gamepiece": "Command",
+      "/Shuffleboard/Intake/Run Intake (perpetual)": "Command",
+      "/Shuffleboard/Intake/Shoot Intake": "Command",
       "/Shuffleboard/Intake/TestCommand": "Command",
       "/Shuffleboard/Intake/TestRPMCommand": "Command",
       "/Shuffleboard/Intake/Velocity PID": "PIDController",
-      "/Shuffleboard/ShooterPivot/Position PID": "PIDController"
+      "/Shuffleboard/ShooterPivot/Position PID": "PIDController",
+      "/Shuffleboard/ShooterPivot/SetPivot": "Command",
+      "/Shuffleboard/ShooterPivot/TestCommand": "Command"
     },
     "windows": {
-      "/Shuffleboard/Intake/TestCommand": {
+      "/Shuffleboard/Intake/Run Intake (perpetual)": {
+        "window": {
+          "name": "IntakePerpetual",
+          "visible": true
+        }
+      },
+      "/Shuffleboard/ShooterPivot/Position PID": {
         "window": {
           "visible": true
         }
       },
-      "/Shuffleboard/Intake/Velocity PID": {
+      "/Shuffleboard/ShooterPivot/SetPivot": {
         "window": {
           "visible": true
         }
@@ -71,7 +84,7 @@
                 0.6901960968971252,
                 1.0
               ],
-              "id": "NT:/Shuffleboard/Intake/Master motor/RPM"
+              "id": "NT:/Shuffleboard/ShooterPivot/Master motor/Current"
             }
           ]
         }
@@ -80,12 +93,7 @@
     "Plot <1>": {
       "plots": [
         {
-          "axis": [
-            {
-              "autoFit": true
-            }
-          ],
-          "height": 229,
+          "height": 513,
           "series": [
             {
               "color": [
@@ -108,20 +116,12 @@
               "autoFit": true
             }
           ],
-          "height": 190,
-          "series": [
-            {
-              "color": [
-                0.2980392277240753,
-                0.44705885648727417,
-                0.6901960968971252,
-                1.0
-              ],
-              "id": "NT:/Shuffleboard/Intake/Master motor/Current"
-            }
-          ]
+          "height": 190
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     }
   }
 }

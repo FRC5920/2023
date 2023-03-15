@@ -56,8 +56,10 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.lib.dashboard.WidgetsWithChangeDetection.SliderWithChangeDetection;
 import frc.robot.RobotContainer;
+import frc.robot.commands.Shooter.IntakeGamepiece;
 import frc.robot.subsystems.Dashboard.IDashboardTab;
 import frc.robot.subsystems.Intake.IntakeSubsystem.IntakeSubsystemTelemetry;
 import frc.robot.subsystems.Intake.IntakeSubsystem.MotorTelemetry;
@@ -82,11 +84,16 @@ public class IntakeDashboardTab implements IDashboardTab {
   /** Measurements populated by the subsystem */
   private final IntakeSubsystemTelemetry m_telemetry;
 
+  /** Command to run intake-and-stop */
+  private CommandBase m_intakeAndStopCommand;
+
   /** A command for testing intake speed */
   private TestCommand m_intakeTestCommand;
 
   /** A slider for testing intake speed */
   SliderWithChangeDetection m_intakeSpeedSlider;
+
+  private CommandBase m_shooterTunerCommand;
 
   /** Create an instance of the tab */
   public IntakeDashboardTab(IntakeSubsystem subsystem) {
@@ -120,12 +127,20 @@ public class IntakeDashboardTab implements IDashboardTab {
 
     m_intakeSpeedSlider =
         new SliderWithChangeDetection(
-            m_tab, "Intake Speed (percent)", SpeedPreset.Acquire.motorSpeed, 0, 100, 1);
+            m_tab, "Intake Speed (percent)", IntakePreset.Acquire.motorSpeed, -20, 100, 1);
     m_intakeSpeedSlider.getWidget().withPosition(4, 10).withSize(5, 2);
+
+    m_intakeAndStopCommand = new IntakeGamepiece(m_intakeSubsystem);
+    m_tab.add("Intake Gamepiece", m_intakeAndStopCommand).withPosition(0, 10);
 
     m_intakeTestCommand =
         new TestCommand(m_intakeSubsystem, () -> m_intakeSpeedSlider.getValue() / 100.0);
-    m_tab.add(m_intakeTestCommand).withPosition(0, 10);
+    m_tab.add("Run Intake (perpetual)", m_intakeTestCommand).withPosition(0, 10);
+
+    m_shooterTunerCommand =
+        TestCommand.runForDuration(
+            m_intakeSubsystem, () -> m_intakeSpeedSlider.getValue() / 100., 1.5);
+    m_tab.add("Shoot Intake", m_shooterTunerCommand).withPosition(0, 12);
   }
 
   /** Updates dashboard widgets with subsystem measurements and obtains dashboard input values */

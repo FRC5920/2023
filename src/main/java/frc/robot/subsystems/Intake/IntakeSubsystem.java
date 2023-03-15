@@ -99,7 +99,7 @@ public class IntakeSubsystem extends SubsystemBase {
    *
    * @param preset Preset to set the intake motors to
    */
-  public void activatePreset(SpeedPreset preset) {
+  public void activatePreset(IntakePreset preset) {
     setSpeedPercent(preset.motorSpeed);
   }
 
