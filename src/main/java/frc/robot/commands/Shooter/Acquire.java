@@ -64,10 +64,11 @@ public class Acquire extends SequentialCommandGroup {
 
   public static CommandBase acquireAndPark(
       ShooterPivotSubsystem shooterPivotSubsystem, IntakeSubsystem intakeSubsystem) {
-    return Commands.sequence(
-        new SetShooterAngle(shooterPivotSubsystem, PivotPresets.Acquire),
-        new IntakeGamepiece(intakeSubsystem),
-        new SetShooterAngle(shooterPivotSubsystem, PivotPresets.Park));
+    return new SetShooterAngle(shooterPivotSubsystem, PivotPresets.Acquire)
+        .alongWith(
+            Commands.waitUntil(() -> shooterPivotSubsystem.getAngleDegrees() > 45.0)
+                .andThen(new IntakeGamepiece(intakeSubsystem)))
+        .andThen(new SetShooterAngle(shooterPivotSubsystem, PivotPresets.Park));
   }
 
   /**

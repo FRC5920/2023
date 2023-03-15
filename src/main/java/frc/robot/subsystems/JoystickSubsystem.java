@@ -62,7 +62,7 @@ import frc.robot.RobotContainer;
 import frc.robot.commands.Balance;
 import frc.robot.commands.Shooter.Acquire;
 import frc.robot.commands.Shooter.Shoot;
-import frc.robot.commands.zTarget;
+import frc.robot.commands.zTarget.DriveWithZTargeting;
 import frc.robot.subsystems.Intake.IntakePreset;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.ShooterPivot.PivotPresets;
@@ -70,6 +70,9 @@ import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 
 /** A subsystem providing/managing Xbox controllers for driving the robot manually */
 public class JoystickSubsystem extends SubsystemBase {
+
+  public static final boolean kDriverControllerIsEnabled = true;
+  public static final boolean kOperatorControllerIsEnabled = false;
 
   public enum ControllerId {
     kDriver(0),
@@ -83,9 +86,9 @@ public class JoystickSubsystem extends SubsystemBase {
   }
 
   // ---------- Joystick Processing Constants -----------------
-  public static final double kDriverLeftStickSensitivity = 0.3;
+  public static final double kDriverLeftStickSensitivity = 0.5;
   public static final double kDriverLeftStickDeadbands[] = {0.1, 0.95};
-  public static final double kDriverRightStickSensitivity = 0.3;
+  public static final double kDriverRightStickSensitivity = 0.5;
   public static final double kDriverRightStickDeadbands[] = {0.1, 0.95};
   public static final double kDriverTriggerSensitivity = 1.0;
   public static final double kDriverTriggerDeadbands[] = {0.1, 0.95};
@@ -106,43 +109,48 @@ public class JoystickSubsystem extends SubsystemBase {
   /** Button */
   /** Creates a new JoystickSubsystem */
   public JoystickSubsystem() {
-    // Configure driver controller stick and trigger processing
-    driverController = new ProcessedXboxController(ControllerId.kDriver.port);
-    AxisProcChain.Config stickConfig =
-        new AxisProcChain.Config(kDriverLeftStickSensitivity, kDriverLeftStickDeadbands);
-    driverController.getStickProcessing(XboxController.Axis.kLeftX).configure(stickConfig);
-    driverController.getStickProcessing(XboxController.Axis.kLeftY).configure(stickConfig);
-    stickConfig =
-        new AxisProcChain.Config(kDriverRightStickSensitivity, kDriverRightStickDeadbands);
-    driverController.getStickProcessing(XboxController.Axis.kRightX).configure(stickConfig);
-    driverController.getStickProcessing(XboxController.Axis.kRightY).configure(stickConfig);
-    AxisProcChain.Config triggerConfig =
-        new AxisProcChain.Config(kDriverTriggerSensitivity, kDriverTriggerDeadbands);
-    driverController
-        .getTriggerProcessing(XboxController.Axis.kLeftTrigger)
-        .configure(triggerConfig);
-    driverController
-        .getTriggerProcessing(XboxController.Axis.kRightTrigger)
-        .configure(triggerConfig);
 
-    // Configure operator controller stick and trigger processing
-    operatorController = new ProcessedXboxController(ControllerId.kOperator.port);
-    stickConfig =
-        new AxisProcChain.Config(kOperatorLeftStickSensitivity, kOperatorLeftStickDeadbands);
-    driverController.getStickProcessing(XboxController.Axis.kLeftX).configure(stickConfig);
-    driverController.getStickProcessing(XboxController.Axis.kLeftY).configure(stickConfig);
-    stickConfig =
-        new AxisProcChain.Config(kOperatorRightStickSensitivity, kOperatorRightStickDeadbands);
-    driverController.getStickProcessing(XboxController.Axis.kRightX).configure(stickConfig);
-    driverController.getStickProcessing(XboxController.Axis.kRightY).configure(stickConfig);
-    triggerConfig =
-        new AxisProcChain.Config(kOperatorTriggerSensitivity, kOperatorTriggerDeadbands);
-    driverController
-        .getTriggerProcessing(XboxController.Axis.kLeftTrigger)
-        .configure(triggerConfig);
-    driverController
-        .getTriggerProcessing(XboxController.Axis.kRightTrigger)
-        .configure(triggerConfig);
+    if (kDriverControllerIsEnabled) {
+      // Configure driver controller stick and trigger processing
+      driverController = new ProcessedXboxController(ControllerId.kDriver.port);
+      AxisProcChain.Config stickConfig =
+          new AxisProcChain.Config(kDriverLeftStickSensitivity, kDriverLeftStickDeadbands);
+      driverController.getStickProcessing(XboxController.Axis.kLeftX).configure(stickConfig);
+      driverController.getStickProcessing(XboxController.Axis.kLeftY).configure(stickConfig);
+      stickConfig =
+          new AxisProcChain.Config(kDriverRightStickSensitivity, kDriverRightStickDeadbands);
+      driverController.getStickProcessing(XboxController.Axis.kRightX).configure(stickConfig);
+      driverController.getStickProcessing(XboxController.Axis.kRightY).configure(stickConfig);
+      AxisProcChain.Config triggerConfig =
+          new AxisProcChain.Config(kDriverTriggerSensitivity, kDriverTriggerDeadbands);
+      driverController
+          .getTriggerProcessing(XboxController.Axis.kLeftTrigger)
+          .configure(triggerConfig);
+      driverController
+          .getTriggerProcessing(XboxController.Axis.kRightTrigger)
+          .configure(triggerConfig);
+    }
+
+    if (kOperatorControllerIsEnabled) {
+      // Configure operator controller stick and trigger processing
+      operatorController = new ProcessedXboxController(ControllerId.kOperator.port);
+      AxisProcChain.Config stickConfig =
+          new AxisProcChain.Config(kOperatorLeftStickSensitivity, kOperatorLeftStickDeadbands);
+      driverController.getStickProcessing(XboxController.Axis.kLeftX).configure(stickConfig);
+      driverController.getStickProcessing(XboxController.Axis.kLeftY).configure(stickConfig);
+      stickConfig =
+          new AxisProcChain.Config(kOperatorRightStickSensitivity, kOperatorRightStickDeadbands);
+      driverController.getStickProcessing(XboxController.Axis.kRightX).configure(stickConfig);
+      driverController.getStickProcessing(XboxController.Axis.kRightY).configure(stickConfig);
+      AxisProcChain.Config triggerConfig =
+          new AxisProcChain.Config(kOperatorTriggerSensitivity, kOperatorTriggerDeadbands);
+      driverController
+          .getTriggerProcessing(XboxController.Axis.kLeftTrigger)
+          .configure(triggerConfig);
+      driverController
+          .getTriggerProcessing(XboxController.Axis.kRightTrigger)
+          .configure(triggerConfig);
+    }
   }
 
   /**
@@ -157,66 +165,74 @@ public class JoystickSubsystem extends SubsystemBase {
     ShooterPivotSubsystem shooterPivot = botContainer.shooterPivotSubsystem;
     IntakeSubsystem intake = botContainer.intakeSubsystem;
 
-    // Map buttons on driver controller
-    driverController.A.onTrue(
-        Shoot.pivotAndShoot(
-            shooterPivot, intake, PivotPresets.CloseShotLow, IntakePreset.CloseShotLow));
-    driverController.B.onTrue(
-        Shoot.pivotAndShoot(
-            shooterPivot, intake, PivotPresets.CloseShotMid, IntakePreset.CloseShotMid));
-    driverController.Y.onTrue(
-        Shoot.pivotAndShoot(
-            shooterPivot, intake, PivotPresets.CloseShotHigh, IntakePreset.CloseShotHigh));
+    if (kDriverControllerIsEnabled) {
+      // Map buttons on driver controller
+      driverController.A.onTrue(
+          Shoot.pivotAndShoot(
+              shooterPivot, intake, PivotPresets.CloseShotLow, IntakePreset.CloseShotLow));
+      driverController.B.onTrue(
+          Shoot.pivotAndShoot(
+              shooterPivot, intake, PivotPresets.CloseShotMid, IntakePreset.CloseShotMid));
+      driverController.Y.onTrue(
+          Shoot.pivotAndShoot(
+              shooterPivot, intake, PivotPresets.CloseShotHigh, IntakePreset.CloseShotHigh));
 
-    driverController.X.whileTrue(Acquire.acquireAndPark(shooterPivot, intake));
+      driverController.X.whileTrue(Acquire.acquireAndPark(shooterPivot, intake));
 
-    driverController.leftBumper.whileTrue(
-        new zTarget(
-            GameTarget.Cube,
-            botContainer.ArmCamera,
-            botContainer.swerveSubsystem,
-            botContainer.joystickSubsystem,
-            true,
-            true));
-    driverController.rightBumper.whileTrue(
-        new zTarget(
-            GameTarget.AprilTag2D,
-            botContainer.ArmCamera,
-            botContainer.swerveSubsystem,
-            botContainer.joystickSubsystem,
-            true,
-            true));
+      driverController.rightBumper.whileTrue(
+          DriveWithZTargeting.zTargetDriveWithIntake(
+              GameTarget.Cube,
+              botContainer.ArmCamera,
+              botContainer.swerveSubsystem,
+              botContainer.joystickSubsystem,
+              shooterPivot,
+              intake,
+              true,
+              true));
 
-    driverController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
-    driverController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
-    driverController.back.onTrue(
-        new InstantCommand(() -> botContainer.swerveSubsystem.zeroGyro())); // left little
-    driverController.start.whileTrue(new Balance(botContainer.swerveSubsystem)); // right little
+      driverController.leftBumper.whileTrue(
+          new DriveWithZTargeting(
+              GameTarget.AprilTag2D,
+              botContainer.ArmCamera,
+              botContainer.swerveSubsystem,
+              botContainer.joystickSubsystem,
+              true,
+              true));
 
-    // Map buttons on operator controller
-    operatorController.A.onTrue(
-        Shoot.pivotAndShoot(
-            shooterPivot, intake, PivotPresets.CloseShotLow, IntakePreset.CloseShotLow));
-    operatorController.B.onTrue(
-        Shoot.pivotAndShoot(
-            shooterPivot, intake, PivotPresets.CloseShotMid, IntakePreset.CloseShotMid));
-    operatorController.Y.onTrue(
-        Shoot.pivotAndShoot(
-            shooterPivot, intake, PivotPresets.CloseShotHigh, IntakePreset.CloseShotHigh));
+      driverController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
+      driverController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
+      driverController.back.onTrue(
+          new InstantCommand(() -> botContainer.swerveSubsystem.zeroGyro())); // left little
+      driverController.start.whileTrue(new Balance(botContainer.swerveSubsystem)); // right little
+    }
 
-    operatorController.leftBumper.whileTrue(
-        Acquire.acquireAndPark(botContainer.shooterPivotSubsystem, botContainer.intakeSubsystem));
-    operatorController.rightBumper.whileTrue(new InstantCommand());
+    if (kOperatorControllerIsEnabled) {
+      // Map buttons on operator controller
+      operatorController.A.onTrue(
+          Shoot.pivotAndShoot(
+              shooterPivot, intake, PivotPresets.CloseShotLow, IntakePreset.CloseShotLow));
+      operatorController.B.onTrue(
+          Shoot.pivotAndShoot(
+              shooterPivot, intake, PivotPresets.CloseShotMid, IntakePreset.CloseShotMid));
+      operatorController.Y.onTrue(
+          Shoot.pivotAndShoot(
+              shooterPivot, intake, PivotPresets.CloseShotHigh, IntakePreset.CloseShotHigh));
 
-    operatorController.leftTriggerAsButton.whileTrue(Acquire.acquireAndPark(shooterPivot, intake));
+      operatorController.leftBumper.whileTrue(
+          Acquire.acquireAndPark(botContainer.shooterPivotSubsystem, botContainer.intakeSubsystem));
+      operatorController.rightBumper.whileTrue(new InstantCommand());
 
-    operatorController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
-    operatorController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
-    operatorController.back.onTrue(
-        new InstantCommand(
-            () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.Park)));
-    operatorController.start.onTrue(
-        new InstantCommand(() -> botContainer.shooterPivotSubsystem.zeroPivotPosition()));
+      operatorController.leftTriggerAsButton.whileTrue(
+          Acquire.acquireAndPark(shooterPivot, intake));
+
+      operatorController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
+      operatorController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
+      operatorController.back.onTrue(
+          new InstantCommand(
+              () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.Park)));
+      operatorController.start.onTrue(
+          new InstantCommand(() -> botContainer.shooterPivotSubsystem.zeroPivotPosition()));
+    }
   }
 
   @Override

@@ -49,109 +49,114 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.commands;
+package frc.lib.utility;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.Constants.GameTarget;
-import frc.robot.RobotContainer;
-import frc.robot.subsystems.JoystickSubsystem;
-import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 
-public class zTarget extends CommandBase {
-  private Translation2d translation;
-  private boolean fieldRelative;
-  private boolean openLoop;
-  private Swerve s_Swerve;
-  private ProcessedXboxController controller;
-  private static final double SwerveP = 1.0;
-  private static final double SwerveI = 0.0;
-  private static final double SwervekD = 0.0;
+/**
+ * ZTargeter implements Z-targeting: using vision subsystems to identify a gamepiece and producing a
+ * recommended rotation to center on it
+ */
+public class ZTargeter {
 
-  PhotonCamera TargetingCamera;
-  GameTarget zTargetWhat;
-  private final PIDController omegaController = new PIDController(SwerveP, SwerveI, SwervekD);
+  // Set this constant to true to send values to the dashboard for debugging
+  public static final boolean kEnableDashboardDebug = true;
 
-  public zTarget(
-      GameTarget TargetWhat,
-      PhotonCamera camera,
-      Swerve s_Swerve,
-      JoystickSubsystem joystickSubsystem,
-      boolean fieldRelative,
-      boolean openLoop) {
+  /** Default proportional gain used for the rotation PID controller */
+  public static final double kDefault_kP = 0.7;
+  /** Default integral gain used for the rotation PID controller */
+  public static final double kDefault_kI = 0.0;
+  /** Default derivative gain used for the rotation PID controller */
+  public static final double kDefault_kD = 0.07;
 
-    this.s_Swerve = s_Swerve;
-    addRequirements(s_Swerve);
+  /** Camera used to target the gamepiece */
+  private final PhotonCamera m_camera;
 
-    this.controller = joystickSubsystem.driverController;
-    this.fieldRelative = fieldRelative;
-    this.openLoop = openLoop;
-    this.TargetingCamera = camera;
-    this.zTargetWhat = TargetWhat;
+  /** Type of gamepiece to target */
+  private final GameTarget m_gamepieceType;
 
+  /**
+   * PID controller used to produce a control effort that will bring the rotation of the camera to
+   * center on a detected gamepiece
+   */
+  private final PIDController omegaController;
+
+  /**
+   * Creates an instance of the targeter that uses a given camera to target a given type of
+   * gamepiece
+   *
+   * @param TargetWhat The type of gamepiece to target
+   * @param camera Camera used to locate and target the gamepiece
+   * @param gains PID gains to use for converging on the target
+   */
+  public ZTargeter(GameTarget TargetWhat, PhotonCamera camera) {
+    this(TargetWhat, camera, new PIDGains(kDefault_kP, kDefault_kI, kDefault_kD));
+  }
+
+  /**
+   * Creates an instance of the targeter that uses a given camera to target a given type of
+   * gamepiece
+   *
+   * @param TargetWhat The type of gamepiece to target
+   * @param camera Camera used to locate and target the gamepiece
+   * @param gains PID gains to use for converging on the target
+   */
+  public ZTargeter(GameTarget TargetWhat, PhotonCamera camera, PIDGains gains) {
+    m_camera = camera;
+    m_gamepieceType = TargetWhat;
+
+    omegaController = new PIDController(gains.kP, gains.kI, gains.kD);
     omegaController.setTolerance(Units.degreesToRadians(5));
     omegaController.enableContinuousInput(-Math.PI, Math.PI);
     omegaController.setSetpoint(0);
   }
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {}
+  /** This method must be called to initialize the camera used by the ZTargeter */
+  public void initialize() {
+    m_camera.setPipelineIndex(m_gamepieceType.PipelineIndex);
+  }
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
+  /**
+   * This method is called regularly to process vision results from the ZTargeter's camera and get a
+   * rotation needed to center on a target
+   *
+   * @return null if no target is detected; else a Rotation2d object indicating the direction and
+   *     amount to rotate in order to center on a detected target
+   */
+  public Rotation2d getRotationToTarget() {
+    Rotation2d result = null;
 
-    TargetingCamera.setPipelineIndex(zTargetWhat.PipelineIndex);
-    // Get translation and rotation from the joystick controller
-    double yAxis = -controller.getLeftY();
-    double xAxis = -controller.getLeftX();
-    double rotationRad = -controller.getRightX();
-
-    PhotonPipelineResult result = TargetingCamera.getLatestResult();
+    m_camera.setPipelineIndex(m_gamepieceType.PipelineIndex);
+    PhotonPipelineResult pipelineResult = m_camera.getLatestResult();
 
     // If vision has acquired a target, we will overwrite the rotation with a value
     // that will rotate the bot toward the target
-    if (result.hasTargets()) {
+    if (pipelineResult.hasTargets()) {
 
       // Calculate angular turn power
       // -1.0 required to ensure positive PID controller effort _increases_ yaw
       // Current measurement is the yaw relative to the bot.
       // omegaController has a setpoint of zero.  So, it's trying to reduce the
       // yaw to zero.
-      double angleToTargetDeg = result.getBestTarget().getYaw();
+      double angleToTargetDeg = pipelineResult.getBestTarget().getYaw();
       double yawToTargetRad = Units.degreesToRadians(angleToTargetDeg);
       double zRotationRad = omegaController.calculate(yawToTargetRad);
-      // zRotation = -1.0 * Math.signum(rotationRad) * Math.min(1.0, Math.abs(rotationRad));
-      SmartDashboard.putNumber("zTarget/degreesToTarget", angleToTargetDeg);
-      SmartDashboard.putNumber("zTarget/yawToTargetRad", yawToTargetRad);
-      SmartDashboard.putNumber("zTarget/controllerRad", zRotationRad);
 
-      rotationRad = zRotationRad; // NOTE: may need to cap this at a maximum...
+      if (kEnableDashboardDebug) {
+        SmartDashboard.putNumber("zTarget/degreesToTarget", angleToTargetDeg);
+        SmartDashboard.putNumber("zTarget/yawToTargetRad", yawToTargetRad);
+        SmartDashboard.putNumber("zTarget/controllerRad", zRotationRad);
+      }
+
+      result = new Rotation2d(zRotationRad);
     }
 
-    translation = new Translation2d(yAxis, xAxis).times(RobotContainer.MaxSpeed);
-    rotationRad *= RobotContainer.MaxRotate;
-    SmartDashboard.putNumber("zTarget/commandedOutput", rotationRad);
-    s_Swerve.drive(translation, rotationRad, fieldRelative, openLoop);
-  }
-
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    // TargetingCamera.setPipelineIndex(-1);
-  }
-
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    // TargetingCamera.setPipelineIndex(-1);
-    return false;
+    return result;
   }
 }
