@@ -140,7 +140,7 @@ public class ShooterPivotDashboardTab implements IDashboardTab {
 
     m_testCommand = new TestCommand(m_shooterSubsystem, () -> m_positionSlider.getValue());
     m_tab
-        .add(m_testCommand)
+        .add("SetPivot", m_testCommand)
         .withPosition(3 + (kTelemetryPanelWidthCells + 4), kTelemetryPanelHeightCells + 4)
         .withSize(3, 3);
 

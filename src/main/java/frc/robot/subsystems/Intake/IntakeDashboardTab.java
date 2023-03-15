@@ -127,7 +127,7 @@ public class IntakeDashboardTab implements IDashboardTab {
 
     m_intakeSpeedSlider =
         new SliderWithChangeDetection(
-            m_tab, "Intake Speed (percent)", IntakePreset.Acquire.motorSpeed, 0, 100, 1);
+            m_tab, "Intake Speed (percent)", IntakePreset.Acquire.motorSpeed, -20, 100, 1);
     m_intakeSpeedSlider.getWidget().withPosition(4, 10).withSize(5, 2);
 
     m_intakeAndStopCommand = new IntakeGamepiece(m_intakeSubsystem);

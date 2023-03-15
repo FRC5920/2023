@@ -70,7 +70,7 @@ public class ShooterPivotSubsystem extends SubsystemBase {
   /** Gear ratio used to couple pivot motor axles to primary chain sprocket */
   public static final double kPrimaryGearRatio = 1.0 / 21.0;
   /** Gear ratio used to couple secondary chain sprocket to pivot */
-  public static final double kSecondaryGearRatio = 15.0 / 12.0;
+  public static final double kSecondaryGearRatio = 12.0 / 15.0;
   /** The combined gear ratio */
   public static final double kPivotGearRatio = kPrimaryGearRatio * kSecondaryGearRatio;
 
@@ -86,9 +86,9 @@ public class ShooterPivotSubsystem extends SubsystemBase {
       new PIDGains(
           kDefaultPivotPID_kP, kDefaultPivotPID_kI, kDefaultPivotPID_kD, kDefaultPivotPID_kFF);
 
-  public static final double kMotionCruiseVelocityDegPerSec = 40.0;
-  public static final double kMotionAccelerationDegPerSec2 = 25.0;
-  public static final int kMotionSmoothing = 8;
+  public static final double kMotionCruiseVelocityDegPerSec = 60.0;
+  public static final double kMotionAccelerationDegPerSec2 = 40.0;
+  public static final int kMotionSmoothing = 6;
 
   /** Peak output (%) that intake motors should run */
   private static final double kMaxMotorOutputPercent = 1.0;
@@ -266,7 +266,7 @@ public class ShooterPivotSubsystem extends SubsystemBase {
       motor.configSelectedFeedbackSensor(
           TalonFXFeedbackDevice.IntegratedSensor, kPIDLoopIdx, kTimeoutMs);
       motor.setSensorPhase(true);
-      motor.configAllowableClosedloopError(0, degreesToFalconTicks(5), kTimeoutMs);
+      // motor.configAllowableClosedloopError(0, degreesToFalconTicks(1), kTimeoutMs);
 
       // Select a motion profile slot
       int kSlotIdx = 0;
