@@ -62,7 +62,7 @@ import frc.robot.RobotContainer;
 import frc.robot.commands.Balance;
 import frc.robot.commands.Shooter.Acquire;
 import frc.robot.commands.Shooter.Shoot;
-import frc.robot.commands.zTarget;
+import frc.robot.commands.zTarget.DriveWithZTargeting;
 import frc.robot.subsystems.Intake.IntakePreset;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.ShooterPivot.PivotPresets;
@@ -171,7 +171,7 @@ public class JoystickSubsystem extends SubsystemBase {
     driverController.X.whileTrue(Acquire.acquireAndPark(shooterPivot, intake));
 
     driverController.leftBumper.whileTrue(
-        new zTarget(
+        new DriveWithZTargeting(
             GameTarget.Cube,
             botContainer.ArmCamera,
             botContainer.swerveSubsystem,
@@ -179,7 +179,7 @@ public class JoystickSubsystem extends SubsystemBase {
             true,
             true));
     driverController.rightBumper.whileTrue(
-        new zTarget(
+        new DriveWithZTargeting(
             GameTarget.AprilTag2D,
             botContainer.ArmCamera,
             botContainer.swerveSubsystem,

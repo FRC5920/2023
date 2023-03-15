@@ -49,12 +49,13 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.commands;
+package frc.robot.commands.zTarget;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.lib.utility.ZTargeter;
 import frc.robot.Constants.GameTarget;
@@ -63,7 +64,7 @@ import frc.robot.subsystems.JoystickSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import org.photonvision.PhotonCamera;
 
-public class zTarget extends CommandBase {
+public class DriveWithZTargeting extends CommandBase {
 
   private final boolean m_fieldRelative;
   private final boolean m_openLoop;
@@ -71,7 +72,22 @@ public class zTarget extends CommandBase {
   private final ProcessedXboxController m_controller;
   private final ZTargeter m_zTargeter;
 
-  public zTarget(
+  /** Returns a command that drives with Z-targeting and intake engaged */
+  public static CommandBase zTargetDriveWithIntake(
+      GameTarget gamepieceType,
+      PhotonCamera camera,
+      Swerve swerveSubsystem,
+      JoystickSubsystem joystickSubsystem,
+      boolean fieldRelative,
+      boolean openLoop) {
+    return Commands.race(
+        new DriveWithZTargeting(
+            gamepieceType, camera, swerveSubsystem, joystickSubsystem, fieldRelative, openLoop)
+        // TODO: add acquire command
+        );
+  }
+
+  public DriveWithZTargeting(
       GameTarget gamepieceType,
       PhotonCamera camera,
       Swerve swerveSubsystem,
