@@ -73,6 +73,9 @@ public class IntakeSubsystem extends SubsystemBase {
   /** Time required to ramp from neutral to full scale motor output */
   private static final double kOpenLoopRampSec = 0.5;
 
+  /** Voltage that motors will automatically scale full-scale output to */
+  private static final double kMotorVoltageCompensationFullScale = 11.0;
+  
   private static final int kPIDLoopIdx = 0;
   private static final int kTimeoutMs = 30;
 
@@ -209,6 +212,10 @@ public class IntakeSubsystem extends SubsystemBase {
       // that occurs as the motor starts up and has to overcome the inertia of itself and the
       // rollers
       motor.configOpenloopRamp(kOpenLoopRampSec);
+
+      // Full-scale output for the motor will be scaled to 11 Volts
+      motor.configVoltageCompSaturation(kMotorVoltageCompensationFullScale);
+      motor.enableVoltageCompensation(true);
     }
   }
 
