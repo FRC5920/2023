@@ -133,7 +133,6 @@ public class ZTargeter {
   public Rotation2d getRotationToTarget() {
     Rotation2d result = null;
 
-    m_camera.setPipelineIndex(m_gamepieceType.PipelineIndex);
     PhotonPipelineResult pipelineResult = m_camera.getLatestResult();
 
     // If vision has acquired a target, we will overwrite the rotation with a value
