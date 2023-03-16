@@ -62,7 +62,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.SwerveDrive.GyroIO;
 import frc.lib.SwerveDrive.GyroInputsAutoLogged;
@@ -298,7 +297,7 @@ public class Swerve extends SubsystemBase {
   /** Executed periodically to service the subsystem */
   @Override
   public void periodic() {
-  
+
     m_gyroIO.updateInputs(m_gyroMeasurements);
     // Logger.getInstance().processInputs("Drive/Gyro", m_gyroMeasurements);
     for (SwerveModule module : mSwerveMods) {
