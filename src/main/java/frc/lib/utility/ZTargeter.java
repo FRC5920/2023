@@ -69,11 +69,11 @@ public class ZTargeter {
   public static final boolean kEnableDashboardDebug = true;
 
   /** Default proportional gain used for the rotation PID controller */
-  public static final double kDefault_kP = 0.7;
+  public static final double kDefault_kP = 0.9;
   /** Default integral gain used for the rotation PID controller */
   public static final double kDefault_kI = 0.0;
   /** Default derivative gain used for the rotation PID controller */
-  public static final double kDefault_kD = 0.07;
+  public static final double kDefault_kD = 0.1;
 
   /** Camera used to target the gamepiece */
   private final PhotonCamera m_camera;
@@ -120,7 +120,7 @@ public class ZTargeter {
   /** This method must be called to initialize the camera used by the ZTargeter */
   public void initialize() {
     m_camera.setPipelineIndex(m_gamepieceType.PipelineIndex);
-    System.out.println("Z-Target: Targetting " +  String.valueOf(m_gamepieceType));
+    // System.out.println("Z-Target: Targetting " + String.valueOf(m_gamepieceType));
   }
 
   /**

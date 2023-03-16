@@ -87,8 +87,8 @@ public class Balance extends CommandBase {
     // omegaController.reset(drivetrainSubsystem.getYaw().getRadians());
     // xController.reset(drivetrainSubsystem.getRoll());
     // yController.reset(drivetrainSubsystem.getPitch());
-    
-    System.out.println("Balance: Balacing ");
+
+    // System.out.println("Balance: Balacing ");
   }
 
   // Called every time the scheduler runs while the command is scheduled.

@@ -62,6 +62,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.SwerveDrive.GyroIO;
 import frc.lib.SwerveDrive.GyroInputsAutoLogged;
@@ -72,7 +73,7 @@ import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 
 public class Swerve extends SubsystemBase {
   /** Set to true to enable a dashboard tab for the Swerve subsystem */
-  public static final boolean kDashboardTabIsEnabled = false;
+  public static final boolean kDashboardTabIsEnabled = true;
 
   private static final Rotation2d kAngleZero = new Rotation2d(0.0);
   private static final Rotation2d kAngle360 = Rotation2d.fromDegrees(360);
@@ -297,6 +298,7 @@ public class Swerve extends SubsystemBase {
   /** Executed periodically to service the subsystem */
   @Override
   public void periodic() {
+  
     m_gyroIO.updateInputs(m_gyroMeasurements);
     // Logger.getInstance().processInputs("Drive/Gyro", m_gyroMeasurements);
     for (SwerveModule module : mSwerveMods) {

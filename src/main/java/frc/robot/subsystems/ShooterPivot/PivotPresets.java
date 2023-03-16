@@ -56,7 +56,7 @@ public enum PivotPresets {
   /** Angle used to park the intake */
   Park(0.0),
   /** Angle used to acquire a game piece */
-  Acquire(185.0),
+  Acquire(195.0),
   /** Angle used when transporting a game piece */
   Transport(60),
 

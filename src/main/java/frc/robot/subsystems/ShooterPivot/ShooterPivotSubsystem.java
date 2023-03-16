@@ -86,8 +86,8 @@ public class ShooterPivotSubsystem extends SubsystemBase {
       new PIDGains(
           kDefaultPivotPID_kP, kDefaultPivotPID_kI, kDefaultPivotPID_kD, kDefaultPivotPID_kFF);
 
-  public static final double kMotionCruiseVelocityDegPerSec = 60.0;
-  public static final double kMotionAccelerationDegPerSec2 = 40.0;
+  public static final double kMotionCruiseVelocityDegPerSec = 200.0;
+  public static final double kMotionAccelerationDegPerSec2 = 130.0;
   public static final int kMotionSmoothing = 6;
 
   /** Peak output (%) that intake motors should run */
