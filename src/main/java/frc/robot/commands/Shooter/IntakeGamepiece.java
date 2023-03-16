@@ -52,74 +52,174 @@
 package frc.robot.commands.Shooter;
 
 import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
 import frc.robot.subsystems.Intake.IntakePreset;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 
-public class IntakeGamepiece extends CommandBase {
+/**
+ * IntakeGamepiece uses the Intake subsystem to pull in do this, it a cube gamepiece. To do this, it
+ * implements the following sequence: 1.) Ramp up Intake Motors to get the intake rollers spinning
+ * 2.) Detect when the rollers have pulled in a gamepiece 3.) Stop intake rollers
+ *
+ * <p>Detecting when a gamepiece has been pulled into the intake is done by sensing the friction
+ * created by the cube when it gets pulled into the rollers. This friction causes the speed of the
+ * motors to decrease and the motors to draw more current as they work to run at the commanded
+ * speed.
+ *
+ * <p>Detecting an increase in motor current is complicated by the fact that when the motors are
+ * initially started, they draw more current as they work to overcome the inertia of the intake
+ * rollers. This causes a spike in electrical current until the rollers reach their commanded speed.
+ * Additionally, motor current and speed sensor readings tend to be fairly "noisy". To mitigate
+ * these problems, motor current and speed measurements are passed through moving average filters
+ * that yield the average measurement over a period of time.
+ */
+public class IntakeGamepiece extends SequentialCommandGroup {
+
+  /** Amount of time (seconds) to average motor current and speed measurements */
   private static final double kAverageWindowSec = 0.2;
-  private static final int kNumFilterTaps = (int) (kAverageWindowSec / Constants.robotPeriodSec);
+
+  /**
+   * Motor current threshold used to detect when a cube has been loaded into the intake. A cube has
+   * been loaded when the average motor current exceeds this threshold.
+   */
   private static final double kCurrentThresholdAmps = 65.0;
-  private static final double kMotorSlewRate = 0.1;
 
-  private final IntakeSubsystem m_intakeSubsystem;
+  /**
+   * Motor speed threshold used to detect when a cube has been loaded into the intake. A cube has
+   * been loaded when the average motor speed falls below this percentage of the commanded speed.
+   */
+  private static final double kSpeedThresholdPercent = 60.0;
+
+  /** Number of taps in moving average filters applied to motor measurements */
+  private static final int kNumFilterTaps = (int) (kAverageWindowSec / Constants.robotPeriodSec);
+
+  /**
+   * Filter used to calculate the average intake motor speed value
+   *
+   * @remarks This filter must by shared by internal motor ramp-up and gamepiece detection commands
+   *     to prevent discontinuities in average motor speed calculation.
+   */
   private LinearFilter m_speedAverager = LinearFilter.movingAverage(kNumFilterTaps);
-  private LinearFilter m_currentAverager = LinearFilter.movingAverage(kNumFilterTaps);
-  private SlewRateLimiter m_slewRateLimiter =
-      new SlewRateLimiter(kMotorSlewRate, kMotorSlewRate, 0.0);
-
-  private enum State {
-    RampUpMotor,
-    IntakeGamepiece
-  }
-
-  private State m_state = State.RampUpMotor;
 
   /** Creates a new IntakeGamepiece. */
   public IntakeGamepiece(IntakeSubsystem intakeSubsystem) {
     addRequirements(intakeSubsystem);
-    m_intakeSubsystem = intakeSubsystem;
+    m_speedAverager.reset();
+
+    addCommands(
+        new RampUpIntakeMotors(intakeSubsystem, m_speedAverager, IntakePreset.Acquire.motorSpeed),
+        new DetectGamepiece(
+            intakeSubsystem, m_speedAverager, kSpeedThresholdPercent, kCurrentThresholdAmps),
+        new InstantCommand(() -> intakeSubsystem.stopIntake()));
   }
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    m_intakeSubsystem.activatePreset(IntakePreset.Acquire);
-    m_currentAverager.reset();
-    // System.out.println("Intake: Starting Intake");
-  }
+  /**
+   * Internal command used to ramp up intake motors. Finishes when intake motors are running at a
+   * specified target speed.
+   */
+  private static class RampUpIntakeMotors extends CommandBase {
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {}
+    /** The Intake subsystem to operate on */
+    private final IntakeSubsystem m_intakeSubsystem;
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    m_intakeSubsystem.stopIntake();
-    // System.out.println("Intake: Stopping");
-  }
+    /** Filter used to calculate the average intake motor speed value */
+    private LinearFilter m_averager;
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    boolean finished = false;
+    /** The command will finish once the average motor speed has exceeded this value */
+    private final double m_targetMotorSpeedPercent;
 
-    switch (m_state) {
-      case RampUpMotor:
-        double averageSpeed = m_speedAverager.calculate(m_intakeSubsystem.getSpeedPercent());
-        m_state =
-            (averageSpeed >= IntakePreset.Acquire.motorSpeed * 0.80)
-                ? State.IntakeGamepiece
-                : State.RampUpMotor;
-        break;
-      case IntakeGamepiece:
-        double averageAmps = m_currentAverager.calculate(m_intakeSubsystem.getMotorCurrentAmps());
-        finished = averageAmps > kCurrentThresholdAmps;
+    /**
+     * Creates an instance of the command
+     *
+     * @param intakeSubsystem Intake subsytem to operate on
+     * @param speedFilter Filter used to calculate average motor speed
+     * @param targetSpeed Target motor speed to ramp up to
+     */
+    RampUpIntakeMotors(
+        IntakeSubsystem intakeSubsystem, LinearFilter speedFilter, double targetSpeed) {
+      m_intakeSubsystem = intakeSubsystem;
+      m_targetMotorSpeedPercent = targetSpeed;
+      m_averager = speedFilter;
     }
 
-    return finished;
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {
+      m_intakeSubsystem.setSpeedPercent(m_targetMotorSpeedPercent);
+    }
+
+    /** Returns true when the motor speed exceeds 95% of the target speed */
+    @Override
+    public boolean isFinished() {
+      double averageSpeed = m_averager.calculate(m_intakeSubsystem.getSpeedPercent());
+      return (averageSpeed >= m_targetMotorSpeedPercent * 0.9);
+    }
+  }
+
+  /**
+   * Internal command used to detect when a gamepiece has been loaded into the intake. Finishes when
+   * a gamepiece is detected.
+   */
+  private static class DetectGamepiece extends CommandBase {
+
+    /** The Intake subsystem to operate on */
+    private final IntakeSubsystem m_intakeSubsystem;
+
+    /** If motor speed falls below this threshold, a gamepiece is loaded */
+    private final double m_motorSpeedThreshold;
+
+    /** If motor current exceeds this threshold, a gamepiece is loaded */
+    private final double m_motorCurrentThreshold;
+
+    /** Filter used to calculate the average intake motor speed */
+    private LinearFilter m_speedAverager;
+
+    /** Filter used to calculate the average intake motor current value */
+    private LinearFilter m_currentAverager = LinearFilter.movingAverage(kNumFilterTaps);
+
+    /**
+     * Creates an instance of the command
+     *
+     * @param intakeSubsystem Intake subsytem to operate on
+     * @param speedFilter Filter used to calculate average motor speed
+     * @param currentFilter Filter used to calculate average motor current
+     * @param speedThreshold Threshold used to detect a gamepiece using speed
+     * @param currentThreshold Threshold used to detect a gamepiece using current
+     */
+    public DetectGamepiece(
+        IntakeSubsystem intakeSubsystem,
+        LinearFilter speedFilter,
+        double speedThreshold,
+        double currentThreshold) {
+      m_intakeSubsystem = intakeSubsystem;
+      m_motorSpeedThreshold = speedThreshold;
+      m_speedAverager = speedFilter;
+      m_motorCurrentThreshold = currentThreshold;
+    }
+
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {
+      m_currentAverager.reset();
+    }
+
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+      return detectUsingSpeed() || detectUsingCurrent();
+    }
+
+    private boolean detectUsingCurrent() {
+      double averageCurrent = m_currentAverager.calculate(m_intakeSubsystem.getMotorCurrentAmps());
+      return averageCurrent >= m_motorCurrentThreshold;
+    }
+
+    private boolean detectUsingSpeed() {
+      double averageSpeed = m_speedAverager.calculate(m_intakeSubsystem.getSpeedPercent());
+      return averageSpeed >= m_motorSpeedThreshold;
+    }
   }
 }

@@ -75,7 +75,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   /** Voltage that motors will automatically scale full-scale output to */
   private static final double kMotorVoltageCompensationFullScale = 11.0;
-  
+
   private static final int kPIDLoopIdx = 0;
   private static final int kTimeoutMs = 30;
 
