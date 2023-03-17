@@ -60,7 +60,6 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.lib.dashboard.WidgetsWithChangeDetection.ChooserWithChangeDetection;
 import frc.lib.dashboard.WidgetsWithChangeDetection.PIDTunerPanel;
-import frc.lib.dashboard.WidgetsWithChangeDetection.ToggleButtonWithChangeDetection;
 import frc.robot.RobotContainer;
 import frc.robot.autos.AutoConstants.EscapeRoute;
 import frc.robot.autos.AutoConstants.Grids;
@@ -96,7 +95,6 @@ public class AutoDashboardTab implements IDashboardTab {
 
   /** 2d view of the field */
   private Field2d m_field2d;
-
 
   /** Initial position chooser */
   private final ChooserWithChangeDetection<Grids.ScoringPosition> m_initialPositionChooser =
@@ -150,6 +148,12 @@ public class AutoDashboardTab implements IDashboardTab {
         .withSize(kChooserWidth, kChooserHeight)
         .withPosition(0 * kChooserWidth, 0);
 
+    m_initialActionChooser.loadOptions(InitialAction.getNames(), InitialAction.values(), 2);
+    m_tab
+        .add("Initial Action", m_initialActionChooser)
+        .withSize(kChooserWidth, kChooserHeight)
+        .withPosition(1 * kChooserWidth, 0);
+
     // Set up a chooser for the route to follow out of the community
     m_routeChooser.loadOptions(EscapeRoute.Route.getNames(), EscapeRoute.Route.values(), 0);
     m_tab
@@ -163,12 +167,6 @@ public class AutoDashboardTab implements IDashboardTab {
         .add("Secondary Action", m_secondaryActionChooser)
         .withSize(kChooserWidth, kChooserHeight)
         .withPosition(3 * kChooserWidth, 0);
-
-    m_initialActionChooser.loadOptions(InitialAction.getNames(), InitialAction.values(), 2);
-    m_tab
-        .add("Initial Action", m_initialActionChooser)
-        .withSize(kChooserWidth, kChooserHeight)
-        .withPosition(1 * kChooserWidth, 0);
 
     // Set up a chooser for the waypoint to move to outside the community
     // populateChooser(m_targetWaypointChooser, Waypoints.ID.getNames(), Waypoints.ID.values());
@@ -199,21 +197,21 @@ public class AutoDashboardTab implements IDashboardTab {
     Alliance currentAlliance = DriverStation.getAlliance();
 
     boolean initialPositionChanged = m_initialPositionChooser.hasChanged();
+    boolean initialActionChanged = m_initialActionChooser.hasChanged();
     boolean routeHasChanged = m_routeChooser.hasChanged();
     boolean selectedActionChanged = m_secondaryActionChooser.hasChanged();
     boolean targetWaypointChanged = false; // m_targetWaypointChooser.hasChanged();
     boolean translationPIDChanged = m_translationPIDPanel.hasChanged();
     boolean rotationPIDChanged = m_rotationPIDPanel.hasChanged();
-    boolean initialActionChanged = m_initialActionChooser.hasChanged();
 
     if ((m_lastAlliance != currentAlliance)
         || initialPositionChanged
+        || initialActionChanged
         || routeHasChanged
         || selectedActionChanged
         || targetWaypointChanged
         || translationPIDChanged
-        || rotationPIDChanged
-        || initialActionChanged) {
+        || rotationPIDChanged) {
 
       System.out.println("<AutoDashboardTab::updateDashboard> processing dashboard value change");
       m_lastAlliance = currentAlliance;
@@ -222,6 +220,7 @@ public class AutoDashboardTab implements IDashboardTab {
       m_builder.build(
           botContainer,
           m_initialPositionChooser.getSelected(),
+          m_initialActionChooser.getSelected(),
           m_routeChooser.getSelected(),
           m_secondaryActionChooser.getSelected(),
           m_translationPIDPanel.getGains(),

@@ -86,9 +86,9 @@ public class AutoConstants {
   /** Constants indicating the robot's rotational orientation */
   public static class BotOrientation {
     /** Bot is rotated toward Grids */
-    private static final Rotation2d kFacingGrid = new Rotation2d(Math.PI);
+    public static final Rotation2d kFacingGrid = new Rotation2d(Math.PI);
     /** Bot is rotated toward the middle of the field */
-    private static final Rotation2d kFacingField = new Rotation2d(0.0);
+    public static final Rotation2d kFacingField = new Rotation2d(0.0);
     /** Bot is rotated facing in the opposite direction of the scoring table */
     public static final Rotation2d kFacingNorth = new Rotation2d(Math.PI / 2.0);
     /** Bot is rotated facing the scoring table */
@@ -463,18 +463,19 @@ public class AutoConstants {
     }
   }
 
+  /////////////////////////////////////////////////////////////////////////////
+  /** An enumeration of initial actions to take before escaping the community */
   public static enum InitialAction {
-    Nothing,
-    BumpScore,
-    ShootLow,
-    ShootMid,
-    ShootHigh;
+    BumpScore, // Drive forward to leave behind a cube, then drive back to bump it into low goal
+    ShootLow, // Shoot pre-loaded cube into low goal
+    ShootMid, // Shoot pre-loaded cube into mid goal
+    ShootHigh; // Shoot pre-loaded cube into high goal
 
     /** Returns a list of names of enum elements */
     public static String[] getNames() {
       return getEnumNames(InitialAction.class);
     }
-  }
+  };
 
   /////////////////////////////////////////////////////////////////////////////
   /** An enumeration of secondary actions to take after escaping the community */

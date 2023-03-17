@@ -63,7 +63,7 @@ import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 public class Shoot {
   public static final double kShootDurationSec = 0.5;
 
-  public static Command pivotAndShoot(
+  public static CommandBase pivotAndShoot(
       ShooterPivotSubsystem shooterPivotSubsystem,
       IntakeSubsystem intakeSubsystem,
       PivotPresets pivotPreset,
@@ -73,7 +73,7 @@ public class Shoot {
         shootAtSpeed(intakeSubsystem, speedPreset, kShootDurationSec));
   }
 
-  public static Command pivotAndShoot(
+  public static CommandBase pivotAndShoot(
       ShooterPivotSubsystem shooterPivotSubsystem,
       IntakeSubsystem intakeSubsystem,
       double pivotDegrees,
@@ -81,6 +81,33 @@ public class Shoot {
     return Commands.sequence(
         new SetShooterAngle(shooterPivotSubsystem, pivotDegrees),
         shootAtSpeed(intakeSubsystem, shooterSpeedPercent, 1.5));
+  }
+
+  public static CommandBase pivotAndShootLow(
+      ShooterPivotSubsystem shooterPivotSubsystem, IntakeSubsystem intakeSubsystem) {
+    return pivotAndShoot(
+        shooterPivotSubsystem,
+        intakeSubsystem,
+        PivotPresets.CloseShotLow,
+        IntakePreset.CloseShotLow);
+  }
+
+  public static CommandBase pivotAndShootMid(
+      ShooterPivotSubsystem shooterPivotSubsystem, IntakeSubsystem intakeSubsystem) {
+    return pivotAndShoot(
+        shooterPivotSubsystem,
+        intakeSubsystem,
+        PivotPresets.CloseShotMid,
+        IntakePreset.CloseShotMid);
+  }
+
+  public static CommandBase pivotAndShootHigh(
+      ShooterPivotSubsystem shooterPivotSubsystem, IntakeSubsystem intakeSubsystem) {
+    return pivotAndShoot(
+        shooterPivotSubsystem,
+        intakeSubsystem,
+        PivotPresets.CloseShotHigh,
+        IntakePreset.CloseShotHigh);
   }
 
   /**

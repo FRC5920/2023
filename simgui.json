@@ -92,6 +92,11 @@
           "visible": true
         }
       },
+      "/Shuffleboard/Auto Builder/Initial Action": {
+        "window": {
+          "visible": true
+        }
+      },
       "/Shuffleboard/Auto Builder/Initial Position": {
         "window": {
           "name": "Initial Position",
@@ -107,6 +112,11 @@
       "/Shuffleboard/Auto Builder/Route": {
         "window": {
           "name": "Escape Route",
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Auto Builder/Secondary Action": {
+        "window": {
           "visible": true
         }
       },

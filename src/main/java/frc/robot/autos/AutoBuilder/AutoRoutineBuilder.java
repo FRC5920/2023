@@ -55,16 +55,22 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.lib.thirdparty.FRC6328.AllianceFlipUtil;
 import frc.lib.utility.PIDGains;
 import frc.robot.RobotContainer;
 import frc.robot.autos.AutoConstants.BotOrientation;
 import frc.robot.autos.AutoConstants.EscapeRoute;
 import frc.robot.autos.AutoConstants.Grids;
+import frc.robot.autos.AutoConstants.InitialAction;
 import frc.robot.autos.AutoConstants.SecondaryAction;
 import frc.robot.autos.AutoConstants.Waypoints;
 import frc.robot.autos.BumpScore;
+import frc.robot.commands.Shooter.Shoot;
+import frc.robot.subsystems.Intake.IntakeSubsystem;
+import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import frc.robot.subsystems.SwerveDrivebase.Swerve.WheelPreset;
 import java.util.ArrayList;
@@ -116,6 +122,7 @@ public class AutoRoutineBuilder {
   public Command build(
       RobotContainer botContainer,
       Grids.ScoringPosition startingPosition,
+      InitialAction initialAction,
       EscapeRoute.Route escapeRoute,
       SecondaryAction secondaryAction,
       PIDGains translationPIDGains,
@@ -135,9 +142,9 @@ public class AutoRoutineBuilder {
               botContainer.swerveSubsystem.setWheelPreset(WheelPreset.Forward);
             }));
 
-    if (doBumpScore) {
-      autoCommandGroup.addCommands(new BumpScore(startingPosition, botContainer.swerveSubsystem));
-    }
+    // Add a command to implement the initial action
+    autoCommandGroup.addCommands(
+        getInitialActionCommands(botContainer, initialAction, startingPosition));
 
     EscapeStrategy escapeStrategy =
         new EscapeStrategy(
@@ -164,8 +171,8 @@ public class AutoRoutineBuilder {
                 "BalanceStart",
                 endpoint.getX(),
                 endpoint.getY(),
-                BotOrientation.facingField(),
-                BotOrientation.facingField());
+                AllianceFlipUtil.apply(BotOrientation.kFacingField),
+                AllianceFlipUtil.apply(BotOrientation.kFacingField));
         BalanceStrategy balanceStrategy = new BalanceStrategy(balanceStart);
         autoCommandGroup.addCommands(
             balanceStrategy.generateCommand(
@@ -190,5 +197,35 @@ public class AutoRoutineBuilder {
   /** Returns the last command built using build() */
   public Command getCommand() {
     return m_builtCommand;
+  }
+
+  static CommandBase getInitialActionCommands(
+      RobotContainer botContainer,
+      InitialAction initialAction,
+      Grids.ScoringPosition startingPosition) {
+    ShooterPivotSubsystem shooterPivot = botContainer.shooterPivotSubsystem;
+    IntakeSubsystem intake = botContainer.intakeSubsystem;
+
+    CommandBase actionCommand = null;
+
+    switch (initialAction) {
+      case BumpScore:
+        actionCommand = new BumpScore(startingPosition, botContainer.swerveSubsystem);
+        break;
+
+      case ShootLow:
+        actionCommand = Shoot.pivotAndShootLow(shooterPivot, intake);
+        break;
+
+      case ShootMid:
+        actionCommand = Shoot.pivotAndShootMid(shooterPivot, intake);
+        break;
+
+      case ShootHigh:
+        actionCommand = Shoot.pivotAndShootHigh(shooterPivot, intake);
+        break;
+    }
+
+    return actionCommand;
   }
 }

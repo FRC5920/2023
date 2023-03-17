@@ -59,11 +59,12 @@ import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.lib.thirdparty.FRC6328.AllianceFlipUtil;
 import frc.lib.utility.PIDGains;
+import frc.robot.autos.AutoConstants.BotOrientation;
 import frc.robot.autos.AutoConstants.ChargingStation;
 import frc.robot.autos.AutoConstants.Waypoints;
 import frc.robot.commands.Balance;
@@ -162,12 +163,8 @@ public class BalanceStrategy {
     Translation2d cs = ChargingStation.getCenter();
 
     // PathPlanner doesn't automatically adjust rotations according to Alliance
-    Rotation2d fieldFacing =
-        new Rotation2d(
-            (DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 0.0 : Math.PI);
-    Rotation2d gridFacing =
-        new Rotation2d(
-            (DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? Math.PI : 0.0);
+    Rotation2d fieldFacing = AllianceFlipUtil.apply(BotOrientation.kFacingField);
+    Rotation2d gridFacing = AllianceFlipUtil.apply(BotOrientation.kFacingGrid);
 
     PathPointHelper initialPoint =
         new PathPointHelper(
@@ -175,11 +172,11 @@ public class BalanceStrategy {
             m_initialLocation.getX(),
             m_initialLocation.getY(),
             fieldFacing, // Heading needs to be facing field to get the right spline
-            fieldFacing);
+            gridFacing);
     PathPointHelper stageAtY =
-        new PathPointHelper("Stage at Y", y.getX(), y.getY(), gridFacing, fieldFacing);
+        new PathPointHelper("Stage at Y", y.getX(), y.getY(), gridFacing, gridFacing);
     PathPointHelper centerOfCS =
-        new PathPointHelper("Center of CS", cs.getX(), cs.getY(), gridFacing, fieldFacing);
+        new PathPointHelper("Center of CS", cs.getX(), cs.getY(), gridFacing, gridFacing);
 
     trajectoryList.add(
         PathPlanner.generatePath(kDefaultPathConstraints, initialPoint, stageAtY, centerOfCS));

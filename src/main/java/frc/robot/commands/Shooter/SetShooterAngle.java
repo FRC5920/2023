@@ -51,6 +51,8 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.commands.Shooter;
 
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ShooterPivot.PivotPresets;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
@@ -63,6 +65,9 @@ public class SetShooterAngle extends CommandBase {
   private final ShooterPivotSubsystem m_shooterPivotSubsystem;
 
   private final double m_pivotDegrees;
+
+  /** Timer used to simulate shot in simulation mode */
+  private Timer m_simulationTimer = new Timer();
 
   /**
    * Creates a new instance of the command that sets the pivot to a specified angle
@@ -88,12 +93,27 @@ public class SetShooterAngle extends CommandBase {
   @Override
   public void initialize() {
     m_shooterPivotSubsystem.setAngleDegrees(m_pivotDegrees);
-    // System.out.println("Shooter: Pivoting to " + String.valueOf(m_pivotDegrees));
+
+    if (RobotBase.isSimulation()) {
+      System.out.println("Shooter: Pivot to " + String.valueOf(m_pivotDegrees) + " degrees");
+      m_simulationTimer.restart();
+    }
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+
+    // In simulation mode, we can't actually shoot anything.  Instead, we approximate
+    // the time it takes to shoot.
+    if (RobotBase.isSimulation()) {
+      boolean finished = m_simulationTimer.hasElapsed(0.5);
+      if (finished) {
+        System.out.println("Shooter: Pivot to " + String.valueOf(m_pivotDegrees) + " degrees");
+      }
+      return finished;
+    }
+
     double presentAngleDeg = m_shooterPivotSubsystem.getAngleDegrees();
     double delta = Math.abs(presentAngleDeg - m_pivotDegrees);
     // SmartDashboard.putNumber("PivotTarget", m_pivotDegrees);
