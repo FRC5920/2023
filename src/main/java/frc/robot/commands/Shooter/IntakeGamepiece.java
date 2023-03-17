@@ -52,6 +52,8 @@
 package frc.robot.commands.Shooter;
 
 import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -113,7 +115,8 @@ public class IntakeGamepiece extends SequentialCommandGroup {
         new RampUpIntakeMotors(intakeSubsystem, m_speedAverager, IntakePreset.Acquire.motorSpeed),
         new DetectGamepiece(
             intakeSubsystem, m_speedAverager, kSpeedThresholdPercent, kCurrentThresholdAmps),
-        new InstantCommand(() -> intakeSubsystem.stopIntake()));
+        new InstantCommand(() -> intakeSubsystem.stopIntake()),
+        new InstantCommand(() -> m_speedAverager.reset()));
   }
 
   /**
@@ -131,6 +134,8 @@ public class IntakeGamepiece extends SequentialCommandGroup {
     /** The command will finish once the average motor speed has exceeded this value */
     private final double m_targetMotorSpeedPercent;
 
+    private final SlewRateLimiter m_rateLimiter;
+
     /**
      * Creates an instance of the command
      *
@@ -143,19 +148,35 @@ public class IntakeGamepiece extends SequentialCommandGroup {
       m_intakeSubsystem = intakeSubsystem;
       m_targetMotorSpeedPercent = targetSpeed;
       m_averager = speedFilter;
+
+      // Rate = units / seconds
+      m_rateLimiter = new SlewRateLimiter(2, -2, 0.0);
+      SmartDashboard.putNumber("RampedSpeed", 0.0);
     }
 
-    // Called when the command is initially scheduled.
     @Override
     public void initialize() {
       m_intakeSubsystem.setSpeedPercent(m_targetMotorSpeedPercent);
+    }
+
+    // Called each execution cycle.
+    @Override
+    public void execute() {
+      // double speed = m_rateLimiter.calculate(m_targetMotorSpeedPercent);
+      // SmartDashboard.putNumber("RampedSpeed", speed);
+      // m_intakeSubsystem.setSpeedPercent(m_targetMotorSpeedPercent);
     }
 
     /** Returns true when the motor speed exceeds 95% of the target speed */
     @Override
     public boolean isFinished() {
       double averageSpeed = m_averager.calculate(m_intakeSubsystem.getSpeedPercent());
-      return (averageSpeed >= m_targetMotorSpeedPercent * 0.9);
+      return (averageSpeed >= m_targetMotorSpeedPercent * 0.95);
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+      m_rateLimiter.reset(0.0);
     }
   }
 
@@ -209,7 +230,7 @@ public class IntakeGamepiece extends SequentialCommandGroup {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-      return detectUsingSpeed() || detectUsingCurrent();
+      return m_intakeSubsystem.limitSwitchIsClosed() || detectUsingSpeed() || detectUsingCurrent();
     }
 
     private boolean detectUsingCurrent() {

@@ -53,6 +53,9 @@ package frc.robot.subsystems.Intake;
 
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 
@@ -64,6 +67,9 @@ public class IntakeSubsystem extends SubsystemBase {
   // Motor CAN ID's
   public static final int kIntakeMasterMotorCANId = 40;
   public static final int kIntakeSlaveMotorCANId = 41;
+
+  /** Digital input channel connected to the limit */
+  private static final int kLimitSwitchDIChannel = 9;
 
   /** Gear ratio used to couple intake motor axles to rollers */
   public static final double kIntakeGearRatio = 1.0 / 3.33;
@@ -87,6 +93,15 @@ public class IntakeSubsystem extends SubsystemBase {
 
   private final WPI_TalonFX m_masterMotor = m_motors[0];
   private final WPI_TalonFX m_slaveMotor = m_motors[1];
+
+  /** Digital input used for the intake limit switch */
+  private DigitalInput m_limitSwitchInput = new DigitalInput(kLimitSwitchDIChannel);
+
+  /** Object used to debounce the limit switch */
+  private Debouncer m_limitSwitchDebouncer = new Debouncer(0.05, DebounceType.kBoth);
+
+  /** Debounced limit switch state */
+  private boolean m_debouncedLimitSwitch = false;
 
   /** Dashboard tab for the intake subsystem */
   final IntakeDashboardTab m_dashboardTab;
@@ -114,7 +129,7 @@ public class IntakeSubsystem extends SubsystemBase {
    */
   public void setSpeedPercent(double percent) {
     // Convert RPM to falcon sensor velocity
-    m_masterMotor.set(percent);
+    m_masterMotor.set(percent / 100.0);
   }
 
   /** Deactivates intake motors */
@@ -124,7 +139,11 @@ public class IntakeSubsystem extends SubsystemBase {
 
   /** Returns the present motor speed as a percentage of full scale output */
   public double getSpeedPercent() {
-    return m_masterMotor.get();
+    return m_masterMotor.get() * 100.0;
+  }
+
+  public boolean limitSwitchIsClosed() {
+    return m_debouncedLimitSwitch;
   }
 
   /** Returns the present motor current reading in amps */
@@ -221,5 +240,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   /** Called by the scheduler to service the subsystem */
   @Override
-  public void periodic() {}
+  public void periodic() {
+    m_debouncedLimitSwitch = m_limitSwitchDebouncer.calculate(m_limitSwitchInput.get());
+  }
 }
