@@ -67,14 +67,21 @@ public class Acquire extends SequentialCommandGroup {
   public static CommandBase acquireAndPark(
       ShooterPivotSubsystem shooterPivotSubsystem, IntakeSubsystem intakeSubsystem) {
     return Commands.parallel(
-        Commands.sequence(
-            new SimulationPrinter("<Acquire> Pivot for shot"),
-            new SetShooterAngle(shooterPivotSubsystem, PivotPresets.Acquire)),
-        Commands.sequence(
-            new SimulationPrinter("<Acquire> wait for shooter angle"),
-            new WaitUntilCommand(() -> waitForShooterAngle(shooterPivotSubsystem)),
-            new SimulationPrinter("<Acquire> start intake"),
-            new IntakeGamepiece(intakeSubsystem)));
+            Commands.sequence(
+                new SimulationPrinter("<Acquire> Pivot for shot"),
+                new SetShooterAngle(shooterPivotSubsystem, PivotPresets.Acquire)),
+            Commands.sequence(
+                new SimulationPrinter("<Acquire> wait for shooter angle"),
+                new WaitUntilCommand(() -> waitForShooterAngle(shooterPivotSubsystem)),
+                new SimulationPrinter("<Acquire> start intake"),
+                new IntakeGamepiece(intakeSubsystem)))
+        .finallyDo((interrupted) -> endBehavior(shooterPivotSubsystem, intakeSubsystem));
+  }
+
+  private static void endBehavior(
+      ShooterPivotSubsystem shooterPivotSubsystem, IntakeSubsystem intakeSubsystem) {
+    shooterPivotSubsystem.park();
+    intakeSubsystem.stopIntake();
   }
 
   private static boolean waitForShooterAngle(ShooterPivotSubsystem subsystem) {

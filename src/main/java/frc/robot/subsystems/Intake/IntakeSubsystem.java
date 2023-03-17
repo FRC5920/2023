@@ -56,7 +56,11 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.commands.UtilityCommands.SimulationPrinter;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 
 /** Subsystem for managing rollers used to pull in and shoot game pieces */
@@ -112,6 +116,20 @@ public class IntakeSubsystem extends SubsystemBase {
     configureMotors();
   }
 
+  /** Returns the default command for the subsystem */
+  public CommandBase getDefaultCommand() {
+    CommandBase defaultCommand =
+        Commands.either(
+            Commands.sequence(
+                new SimulationPrinter("<IntakeSubsystem> default shutoff"),
+                new InstantCommand(this::stopIntake)),
+            new InstantCommand(),
+            () -> this.getSpeedPercent() > 0.0);
+
+    defaultCommand.addRequirements(this);
+    return defaultCommand;
+  }
+
   /**
    * Activates intake motors at a specified speed preset
    *
@@ -139,7 +157,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   /** Returns the present motor speed as a percentage of full scale output */
   public double getSpeedPercent() {
-    return m_masterMotor.get() * 100.0;
+    return m_masterMotor.getMotorOutputPercent() * 100.0;
   }
 
   public boolean limitSwitchIsClosed() {

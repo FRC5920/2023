@@ -55,6 +55,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.Intake.IntakePreset;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
@@ -70,10 +71,8 @@ public class Shoot {
       PivotPresets pivotPreset,
       IntakePreset speedPreset) {
     return Commands.sequence(
-        new InstantCommand(
-            () ->
-                System.out.printf(
-                    "pivotAndShoot: pivot=%s, speed=%s\n", pivotPreset.name(), speedPreset.name())),
+        new PrintCommand(
+                    String.format("pivotAndShoot: pivot=%s, speed=%s\n", pivotPreset.name(), speedPreset.name())),
         new SetShooterAngle(shooterPivotSubsystem, pivotPreset),
         shootAtSpeed(intakeSubsystem, speedPreset, kShootDurationSec));
   }
@@ -83,9 +82,12 @@ public class Shoot {
       IntakeSubsystem intakeSubsystem,
       double pivotDegrees,
       double shooterSpeedPercent) {
-    return Commands.sequence(
-        new SetShooterAngle(shooterPivotSubsystem, pivotDegrees),
-        shootAtSpeed(intakeSubsystem, shooterSpeedPercent, 1.5));
+    CommandBase command =
+        Commands.sequence(
+            new SetShooterAngle(shooterPivotSubsystem, pivotDegrees),
+            shootAtSpeed(intakeSubsystem, shooterSpeedPercent, 1.5));
+    command.addRequirements(shooterPivotSubsystem, intakeSubsystem);
+    return command;
   }
 
   public static CommandBase pivotAndShootLow(

@@ -53,6 +53,7 @@ package frc.robot.commands.Shooter;
 
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -174,6 +175,8 @@ public class IntakeGamepiece extends SequentialCommandGroup {
         averageSpeed = m_targetMotorSpeedPercent;
       }
 
+      averageSpeed = m_intakeSubsystem.getSpeedPercent();
+      SmartDashboard.putNumber("SpeedCheck", averageSpeed);
       double delta = Math.abs(m_targetMotorSpeedPercent - averageSpeed);
 
       boolean finished = (delta <= Math.abs(m_targetMotorSpeedPercent * 0.10));
@@ -237,7 +240,8 @@ public class IntakeGamepiece extends SequentialCommandGroup {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-      return m_intakeSubsystem.limitSwitchIsClosed() || detectUsingSpeed() || detectUsingCurrent();
+      return m_intakeSubsystem.limitSwitchIsClosed()
+          || detectUsingSpeed(); // || detectUsingCurrent();
     }
 
     private boolean detectUsingCurrent() {
