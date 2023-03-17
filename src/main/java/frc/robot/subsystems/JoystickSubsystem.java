@@ -54,6 +54,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.Joystick.AxisProcChain;
@@ -63,6 +64,7 @@ import frc.robot.RobotContainer;
 import frc.robot.commands.Balance;
 import frc.robot.commands.Shooter.Acquire;
 import frc.robot.commands.Shooter.Shoot;
+import frc.robot.commands.SimulationPrinter;
 import frc.robot.commands.SnapToGrid;
 import frc.robot.commands.zTarget.DriveWithZTargeting;
 import frc.robot.subsystems.Intake.IntakePreset;
@@ -196,17 +198,17 @@ public class JoystickSubsystem extends SubsystemBase {
     if (kDriverControllerIsEnabled) {
       // Map buttons on driver controller
 
-      // Map buttons for close shots
-      driverController.A.onTrue(closeShotLow);
-      driverController.B.onTrue(closeShotMid);
-      driverController.Y.onTrue(closeShotHigh);
+      // Map shift-keyed buttons for shots
+      driverController.A.onTrue(
+          Commands.either(
+              hailMaryShotLow, closeShotLow, driverController.leftTriggerAsButton::getAsBoolean));
+      driverController.B.onTrue(
+          Commands.either(
+              hailMaryShotMid, closeShotMid, driverController.leftTriggerAsButton::getAsBoolean));
+      driverController.Y.onTrue(
+          Commands.either(
+              hailMaryShotHigh, closeShotHigh, driverController.leftTriggerAsButton::getAsBoolean));
 
-      // Map buttons for hail mary shots
-      driverController.A.onTrue(hailMaryShotLow);
-      driverController.B.onTrue(hailMaryShotMid);
-      driverController.Y.onTrue(hailMaryShotHigh);
-
-      // driverController.X.whileTrue(Acquire.acquireAndPark(shooterPivot, intake));
       driverController.X.whileTrue(Acquire.acquireAndPark(shooterPivot, intake));
 
       driverController.rightBumper.whileTrue(
@@ -236,14 +238,17 @@ public class JoystickSubsystem extends SubsystemBase {
       driverController.start.whileTrue(new Balance(botContainer.swerveSubsystem)); // right little
 
       driverController.rightTriggerAsButton.whileTrue(
-          new SnapToGrid(
-              botContainer.swerveSubsystem,
-              botContainer.joystickSubsystem,
-              true,
-              true,
-              RobotContainer.MaxSpeed,
-              RobotContainer.MaxRotate,
-              botContainer.autoDashboardTab.getField2d()));
+          new SimulationPrinter("Snap-to-grid ON")
+              .andThen(
+                  new SnapToGrid(
+                      botContainer.swerveSubsystem,
+                      botContainer.joystickSubsystem,
+                      true,
+                      true,
+                      RobotContainer.MaxSpeed,
+                      RobotContainer.MaxRotate,
+                      botContainer.autoDashboardTab.getField2d()))
+              .finallyDo((interrupted) -> new SimulationPrinter("Snap-to-grid OFF").initialize()));
     }
 
     if (kOperatorControllerIsEnabled) {

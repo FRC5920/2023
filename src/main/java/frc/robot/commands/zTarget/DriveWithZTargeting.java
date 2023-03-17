@@ -61,6 +61,7 @@ import frc.lib.utility.ZTargeter;
 import frc.robot.Constants.GameTarget;
 import frc.robot.RobotContainer;
 import frc.robot.commands.Shooter.Acquire;
+import frc.robot.commands.SimulationPrinter;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.JoystickSubsystem;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
@@ -85,10 +86,17 @@ public class DriveWithZTargeting extends CommandBase {
       IntakeSubsystem intake,
       boolean fieldRelative,
       boolean openLoop) {
-    return Commands.race(
-        new DriveWithZTargeting(
-            gamepieceType, camera, swerveSubsystem, joystickSubsystem, fieldRelative, openLoop),
-        Acquire.acquireAndPark(shooterPivot, intake));
+    return new SimulationPrinter(String.format("<Trigger> Z-target drive with intake"))
+        .andThen(
+            Commands.race(
+                new DriveWithZTargeting(
+                    gamepieceType,
+                    camera,
+                    swerveSubsystem,
+                    joystickSubsystem,
+                    fieldRelative,
+                    openLoop),
+                Acquire.acquireAndPark(shooterPivot, intake)));
   }
 
   public DriveWithZTargeting(

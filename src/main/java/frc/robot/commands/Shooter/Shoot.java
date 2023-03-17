@@ -54,9 +54,8 @@ package frc.robot.commands.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.commands.SimulationPrinter;
 import frc.robot.subsystems.Intake.IntakePreset;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.ShooterPivot.PivotPresets;
@@ -70,11 +69,13 @@ public class Shoot {
       IntakeSubsystem intakeSubsystem,
       PivotPresets pivotPreset,
       IntakePreset speedPreset) {
-    return Commands.sequence(
-        new PrintCommand(
-                    String.format("pivotAndShoot: pivot=%s, speed=%s\n", pivotPreset.name(), speedPreset.name())),
-        new SetShooterAngle(shooterPivotSubsystem, pivotPreset),
-        shootAtSpeed(intakeSubsystem, speedPreset, kShootDurationSec));
+    return new SimulationPrinter(
+            String.format(
+                "<pivotAndShoot> pivot=%s, speed=%s", pivotPreset.name(), speedPreset.name()))
+        .andThen(new SetShooterAngle(shooterPivotSubsystem, pivotPreset))
+        .andThen(new SimulationPrinter(String.format("<pivotAndShoot> Take the shot")))
+        .andThen(shootAtSpeed(intakeSubsystem, speedPreset, kShootDurationSec))
+        .andThen(new SimulationPrinter(String.format("<pivotAndShoot> Shot complete")));
   }
 
   public static CommandBase pivotAndShoot(

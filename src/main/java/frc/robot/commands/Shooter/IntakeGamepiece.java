@@ -53,12 +53,11 @@ package frc.robot.commands.Shooter;
 
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
-import frc.robot.commands.UtilityCommands.SimulationPrinter;
+import frc.robot.commands.SimulationPrinter;
 import frc.robot.subsystems.Intake.IntakePreset;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 
@@ -176,7 +175,6 @@ public class IntakeGamepiece extends SequentialCommandGroup {
       }
 
       averageSpeed = m_intakeSubsystem.getSpeedPercent();
-      SmartDashboard.putNumber("SpeedCheck", averageSpeed);
       double delta = Math.abs(m_targetMotorSpeedPercent - averageSpeed);
 
       boolean finished = (delta <= Math.abs(m_targetMotorSpeedPercent * 0.10));

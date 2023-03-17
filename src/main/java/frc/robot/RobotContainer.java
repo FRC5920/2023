@@ -181,7 +181,7 @@ public class RobotContainer {
     // Set up a default command on the shooter pivot subsystem that automatically parks the shooter
     shooterPivotSubsystem.setDefaultCommand(shooterPivotSubsystem.getDefaultCommand());
     // Set up a default command on the intake subsystem that automatically stops the intake rollers
-    intakeSubsystem.setDefaultCommand(intakeSubsystem.getDefaultCommand());
+    // intakeSubsystem.setDefaultCommand(intakeSubsystem.getDefaultCommand());
 
     intakeSubsystem.registerDashboardTab(dashboardSubsystem);
     shooterPivotSubsystem.registerDashboardTab(dashboardSubsystem);

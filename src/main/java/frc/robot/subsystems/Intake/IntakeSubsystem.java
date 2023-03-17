@@ -60,7 +60,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.UtilityCommands.SimulationPrinter;
+import frc.robot.commands.SimulationPrinter;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 
 /** Subsystem for managing rollers used to pull in and shoot game pieces */
