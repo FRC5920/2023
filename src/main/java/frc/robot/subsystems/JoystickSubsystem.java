@@ -62,7 +62,6 @@ import frc.robot.Constants.GameTarget;
 import frc.robot.RobotContainer;
 import frc.robot.commands.Balance;
 import frc.robot.commands.Shooter.Acquire;
-import frc.robot.commands.Shooter.IntakeGamepiece;
 import frc.robot.commands.Shooter.Shoot;
 import frc.robot.commands.SnapToGrid;
 import frc.robot.commands.zTarget.DriveWithZTargeting;
@@ -208,7 +207,7 @@ public class JoystickSubsystem extends SubsystemBase {
       driverController.Y.onTrue(hailMaryShotHigh);
 
       // driverController.X.whileTrue(Acquire.acquireAndPark(shooterPivot, intake));
-      driverController.X.whileTrue(new IntakeGamepiece(intake));
+      driverController.X.whileTrue(Acquire.acquireAndPark(shooterPivot, intake));
 
       driverController.rightBumper.whileTrue(
           DriveWithZTargeting.zTargetDriveWithIntake(

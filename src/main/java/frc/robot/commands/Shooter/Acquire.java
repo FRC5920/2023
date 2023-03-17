@@ -51,6 +51,7 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.commands.Shooter;
 
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -67,11 +68,14 @@ public class Acquire extends SequentialCommandGroup {
     // System.out.println("Shooter: Deploying");
     return new SetShooterAngle(shooterPivotSubsystem, PivotPresets.Acquire)
         .alongWith(
-            Commands.waitUntil(() -> shooterPivotSubsystem.getAngleDegrees() > 45.0)
+            Commands.waitUntil(() -> waitForShooterAngle(shooterPivotSubsystem))
                 .andThen(new IntakeGamepiece(intakeSubsystem)))
         .andThen(new SetShooterAngle(shooterPivotSubsystem, PivotPresets.Park));
   }
 
+  static boolean waitForShooterAngle(ShooterPivotSubsystem shooterPivotSubsystem) {
+    return RobotBase.isSimulation() || (shooterPivotSubsystem.getAngleDegrees() > 45.0);
+  }
   /**
    * Generate a command that parks the shooter
    *

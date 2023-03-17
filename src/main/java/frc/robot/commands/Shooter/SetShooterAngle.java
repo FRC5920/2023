@@ -93,9 +93,9 @@ public class SetShooterAngle extends CommandBase {
   @Override
   public void initialize() {
     m_shooterPivotSubsystem.setAngleDegrees(m_pivotDegrees);
+    System.out.println("Shooter: Pivot to " + String.valueOf(m_pivotDegrees) + " degrees");
 
     if (RobotBase.isSimulation()) {
-      System.out.println("Shooter: Pivot to " + String.valueOf(m_pivotDegrees) + " degrees");
       m_simulationTimer.restart();
     }
   }
@@ -103,22 +103,25 @@ public class SetShooterAngle extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    boolean finished = false;
 
     // In simulation mode, we can't actually shoot anything.  Instead, we approximate
     // the time it takes to shoot.
     if (RobotBase.isSimulation()) {
-      boolean finished = m_simulationTimer.hasElapsed(0.5);
-      if (finished) {
-        System.out.println("Shooter: Pivot to " + String.valueOf(m_pivotDegrees) + " degrees");
-      }
-      return finished;
+      finished = m_simulationTimer.hasElapsed(0.5);
+    } else {
+      double presentAngleDeg = m_shooterPivotSubsystem.getAngleDegrees();
+      double delta = Math.abs(presentAngleDeg - m_pivotDegrees);
+      // SmartDashboard.putNumber("PivotTarget", m_pivotDegrees);
+      // SmartDashboard.putNumber("PivotAngle", presentAngleDeg);
+      // SmartDashboard.putNumber("PivotDelta", delta);
+      finished = delta < kAngleToleranceDeg;
     }
 
-    double presentAngleDeg = m_shooterPivotSubsystem.getAngleDegrees();
-    double delta = Math.abs(presentAngleDeg - m_pivotDegrees);
-    // SmartDashboard.putNumber("PivotTarget", m_pivotDegrees);
-    // SmartDashboard.putNumber("PivotAngle", presentAngleDeg);
-    // SmartDashboard.putNumber("PivotDelta", delta);
-    return delta < kAngleToleranceDeg;
+    if (finished) {
+      System.out.println("Shooter: pivot reached: " + String.valueOf(m_pivotDegrees) + " degrees");
+    }
+
+    return finished;
   }
 }

@@ -52,8 +52,7 @@
 package frc.robot.commands.Shooter;
 
 import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -134,8 +133,6 @@ public class IntakeGamepiece extends SequentialCommandGroup {
     /** The command will finish once the average motor speed has exceeded this value */
     private final double m_targetMotorSpeedPercent;
 
-    private final SlewRateLimiter m_rateLimiter;
-
     /**
      * Creates an instance of the command
      *
@@ -148,21 +145,18 @@ public class IntakeGamepiece extends SequentialCommandGroup {
       m_intakeSubsystem = intakeSubsystem;
       m_targetMotorSpeedPercent = targetSpeed;
       m_averager = speedFilter;
-
-      // Rate = units / seconds
-      m_rateLimiter = new SlewRateLimiter(2, -2, 0.0);
-      SmartDashboard.putNumber("RampedSpeed", 0.0);
     }
 
     @Override
     public void initialize() {
+      System.out.printf(
+          "IntakeGamepiece: set intake speed to %.0f percent\n", m_targetMotorSpeedPercent);
       m_intakeSubsystem.setSpeedPercent(m_targetMotorSpeedPercent);
     }
 
     // Called each execution cycle.
     @Override
     public void execute() {
-      // double speed = m_rateLimiter.calculate(m_targetMotorSpeedPercent);
       // SmartDashboard.putNumber("RampedSpeed", speed);
       // m_intakeSubsystem.setSpeedPercent(m_targetMotorSpeedPercent);
     }
@@ -171,13 +165,21 @@ public class IntakeGamepiece extends SequentialCommandGroup {
     @Override
     public boolean isFinished() {
       double averageSpeed = m_averager.calculate(m_intakeSubsystem.getSpeedPercent());
-      return (averageSpeed >= m_targetMotorSpeedPercent * 0.95);
+      if (RobotBase.isSimulation()) {
+        averageSpeed = m_targetMotorSpeedPercent;
+      }
+
+      double delta = Math.abs(m_targetMotorSpeedPercent - averageSpeed);
+
+      boolean finished = (delta <= Math.abs(m_targetMotorSpeedPercent * 0.10));
+      if (finished) {
+        System.out.printf("IntakeGamepiece: finished with speed at %.0f percent\n", averageSpeed);
+      }
+      return finished;
     }
 
     @Override
-    public void end(boolean interrupted) {
-      m_rateLimiter.reset(0.0);
-    }
+    public void end(boolean interrupted) {}
   }
 
   /**
