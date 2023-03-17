@@ -62,6 +62,7 @@ import frc.robot.RobotContainer;
 import frc.robot.commands.Balance;
 import frc.robot.commands.Shooter.Acquire;
 import frc.robot.commands.Shooter.Shoot;
+import frc.robot.commands.SnapToGrid;
 import frc.robot.commands.zTarget.DriveWithZTargeting;
 import frc.robot.subsystems.Intake.IntakePreset;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
@@ -204,6 +205,16 @@ public class JoystickSubsystem extends SubsystemBase {
       driverController.back.onTrue(
           new InstantCommand(() -> botContainer.swerveSubsystem.zeroGyro())); // left little
       driverController.start.whileTrue(new Balance(botContainer.swerveSubsystem)); // right little
+
+      driverController.rightTriggerAsButton.whileTrue(
+          new SnapToGrid(
+              botContainer.swerveSubsystem,
+              botContainer.joystickSubsystem,
+              true,
+              true,
+              RobotContainer.MaxSpeed,
+              RobotContainer.MaxRotate,
+              botContainer.autoDashboardTab.getField2d()));
     }
 
     if (kOperatorControllerIsEnabled) {

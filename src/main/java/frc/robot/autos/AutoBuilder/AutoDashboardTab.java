@@ -278,4 +278,9 @@ public class AutoDashboardTab implements IDashboardTab {
   public AutoRoutineBuilder getAutoBuilder() {
     return m_builder;
   }
+
+  /** Returns the field displayed in the dashboard tab */
+  public Field2d getField2d() {
+    return m_field2d;
+  }
 }
