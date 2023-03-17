@@ -61,7 +61,7 @@ import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 
 public class ShooterPivotSubsystem extends SubsystemBase {
   /** Set this constant true to display a dashboard tab for the intake subsystem */
-  private static boolean kEnableDashboardTab = true;
+  private static boolean kEnableDashboardTab = false;
 
   // Motor CAN ID's
   public static final int kPivotMasterMotorCANId = 30;

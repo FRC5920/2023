@@ -59,7 +59,7 @@ import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 /** Subsystem for managing rollers used to pull in and shoot game pieces */
 public class IntakeSubsystem extends SubsystemBase {
   /** Set this constant to true if the subsystem's dashboard tab should be displayed */
-  private static boolean kEnableDashboardTab = true;
+  private static boolean kEnableDashboardTab = false;
 
   // Motor CAN ID's
   public static final int kIntakeMasterMotorCANId = 40;
