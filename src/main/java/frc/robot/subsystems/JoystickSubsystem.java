@@ -53,6 +53,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.Joystick.AxisProcChain;
@@ -165,17 +166,44 @@ public class JoystickSubsystem extends SubsystemBase {
     ShooterPivotSubsystem shooterPivot = botContainer.shooterPivotSubsystem;
     IntakeSubsystem intake = botContainer.intakeSubsystem;
 
+    // Create shoot commands that are active when left trigger is off
+    CommandBase closeShotLow =
+        Shoot.pivotAndShoot(
+                shooterPivot, intake, PivotPresets.CloseShotLow, IntakePreset.CloseShotLow)
+            .unless(() -> driverController.leftTriggerAsButton.getAsBoolean());
+    CommandBase closeShotMid =
+        Shoot.pivotAndShoot(
+                shooterPivot, intake, PivotPresets.CloseShotMid, IntakePreset.CloseShotMid)
+            .unless(() -> driverController.leftTriggerAsButton.getAsBoolean());
+    CommandBase closeShotHigh =
+        Shoot.pivotAndShoot(
+                shooterPivot, intake, PivotPresets.CloseShotHigh, IntakePreset.CloseShotHigh)
+            .unless(() -> driverController.leftTriggerAsButton.getAsBoolean());
+
+    // --------------------
+    // Create shift-keyed shoot commands that are active when left trigger is pulled
+    CommandBase hailMaryShotLow =
+        Shoot.pivotAndShoot(shooterPivot, intake, PivotPresets.CloseShotLow, IntakePreset.HailMary)
+            .unless(() -> !driverController.leftTriggerAsButton.getAsBoolean());
+    CommandBase hailMaryShotMid =
+        Shoot.pivotAndShoot(shooterPivot, intake, PivotPresets.CloseShotMid, IntakePreset.HailMary)
+            .unless(() -> !driverController.leftTriggerAsButton.getAsBoolean());
+    CommandBase hailMaryShotHigh =
+        Shoot.pivotAndShoot(shooterPivot, intake, PivotPresets.CloseShotHigh, IntakePreset.HailMary)
+            .unless(() -> !driverController.leftTriggerAsButton.getAsBoolean());
+
     if (kDriverControllerIsEnabled) {
       // Map buttons on driver controller
-      driverController.A.onTrue(
-          Shoot.pivotAndShoot(
-              shooterPivot, intake, PivotPresets.CloseShotLow, IntakePreset.CloseShotLow));
-      driverController.B.onTrue(
-          Shoot.pivotAndShoot(
-              shooterPivot, intake, PivotPresets.CloseShotMid, IntakePreset.CloseShotMid));
-      driverController.Y.onTrue(
-          Shoot.pivotAndShoot(
-              shooterPivot, intake, PivotPresets.CloseShotHigh, IntakePreset.CloseShotHigh));
+
+      // Map buttons for close shots
+      driverController.A.onTrue(closeShotLow);
+      driverController.B.onTrue(closeShotMid);
+      driverController.Y.onTrue(closeShotHigh);
+
+      // Map buttons for hail mary shots
+      driverController.A.onTrue(hailMaryShotLow);
+      driverController.B.onTrue(hailMaryShotMid);
+      driverController.Y.onTrue(hailMaryShotHigh);
 
       driverController.X.whileTrue(Acquire.acquireAndPark(shooterPivot, intake));
 

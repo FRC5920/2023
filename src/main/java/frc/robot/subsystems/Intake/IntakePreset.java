@@ -56,7 +56,8 @@ public enum IntakePreset {
   Acquire(-0.2),
   CloseShotLow(0.10),
   CloseShotMid(0.15),
-  CloseShotHigh(0.35);
+  CloseShotHigh(0.35),
+  HailMary(0.65);
 
   public final double motorSpeed;
 
