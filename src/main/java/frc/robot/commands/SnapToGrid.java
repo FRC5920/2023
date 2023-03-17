@@ -70,6 +70,9 @@ import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import java.util.HashMap;
 
 public class SnapToGrid extends CommandBase {
+  /** Set this to true to display grid lines on the dashboard field view */
+  private static final boolean kDisplayGridLinesOnField = false;
+
   /** Y values comprising grid lines */
   public static final double kGridYValues[] =
       new double[] {
@@ -129,7 +132,9 @@ public class SnapToGrid extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_gridFieldLineHelper.display();
+    if (kDisplayGridLinesOnField) {
+      m_gridFieldLineHelper.display();
+    }
     SmartDashboard.putNumber("S2G-snapValue", 0.0);
   }
 
@@ -178,7 +183,9 @@ public class SnapToGrid extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_gridFieldLineHelper.hide();
+    if (kDisplayGridLinesOnField) {
+      m_gridFieldLineHelper.hide();
+    }
   }
 
   // Returns true when the command should end.
