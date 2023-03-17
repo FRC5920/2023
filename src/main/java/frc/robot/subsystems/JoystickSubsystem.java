@@ -62,12 +62,12 @@ import frc.robot.RobotContainer;
 import frc.robot.commands.Balance;
 import frc.robot.commands.Shooter.Acquire;
 import frc.robot.commands.Shooter.Shoot;
+import frc.robot.commands.SnapToGrid;
 import frc.robot.commands.zTarget.DriveWithZTargeting;
 import frc.robot.subsystems.Intake.IntakePreset;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.ShooterPivot.PivotPresets;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
-import frc.robot.commands.SnapToGrid;
 
 /** A subsystem providing/managing Xbox controllers for driving the robot manually */
 public class JoystickSubsystem extends SubsystemBase {
@@ -207,14 +207,15 @@ public class JoystickSubsystem extends SubsystemBase {
       driverController.start.whileTrue(new Balance(botContainer.swerveSubsystem)); // right little
 
       driverController.rightTriggerAsButton.whileTrue(
-        new SnapToGrid(
-            botContainer.swerveSubsystem,
-            botContainer.joystickSubsystem,
-            true,
-            true,
-            RobotContainer.MaxSpeed,
-            RobotContainer.MaxRotate,
-            botContainer.autoDashboardTab.getField2d()));
+          new SnapToGrid(
+              botContainer.swerveSubsystem,
+              botContainer.joystickSubsystem,
+              true,
+              true,
+              RobotContainer.MaxSpeed,
+              RobotContainer.MaxRotate,
+              botContainer.autoDashboardTab.getField2d()));
+    }
 
     if (kOperatorControllerIsEnabled) {
       // Map buttons on operator controller
