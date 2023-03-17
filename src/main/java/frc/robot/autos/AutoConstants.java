@@ -137,7 +137,7 @@ public class AutoConstants {
       H(7),
       I(8);
 
-      private final int id;
+      public final int id;
       private final Translation2d position;
 
       private ScoringPosition(int idx) {
@@ -207,13 +207,16 @@ public class AutoConstants {
      *     Charging Station.
      */
     public static enum BalancePosition {
-      NorthOfCS(kNorthBalancePosition),
-      CenterOfCS(kCenterBalancePosition),
-      SouthOfCS(kSouthBalancePosition);
+      NorthOfCS(0, kNorthBalancePosition),
+      CenterOfCS(1, kCenterBalancePosition),
+      SouthOfCS(2, kSouthBalancePosition);
+
+      public final int id;
 
       private final Translation2d position;
 
-      private BalancePosition(Translation2d pos) {
+      private BalancePosition(int _id, Translation2d pos) {
+        id = _id;
         position = pos;
       }
 
@@ -504,10 +507,16 @@ public class AutoConstants {
   /////////////////////////////////////////////////////////////////////////////
   /** An enumeration of initial actions to take before escaping the community */
   public static enum InitialAction {
-    BumpScore, // Drive forward to leave behind a cube, then drive back to bump it into low goal
-    ShootLow, // Shoot pre-loaded cube into low goal
-    ShootMid, // Shoot pre-loaded cube into mid goal
-    ShootHigh; // Shoot pre-loaded cube into high goal
+    BumpScore(0), // Drive forward to leave behind a cube, then drive back to bump it into low goal
+    ShootLow(1), // Shoot pre-loaded cube into low goal
+    ShootMid(2), // Shoot pre-loaded cube into mid goal
+    ShootHigh(3); // Shoot pre-loaded cube into high goal
+
+    public final int id;
+
+    private InitialAction(int _id) {
+      id = _id;
+    }
 
     /** Returns a list of names of enum elements */
     public static String[] getNames() {

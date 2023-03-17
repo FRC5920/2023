@@ -146,13 +146,16 @@ public class AutoDashboardTab implements IDashboardTab {
 
     // Set up the initial position chooser
     m_initialPositionChooser.loadOptions(
-        Grids.ScoringPosition.getNames(), Grids.ScoringPosition.values(), 0);
+        Grids.ScoringPosition.getNames(),
+        Grids.ScoringPosition.values(),
+        Grids.ScoringPosition.H.id);
     m_tab
         .add("Initial Position", m_initialPositionChooser)
         .withSize(kChooserWidth, kChooserHeight)
         .withPosition(0 * kChooserWidth, 0);
 
-    m_initialActionChooser.loadOptions(InitialAction.getNames(), InitialAction.values(), 2);
+    m_initialActionChooser.loadOptions(
+        InitialAction.getNames(), InitialAction.values(), InitialAction.ShootHigh.id);
     m_tab
         .add("Initial Action", m_initialActionChooser)
         .withSize(kChooserWidth, kChooserHeight)
@@ -174,7 +177,9 @@ public class AutoDashboardTab implements IDashboardTab {
 
     // Set up a chooser for the balance position
     m_balancePositionChooser.loadOptions(
-        ChargingStation.BalancePosition.getNames(), ChargingStation.BalancePosition.values(), 0);
+        ChargingStation.BalancePosition.getNames(),
+        ChargingStation.BalancePosition.values(),
+        ChargingStation.BalancePosition.CenterOfCS.id);
     m_tab
         .add("Balance Position", m_balancePositionChooser)
         .withSize(kChooserWidth, kChooserHeight)
