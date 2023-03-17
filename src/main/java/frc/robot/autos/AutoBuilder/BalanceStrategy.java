@@ -160,7 +160,7 @@ public class BalanceStrategy {
   private void generateTrajectories() {
     ArrayList<PathPlannerTrajectory> trajectoryList = new ArrayList<PathPlannerTrajectory>();
     Translation2d y = Waypoints.ID.Y.getPosition();
-    Translation2d cs = ChargingStation.getCenter();
+    Translation2d cs = ChargingStation.getCenterBalancePosition();
 
     // PathPlanner doesn't automatically adjust rotations according to Alliance
     Rotation2d fieldFacing = AllianceFlipUtil.apply(BotOrientation.kFacingField);

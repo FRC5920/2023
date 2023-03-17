@@ -174,6 +174,9 @@ public class AutoConstants {
     /** Y coordinate of the side of the charging station furthest from the Grids */
     private static final double kNorthSideY = FieldConstants.Community.chargingStationLeftY;
 
+    /** Dimension of the charging station measured from North to South */
+    private static final double kDistanceNorthToSouth = kNorthSideY - kSouthSideY;
+
     /** X coordinate of the center of the Charging Station */
     private static final double kCenterX =
         (kFieldSideX - (FieldConstants.Community.chargingStationLength / 2));
@@ -181,11 +184,33 @@ public class AutoConstants {
     private static final double kCenterY =
         (kSouthSideY + (FieldConstants.Community.chargingStationWidth / 2));
 
+    /** Distance between robot footprints on the Charging Station */
+    private static final double distanceBetweenBots = 
+      (kDistanceNorthToSouth - (BotDimensions.kFootprintWidth * 3.0) / 2.0);
+    private static final Translation2d outerBalancePositionOffset = 
+      new Translation2d(0.0, distanceBetweenBots + BotDimensions.kFootprintWidth);
+
     private static Translation2d kGridSideNorth = new Translation2d(kGridSideX, kNorthSideY);
     private static Translation2d kFieldSideSouth = new Translation2d(kGridSideX, kNorthSideY);
     private static Translation2d kCenter = new Translation2d(kCenterX, kCenterY);
 
-    public static Translation2d getCenter() {
+    /** Location for balancing at the center of the Charging Station */
+    private static Translation2d kCenterBalancePosition = kCenter;
+    /** Location for balancing at the north of the Charging Station */
+    private static Translation2d kNorthBalancePosition = kCenter.plus(outerBalancePositionOffset);
+    /** Location for balancing at the north of the Charging Station */
+    private static Translation2d kSouthBalancePosition = kCenter.minus(outerBalancePositionOffset);
+
+
+    public static Translation2d getCenterBalancePosition() {
+      return AllianceFlipUtil.apply(kCenter);
+    }
+
+    public static Translation2d getNorthBalancePosition() {
+      return AllianceFlipUtil.apply(kCenter);
+    }
+
+    public static Translation2d getSouthBalancePosition() {
       return AllianceFlipUtil.apply(kCenter);
     }
   }
