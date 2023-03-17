@@ -55,8 +55,12 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.utility.PIDGains;
+import frc.robot.commands.UtilityCommands.SimulationPrinter;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 
 public class ShooterPivotSubsystem extends SubsystemBase {
@@ -125,6 +129,19 @@ public class ShooterPivotSubsystem extends SubsystemBase {
     zeroPivotPosition();
   }
 
+  public CommandBase getDefaultCommand() {
+    CommandBase defaultCommand =
+        Commands.either(
+            Commands.sequence(
+                new SimulationPrinter("<ShooterPivot> default park"),
+                new InstantCommand(this::park)),
+            new InstantCommand(),
+            () -> this.getAngleDegrees() > PivotPresets.Park.angleDegrees);
+
+    defaultCommand.addRequirements(this);
+    return defaultCommand;
+  }
+
   /**
    * Moves the pivot to a specified angle in degrees
    *
@@ -141,6 +158,11 @@ public class ShooterPivotSubsystem extends SubsystemBase {
    */
   public void setAnglePreset(PivotPresets preset) {
     setAngleDegrees(preset.angleDegrees);
+  }
+
+  /** Sets the shooter pivot to its "Parked" position */
+  public void park() {
+    setAngleDegrees(PivotPresets.Park.angleDegrees);
   }
 
   /**

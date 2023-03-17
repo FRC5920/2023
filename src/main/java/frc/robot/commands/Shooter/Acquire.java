@@ -52,11 +52,12 @@
 package frc.robot.commands.Shooter;
 
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.commands.UtilityCommands.SimulationPrinter;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.ShooterPivot.PivotPresets;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
@@ -65,17 +66,21 @@ public class Acquire extends SequentialCommandGroup {
 
   public static CommandBase acquireAndPark(
       ShooterPivotSubsystem shooterPivotSubsystem, IntakeSubsystem intakeSubsystem) {
-    // System.out.println("Shooter: Deploying");
-    return new SetShooterAngle(shooterPivotSubsystem, PivotPresets.Acquire)
-        .alongWith(
-            Commands.waitUntil(() -> waitForShooterAngle(shooterPivotSubsystem))
-                .andThen(new IntakeGamepiece(intakeSubsystem)))
-        .andThen(new SetShooterAngle(shooterPivotSubsystem, PivotPresets.Park));
+    return Commands.parallel(
+        Commands.sequence(
+            new SimulationPrinter("<Acquire> Pivot for shot"),
+            new SetShooterAngle(shooterPivotSubsystem, PivotPresets.Acquire)),
+        Commands.sequence(
+            new SimulationPrinter("<Acquire> wait for shooter angle"),
+            new WaitUntilCommand(() -> waitForShooterAngle(shooterPivotSubsystem)),
+            new SimulationPrinter("<Acquire> start intake"),
+            new IntakeGamepiece(intakeSubsystem)));
   }
 
-  static boolean waitForShooterAngle(ShooterPivotSubsystem shooterPivotSubsystem) {
-    return RobotBase.isSimulation() || (shooterPivotSubsystem.getAngleDegrees() > 45.0);
+  private static boolean waitForShooterAngle(ShooterPivotSubsystem subsystem) {
+    return RobotBase.isSimulation() || (subsystem.getAngleDegrees() > 45.0);
   }
+
   /**
    * Generate a command that parks the shooter
    *
@@ -83,8 +88,10 @@ public class Acquire extends SequentialCommandGroup {
    *     intentionally so that the park command can be quickly overridden by another command without
    *     having to complete the park sequence (e.g. to shoot a cube)
    */
-  public static Command parkShooter(ShooterPivotSubsystem shooterPivotSubsystem) {
-    // System.out.println("Shooter: Parking");
-    return new InstantCommand(() -> shooterPivotSubsystem.setAnglePreset(PivotPresets.Park));
+  public static CommandBase parkShooter(ShooterPivotSubsystem shooterPivotSubsystem) {
+    return Commands.sequence(
+        new SimulationPrinter("<Acquire> Park shooter"),
+        new InstantCommand(() -> shooterPivotSubsystem.setAnglePreset(PivotPresets.Park)),
+        new SimulationPrinter("<Acquire> parked"));
   }
 }

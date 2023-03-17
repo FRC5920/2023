@@ -57,6 +57,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
+import frc.robot.commands.UtilityCommands.SimulationPrinter;
 import frc.robot.subsystems.Intake.IntakePreset;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 
@@ -111,10 +112,14 @@ public class IntakeGamepiece extends SequentialCommandGroup {
     m_speedAverager.reset();
 
     addCommands(
+        new SimulationPrinter("<IntakeGamepiece> ramp up intake motor"),
         new RampUpIntakeMotors(intakeSubsystem, m_speedAverager, IntakePreset.Acquire.motorSpeed),
+        new SimulationPrinter("<IntakeGamepiece> detect gamepiece"),
         new DetectGamepiece(
             intakeSubsystem, m_speedAverager, kSpeedThresholdPercent, kCurrentThresholdAmps),
+        new SimulationPrinter("<IntakeGamepiece> stop intake"),
         new InstantCommand(() -> intakeSubsystem.stopIntake()),
+        new SimulationPrinter("<IntakeGamepiece> reset average filter"),
         new InstantCommand(() -> m_speedAverager.reset()));
   }
 
