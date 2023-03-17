@@ -228,7 +228,8 @@ public class EscapeStrategy {
             cornerPosition.getX(),
             cornerPosition.getY(),
             populateLater, // Heading will get filled in later
-            initialHolRot); // Holonomic Rotation
+            initialHolRot); // Holonomic Rotation ** Maybe change this to
+    // BotOrientation.kFacingField for earlier rotation **
 
     // Generate a waypoint to move into the active lane
     PathPointHelper initialLaneEndpoint =

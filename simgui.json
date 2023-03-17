@@ -37,6 +37,7 @@
       "/LiveWindow/Ungrouped/PIDController[8]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[9]": "PIDController",
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
+      "/Shuffleboard/Auto Builder/Balance Position": "String Chooser",
       "/Shuffleboard/Auto Builder/Field": "Field2d",
       "/Shuffleboard/Auto Builder/Initial Action": "String Chooser",
       "/Shuffleboard/Auto Builder/Initial Position": "String Chooser",
@@ -64,6 +65,12 @@
       "/Shuffleboard/SwerveDrive/RearRight/Angle/Degrees": "Gyro"
     },
     "windows": {
+      "/Shuffleboard/Auto Builder/Balance Position": {
+        "window": {
+          "name": "Balance Position",
+          "visible": true
+        }
+      },
       "/Shuffleboard/Auto Builder/Field": {
         "AutoTrajectory0": {
           "arrows": false,
@@ -117,6 +124,7 @@
       },
       "/Shuffleboard/Auto Builder/Secondary Action": {
         "window": {
+          "name": "Secondary Action",
           "visible": true
         }
       },

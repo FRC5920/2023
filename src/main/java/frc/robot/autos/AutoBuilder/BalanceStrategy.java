@@ -65,7 +65,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.thirdparty.FRC6328.AllianceFlipUtil;
 import frc.lib.utility.PIDGains;
 import frc.robot.autos.AutoConstants.BotOrientation;
-import frc.robot.autos.AutoConstants.ChargingStation;
+import frc.robot.autos.AutoConstants.ChargingStation.BalancePosition;
 import frc.robot.autos.AutoConstants.Waypoints;
 import frc.robot.commands.Balance;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
@@ -92,13 +92,17 @@ public class BalanceStrategy {
   /** Initial location of the bot */
   PathPointHelper m_initialLocation;
 
+  /** Balance position on the charging station */
+  BalancePosition m_balancePosition;
+
   /**
    * Creates an instance of the strategy
    *
    * @param initialLocation Initial location of the bot when the strategy begins
    */
-  BalanceStrategy(PathPointHelper initialLocation) {
+  BalanceStrategy(PathPointHelper initialLocation, BalancePosition balancePosition) {
     m_initialLocation = initialLocation;
+    m_balancePosition = balancePosition;
     generateTrajectories();
   }
 
@@ -160,7 +164,7 @@ public class BalanceStrategy {
   private void generateTrajectories() {
     ArrayList<PathPlannerTrajectory> trajectoryList = new ArrayList<PathPlannerTrajectory>();
     Translation2d y = Waypoints.ID.Y.getPosition();
-    Translation2d cs = ChargingStation.getCenterBalancePosition();
+    Translation2d cs = m_balancePosition.getBalancePosition();
 
     // PathPlanner doesn't automatically adjust rotations according to Alliance
     Rotation2d fieldFacing = AllianceFlipUtil.apply(BotOrientation.kFacingField);
@@ -174,7 +178,12 @@ public class BalanceStrategy {
             fieldFacing, // Heading needs to be facing field to get the right spline
             gridFacing);
     PathPointHelper stageAtY =
-        new PathPointHelper("Stage at Y", y.getX(), y.getY(), gridFacing, gridFacing);
+        new PathPointHelper(
+            "Stage at Y",
+            y.getX(),
+            m_balancePosition.getBalancePosition().getY(),
+            gridFacing,
+            gridFacing);
     PathPointHelper centerOfCS =
         new PathPointHelper("Center of CS", cs.getX(), cs.getY(), gridFacing, gridFacing);
 

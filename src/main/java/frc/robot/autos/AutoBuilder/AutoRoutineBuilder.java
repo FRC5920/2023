@@ -62,6 +62,7 @@ import frc.lib.thirdparty.FRC6328.AllianceFlipUtil;
 import frc.lib.utility.PIDGains;
 import frc.robot.RobotContainer;
 import frc.robot.autos.AutoConstants.BotOrientation;
+import frc.robot.autos.AutoConstants.ChargingStation;
 import frc.robot.autos.AutoConstants.EscapeRoute;
 import frc.robot.autos.AutoConstants.Grids;
 import frc.robot.autos.AutoConstants.InitialAction;
@@ -125,6 +126,7 @@ public class AutoRoutineBuilder {
       InitialAction initialAction,
       EscapeRoute.Route escapeRoute,
       SecondaryAction secondaryAction,
+      ChargingStation.BalancePosition balancePosition,
       PIDGains translationPIDGains,
       PIDGains rotationPIDGains,
       boolean doBumpScore) {
@@ -173,7 +175,7 @@ public class AutoRoutineBuilder {
                 endpoint.getY(),
                 AllianceFlipUtil.apply(BotOrientation.kFacingField),
                 AllianceFlipUtil.apply(BotOrientation.kFacingField));
-        BalanceStrategy balanceStrategy = new BalanceStrategy(balanceStart);
+        BalanceStrategy balanceStrategy = new BalanceStrategy(balanceStart, balancePosition);
         autoCommandGroup.addCommands(
             balanceStrategy.generateCommand(
                 botContainer.swerveSubsystem, translationPIDGains, rotationPIDGains));

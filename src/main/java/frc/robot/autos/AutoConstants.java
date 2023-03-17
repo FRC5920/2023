@@ -184,11 +184,8 @@ public class AutoConstants {
     private static final double kCenterY =
         (kSouthSideY + (FieldConstants.Community.chargingStationWidth / 2));
 
-    /** Distance between robot footprints on the Charging Station */
-    private static final double distanceBetweenBots = 
-      (kDistanceNorthToSouth - (BotDimensions.kFootprintWidth * 3.0) / 2.0);
-    private static final Translation2d outerBalancePositionOffset = 
-      new Translation2d(0.0, distanceBetweenBots + BotDimensions.kFootprintWidth);
+    private static final double kOffsetFromCSEnd =
+        Units.inchesToMeters(4.0) + BotDimensions.kHalfFootprintWidth;
 
     private static Translation2d kGridSideNorth = new Translation2d(kGridSideX, kNorthSideY);
     private static Translation2d kFieldSideSouth = new Translation2d(kGridSideX, kNorthSideY);
@@ -197,21 +194,37 @@ public class AutoConstants {
     /** Location for balancing at the center of the Charging Station */
     private static Translation2d kCenterBalancePosition = kCenter;
     /** Location for balancing at the north of the Charging Station */
-    private static Translation2d kNorthBalancePosition = kCenter.plus(outerBalancePositionOffset);
+    private static Translation2d kNorthBalancePosition =
+        new Translation2d(kCenterX, kNorthSideY - kOffsetFromCSEnd);
     /** Location for balancing at the north of the Charging Station */
-    private static Translation2d kSouthBalancePosition = kCenter.minus(outerBalancePositionOffset);
+    private static Translation2d kSouthBalancePosition =
+        new Translation2d(kCenterX, kSouthSideY + kOffsetFromCSEnd);
 
+    /**
+     * Lanes
+     *
+     * @remarks Lanes are used to indicate imaginary lantes that run between the Grids and the
+     *     Charging Station.
+     */
+    public static enum BalancePosition {
+      NorthOfCS(kNorthBalancePosition),
+      CenterOfCS(kCenterBalancePosition),
+      SouthOfCS(kSouthBalancePosition);
 
-    public static Translation2d getCenterBalancePosition() {
-      return AllianceFlipUtil.apply(kCenter);
-    }
+      private final Translation2d position;
 
-    public static Translation2d getNorthBalancePosition() {
-      return AllianceFlipUtil.apply(kCenter);
-    }
+      private BalancePosition(Translation2d pos) {
+        position = pos;
+      }
 
-    public static Translation2d getSouthBalancePosition() {
-      return AllianceFlipUtil.apply(kCenter);
+      /** Returns a list of names of enum elements */
+      public static String[] getNames() {
+        return getEnumNames(BalancePosition.class);
+      }
+
+      public Translation2d getBalancePosition() {
+        return AllianceFlipUtil.apply(position);
+      }
     }
   }
 

@@ -61,6 +61,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.lib.dashboard.WidgetsWithChangeDetection.ChooserWithChangeDetection;
 import frc.lib.dashboard.WidgetsWithChangeDetection.PIDTunerPanel;
 import frc.robot.RobotContainer;
+import frc.robot.autos.AutoConstants.ChargingStation;
 import frc.robot.autos.AutoConstants.EscapeRoute;
 import frc.robot.autos.AutoConstants.Grids;
 import frc.robot.autos.AutoConstants.InitialAction;
@@ -99,15 +100,18 @@ public class AutoDashboardTab implements IDashboardTab {
   /** Initial position chooser */
   private final ChooserWithChangeDetection<Grids.ScoringPosition> m_initialPositionChooser =
       new ChooserWithChangeDetection<Grids.ScoringPosition>();
+  /** Initial action chooser */
+  private final ChooserWithChangeDetection<InitialAction> m_initialActionChooser =
+      new ChooserWithChangeDetection<InitialAction>();
   /** Route chooser */
   private final ChooserWithChangeDetection<EscapeRoute.Route> m_routeChooser =
       new ChooserWithChangeDetection<EscapeRoute.Route>();
   /** Secondary action chooser */
   private final ChooserWithChangeDetection<SecondaryAction> m_secondaryActionChooser =
       new ChooserWithChangeDetection<SecondaryAction>();
-  /* Initial action chooser */
-  private final ChooserWithChangeDetection<InitialAction> m_initialActionChooser =
-      new ChooserWithChangeDetection<InitialAction>();
+  /* Balance Position Chooser */
+  private final ChooserWithChangeDetection<ChargingStation.BalancePosition>
+      m_balancePositionChooser = new ChooserWithChangeDetection<ChargingStation.BalancePosition>();
   /** Waypoint chooser */
   // private final ChooserWithChangeDetection<Waypoints.ID> m_targetWaypointChooser =
   //     new ChooserWithChangeDetection<Waypoints.ID>();
@@ -168,6 +172,14 @@ public class AutoDashboardTab implements IDashboardTab {
         .withSize(kChooserWidth, kChooserHeight)
         .withPosition(3 * kChooserWidth, 0);
 
+    // Set up a chooser for the balance position
+    m_balancePositionChooser.loadOptions(
+        ChargingStation.BalancePosition.getNames(), ChargingStation.BalancePosition.values(), 0);
+    m_tab
+        .add("Balance Position", m_balancePositionChooser)
+        .withSize(kChooserWidth, kChooserHeight)
+        .withPosition(4 * kChooserWidth, 0);
+
     // Set up a chooser for the waypoint to move to outside the community
     // populateChooser(m_targetWaypointChooser, Waypoints.ID.getNames(), Waypoints.ID.values());
     // m_tab
@@ -200,6 +212,7 @@ public class AutoDashboardTab implements IDashboardTab {
     boolean initialActionChanged = m_initialActionChooser.hasChanged();
     boolean routeHasChanged = m_routeChooser.hasChanged();
     boolean selectedActionChanged = m_secondaryActionChooser.hasChanged();
+    boolean balancePositionChanged = m_balancePositionChooser.hasChanged();
     boolean targetWaypointChanged = false; // m_targetWaypointChooser.hasChanged();
     boolean translationPIDChanged = m_translationPIDPanel.hasChanged();
     boolean rotationPIDChanged = m_rotationPIDPanel.hasChanged();
@@ -209,6 +222,7 @@ public class AutoDashboardTab implements IDashboardTab {
         || initialActionChanged
         || routeHasChanged
         || selectedActionChanged
+        || balancePositionChanged
         || targetWaypointChanged
         || translationPIDChanged
         || rotationPIDChanged) {
@@ -223,6 +237,7 @@ public class AutoDashboardTab implements IDashboardTab {
           m_initialActionChooser.getSelected(),
           m_routeChooser.getSelected(),
           m_secondaryActionChooser.getSelected(),
+          m_balancePositionChooser.getSelected(),
           m_translationPIDPanel.getGains(),
           m_rotationPIDPanel.getGains(),
           false);
