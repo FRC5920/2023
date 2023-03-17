@@ -63,6 +63,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.lib.Joystick.ProcessedXboxController;
+import frc.robot.autos.AutoConstants.BotDimensions;
 import frc.robot.autos.AutoConstants.Grids;
 import frc.robot.subsystems.JoystickSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
@@ -72,26 +73,20 @@ public class SnapToGrid extends CommandBase {
   /** Y values comprising grid lines */
   public static final double kGridYValues[] =
       new double[] {
-        Grids.ScoringPosition.A.getPosition().getY(),
         Grids.ScoringPosition.B.getPosition().getY(),
-        Grids.ScoringPosition.C.getPosition().getY(),
-        Grids.ScoringPosition.D.getPosition().getY(),
         Grids.ScoringPosition.E.getPosition().getY(),
-        Grids.ScoringPosition.F.getPosition().getY(),
-        Grids.ScoringPosition.G.getPosition().getY(),
         Grids.ScoringPosition.H.getPosition().getY(),
-        Grids.ScoringPosition.I.getPosition().getY(),
       };
 
   /** Distance from a grid line to capture */
-  private static final double kCaptureRangeMeters = // BotDimensions.kHalfFootprintWidth;
-      (Grids.ScoringPosition.B.getPosition().getY() - Grids.ScoringPosition.A.getPosition().getY())
-          / 2.0;
+  private static final double kCaptureRangeMeters = BotDimensions.kFootprintWidth;
+  // (Grids.ScoringPosition.B.getPosition().getY() - Grids.ScoringPosition.A.getPosition().getY())
+  //     / 2.0;
 
-  private static final double kP = 1.0;
+  private static final double kP = 0.8;
   private static final double kI = 0.0;
-  private static final double kD = 0.1;
-  private static final double kErrorTolerance = 0.1;
+  private static final double kD = 0.08;
+  private static final double kErrorTolerance = 0.02;
 
   private final double m_maxSpeed;
   private final double m_maxRotation;
@@ -135,6 +130,7 @@ public class SnapToGrid extends CommandBase {
   @Override
   public void initialize() {
     m_gridFieldLineHelper.display();
+    SmartDashboard.putNumber("S2G-snapValue", 0.0);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -149,7 +145,7 @@ public class SnapToGrid extends CommandBase {
     Translation2d currentPosition = m_swerveSubsystem.getPose().getTranslation();
     double currentY = currentPosition.getY();
 
-    // Get the distance from the current snap value
+    // Determine if the bot is within range of a grid line
     Double snapValue = m_gridHelper.getNearestGridValue(currentY);
     if (snapValue != null) {
       // If snapping to a new value, reset the PID controller
@@ -158,18 +154,13 @@ public class SnapToGrid extends CommandBase {
         m_snapPID.reset();
       }
 
+      m_snapPID.setSetpoint(snapValue);
       // Calculate a speed value to drive the Y value to the nearest grid
-      double snapDeltaY = -1.0 * deltaX * m_snapPID.calculate(currentY, m_snapValue);
-      // Cap snap delta to joystick speed range
-      snapDeltaY = Math.signum(snapDeltaY) * Math.min(Math.abs(snapDeltaY), 1.0);
+      double snapDeltaY = m_snapPID.calculate(currentY, m_snapValue);
+      deltaY = snapDeltaY;
 
       SmartDashboard.putNumber("S2G-snapValue", m_snapValue);
-
-      deltaY =
-          (Math.abs(deltaX) > Math.abs(deltaY))
-              ? Math.min(snapDeltaY, (0.75 * deltaX))
-              : snapDeltaY;
-      // deltaY = (deltaX > deltaY) ? (snapDeltaY * deltaY / deltaX) : snapDeltaY;
+      SmartDashboard.putNumber("S2G-snapDeltaY", m_snapValue);
     } else {
       SmartDashboard.putNumber("S2G-snapValue", Double.NaN);
     }
@@ -179,8 +170,6 @@ public class SnapToGrid extends CommandBase {
     SmartDashboard.putNumber("S2G-deltaX", deltaX);
     SmartDashboard.putNumber("S2G-deltaY", deltaY);
     Translation2d translationSpeeds = new Translation2d(deltaX, deltaY).times(m_maxSpeed);
-    // SmartDashboard.putNumber("xSpeed", translation.getX());
-    // SmartDashboard.putNumber("ySpeed", translation.getY());
     double rotationSpeed = deltaRot * m_maxRotation;
 
     m_swerveSubsystem.drive(translationSpeeds, rotationSpeed, m_fieldRelative, m_openLoop);
