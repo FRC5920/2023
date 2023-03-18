@@ -248,7 +248,7 @@ public class EscapeStrategy {
             endpoint.getPosition().getX(),
             endpoint.getPosition().getY(),
             BotOrientation.kFacingField,
-            AllianceFlipUtil.apply(BotOrientation.kFacingGrid));
+            AllianceFlipUtil.apply(BotOrientation.kFacingField));
 
     m_waypointList = new ArrayList<>();
     m_waypointList.add(initialWaypoint);

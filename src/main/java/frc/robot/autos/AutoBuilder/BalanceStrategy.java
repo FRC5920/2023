@@ -176,16 +176,16 @@ public class BalanceStrategy {
             m_initialLocation.getX(),
             m_initialLocation.getY(),
             fieldFacing, // Heading needs to be facing field to get the right spline
-            gridFacing);
+            fieldFacing);
     PathPointHelper stageAtY =
         new PathPointHelper(
             "Stage at Y",
             y.getX(),
             m_balancePosition.getBalancePosition().getY(),
             gridFacing,
-            gridFacing);
+            fieldFacing);
     PathPointHelper centerOfCS =
-        new PathPointHelper("Center of CS", cs.getX(), cs.getY(), gridFacing, gridFacing);
+        new PathPointHelper("Center of CS", cs.getX(), cs.getY(), gridFacing, fieldFacing);
 
     trajectoryList.add(
         PathPlanner.generatePath(kDefaultPathConstraints, initialPoint, stageAtY, centerOfCS));
