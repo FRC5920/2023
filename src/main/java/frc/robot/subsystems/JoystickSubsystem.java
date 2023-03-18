@@ -61,8 +61,8 @@ import frc.lib.Joystick.AxisProcChain;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.Constants.GameTarget;
 import frc.robot.RobotContainer;
-import frc.robot.commands.Balance;
 import frc.robot.commands.Shooter.Acquire;
+import frc.robot.commands.Shooter.AutoZeroPivot;
 import frc.robot.commands.Shooter.Shoot;
 import frc.robot.commands.SimulationPrinter;
 import frc.robot.commands.SnapToGrid;
@@ -235,7 +235,8 @@ public class JoystickSubsystem extends SubsystemBase {
       driverController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
       driverController.back.onTrue(
           new InstantCommand(() -> botContainer.swerveSubsystem.zeroGyro())); // left little
-      driverController.start.whileTrue(new Balance(botContainer.swerveSubsystem)); // right little
+      driverController.start.whileTrue(
+          new AutoZeroPivot(botContainer.shooterPivotSubsystem, 5.0)); // right little
 
       driverController.rightTriggerAsButton.whileTrue(
           new SimulationPrinter("Snap-to-grid ON")
@@ -276,7 +277,7 @@ public class JoystickSubsystem extends SubsystemBase {
           new InstantCommand(
               () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.Park)));
       operatorController.start.onTrue(
-          new InstantCommand(() -> botContainer.shooterPivotSubsystem.zeroPivotPosition()));
+          new InstantCommand(() -> botContainer.shooterPivotSubsystem.zeroPivotPositionSensor()));
     }
   }
 
