@@ -71,7 +71,7 @@ import java.util.HashMap;
 
 public class SnapToGrid extends CommandBase {
   /** Set this to true to display grid lines on the dashboard field view */
-  private static final boolean kDisplayGridLinesOnField = false;
+  private static final boolean kDisplayGridLinesOnField = true;
 
   /** Y values comprising grid lines */
   public static final double kGridYValues[] =
