@@ -235,9 +235,13 @@ public class AutoConstants {
   /** Constants used to identify the route the bot will take out of the community */
   public static class EscapeRoute {
 
-    /** X coordinate of escape route endpoint */
-    public static final double kEscapeEndpointX =
+    /** X coordinate of escape route endpoints North of the Charging Station */
+    public static final double kNorthEscapeEndpointX =
         ChargingStation.kFieldSideX + (BotDimensions.kFootprintWidth);
+
+    /** X coordinate of escape route endpoints South of the Charging Station */
+    public static final double kSouthEscapeEndpointX =
+        kNorthEscapeEndpointX + BotDimensions.kFootprintWidth;
 
     public static enum Route {
       /**
@@ -325,17 +329,17 @@ public class AutoConstants {
 
     public static enum Endpoint {
       /** End of the North OUTER lane aligned with Fieldward side of Charging Station */
-      OuterLaneNorthEndpoint(kEscapeEndpointX, LaneConstants.kOuterLaneNorthCenterY),
+      OuterLaneNorthEndpoint(kNorthEscapeEndpointX, LaneConstants.kOuterLaneNorthCenterY),
       /** End of the North INNER lane aligned with Fieldward side of Charging Station */
-      InnerLaneNorthEndpoint(kEscapeEndpointX, LaneConstants.kInnerLaneNorthCenterY),
+      InnerLaneNorthEndpoint(kNorthEscapeEndpointX, LaneConstants.kInnerLaneNorthCenterY),
 
       /** End of the South OUTER lane just past tape South of Charging Station */
-      OuterLaneSouthEndpoint(kEscapeEndpointX, LaneConstants.kOuterLaneSouthCenterY),
+      OuterLaneSouthEndpoint(kSouthEscapeEndpointX, LaneConstants.kOuterLaneSouthCenterY),
       /** End of the South INNER lane just past tape South of Charging Station */
-      InnerLaneSouthEndpoint(kEscapeEndpointX, LaneConstants.kInnerLaneSouthCenterY),
+      InnerLaneSouthEndpoint(kSouthEscapeEndpointX, LaneConstants.kInnerLaneSouthCenterY),
 
       /** End of the route through the Charging Station via the Outer lane */
-      ThroughCSEndpoint(kEscapeEndpointX, ChargingStation.kCenterY);
+      ThroughCSEndpoint(kNorthEscapeEndpointX, ChargingStation.kCenterY);
 
       private final Translation2d position;
 

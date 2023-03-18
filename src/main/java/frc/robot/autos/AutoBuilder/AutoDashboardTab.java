@@ -158,22 +158,19 @@ public class AutoDashboardTab implements IDashboardTab {
         InitialAction.getNames(), InitialAction.values(), InitialAction.ShootHigh.id);
     m_tab
         .add("Initial Action", m_initialActionChooser)
-        .withSize(kChooserWidth, kChooserHeight)
-        .withPosition(1 * kChooserWidth, 0);
+        .withSize(6, kChooserHeight)
+        .withPosition(4, 0);
 
     // Set up a chooser for the route to follow out of the community
     m_routeChooser.loadOptions(EscapeRoute.Route.getNames(), EscapeRoute.Route.values(), 0);
-    m_tab
-        .add("Route", m_routeChooser)
-        .withSize(kChooserWidth, kChooserHeight)
-        .withPosition(2 * kChooserWidth, 0);
+    m_tab.add("Route", m_routeChooser).withSize(8, kChooserHeight).withPosition(10, 0);
 
     // Set up a chooser for the secondary action to take
     m_secondaryActionChooser.loadOptions(SecondaryAction.getNames(), SecondaryAction.values(), 0);
     m_tab
         .add("Secondary Action", m_secondaryActionChooser)
-        .withSize(kChooserWidth, kChooserHeight)
-        .withPosition(3 * kChooserWidth, 0);
+        .withSize(7, kChooserHeight)
+        .withPosition(18, 0);
 
     // Set up a chooser for the balance position
     m_balancePositionChooser.loadOptions(
@@ -182,8 +179,8 @@ public class AutoDashboardTab implements IDashboardTab {
         ChargingStation.BalancePosition.CenterOfCS.id);
     m_tab
         .add("Balance Position", m_balancePositionChooser)
-        .withSize(kChooserWidth, kChooserHeight)
-        .withPosition(4 * kChooserWidth, 0);
+        .withSize(6, kChooserHeight)
+        .withPosition(25, 0);
 
     // Set up a chooser for the waypoint to move to outside the community
     // populateChooser(m_targetWaypointChooser, Waypoints.ID.getNames(), Waypoints.ID.values());
@@ -195,17 +192,15 @@ public class AutoDashboardTab implements IDashboardTab {
     // Add the 2D view of the field
     m_tab
         .add("Field", m_field2d)
-        .withSize(kFieldWidthCells, kFieldHeightCells)
-        .withPosition(0, kChooserHeight + 1)
+        .withSize(24, 14)
+        .withPosition(0, 4)
         .withProperties(Map.of("Label position", "HIDDEN"));
 
     m_translationPIDPanel =
-        new PIDTunerPanel(
-            m_tab, "Translation PID", 0, kFieldWidthCells, DriveToWaypoint.kDefaultPositionGains);
+        new PIDTunerPanel(m_tab, "Translation PID", 0, 33, DriveToWaypoint.kDefaultPositionGains);
 
     m_rotationPIDPanel =
-        new PIDTunerPanel(
-            m_tab, "Rotation PID", 0, kFieldWidthCells, DriveToWaypoint.kDefaultRotationGains);
+        new PIDTunerPanel(m_tab, "Rotation PID", 8, 33, DriveToWaypoint.kDefaultRotationGains);
   }
 
   /** Service dashboard tab widgets */
