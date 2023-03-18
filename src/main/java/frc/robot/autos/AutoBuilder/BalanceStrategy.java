@@ -77,10 +77,10 @@ import java.util.List;
 public class BalanceStrategy {
 
   /** Maximum velocity when driving to Charging Station */
-  public static final double kMaxVelocity = 5.0;
+  public static final double kMaxVelocity = 6.0;
 
   /** Maximum velocity when driving to Charging Station */
-  public static final double kMaxAcceleration = 4.0;
+  public static final double kMaxAcceleration = 8.0;
 
   // Create a trajectory from the waypoints
   private static final PathConstraints kDefaultPathConstraints =

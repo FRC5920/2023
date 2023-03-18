@@ -342,7 +342,7 @@ public class SwerveDashboardTab implements IDashboardTab {
       driveCurrent.setDouble(telemetry.driveCurrentAmps);
       driveTemp.setDouble(telemetry.driveTempCelcius);
       m_swerveVisualizer.update(
-          Units.radiansToDegrees(telemetry.angleAbsolutePositionRad),
+          Units.radiansToDegrees(telemetry.anglePositionRad),
           Units.radiansToDegrees(telemetry.angleVelocityRadPerSec));
       angleVel.setDouble(Units.radiansToDegrees(telemetry.angleVelocityRadPerSec));
       angleVolts.setDouble(telemetry.angleAppliedVolts);
