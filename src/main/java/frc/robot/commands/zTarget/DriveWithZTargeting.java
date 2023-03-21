@@ -53,6 +53,7 @@ package frc.robot.commands.zTarget;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -69,12 +70,14 @@ import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import org.photonvision.PhotonCamera;
 
 public class DriveWithZTargeting extends CommandBase {
-
+  private static final double kAcquireApproachSpeedMetersPerSec = RobotContainer.MaxSpeed / 2.0;
+  private static final double kAutoAcquireAngleToleranceDeg = 2.0;
   private final boolean m_fieldRelative;
   private final boolean m_openLoop;
   private final Swerve m_swerveSubsystem;
   private final ProcessedXboxController m_controller;
   private final ZTargeter m_zTargeter;
+  private GameTarget m_gamepieceType;
 
   /** Returns a command that drives with Z-targeting and intake engaged */
   public static CommandBase zTargetDriveWithIntake(
@@ -113,7 +116,7 @@ public class DriveWithZTargeting extends CommandBase {
     m_controller = joystickSubsystem.driverController;
     m_fieldRelative = fieldRelative;
     m_openLoop = openLoop;
-
+    m_gamepieceType = gamepieceType;
     m_zTargeter = new ZTargeter(gamepieceType, camera);
   }
 
@@ -130,14 +133,37 @@ public class DriveWithZTargeting extends CommandBase {
     // Get translation and rotation from the joystick controller
     double yAxis = -m_controller.getLeftY();
     double xAxis = -m_controller.getLeftX();
-
-    Rotation2d zRotation = m_zTargeter.getRotationToTarget();
-    double rotationRad = (zRotation != null) ? zRotation.getRadians() : -m_controller.getRightX();
-
+    double rotationRad = -m_controller.getRightX();
+    boolean isFieldRelative = m_fieldRelative;
     Translation2d translation = new Translation2d(yAxis, xAxis).times(RobotContainer.MaxSpeed);
+
+    // Get the rotation to a target.  Returns null if no target is found
+    Rotation2d zRotation = m_zTargeter.getRotationToTarget();
+    boolean targetExists = (zRotation != null);
+    if (targetExists) {
+      rotationRad = zRotation.getRadians();
+
+      // If we're fetching a cube and the driver is pressing the right stick button and
+      // our rotation is within an angle tolerance, then advance to grab the cube
+      if ((m_gamepieceType == GameTarget.Cube)
+          && (m_controller.getRightStickButton())
+          && (rotationRad < Units.degreesToRadians(kAutoAcquireAngleToleranceDeg))) {
+        // Drive forward to grab the cube
+        translation = new Translation2d(-1.0 * kAcquireApproachSpeedMetersPerSec, 0.0);
+        isFieldRelative = false;
+      }
+      if ((m_gamepieceType == GameTarget.Cube)
+      && (Math.abs(m_controller.getRightX()) > .1 || Math.abs(m_controller.getRightY()) > .1)
+      && (rotationRad < Units.degreesToRadians(kAutoAcquireAngleToleranceDeg))) {
+    // Drive forward to grab the cube
+    translation = new Translation2d(-m_controller.getRightY(), -m_controller.getRightX()).times(RobotContainer.MaxSpeed);
+    isFieldRelative = false;
+  }
+    }
+
     rotationRad *= RobotContainer.MaxRotate;
     SmartDashboard.putNumber("zTarget/commandedOutput", rotationRad);
-    m_swerveSubsystem.drive(translation, rotationRad, m_fieldRelative, m_openLoop);
+    m_swerveSubsystem.drive(translation, rotationRad, isFieldRelative, m_openLoop);
   }
 
   // Called once the command ends or is interrupted.
