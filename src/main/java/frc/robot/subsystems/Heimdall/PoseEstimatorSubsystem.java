@@ -261,4 +261,32 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
     photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
     return photonPoseEstimator.update();
   }
+
+  private Matrix<N3, N1> confidenceCalculator(EstimatedRobotPose estimation) {
+    double smallestDistance = Double.POSITIVE_INFINITY;
+    for (var target : estimation.targetsUsed) {
+      var t3d = target.getBestCameraToTarget();
+      var distance = Math.sqrt(Math.pow(t3d.getX(), 2) + Math.pow(t3d.getY(), 2) + Math.pow(t3d.getZ(), 2));
+      if (distance < smallestDistance)
+        smallestDistance = distance;
+    }
+    double poseAmbiguityFactor = estimation.targetsUsed.size() != 1
+        ? 1
+        : Math.max(
+            1,
+            (estimation.targetsUsed.get(0).getPoseAmbiguity()
+                + Constants.VisionConstants.POSE_AMBIGUITY_SHIFTER)
+                * Constants.VisionConstants.POSE_AMBIGUITY_MULTIPLIER);
+    double confidenceMultiplier = Math.max(
+        1,
+        (Math.max(
+            1,
+            Math.max(0, smallestDistance - Constants.VisionConstants.NOISY_DISTANCE_METERS)
+                * Constants.VisionConstants.DISTANCE_WEIGHT)
+            * poseAmbiguityFactor)
+            / (1
+                + ((estimation.targetsUsed.size() - 1) * Constants.VisionConstants.TAG_PRESENCE_WEIGHT)));
+
+    return Constants.VisionConstants.VISION_MEASUREMENT_STANDARD_DEVIATIONS.times(confidenceMultiplier);
+  }
 }
