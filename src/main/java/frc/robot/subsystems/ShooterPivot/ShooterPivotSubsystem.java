@@ -55,8 +55,15 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.utility.PIDGains;
+import frc.robot.commands.Shooter.AutoZeroPivot;
+import frc.robot.commands.Shooter.SetShooterAngle;
+import frc.robot.commands.SimulationPrinter;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 
 public class ShooterPivotSubsystem extends SubsystemBase {
@@ -122,7 +129,23 @@ public class ShooterPivotSubsystem extends SubsystemBase {
     configureMotors();
 
     // Zero the internal sensor position on startup
-    zeroPivotPosition();
+    zeroPivotPositionSensor();
+  }
+
+  public CommandBase getDefaultCommand() {
+    CommandBase defaultCommand =
+        Commands.either(
+            Commands.sequence(
+                new SimulationPrinter("<ShooterPivot> default park"),
+                new SetShooterAngle(this, PivotPresets.Park)),
+            new ConditionalCommand(
+                new AutoZeroPivot(this, 2.0),
+                new InstantCommand(),
+                () -> getPositionTicks() != 0.0),
+            () -> this.getAngleDegrees() > PivotPresets.Park.angleDegrees);
+
+    defaultCommand.addRequirements(this);
+    return defaultCommand;
   }
 
   /**
@@ -143,6 +166,11 @@ public class ShooterPivotSubsystem extends SubsystemBase {
     setAngleDegrees(preset.angleDegrees);
   }
 
+  /** Sets the shooter pivot to its "Parked" position */
+  public void park() {
+    setAngleDegrees(PivotPresets.Park.angleDegrees);
+  }
+
   /**
    * Returns true if the present pivot position is at a given angle
    *
@@ -154,11 +182,21 @@ public class ShooterPivotSubsystem extends SubsystemBase {
     return falconTicksToDegrees(m_masterMotor.getSelectedSensorPosition());
   }
 
+  /** Returns the raw sensor position in ticks from the pivot motor */
+  public double getPositionTicks() {
+    return m_masterMotor.getSelectedSensorPosition();
+  }
+
   /** Resets the encoder count in pivot motors */
-  public void zeroPivotPosition() {
+  public void zeroPivotPositionSensor() {
     for (WPI_TalonFX motor : m_motors) {
       motor.setSelectedSensorPosition(0);
     }
+  }
+
+  /** Runs the pivot motor directly at a given speed */
+  public void runPivotMotor(double speedPercent) {
+    m_masterMotor.set(speedPercent / 100.0);
   }
 
   /** Returns the subsystem's dashboard tab */

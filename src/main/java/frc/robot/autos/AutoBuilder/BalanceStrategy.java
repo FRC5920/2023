@@ -59,12 +59,13 @@ import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.lib.thirdparty.FRC6328.AllianceFlipUtil;
 import frc.lib.utility.PIDGains;
-import frc.robot.autos.AutoConstants.ChargingStation;
+import frc.robot.autos.AutoConstants.BotOrientation;
+import frc.robot.autos.AutoConstants.ChargingStation.BalancePosition;
 import frc.robot.autos.AutoConstants.Waypoints;
 import frc.robot.commands.Balance;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
@@ -76,10 +77,10 @@ import java.util.List;
 public class BalanceStrategy {
 
   /** Maximum velocity when driving to Charging Station */
-  public static final double kMaxVelocity = 5.0;
+  public static final double kMaxVelocity = 6.0;
 
   /** Maximum velocity when driving to Charging Station */
-  public static final double kMaxAcceleration = 4.0;
+  public static final double kMaxAcceleration = 8.0;
 
   // Create a trajectory from the waypoints
   private static final PathConstraints kDefaultPathConstraints =
@@ -91,13 +92,17 @@ public class BalanceStrategy {
   /** Initial location of the bot */
   PathPointHelper m_initialLocation;
 
+  /** Balance position on the charging station */
+  BalancePosition m_balancePosition;
+
   /**
    * Creates an instance of the strategy
    *
    * @param initialLocation Initial location of the bot when the strategy begins
    */
-  BalanceStrategy(PathPointHelper initialLocation) {
+  BalanceStrategy(PathPointHelper initialLocation, BalancePosition balancePosition) {
     m_initialLocation = initialLocation;
+    m_balancePosition = balancePosition;
     generateTrajectories();
   }
 
@@ -159,15 +164,11 @@ public class BalanceStrategy {
   private void generateTrajectories() {
     ArrayList<PathPlannerTrajectory> trajectoryList = new ArrayList<PathPlannerTrajectory>();
     Translation2d y = Waypoints.ID.Y.getPosition();
-    Translation2d cs = ChargingStation.getCenter();
+    Translation2d cs = m_balancePosition.getBalancePosition();
 
     // PathPlanner doesn't automatically adjust rotations according to Alliance
-    Rotation2d fieldFacing =
-        new Rotation2d(
-            (DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? 0.0 : Math.PI);
-    Rotation2d gridFacing =
-        new Rotation2d(
-            (DriverStation.getAlliance() == DriverStation.Alliance.Blue) ? Math.PI : 0.0);
+    Rotation2d fieldFacing = AllianceFlipUtil.apply(BotOrientation.kFacingField);
+    Rotation2d gridFacing = AllianceFlipUtil.apply(BotOrientation.kFacingGrid);
 
     PathPointHelper initialPoint =
         new PathPointHelper(
@@ -177,7 +178,12 @@ public class BalanceStrategy {
             fieldFacing, // Heading needs to be facing field to get the right spline
             fieldFacing);
     PathPointHelper stageAtY =
-        new PathPointHelper("Stage at Y", y.getX(), y.getY(), gridFacing, fieldFacing);
+        new PathPointHelper(
+            "Stage at Y",
+            y.getX(),
+            m_balancePosition.getBalancePosition().getY(),
+            gridFacing,
+            fieldFacing);
     PathPointHelper centerOfCS =
         new PathPointHelper("Center of CS", cs.getX(), cs.getY(), gridFacing, fieldFacing);
 

@@ -67,6 +67,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
@@ -168,19 +169,27 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
         // load
         Optional<Pose3d> tagPose =
             ATfieldLayout == null ? Optional.empty() : ATfieldLayout.getTagPose(fiducialId);
-        if (target.getPoseAmbiguity() <= .2 && fiducialId >= 0 && tagPose.isPresent()) {
-          var targetPose = tagPose.get();
-          Transform3d camToTarget = target.getBestCameraToTarget();
-          Pose3d camPose = targetPose.transformBy(camToTarget.inverse());
 
-          var visionMeasurement = camPose.transformBy(CAMERA_TO_ROBOT);
-          if (target.getPoseAmbiguity() <= .05) {
-            visionMeasurementStdDevs = VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(2));
-          } else {
-            visionMeasurementStdDevs = VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(10));
+        if (tagPose.isPresent() && fiducialIsOnCurrentAllianceSide(target.getFiducialId())) {
+          SmartDashboard.putString(
+              "HeimdallUpdate", String.format("PoseEstimator sees fiducial %d", fiducialId));
+
+          if (target.getPoseAmbiguity() <= .2 && fiducialId >= 0 && tagPose.isPresent()) {
+            var targetPose = tagPose.get();
+            Transform3d camToTarget = target.getBestCameraToTarget();
+            Pose3d camPose = targetPose.transformBy(camToTarget.inverse());
+
+            var visionMeasurement = camPose.transformBy(CAMERA_TO_ROBOT);
+            if (target.getPoseAmbiguity() <= .05) {
+              visionMeasurementStdDevs = VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(2));
+            } else {
+              visionMeasurementStdDevs = VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(10));
+            }
+            poseEstimator.addVisionMeasurement(
+                visionMeasurement.toPose2d(), resultTimestamp, visionMeasurementStdDevs);
           }
-          poseEstimator.addVisionMeasurement(
-              visionMeasurement.toPose2d(), resultTimestamp, visionMeasurementStdDevs);
+        } else {
+          SmartDashboard.putString("HeimdallUpdate", "PoseEstimator sees no tags");
         }
       }
     }
@@ -195,6 +204,21 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
     // } else {
     //  field2d.setRobotPose(getCurrentPose());
     // }
+  }
+
+  private static boolean fiducialIsOnCurrentAllianceSide(int id) {
+    boolean result = false;
+    switch (DriverStation.getAlliance()) {
+      case Red:
+        result = ((id == 1) || (id == 2) || (id == 3));
+        break;
+      case Blue:
+        result = ((id == 6) || (id == 7) || (id == 8));
+        break;
+      default:
+        break;
+    }
+    return result;
   }
 
   public Pose2d getCurrentPose() {

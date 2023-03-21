@@ -52,53 +52,59 @@
 package frc.robot.commands.Shooter;
 
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import frc.robot.commands.SimulationPrinter;
-import frc.robot.subsystems.Intake.IntakeSubsystem;
-import frc.robot.subsystems.ShooterPivot.PivotPresets;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 
-public class Acquire extends SequentialCommandGroup {
+public class AutoZeroPivot extends CommandBase {
+  private double m_pivotPositionTicks = 0;
+  private final ShooterPivotSubsystem m_shooterPivotSubsystem;
+  private final double m_motorSpeedPercent;
+  private double m_startTimeSec = 0.0;
 
-  public static CommandBase acquireAndPark(
-      ShooterPivotSubsystem shooterPivotSubsystem, IntakeSubsystem intakeSubsystem) {
-    return Commands.parallel(
-            Commands.sequence(
-                new SimulationPrinter("<Acquire> Pivot for shot"),
-                new SetShooterAngle(shooterPivotSubsystem, PivotPresets.Acquire)),
-            Commands.sequence(
-                new SimulationPrinter("<Acquire> wait for shooter angle"),
-                new WaitUntilCommand(() -> waitForShooterAngle(shooterPivotSubsystem)),
-                new SimulationPrinter("<Acquire> start intake"),
-                new IntakeGamepiece(intakeSubsystem)))
-        .finallyDo((interrupted) -> endBehavior(shooterPivotSubsystem, intakeSubsystem));
+  /** Creates a new autoZeroPivot. */
+  public AutoZeroPivot(ShooterPivotSubsystem shooterPivotSubsystem, double speedPercent) {
+    m_shooterPivotSubsystem = shooterPivotSubsystem;
+    m_motorSpeedPercent = speedPercent;
+    addRequirements(shooterPivotSubsystem);
   }
 
-  private static void endBehavior(
-      ShooterPivotSubsystem shooterPivotSubsystem, IntakeSubsystem intakeSubsystem) {
-    shooterPivotSubsystem.park();
-    intakeSubsystem.stopIntake();
+  // Called when the command is initially scheduled.
+  @Override
+  public void initialize() {
+    System.out.printf(String.format("Pivot auto-zeroing: speed=%.0f\n", m_motorSpeedPercent));
+    m_pivotPositionTicks = m_shooterPivotSubsystem.getPositionTicks();
+    m_shooterPivotSubsystem.runPivotMotor(m_motorSpeedPercent);
+    m_startTimeSec = Timer.getFPGATimestamp();
   }
 
-  private static boolean waitForShooterAngle(ShooterPivotSubsystem subsystem) {
-    return RobotBase.isSimulation() || (subsystem.getAngleDegrees() > 45.0);
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
+  public void execute() {}
+
+  // Called once the command ends or is interrupted.
+  @Override
+  public void end(boolean interrupted) {
+    // Turn off the pivot motor when the command finishes
+    m_shooterPivotSubsystem.runPivotMotor(0.0);
+
+    // Zero the pivot position sensor
+    m_shooterPivotSubsystem.zeroPivotPositionSensor();
+
+    double elapsedSec = Timer.getFPGATimestamp() - m_startTimeSec;
+    System.out.printf(String.format("Pivot auto-zero completed after %.4f seconds\n", elapsedSec));
   }
 
-  /**
-   * Generate a command that parks the shooter
-   *
-   * @remarks This command doesn't actually register the ShooterPivotSubsystem it uses. This is done
-   *     intentionally so that the park command can be quickly overridden by another command without
-   *     having to complete the park sequence (e.g. to shoot a cube)
-   */
-  public static CommandBase parkShooter(ShooterPivotSubsystem shooterPivotSubsystem) {
-    return Commands.sequence(
-        new SimulationPrinter("<Acquire> Park shooter"),
-        new InstantCommand(() -> shooterPivotSubsystem.setAnglePreset(PivotPresets.Park)),
-        new SimulationPrinter("<Acquire> parked"));
+  // Returns true when the command should end.
+  @Override
+  public boolean isFinished() {
+    // Get the current pivot angle
+    double currentPivotTicks = m_shooterPivotSubsystem.getPositionTicks();
+    double lastPivotTicks = m_pivotPositionTicks;
+    m_pivotPositionTicks = currentPivotTicks;
+
+    // The command is finished when the motor is running and no change has
+    // occurred in the pivot angle
+    return RobotBase.isSimulation() || (0 == Double.compare(lastPivotTicks, currentPivotTicks));
   }
 }

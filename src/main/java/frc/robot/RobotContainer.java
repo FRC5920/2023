@@ -62,12 +62,10 @@ import frc.lib.SwerveDrive.SwerveModuleIO;
 import frc.robot.autos.AutoBuilder.AutoDashboardTab;
 import frc.robot.autos.AutoBuilder.AutoRoutineBuilder;
 import frc.robot.commands.*;
-import frc.robot.commands.Shooter.SetShooterAngle;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 import frc.robot.subsystems.Heimdall.*;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
-import frc.robot.subsystems.ShooterPivot.PivotPresets;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import frc.robot.subsystems.runtimeState.BotStateSubsystem;
@@ -102,7 +100,7 @@ public class RobotContainer {
 
   // Create an auto routine builder
   AutoRoutineBuilder autoBuilder;
-  private final AutoDashboardTab autoDashboardTab;
+  public final AutoDashboardTab autoDashboardTab;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -181,8 +179,9 @@ public class RobotContainer {
     dashboardSubsystem.add(autoDashboardTab);
 
     // Set up a default command on the shooter pivot subsystem that automatically parks the shooter
-    shooterPivotSubsystem.setDefaultCommand(
-        new SetShooterAngle(shooterPivotSubsystem, PivotPresets.Park));
+    shooterPivotSubsystem.setDefaultCommand(shooterPivotSubsystem.getDefaultCommand());
+    // Set up a default command on the intake subsystem that automatically stops the intake rollers
+    // intakeSubsystem.setDefaultCommand(intakeSubsystem.getDefaultCommand());
 
     intakeSubsystem.registerDashboardTab(dashboardSubsystem);
     shooterPivotSubsystem.registerDashboardTab(dashboardSubsystem);

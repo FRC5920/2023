@@ -86,9 +86,9 @@ public class AutoConstants {
   /** Constants indicating the robot's rotational orientation */
   public static class BotOrientation {
     /** Bot is rotated toward Grids */
-    private static final Rotation2d kFacingGrid = new Rotation2d(Math.PI);
+    public static final Rotation2d kFacingGrid = new Rotation2d(Math.PI);
     /** Bot is rotated toward the middle of the field */
-    private static final Rotation2d kFacingField = new Rotation2d(0.0);
+    public static final Rotation2d kFacingField = new Rotation2d(0.0);
     /** Bot is rotated facing in the opposite direction of the scoring table */
     public static final Rotation2d kFacingNorth = new Rotation2d(Math.PI / 2.0);
     /** Bot is rotated facing the scoring table */
@@ -137,7 +137,7 @@ public class AutoConstants {
       H(7),
       I(8);
 
-      private final int id;
+      public final int id;
       private final Translation2d position;
 
       private ScoringPosition(int idx) {
@@ -174,6 +174,9 @@ public class AutoConstants {
     /** Y coordinate of the side of the charging station furthest from the Grids */
     private static final double kNorthSideY = FieldConstants.Community.chargingStationLeftY;
 
+    /** Dimension of the charging station measured from North to South */
+    private static final double kDistanceNorthToSouth = kNorthSideY - kSouthSideY;
+
     /** X coordinate of the center of the Charging Station */
     private static final double kCenterX =
         (kFieldSideX - (FieldConstants.Community.chargingStationLength / 2));
@@ -181,12 +184,50 @@ public class AutoConstants {
     private static final double kCenterY =
         (kSouthSideY + (FieldConstants.Community.chargingStationWidth / 2));
 
+    private static final double kOffsetFromCSEnd =
+        Units.inchesToMeters(4.0) + BotDimensions.kHalfFootprintWidth;
+
     private static Translation2d kGridSideNorth = new Translation2d(kGridSideX, kNorthSideY);
     private static Translation2d kFieldSideSouth = new Translation2d(kGridSideX, kNorthSideY);
     private static Translation2d kCenter = new Translation2d(kCenterX, kCenterY);
 
-    public static Translation2d getCenter() {
-      return AllianceFlipUtil.apply(kCenter);
+    /** Location for balancing at the center of the Charging Station */
+    private static Translation2d kCenterBalancePosition = kCenter;
+    /** Location for balancing at the north of the Charging Station */
+    private static Translation2d kNorthBalancePosition =
+        new Translation2d(kCenterX, kNorthSideY - kOffsetFromCSEnd);
+    /** Location for balancing at the north of the Charging Station */
+    private static Translation2d kSouthBalancePosition =
+        new Translation2d(kCenterX, kSouthSideY + kOffsetFromCSEnd);
+
+    /**
+     * Lanes
+     *
+     * @remarks Lanes are used to indicate imaginary lantes that run between the Grids and the
+     *     Charging Station.
+     */
+    public static enum BalancePosition {
+      NorthOfCS(0, kNorthBalancePosition),
+      CenterOfCS(1, kCenterBalancePosition),
+      SouthOfCS(2, kSouthBalancePosition);
+
+      public final int id;
+
+      private final Translation2d position;
+
+      private BalancePosition(int _id, Translation2d pos) {
+        id = _id;
+        position = pos;
+      }
+
+      /** Returns a list of names of enum elements */
+      public static String[] getNames() {
+        return getEnumNames(BalancePosition.class);
+      }
+
+      public Translation2d getBalancePosition() {
+        return AllianceFlipUtil.apply(position);
+      }
     }
   }
 
@@ -194,9 +235,13 @@ public class AutoConstants {
   /** Constants used to identify the route the bot will take out of the community */
   public static class EscapeRoute {
 
-    /** X coordinate of escape route endpoint */
-    public static final double kEscapeEndpointX =
+    /** X coordinate of escape route endpoints North of the Charging Station */
+    public static final double kNorthEscapeEndpointX =
         ChargingStation.kFieldSideX + (BotDimensions.kFootprintWidth);
+
+    /** X coordinate of escape route endpoints South of the Charging Station */
+    public static final double kSouthEscapeEndpointX =
+        kNorthEscapeEndpointX + BotDimensions.kFootprintWidth;
 
     public static enum Route {
       /**
@@ -284,17 +329,17 @@ public class AutoConstants {
 
     public static enum Endpoint {
       /** End of the North OUTER lane aligned with Fieldward side of Charging Station */
-      OuterLaneNorthEndpoint(kEscapeEndpointX, LaneConstants.kOuterLaneNorthCenterY),
+      OuterLaneNorthEndpoint(kNorthEscapeEndpointX, LaneConstants.kOuterLaneNorthCenterY),
       /** End of the North INNER lane aligned with Fieldward side of Charging Station */
-      InnerLaneNorthEndpoint(kEscapeEndpointX, LaneConstants.kInnerLaneNorthCenterY),
+      InnerLaneNorthEndpoint(kNorthEscapeEndpointX, LaneConstants.kInnerLaneNorthCenterY),
 
       /** End of the South OUTER lane just past tape South of Charging Station */
-      OuterLaneSouthEndpoint(kEscapeEndpointX, LaneConstants.kOuterLaneSouthCenterY),
+      OuterLaneSouthEndpoint(kSouthEscapeEndpointX, LaneConstants.kOuterLaneSouthCenterY),
       /** End of the South INNER lane just past tape South of Charging Station */
-      InnerLaneSouthEndpoint(kEscapeEndpointX, LaneConstants.kInnerLaneSouthCenterY),
+      InnerLaneSouthEndpoint(kSouthEscapeEndpointX, LaneConstants.kInnerLaneSouthCenterY),
 
       /** End of the route through the Charging Station via the Outer lane */
-      ThroughCSEndpoint(kEscapeEndpointX, ChargingStation.kCenterY);
+      ThroughCSEndpoint(kNorthEscapeEndpointX, ChargingStation.kCenterY);
 
       private final Translation2d position;
 
@@ -460,6 +505,26 @@ public class AutoConstants {
     /** Returns a list of names of enum elements */
     public static String[] getNames() {
       return getEnumNames(CargoLocation.class);
+    }
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  /** An enumeration of initial actions to take before escaping the community */
+  public static enum InitialAction {
+    BumpScore(0), // Drive forward to leave behind a cube, then drive back to bump it into low goal
+    ShootLow(1), // Shoot pre-loaded cube into low goal
+    ShootMid(2), // Shoot pre-loaded cube into mid goal
+    ShootHigh(3); // Shoot pre-loaded cube into high goal
+
+    public final int id;
+
+    private InitialAction(int _id) {
+      id = _id;
+    }
+
+    /** Returns a list of names of enum elements */
+    public static String[] getNames() {
+      return getEnumNames(InitialAction.class);
     }
   };
 

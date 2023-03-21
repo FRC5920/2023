@@ -55,6 +55,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.commands.SimulationPrinter;
 import frc.robot.subsystems.Intake.IntakePreset;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.ShooterPivot.PivotPresets;
@@ -63,24 +64,58 @@ import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 public class Shoot {
   public static final double kShootDurationSec = 0.5;
 
-  public static Command pivotAndShoot(
+  public static CommandBase pivotAndShoot(
       ShooterPivotSubsystem shooterPivotSubsystem,
       IntakeSubsystem intakeSubsystem,
       PivotPresets pivotPreset,
       IntakePreset speedPreset) {
-    return Commands.sequence(
-        new SetShooterAngle(shooterPivotSubsystem, pivotPreset),
-        shootAtSpeed(intakeSubsystem, speedPreset, kShootDurationSec));
+    return new SimulationPrinter(
+            String.format(
+                "<pivotAndShoot> pivot=%s, speed=%s", pivotPreset.name(), speedPreset.name()))
+        .andThen(new SetShooterAngle(shooterPivotSubsystem, pivotPreset))
+        .andThen(new SimulationPrinter(String.format("<pivotAndShoot> Take the shot")))
+        .andThen(shootAtSpeed(intakeSubsystem, speedPreset, kShootDurationSec))
+        .andThen(new SimulationPrinter(String.format("<pivotAndShoot> Shot complete")));
   }
 
-  public static Command pivotAndShoot(
+  public static CommandBase pivotAndShoot(
       ShooterPivotSubsystem shooterPivotSubsystem,
       IntakeSubsystem intakeSubsystem,
       double pivotDegrees,
       double shooterSpeedPercent) {
-    return Commands.sequence(
-        new SetShooterAngle(shooterPivotSubsystem, pivotDegrees),
-        shootAtSpeed(intakeSubsystem, shooterSpeedPercent, 1.5));
+    CommandBase command =
+        Commands.sequence(
+            new SetShooterAngle(shooterPivotSubsystem, pivotDegrees),
+            shootAtSpeed(intakeSubsystem, shooterSpeedPercent, 1.5));
+    command.addRequirements(shooterPivotSubsystem, intakeSubsystem);
+    return command;
+  }
+
+  public static CommandBase pivotAndShootLow(
+      ShooterPivotSubsystem shooterPivotSubsystem, IntakeSubsystem intakeSubsystem) {
+    return pivotAndShoot(
+        shooterPivotSubsystem,
+        intakeSubsystem,
+        PivotPresets.CloseShotLow,
+        IntakePreset.CloseShotLow);
+  }
+
+  public static CommandBase pivotAndShootMid(
+      ShooterPivotSubsystem shooterPivotSubsystem, IntakeSubsystem intakeSubsystem) {
+    return pivotAndShoot(
+        shooterPivotSubsystem,
+        intakeSubsystem,
+        PivotPresets.CloseShotMid,
+        IntakePreset.CloseShotMid);
+  }
+
+  public static CommandBase pivotAndShootHigh(
+      ShooterPivotSubsystem shooterPivotSubsystem, IntakeSubsystem intakeSubsystem) {
+    return pivotAndShoot(
+        shooterPivotSubsystem,
+        intakeSubsystem,
+        PivotPresets.CloseShotHigh,
+        IntakePreset.CloseShotHigh);
   }
 
   /**

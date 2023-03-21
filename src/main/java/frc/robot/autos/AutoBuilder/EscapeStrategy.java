@@ -62,6 +62,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.lib.thirdparty.FRC6328.AllianceFlipUtil;
 import frc.lib.utility.PIDGains;
 import frc.robot.autos.AutoConstants.BotDimensions;
 import frc.robot.autos.AutoConstants.BotOrientation;
@@ -227,7 +228,8 @@ public class EscapeStrategy {
             cornerPosition.getX(),
             cornerPosition.getY(),
             populateLater, // Heading will get filled in later
-            initialHolRot); // Holonomic Rotation
+            initialHolRot); // Holonomic Rotation ** Maybe change this to
+    // BotOrientation.kFacingField for earlier rotation **
 
     // Generate a waypoint to move into the active lane
     PathPointHelper initialLaneEndpoint =
@@ -236,7 +238,7 @@ public class EscapeStrategy {
             cornerPosition.getX(),
             initialWaypoint.getY(),
             populateLater,
-            initialHolRot);
+            BotOrientation.kFacingField);
 
     // Create a waypoint for the endpoint of the active escape route
     final EscapeRoute.Endpoint endpoint = EscapeRoute.getEndpoint(m_escapeRoute);
@@ -245,8 +247,8 @@ public class EscapeStrategy {
             endpoint.name(),
             endpoint.getPosition().getX(),
             endpoint.getPosition().getY(),
-            BotOrientation.facingField(),
-            initialHolRot);
+            BotOrientation.kFacingField,
+            AllianceFlipUtil.apply(BotOrientation.kFacingField));
 
     m_waypointList = new ArrayList<>();
     m_waypointList.add(initialWaypoint);
