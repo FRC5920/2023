@@ -181,6 +181,10 @@ public class AutoRoutineBuilder {
                 botContainer.swerveSubsystem, translationPIDGains, rotationPIDGains));
         m_cumulativeTrajectory.addAll(balanceStrategy.getTrajectories());
         break;
+
+      case EthansAuto:
+        autoCommandGroup.addCommands(new EthansAuto(botContainer.swerveSubsystem));
+        break;
       default:
         break;
     }

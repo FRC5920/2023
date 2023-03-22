@@ -533,7 +533,8 @@ public class AutoConstants {
   public static enum SecondaryAction {
     WaitAtLocation, // Go to a location and wait
     Balance, // Balance on the charging station
-    AcquireCargo; // Acquire a piece of cargo
+    AcquireCargo, // Acquire a piece of cargo
+    EthansAuto; // Ethan's fantastic auto
 
     /** Returns a list of names of enum elements */
     public static String[] getNames() {
