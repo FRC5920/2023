@@ -53,7 +53,6 @@ package frc.robot.commands.zTarget;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -145,20 +144,25 @@ public class DriveWithZTargeting extends CommandBase {
 
       // If we're fetching a cube and the driver is pressing the right stick button and
       // our rotation is within an angle tolerance, then advance to grab the cube
+      // if ((m_gamepieceType == GameTarget.Cube)
+      //     && (m_controller.getRightStickButton())
+      //     && (rotationRad < Units.degreesToRadians(kAutoAcquireAngleToleranceDeg))) {
+      //   // Drive forward to grab the cube
+      //   translation = new Translation2d(-1.0 * kAcquireApproachSpeedMetersPerSec, 0.0);
+      //   isFieldRelative = false;
+      // }
+
       if ((m_gamepieceType == GameTarget.Cube)
-          && (m_controller.getRightStickButton())
-          && (rotationRad < Units.degreesToRadians(kAutoAcquireAngleToleranceDeg))) {
-        // Drive forward to grab the cube
-        translation = new Translation2d(-1.0 * kAcquireApproachSpeedMetersPerSec, 0.0);
+          && ((Math.abs(m_controller.getRightY()) > 0.1)
+              || (Math.abs(m_controller.getRightX()) > 0.1))) {
+        translation =
+            new Translation2d(m_controller.getRightY(), m_controller.getRightX())
+                .times(RobotContainer.MaxSpeed);
         isFieldRelative = false;
+      } else {
+        translation = new Translation2d(yAxis, xAxis).times(RobotContainer.MaxSpeed);
+        isFieldRelative = true;
       }
-      if ((m_gamepieceType == GameTarget.Cube)
-      && (Math.abs(m_controller.getRightX()) > .1 || Math.abs(m_controller.getRightY()) > .1)
-      && (rotationRad < Units.degreesToRadians(kAutoAcquireAngleToleranceDeg))) {
-    // Drive forward to grab the cube
-    translation = new Translation2d(-m_controller.getRightY(), -m_controller.getRightX()).times(RobotContainer.MaxSpeed);
-    isFieldRelative = false;
-  }
     }
 
     rotationRad *= RobotContainer.MaxRotate;

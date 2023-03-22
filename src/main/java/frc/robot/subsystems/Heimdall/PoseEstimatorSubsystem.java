@@ -122,10 +122,10 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
       photonPoseEstimator =
           new PhotonPoseEstimator(
               fieldLayout,
-              PoseStrategy.MULTI_TAG_PNP,
+              PoseStrategy.LOWEST_AMBIGUITY,
               photonCamera,
               Constants.VisionConstants.CAMERA_TO_ROBOT);
-      photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+      photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_LAST_POSE);
     } catch (IOException e) {
       // The AprilTagFieldLayout failed to load. We won't be able to estimate poses if we don't know
       // where the tags are.
