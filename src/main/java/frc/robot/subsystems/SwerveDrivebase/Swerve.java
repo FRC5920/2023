@@ -69,6 +69,8 @@ import frc.lib.SwerveDrive.SwerveModule;
 import frc.lib.SwerveDrive.SwerveModuleIO;
 import frc.robot.Constants;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
+import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.Logger;
 
 public class Swerve extends SubsystemBase {
   /** Set to true to enable a dashboard tab for the Swerve subsystem */
@@ -142,6 +144,14 @@ public class Swerve extends SubsystemBase {
     m_ChassisSpeeds = new ChassisSpeeds();
   }
 
+  @AutoLog
+  private static class DriveInputs {
+    public Translation2d translation;
+    public double rotation;
+    public boolean fieldRelative;
+    public boolean isOpenLoop;
+  }
+
   /**
    * Moves the swerve drive to a given translation and rotation
    *
@@ -153,6 +163,14 @@ public class Swerve extends SubsystemBase {
    */
   public void drive(
       Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
+    // Log inputs
+    DriveInputsAutoLogged driveInputs = new DriveInputsAutoLogged();
+    driveInputs.translation = translation;
+    driveInputs.rotation = rotation;
+    driveInputs.fieldRelative = fieldRelative;
+    driveInputs.isOpenLoop = isOpenLoop;
+    Logger.getInstance().processInputs("Swerve/drive-inputs", driveInputs);
+
     double x = translation.getX();
     double y = translation.getY();
 
@@ -173,7 +191,16 @@ public class Swerve extends SubsystemBase {
     }
   }
 
+  @AutoLog
+  private static class RunVelocityInputs {
+    ChassisSpeeds speeds;
+  }
+
   public void runVelocity(ChassisSpeeds speeds) {
+    // Log inputs
+    RunVelocityInputsAutoLogged driveInputs = new RunVelocityInputsAutoLogged();
+    driveInputs.speeds = speeds;
+    Logger.getInstance().processInputs("Swerve/runVelocity-inputs", driveInputs);
 
     m_ChassisSpeeds = speeds;
 
@@ -187,13 +214,24 @@ public class Swerve extends SubsystemBase {
       mod.setDesiredState(newModuleStates[mod.moduleNumber], false);
     }
   }
+
   /** Stops swerve drive motion */
   public void stop() {
     drive(new Translation2d(0, 0).times(0), 0, true, true);
   }
 
+  @AutoLog
+  private static class SetModuleStatesInputs {
+    SwerveModuleState[] desiredStates;
+  }
+
   /* Used by SwerveControllerCommand in Auto */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
+    // Log inputs
+    SetModuleStatesInputsAutoLogged swerveInputs = new SetModuleStatesInputsAutoLogged();
+    swerveInputs.desiredStates = desiredStates;
+    Logger.getInstance().processInputs("Swerve/setModuleStates-inputs", swerveInputs);
+
     SwerveDriveKinematics.desaturateWheelSpeeds(
         desiredStates, Constants.SwerveDrivebaseConstants.maxSpeed);
 
@@ -225,8 +263,18 @@ public class Swerve extends SubsystemBase {
     return pose;
   }
 
+  @AutoLog
+  private static class ResetOdometryInput {
+    Pose2d pose;
+  }
+
   /** Resets odometry */
   public void resetOdometry(Pose2d pose) {
+    // Log inputs
+    ResetOdometryInputAutoLogged poseInput = new ResetOdometryInputAutoLogged();
+    poseInput.pose = pose;
+    Logger.getInstance().processInputs("Swerve/setModuleStates-inputs", poseInput);
+
     swervePoseEstimator.resetPosition(getYaw(), getModulePositions(), pose);
     if (RobotBase.isSimulation()) {
       simOdometryPose = pose;
@@ -294,17 +342,36 @@ public class Swerve extends SubsystemBase {
     }
   }
 
+  @AutoLog
+  private static class SwervePoseEstimatorInputs {
+    public Rotation2d yaw;
+    public SwerveModulePosition[] modulePosition;
+  }
+
   /** Executed periodically to service the subsystem */
   @Override
   public void periodic() {
 
     m_gyroIO.updateInputs(m_gyroMeasurements);
-    // Logger.getInstance().processInputs("Drive/Gyro", m_gyroMeasurements);
-    for (SwerveModule module : mSwerveMods) {
+    Logger.getInstance().processInputs("Swerve/gyro", m_gyroMeasurements);
+
+    // Update and log swerve module telemetry
+    for (int idx = 0; idx < mSwerveMods.length; ++idx) {
+      SwerveModule module = mSwerveMods[idx];
       module.updateLoggedInputs();
+      Logger.getInstance()
+          .processInputs(String.format("Swerve/module%d", idx), module.getIOTelemetry());
     }
 
-    swervePoseEstimator.update(getYaw(), getModulePositions());
+    // Update and log swerve pose estimator
+    SwervePoseEstimatorInputsAutoLogged estimatorInputs = new SwervePoseEstimatorInputsAutoLogged();
+    estimatorInputs.yaw = getYaw();
+    estimatorInputs.modulePosition = getModulePositions();
+    Logger.getInstance().processInputs("Swerve/estimatorInputs", estimatorInputs);
+
+    swervePoseEstimator.update(estimatorInputs.yaw, estimatorInputs.modulePosition);
+    Logger.getInstance()
+        .recordOutput("Swerve/estimatedPose", swervePoseEstimator.getEstimatedPosition());
 
     if (RobotBase.isSimulation()) {
       SwerveModuleState[] measuredStates =

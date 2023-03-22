@@ -69,7 +69,7 @@ public final class Constants {
   public static final double robotPeriodSec = LoggedRobot.defaultPeriodSecs;
 
   /** Set this to true to enable logging with AdvantageKit */
-  public static final boolean kLoggingIsEnabled = false;
+  public static final boolean kLoggingIsEnabled = true;
 
   /** Set the value of logPlaybackIsEnabled to true when replaying log files */
   public static final boolean kLogPlaybackIsEnabled = false;
@@ -293,7 +293,7 @@ public final class Constants {
 
   /** A map of directories where log files should be stored */
   public static final Map<RobotType, String> logDirectories =
-      Map.of(RobotType.PrototypeBot, "/media/sda2/");
+      Map.of(RobotType.PrototypeBot, "/media/sda1/");
 
   /////////////////////////////////////////////////////////////////////////////
   /** Robot types */

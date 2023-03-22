@@ -120,7 +120,7 @@ public class SwerveModule {
    *
    * @return A SwerveModuleIOInputs object containing the module's telemetry values
    */
-  public SwerveModuleIO.SwerveModuleIOTelemetry getIOTelemetry() {
+  public SwerveModuleIOTelemetryAutoLogged getIOTelemetry() {
     return m_loggedTelemetry;
   }
 }
