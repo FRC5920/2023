@@ -238,8 +238,8 @@ public class IntakeGamepiece extends SequentialCommandGroup {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-      return m_intakeSubsystem.limitSwitchIsClosed()
-          || detectUsingSpeed(); // || detectUsingCurrent();
+      return m_intakeSubsystem.limitSwitchIsClosed();
+      // || detectUsingSpeed(); // || detectUsingCurrent();
     }
 
     private boolean detectUsingCurrent() {

@@ -112,7 +112,7 @@ public class ZTargeter {
     m_gamepieceType = TargetWhat;
 
     omegaController = new PIDController(gains.kP, gains.kI, gains.kD);
-    omegaController.setTolerance(Units.degreesToRadians(5));
+    omegaController.setTolerance(Units.degreesToRadians(2));
     omegaController.enableContinuousInput(-Math.PI, Math.PI);
     omegaController.setSetpoint(0);
   }
@@ -120,7 +120,7 @@ public class ZTargeter {
   /** This method must be called to initialize the camera used by the ZTargeter */
   public void initialize() {
     m_camera.setPipelineIndex(m_gamepieceType.PipelineIndex);
-    // System.out.println("Z-Target: Targetting " + String.valueOf(m_gamepieceType));
+    System.out.println("<Z-Targeter> targeting " + String.valueOf(m_gamepieceType));
   }
 
   /**
