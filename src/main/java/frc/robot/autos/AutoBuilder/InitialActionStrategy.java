@@ -49,111 +49,77 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.commands;
+package frc.robot.autos.AutoBuilder;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
+import frc.robot.RobotContainer;
+import frc.robot.autos.AutoConstants.Grids;
+import frc.robot.autos.AutoConstants.InitialAction;
+import frc.robot.autos.BumpScore;
+import frc.robot.commands.Shooter.Shoot;
+import frc.robot.subsystems.Intake.IntakeSubsystem;
+import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 
-public class Balance extends CommandBase {
+/** Implements a strategy for an initial action taken when an auto routine first begins */
+public class InitialActionStrategy extends AutoStrategy {
+  /** The action to take */
+  private final InitialAction m_action;
+  /** Initial position of the bot when the auto starts */
+  private final Grids.ScoringPosition m_initialPosition;
+  /** Subsystem used to access the drive base */
+  private final Swerve m_swerveSubsystem;
+  /** Subsystem used to access the shooter */
+  private final ShooterPivotSubsystem m_shooterPivotSubsystem;
+  /** Subsystem used to access the intake */
+  private final IntakeSubsystem m_intakeSubsystem;
 
-  private static final double SwerveP = 0.07;
-  private static final double SwerveI = 0.00;
-  private static final double SwervekD = 0.0;
-  private final PIDController xController = new PIDController(SwerveP, SwerveI, SwervekD);
-  private final PIDController yController = new PIDController(SwerveP, SwerveI, SwervekD);
-  private final PIDController omegaController = new PIDController(SwerveP, SwerveI, SwervekD);
-
-  private final Swerve drivetrainSubsystem;
-
-  private final Timer m_simulationTimer;
-
-  /** Creates a new Balance. */
-  public Balance(Swerve drivetrainSubsystem) {
-    this.drivetrainSubsystem = drivetrainSubsystem;
-
-    xController.setTolerance(3);
-    yController.setTolerance(3);
-    omegaController.setTolerance(Units.degreesToRadians(3));
-    omegaController.enableContinuousInput(-Math.PI, Math.PI);
-    m_simulationTimer = new Timer();
-    addRequirements(drivetrainSubsystem);
+  /**
+   * Creates an instance of the strategy
+   *
+   * @param action The selected initial action to take
+   * @param startingPosition Initial position of the bot when the auto begins
+   * @param shooterPivotSubsystem The ShooterPivotSubsystem to use
+   * @param intakeSubsystem The IntakeSubsystem to use
+   */
+  public InitialActionStrategy(
+      InitialAction action, Grids.ScoringPosition startingPosition, RobotContainer botContainer) {
+    super(() -> startingPosition.getPose());
+    m_action = action;
+    m_initialPosition = startingPosition;
+    m_shooterPivotSubsystem = botContainer.shooterPivotSubsystem;
+    m_intakeSubsystem = botContainer.intakeSubsystem;
+    m_swerveSubsystem = botContainer.swerveSubsystem;
   }
 
-  // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    // omegaController.reset(drivetrainSubsystem.getYaw().getRadians());
-    // xController.reset(drivetrainSubsystem.getRoll());
-    // yController.reset(drivetrainSubsystem.getPitch());
+  public CommandBase getCommand() {
+    CommandBase actionCommand = null;
 
-    if (RobotBase.isSimulation()) {
-      m_simulationTimer.reset();
-      m_simulationTimer.start();
-      System.out.println("<Balance> Balacing");
+    switch (m_action) {
+      case BumpScore:
+        actionCommand = new BumpScore(m_initialPosition, m_swerveSubsystem);
+        break;
+
+      case ShootLow:
+        actionCommand = Shoot.pivotAndShootLow(m_shooterPivotSubsystem, m_intakeSubsystem);
+        break;
+
+      case ShootMid:
+        actionCommand = Shoot.pivotAndShootMid(m_shooterPivotSubsystem, m_intakeSubsystem);
+        break;
+
+      case ShootHigh:
+        actionCommand = Shoot.pivotAndShootHigh(m_shooterPivotSubsystem, m_intakeSubsystem);
+        break;
     }
+
+    return actionCommand;
   }
 
-  // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-    // drivetrainSubsystem.getPitch();
-    // drivetrainSubsystem.getRoll();
-    xController.setSetpoint(0);
-    yController.setSetpoint(0);
-    omegaController.setSetpoint(drivetrainSubsystem.getYaw().getRadians());
-
-    // Drive to the target
-    var xSpeed = xController.calculate(-drivetrainSubsystem.getPitch().getDegrees());
-    if (xController.atSetpoint()) {
-      xSpeed = 0;
-    }
-
-    var ySpeed = yController.calculate(-drivetrainSubsystem.getRoll().getDegrees());
-    if (yController.atSetpoint()) {
-      ySpeed = 0;
-    }
-
-    var omegaSpeed = omegaController.calculate(drivetrainSubsystem.getYaw().getRadians());
-    if (omegaController.atSetpoint()) {
-      omegaSpeed = 0;
-    }
-    // https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/intro-and-chassis-speeds.html
-    drivetrainSubsystem.drive(
-        new Translation2d(ySpeed, xSpeed).times(Constants.SwerveDrivebaseConstants.maxSpeed * .15),
-        omegaSpeed,
-        true,
-        true);
-
-    // https://www.instructables.com/Self-Balancing-Robot-Using-PID-Algorithm-STM-MC/
-    // https://docs.wpilib.org/en/stable/docs/software/advanced-controls/controllers/pidcontroller.html
-    // https://mcm-frc-docs.readthedocs.io/en/latest/docs/software/commandbased/profilepid-subsystems-commands.html
-  }
-
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    System.out.println(
-        String.format("<Balance> end: %s", (interrupted ? "interrupted" : "finished")));
-    drivetrainSubsystem.stop();
-  }
-
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    boolean finished = false;
-    if (RobotBase.isReal()) {
-      finished =
-          xController.atSetpoint() && yController.atSetpoint() && omegaController.atSetpoint();
-    } else {
-      // In simulation mode, simulate Balance with a delay
-      finished = m_simulationTimer.hasElapsed(1.0);
-    }
-    return finished;
+  public Pose2d getFinalPose() {
+    return m_initialPosition.getPose();
   }
 }

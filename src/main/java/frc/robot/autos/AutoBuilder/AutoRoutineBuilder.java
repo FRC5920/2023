@@ -53,7 +53,6 @@ package frc.robot.autos.AutoBuilder;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -69,7 +68,9 @@ import frc.robot.autos.AutoConstants.InitialAction;
 import frc.robot.autos.AutoConstants.SecondaryAction;
 import frc.robot.autos.AutoConstants.Waypoints;
 import frc.robot.autos.BumpScore;
+import frc.robot.commands.Balance;
 import frc.robot.commands.Shooter.Shoot;
+import frc.robot.commands.Shooter.Shoot.ShootConfig;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
@@ -132,6 +133,10 @@ public class AutoRoutineBuilder {
       boolean doBumpScore) {
     m_cumulativeTrajectory = new ArrayList<PathPlannerTrajectory>();
 
+    IntakeSubsystem intakeSubsystem = botContainer.intakeSubsystem;
+    ShooterPivotSubsystem shooterPivotSubsystem = botContainer.shooterPivotSubsystem;
+    Swerve swerveSubsystem = botContainer.swerveSubsystem;
+
     SequentialCommandGroup autoCommandGroup = new SequentialCommandGroup();
     Pose2d startPosition = startingPosition.getPose();
 
@@ -144,48 +149,44 @@ public class AutoRoutineBuilder {
               botContainer.swerveSubsystem.setWheelPreset(WheelPreset.Forward);
             }));
 
-    // Add a command to implement the initial action
-    autoCommandGroup.addCommands(
-        getInitialActionCommands(botContainer, initialAction, startingPosition));
+    // Gather commands used to perform the selected initial action
+    AutoStrategy initialActionStrategy =
+        new InitialActionStrategy(initialAction, startingPosition, botContainer);
+    autoCommandGroup.addCommands(initialActionStrategy.getCommand());
+    m_cumulativeTrajectory.addAll(initialActionStrategy.getTrajectories());
 
+    // Get commands used to escape the community
     EscapeStrategy escapeStrategy =
         new EscapeStrategy(
             startingPosition,
             escapeRoute,
+            botContainer.swerveSubsystem,
             translationPIDGains,
             rotationPIDGains,
             kMaxEscapeVelocityMetersPerSec,
             kMaxEscapeAccelerationMetersPerSec2);
-
-    // Generate an escape trajectory for the given auto parameters
-    // Command escapeCommand = escapeStrategy.buildTrajectoryCommand(botContainer.swerveSubsystem);
-    autoCommandGroup.addCommands(
-        escapeStrategy.buildWaypointCommandSequence(
-            botContainer.swerveSubsystem, translationPIDGains, rotationPIDGains));
+    autoCommandGroup.addCommands(escapeStrategy.getCommand());
     m_cumulativeTrajectory.addAll(escapeStrategy.getTrajectories());
 
-    // Generate command and trajectory for the secondary action
+    // Get commands used to implement post-escape actions
     switch (secondaryAction) {
       case Balance:
-        Translation2d endpoint = EscapeRoute.getEndpoint(escapeRoute).getPosition();
-        PathPointHelper balanceStart =
-            new PathPointHelper(
-                "BalanceStart",
-                endpoint.getX(),
-                endpoint.getY(),
+        ShootConfig shootConfig = null; // Set null for no shot while balancing
+        BalanceStrategy balanceStrategy =
+            new BalanceStrategy(
+                balancePosition,
                 AllianceFlipUtil.apply(BotOrientation.kFacingField),
-                AllianceFlipUtil.apply(BotOrientation.kFacingField));
-        BalanceStrategy balanceStrategy = new BalanceStrategy(balanceStart, balancePosition);
-        autoCommandGroup.addCommands(
-            balanceStrategy.generateCommand(
-                botContainer.swerveSubsystem, translationPIDGains, rotationPIDGains));
+                shootConfig,
+                () -> escapeStrategy.getFinalPose(),
+                botContainer,
+                translationPIDGains,
+                rotationPIDGains);
+        autoCommandGroup.addCommands(balanceStrategy.getCommand());
         m_cumulativeTrajectory.addAll(balanceStrategy.getTrajectories());
         break;
       default:
         break;
     }
-
-    // TODO: concatenate trajectories from all strategies together
 
     m_builtCommand = autoCommandGroup;
     return m_builtCommand;

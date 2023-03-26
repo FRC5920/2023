@@ -54,6 +54,7 @@ package frc.robot.commands.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.SimulationPrinter;
 import frc.robot.subsystems.Intake.IntakePreset;
@@ -61,8 +62,84 @@ import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.ShooterPivot.PivotPresets;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 
-public class Shoot {
+public class Shoot extends SequentialCommandGroup {
   public static final double kShootDurationSec = 0.5;
+
+  /**
+   * Creates a Shoot command that uses presets for angle and speed
+   *
+   * @param pivotPreset Pivot angle preset to use
+   * @param speedPreset Shooter speed preset to use
+   * @param shooterPivotSubsystem Pivot subsystem to operate on
+   * @param intakeSubsystem Intake subsystem to operate on
+   */
+  public Shoot(
+      PivotPresets pivotPreset,
+      IntakePreset speedPreset,
+      ShooterPivotSubsystem shooterPivotSubsystem,
+      IntakeSubsystem intakeSubsystem) {
+
+    this(
+        new ShootConfig(pivotPreset.angleDegrees, speedPreset.motorSpeed),
+        String.format("<Shoot> angle=%s, speed=%s", pivotPreset.name(), speedPreset.name()),
+        shooterPivotSubsystem,
+        intakeSubsystem);
+  }
+
+  /**
+   * Creates a Shoot command that uses a given angle/speed configuration
+   *
+   * @param config Angle and speed used to shoot
+   * @param shooterPivotSubsystem Pivot subsystem to operate on
+   * @param intakeSubsystem Intake subsystem to operate on
+   */
+  public Shoot(
+      ShootConfig config,
+      ShooterPivotSubsystem shooterPivotSubsystem,
+      IntakeSubsystem intakeSubsystem) {
+
+    this(
+        config,
+        String.format("<Shoot> angle=%s, speed=%s", config.angleDegrees, config.speedPercent),
+        shooterPivotSubsystem,
+        intakeSubsystem);
+  }
+
+  /**
+   * Private constructor used to implement the Shoot command sequence
+   *
+   * @param config Angle and speed used to shoot
+   * @param shootMessage Message to print prior to shooting
+   * @param shooterPivotSubsystem Pivot subsystem to operate on
+   * @param intakeSubsystem Intake subsystem to operate on
+   */
+  private Shoot(
+      ShootConfig config,
+      String shootMessage,
+      ShooterPivotSubsystem shooterPivotSubsystem,
+      IntakeSubsystem intakeSubsystem) {
+
+    addCommands(
+        new SimulationPrinter(shootMessage),
+        new SetShooterAngle(shooterPivotSubsystem, config.angleDegrees),
+        new SimulationPrinter(String.format("<Shoot> Take the shot")),
+        shootAtSpeed(intakeSubsystem, config.speedPercent, kShootDurationSec),
+        new SimulationPrinter(String.format("<Shoot> Shot complete")));
+  }
+
+  /** Class used to bundle together parameters used to shoot a cube */
+  public static class ShootConfig {
+    /** Angle to set the shooter pivot to */
+    public double angleDegrees;
+    /** Speed (percent of full scale) to run the intake at */
+    public double speedPercent;
+
+    /** Creates an instance of a ShootConfig */
+    public ShootConfig(double _angleDegrees, double _speedPercent) {
+      angleDegrees = _angleDegrees;
+      speedPercent = _speedPercent;
+    }
+  }
 
   public static CommandBase pivotAndShoot(
       ShooterPivotSubsystem shooterPivotSubsystem,

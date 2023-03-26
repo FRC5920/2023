@@ -101,6 +101,7 @@
       },
       "/Shuffleboard/Auto Builder/Initial Action": {
         "window": {
+          "name": "Initial Action",
           "visible": true
         }
       },
