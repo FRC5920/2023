@@ -96,9 +96,9 @@ public class AutoRoutineBuilder {
   public static final double kDefaultRotationkD = 1.0;
 
   /** Maximum velocity of the bot when escaping the community */
-  private static final double kMaxEscapeVelocityMetersPerSec = 4.0;
+  private static final double kMaxEscapeVelocity = 6.0;
   /** Maximum acceleration of the bot when escaping the community */
-  private static final double kMaxEscapeAccelerationMetersPerSec2 = 3.0;
+  private static final double kMaxEscapeAcceleration = 8.0;
 
   /** What to do after escaping the community */
   private SecondaryAction m_secondaryAction;
@@ -163,8 +163,8 @@ public class AutoRoutineBuilder {
             botContainer.swerveSubsystem,
             translationPIDGains,
             rotationPIDGains,
-            kMaxEscapeVelocityMetersPerSec,
-            kMaxEscapeAccelerationMetersPerSec2);
+            kMaxEscapeVelocity,
+            kMaxEscapeAcceleration);
     autoCommandGroup.addCommands(escapeStrategy.getCommand());
     m_cumulativeTrajectory.addAll(escapeStrategy.getTrajectories());
 

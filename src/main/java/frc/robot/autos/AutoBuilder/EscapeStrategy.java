@@ -92,6 +92,7 @@ public class EscapeStrategy extends AutoStrategy {
   private final PIDGains m_translationPIDGains;
   /** PID gains applied to rotation carried out by commands */
   private final PIDGains m_rotationPIDGains;
+
   /** Velocity and acceleration constraints observed when moving out of the community */
   private final PathConstraints m_pathConstraints;
 

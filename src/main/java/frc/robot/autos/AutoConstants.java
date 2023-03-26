@@ -237,37 +237,25 @@ public class AutoConstants {
 
     /** X coordinate of escape route endpoints North of the Charging Station */
     public static final double kNorthEscapeEndpointX =
-        ChargingStation.kFieldSideX + (BotDimensions.kFootprintWidth);
+        ChargingStation.kFieldSideX + BotDimensions.kFootprintWidth;
 
     /** X coordinate of escape route endpoints South of the Charging Station */
     public static final double kSouthEscapeEndpointX =
-        kNorthEscapeEndpointX + BotDimensions.kFootprintWidth;
+        ChargingStation.kFieldSideX + BotDimensions.kFootprintWidth;
 
     public static enum Route {
       /**
        * This route takes the bot to the North of the charging station (the side furthest from the
-       * scoring table) via the OUTER lane
+       * scoring table)
        */
-      NorthOfCSViaOuterLane,
-      /**
-       * This route takes the bot to the North of the charging station (the side furthest from the
-       * scoring table) via the INNER lane
-       */
-      NorthOfCSViaInnerLane,
+      NorthOfChargingStation,
       /**
        * This route takes the bot to the South of the charging station (the side closest to the
-       * scoring table) via the OUTER lane
+       * scoring table)
        */
-      SouthOfCSViaOuterLane,
-      /**
-       * This route takes the bot to the South of the charging station (the side closest to the
-       * scoring table) via the OUTER lane
-       */
-      SouthOfCSViaInnerLane,
+      SouthOfChargingStation,
       /** This route takes the bot through the center of the Charging Station via the OUTER lane */
-      ThroughCSViaOuterLane,
-      /** This route takes the bot through the center of the Charging Station via the INNER lane */
-      ThroughCSViaInnerLane;
+      ThroughChargingStation;
 
       /** Returns a list of names of enum elements */
       public static String[] getNames() {
@@ -275,46 +263,12 @@ public class AutoConstants {
       }
     }
 
-    /**
-     * Lanes
-     *
-     * @remarks Lanes are used to indicate imaginary lantes that run between the Grids and the
-     *     Charging Station.
-     */
-    public static enum Lane {
-      Outer(0),
-      Inner(1);
-
-      private final int id;
-      public final double xColumnCenter; // X-coordinate of the lane's North-South section
-
-      private Lane(int idx) {
-        id = idx;
-        xColumnCenter =
-            (id == 1)
-                ? LaneConstants.kInnerLaneColumnCenterX
-                : LaneConstants.kOuterLaneColumnCenterX;
-      }
-
-      /** Returns a list of names of enum elements */
-      public static String[] getNames() {
-        return getEnumNames(Lane.class);
-      }
-    }
-
     public static enum Corner {
       // Outer lane North corner waypoints
-      OuterLaneNorthCorner(
-          LaneConstants.kOuterLaneColumnCenterX, LaneConstants.kOuterLaneNorthCenterY),
-      OuterLaneSouthCorner(
-          LaneConstants.kOuterLaneColumnCenterX, LaneConstants.kOuterLaneSouthCenterY),
-      OuterLaneCenterOfCS(LaneConstants.kOuterLaneColumnCenterX, ChargingStation.kCenterY),
+      NorthLaneCorner(LaneConstants.kNorthSouthColumnCenterX, LaneConstants.kNorthLaneCenterY),
+      SouthLaneCorner(LaneConstants.kNorthSouthColumnCenterX, LaneConstants.kSouthLaneCenterY),
 
-      InnerLaneNorthCorner(
-          LaneConstants.kInnerLaneColumnCenterX, LaneConstants.kInnerLaneNorthCenterY),
-      InnerLaneSouthCorner(
-          LaneConstants.kInnerLaneColumnCenterX, LaneConstants.kInnerLaneSouthCenterY),
-      InnerLaneCenterOfCS(LaneConstants.kInnerLaneColumnCenterX, ChargingStation.kCenterY);
+      CenterOfCS(LaneConstants.kNorthSouthColumnCenterX, ChargingStation.kCenterY);
 
       private final Translation2d position;
 
@@ -329,14 +283,10 @@ public class AutoConstants {
 
     public static enum Endpoint {
       /** End of the North OUTER lane aligned with Fieldward side of Charging Station */
-      OuterLaneNorthEndpoint(kNorthEscapeEndpointX, LaneConstants.kOuterLaneNorthCenterY),
-      /** End of the North INNER lane aligned with Fieldward side of Charging Station */
-      InnerLaneNorthEndpoint(kNorthEscapeEndpointX, LaneConstants.kInnerLaneNorthCenterY),
+      NorthLaneEndpoint(kNorthEscapeEndpointX, LaneConstants.kNorthLaneCenterY),
 
       /** End of the South OUTER lane just past tape South of Charging Station */
-      OuterLaneSouthEndpoint(kSouthEscapeEndpointX, LaneConstants.kOuterLaneSouthCenterY),
-      /** End of the South INNER lane just past tape South of Charging Station */
-      InnerLaneSouthEndpoint(kSouthEscapeEndpointX, LaneConstants.kInnerLaneSouthCenterY),
+      SouthLaneEndpoint(kSouthEscapeEndpointX, LaneConstants.kSouthLaneCenterY),
 
       /** End of the route through the Charging Station via the Outer lane */
       ThroughCSEndpoint(kNorthEscapeEndpointX, ChargingStation.kCenterY);
@@ -352,11 +302,6 @@ public class AutoConstants {
       }
     }
 
-    /** Returns the lane corresponding to a given route */
-    public static Lane getLane(Route route) {
-      return laneMap.get(route);
-    }
-
     /** Returns the corner associated with a given route */
     public static Corner getCorner(Route route) {
       return cornerMap.get(route);
@@ -367,32 +312,17 @@ public class AutoConstants {
       return endpointMap.get(route);
     }
 
-    private static final Map<Route, Lane> laneMap =
-        Map.of(
-            Route.NorthOfCSViaOuterLane, Lane.Outer,
-            Route.NorthOfCSViaInnerLane, Lane.Inner,
-            Route.SouthOfCSViaOuterLane, Lane.Outer,
-            Route.SouthOfCSViaInnerLane, Lane.Inner,
-            Route.ThroughCSViaOuterLane, Lane.Outer,
-            Route.ThroughCSViaInnerLane, Lane.Inner);
-
     private static final Map<Route, Corner> cornerMap =
         Map.of(
-            Route.NorthOfCSViaOuterLane, Corner.OuterLaneNorthCorner,
-            Route.NorthOfCSViaInnerLane, Corner.InnerLaneNorthCorner,
-            Route.SouthOfCSViaOuterLane, Corner.OuterLaneSouthCorner,
-            Route.SouthOfCSViaInnerLane, Corner.InnerLaneSouthCorner,
-            Route.ThroughCSViaOuterLane, Corner.OuterLaneCenterOfCS,
-            Route.ThroughCSViaInnerLane, Corner.InnerLaneCenterOfCS);
+            Route.NorthOfChargingStation, Corner.NorthLaneCorner,
+            Route.SouthOfChargingStation, Corner.SouthLaneCorner,
+            Route.ThroughChargingStation, Corner.CenterOfCS);
 
     private static final Map<Route, Endpoint> endpointMap =
         Map.of(
-            Route.NorthOfCSViaOuterLane, Endpoint.OuterLaneNorthEndpoint,
-            Route.NorthOfCSViaInnerLane, Endpoint.InnerLaneNorthEndpoint,
-            Route.SouthOfCSViaOuterLane, Endpoint.OuterLaneSouthEndpoint,
-            Route.SouthOfCSViaInnerLane, Endpoint.InnerLaneSouthEndpoint,
-            Route.ThroughCSViaOuterLane, Endpoint.ThroughCSEndpoint,
-            Route.ThroughCSViaInnerLane, Endpoint.ThroughCSEndpoint);
+            Route.NorthOfChargingStation, Endpoint.NorthLaneEndpoint,
+            Route.SouthOfChargingStation, Endpoint.SouthLaneEndpoint,
+            Route.ThroughChargingStation, Endpoint.ThroughCSEndpoint);
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
     /**
@@ -407,49 +337,31 @@ public class AutoConstants {
       /** Margin introduced to lane centers */
       public static final double kLaneMargin = Units.inchesToMeters(4);
 
-      /** Robot center X coordinate in the middle of the North-South section of the INNER lane */
-      public static final double kInnerLaneColumnCenterX =
-          ChargingStation.kGridSideX - BotDimensions.kHalfFootprintWidth - kLaneMargin;
+      /** Robot center X coordinate in the middle of the North-South section of escape lanes */
+      public static final double kNorthSouthColumnCenterX =
+          Grids.kGridEdgeX + (ChargingStation.kGridSideX - Grids.kGridEdgeX) / 2.0;
 
-      /** Robot center X coordinate in the middle of the North-South section of the OUTER lane */
-      public static final double kOuterLaneColumnCenterX =
-          Grids.kGridEdgeX + BotDimensions.kHalfFootprintWidth + kLaneMargin;
+      /** Y coordinate of the center of the North lane furthest away from the scoring table */
+      public static double kNorthLaneCenterY =
+          Grids.ScoringPosition.H.position.getY()
+              + (Grids.ScoringPosition.I.position.getY() - Grids.ScoringPosition.H.position.getY())
+                  / 2.0;
 
-      /**
-       * Y coordinate of the center of the East-West portion of the OUTER lane furthest from the
-       * scoring table
-       *
-       * <p>TODO: this value needs experimental refinement!
-       */
-      public static double kOuterLaneNorthCenterY =
-          Grids.ScoringPosition.I.position.getY() - kLaneMargin;
-
-      /**
-       * Y coordinate in the center of the East-West portion of the INNER lane furthest from the
-       * scoring table
-       */
-      public static double kInnerLaneNorthCenterY =
-          ChargingStation.kNorthSideY + BotDimensions.kHalfFootprintWidth + kLaneMargin;
-
-      /**
-       * Y coordinate in the center of the East-West portion of the OUTER lane closest to the
-       * scoring table
-       */
-      public static double kOuterLaneSouthCenterY =
-          0.0 + BotDimensions.kHalfFootprintWidth + kLaneMargin;
-
-      /**
-       * Y coordinate in the center of the East-West portion of the INNER lane closest to the
-       * scoring table
-       */
-      public static double kInnerLaneSouthCenterY =
-          ChargingStation.kSouthSideY - BotDimensions.kHalfFootprintWidth - kLaneMargin;
+      /** Y coordinate of the center of the South lane closest to the scoring table */
+      public static double kSouthLaneCenterY =
+          Grids.ScoringPosition.A.position.getY()
+              + (Grids.ScoringPosition.B.position.getY() - Grids.ScoringPosition.A.position.getY())
+                  / 2.0;
     }
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////
   /** Constants used in conjunction with predefined waypoints used in auto routines */
   public static class Waypoints {
+    private static final double kStagingWaypointX =
+        ChargingStation.kFieldSideX
+            + (FieldConstants.StagingLocations.translations[0].getX() - ChargingStation.kFieldSideX)
+                / 2.0;
 
     public static enum ID {
       // Far North staging areas next to center line
@@ -457,9 +369,9 @@ public class AutoConstants {
       V(7.5, 6.0), // Secondmost north next to center line
 
       // Staging areas between charging station and cargo
-      X(6.0, ChargingStation.kNorthSideY), // North of charging station
-      Y(6.0, ChargingStation.kCenterY), // Centered on charging station
-      Z(6.0, ChargingStation.kSouthSideY); // South of charging station
+      X(kStagingWaypointX, ChargingStation.kNorthSideY), // North of charging station
+      Y(kStagingWaypointX, ChargingStation.kCenterY), // Centered on charging station
+      Z(kStagingWaypointX, ChargingStation.kSouthSideY); // South of charging station
 
       /** Coordinates on the field */
       private final Translation2d position;
