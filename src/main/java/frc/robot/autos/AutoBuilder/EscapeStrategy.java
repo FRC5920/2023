@@ -57,6 +57,7 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -73,6 +74,56 @@ import java.util.List;
 
 /** The EscapeStrategy class is used to generate auto commands used to escape the community */
 public class EscapeStrategy extends AutoStrategy {
+
+  /** Default max velocity used for position constraints */
+  public static final double kDefaultMaxVelocity = DriveToWaypoint.kDefaultMaxVelocity;
+  /** Default max acceleration used for position constraints */
+  public static final double kDefaultMaxAcceleration = DriveToWaypoint.kDefaultMaxAcceleration;
+  /** Default control constraints used for the position controller */
+  public static final TrapezoidProfile.Constraints kDefaultPositionConstraints =
+      new TrapezoidProfile.Constraints(kDefaultMaxVelocity, kDefaultMaxAcceleration);
+
+  /** Default max velocity used for rotation constraints */
+  public static final double kDefaultMaxRotVelocity = DriveToWaypoint.kDefaultMaxRotVelocity;
+  /** Default max acceleration used for rotation constraints */
+  public static final double kDefaultMaxRotAcceleration =
+      DriveToWaypoint.kDefaultMaxRotAcceleration;
+  /** Default control constraints used for the rotation controller */
+  public static final TrapezoidProfile.Constraints kDefaultRotationConstraints =
+      new TrapezoidProfile.Constraints(kDefaultMaxRotVelocity, kDefaultMaxRotAcceleration);
+
+  /** Proportional gain used for translation when following trajectories */
+  public static final double kDefaultTranslationkP = 8.0;
+  /** Integral gain used for translation when following trajectories */
+  public static final double kDefaultTranslationkI = 0.0;
+  /** Derivative gain used for translation when following trajectories */
+  public static final double kDefaultTranslationkD = 0.2;
+
+  /** Default gains used to control translation */
+  public static final PIDGains kDefaultTranslationPIDGains =
+      new PIDGains(kDefaultTranslationkP, kDefaultTranslationkI, kDefaultTranslationkD);
+
+  /** Proportional gain used for rotation when following trajectories */
+  public static final double kDefaultRotationkP = 10.0;
+  /** Integral gain used for rotation when following trajectories */
+  public static final double kDefaultRotationkI = 0.0;
+  /** Derivative gain used for rotation when following trajectories */
+  public static final double kDefaultRotationkD = 0.2;
+
+  /** Default gains used to control rotation */
+  public static final PIDGains kDefaultRotationPIDGains =
+      new PIDGains(kDefaultTranslationkP, kDefaultTranslationkI, kDefaultTranslationkD);
+
+  /** Default motion configuration */
+  public static final EscapeMotionConfig kDefaultMotionConfig =
+      new EscapeMotionConfig(
+          kDefaultTranslationPIDGains,
+          kDefaultRotationPIDGains,
+          kDefaultMaxVelocity,
+          kDefaultMaxAcceleration,
+          kDefaultMaxRotVelocity,
+          kDefaultMaxRotAcceleration);
+
   /** Pose where the bot is initially positioned */
   private Grids.ScoringPosition m_startingPosition;
 
@@ -88,13 +139,8 @@ public class EscapeStrategy extends AutoStrategy {
   /** Swerve subsystem used to carry out commands */
   private final Swerve m_swerveSubsystem;
 
-  /** PID gains applied to translation carried out by commands */
-  private final PIDGains m_translationPIDGains;
-  /** PID gains applied to rotation carried out by commands */
-  private final PIDGains m_rotationPIDGains;
-
-  /** Velocity and acceleration constraints observed when moving out of the community */
-  private final PathConstraints m_pathConstraints;
+  /** PID gains and constraints applied to motion in the Escape strategy */
+  EscapeMotionConfig m_motionConfig;
 
   /** The final pose of the robot at the end of the escape */
   private Pose2d m_finalPose;
@@ -111,10 +157,7 @@ public class EscapeStrategy extends AutoStrategy {
       Grids.ScoringPosition startingPosition,
       EscapeRoute.Route escapeRoute,
       Swerve swerveSubsystem,
-      PIDGains translationPIDGains,
-      PIDGains rotationPIDGains,
-      double maxVelocity,
-      double maxAcceleration) {
+      EscapeMotionConfig motionConfig) {
     // Initialize common base class
     super(() -> startingPosition.getPose());
 
@@ -122,9 +165,7 @@ public class EscapeStrategy extends AutoStrategy {
     m_startingPosition = startingPosition;
     m_escapeRoute = escapeRoute;
     m_swerveSubsystem = swerveSubsystem;
-    m_translationPIDGains = translationPIDGains;
-    m_rotationPIDGains = rotationPIDGains;
-    m_pathConstraints = new PathConstraints(maxVelocity, maxAcceleration);
+    m_motionConfig = motionConfig;
 
     // Pre-generate waypoints used to carry out the auto
     generatePathWaypoints();
@@ -163,10 +204,10 @@ public class EscapeStrategy extends AutoStrategy {
               new Pose2d(waypoint.getPosition(), waypoint.getHolonomicRotation()),
               DriveToWaypoint.kDefaultPositionToleranceMeters,
               DriveToWaypoint.kDefaultRotationToleranceRadians,
-              m_translationPIDGains,
-              m_rotationPIDGains,
-              DriveToWaypoint.kDefaultPositionConstraints,
-              DriveToWaypoint.kDefaultRotationConstraints));
+              m_motionConfig.translationPIDGains,
+              m_motionConfig.rotationPIDGains,
+              m_motionConfig.translationConstraints,
+              m_motionConfig.rotationConstraints));
     }
 
     commands.addCommands(new PrintCommand("My escape is complete"));
@@ -232,12 +273,13 @@ public class EscapeStrategy extends AutoStrategy {
   /** Generates a path for the bot to follow to get out of the Grid/community */
   private void generateEscapeTrajectories() {
     // Generate a list of trajectories from the waypoint list
-    m_escapeTrajectories = generateTrajectoriesFromWaypoints(m_waypointList, m_pathConstraints);
+    m_escapeTrajectories = generateTrajectoriesFromWaypoints(m_waypointList);
   }
 
   /** Creates a list of PathPlannerTrajectories from a list of waypoints */
   private static List<PathPlannerTrajectory> generateTrajectoriesFromWaypoints(
-      List<PathPointHelper> waypointList, PathConstraints constraints) {
+      List<PathPointHelper> waypointList) {
+
     ArrayList<PathPlannerTrajectory> trajectoryList = new ArrayList<PathPlannerTrajectory>();
 
     // Move helper points into a list of PathPoints because Java ArrayLists are not polymorphic
@@ -249,7 +291,9 @@ public class EscapeStrategy extends AutoStrategy {
       PathPointHelper end = pointList.get(1);
       // System.out.printf("Generate trajectory: %s --> %s\n", start.format(), end.format());
 
-      trajectoryList.add(PathPlanner.generatePath(constraints, start, end));
+      // Generated trajectories are only used for display, so use some placeholder path constraints
+      PathConstraints placeHolderPathConstraints = new PathConstraints(1.0, 1.0);
+      trajectoryList.add(PathPlanner.generatePath(placeHolderPathConstraints, start, end));
     }
 
     return trajectoryList;
@@ -277,5 +321,28 @@ public class EscapeStrategy extends AutoStrategy {
             end.getHolonomicRotation(),
             Rotation2d.fromRadians(theta)));
     return alignedPoints;
+  }
+
+  /** Configuration for motion in the Escape strategy */
+  public static class EscapeMotionConfig {
+    public final PIDGains translationPIDGains;
+    public final PIDGains rotationPIDGains;
+    public final TrapezoidProfile.Constraints translationConstraints;
+    public final TrapezoidProfile.Constraints rotationConstraints;
+
+    public EscapeMotionConfig(
+        PIDGains transGains,
+        PIDGains rotGains,
+        double maxTranslationVelocity,
+        double maxTranslationAcceleration,
+        double maxRotationVelocity,
+        double maxRotationAcceleration) {
+      translationPIDGains = transGains;
+      rotationPIDGains = rotGains;
+      translationConstraints =
+          new TrapezoidProfile.Constraints(maxTranslationVelocity, maxTranslationAcceleration);
+      rotationConstraints =
+          new TrapezoidProfile.Constraints(maxRotationVelocity, maxRotationAcceleration);
+    }
   }
 }

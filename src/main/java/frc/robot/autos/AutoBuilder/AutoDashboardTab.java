@@ -53,25 +53,38 @@ package frc.robot.autos.AutoBuilder;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.lib.dashboard.WidgetsWithChangeDetection.ChooserWithChangeDetection;
-import frc.lib.dashboard.WidgetsWithChangeDetection.PIDTunerPanel;
 import frc.robot.RobotContainer;
 import frc.robot.autos.AutoConstants.ChargingStation;
 import frc.robot.autos.AutoConstants.EscapeRoute;
 import frc.robot.autos.AutoConstants.Grids;
 import frc.robot.autos.AutoConstants.InitialAction;
 import frc.robot.autos.AutoConstants.SecondaryAction;
-import frc.robot.autos.DriveToWaypoint;
 import frc.robot.subsystems.Dashboard.IDashboardTab;
 import java.util.*;
 
 /** A class supplying a Shuffleboard tab for configuring drive train parameters */
 public class AutoDashboardTab implements IDashboardTab {
+
+  /** Maximum velocity of the bot when escaping the community */
+  private static final double kMaxEscapeVelocity = 6.0;
+  /** Maximum acceleration of the bot when escaping the community */
+  private static final double kMaxEscapeAcceleration = 8.0;
+  /** Maximum velocity of the bot when escaping the community */
+  private static final double kMaxEscapeRotationVelocity = Units.degreesToRadians(360.0);
+  /** Maximum acceleration of the bot when escaping the community */
+  private static final double kMaxEscapeRotationAcceleration = Units.degreesToRadians(720.0);
+
+  /** Maximum velocity of the bot when moving to balance position on the Charging Station */
+  private static final double kMaxBalanceVelocity = 6.0;
+  /** Maximum acceleration of the bot when moving to balance position on the Charging Station */
+  private static final double kMaxBalanceAcceleration = 8.0;
 
   /** Title displayed in the dashboard tab */
   static final String kTabTitle = "Auto Builder";
@@ -112,15 +125,12 @@ public class AutoDashboardTab implements IDashboardTab {
   /* Balance Position Chooser */
   private final ChooserWithChangeDetection<ChargingStation.BalancePosition>
       m_balancePositionChooser = new ChooserWithChangeDetection<ChargingStation.BalancePosition>();
-  /** Waypoint chooser */
-  // private final ChooserWithChangeDetection<Waypoints.ID> m_targetWaypointChooser =
-  //     new ChooserWithChangeDetection<Waypoints.ID>();
 
-  /** Panel used to set translation PID gains */
-  private PIDTunerPanel m_translationPIDPanel;
+  // /** Panel used to set translation PID gains for the escape phase */
+  // private PIDTunerPanel m_escapeTranslationPIDPanel;
 
-  /** Panel used to set rotation PID gains */
-  private PIDTunerPanel m_rotationPIDPanel;
+  // /** Panel used to set rotation PID gains for the escape phase */
+  // private PIDTunerPanel m_escapeRotationPIDPanel;
 
   /** Used to detect when the present alliance changes */
   private Alliance m_lastAlliance;
@@ -182,13 +192,6 @@ public class AutoDashboardTab implements IDashboardTab {
         .withSize(6, kChooserHeight)
         .withPosition(25, 0);
 
-    // Set up a chooser for the waypoint to move to outside the community
-    // populateChooser(m_targetWaypointChooser, Waypoints.ID.getNames(), Waypoints.ID.values());
-    // m_tab
-    //     .add("Waypoint", m_targetWaypointChooser)
-    //     .withSize(kChooserWidth, kChooserHeight)
-    //     .withPosition(4 * kChooserWidth, 0);
-
     // Add the 2D view of the field
     m_tab
         .add("Field", m_field2d)
@@ -196,11 +199,13 @@ public class AutoDashboardTab implements IDashboardTab {
         .withPosition(0, 4)
         .withProperties(Map.of("Label position", "HIDDEN"));
 
-    m_translationPIDPanel =
-        new PIDTunerPanel(m_tab, "Translation PID", 0, 33, DriveToWaypoint.kDefaultPositionGains);
+    /*
+    m_escapeTranslationPIDPanel =
+        new PIDTunerPanel(m_tab, "Translation PID", 0, 33, kDefaultTranslationPIDGains);
 
-    m_rotationPIDPanel =
-        new PIDTunerPanel(m_tab, "Rotation PID", 8, 33, DriveToWaypoint.kDefaultRotationGains);
+    m_escapeRotationPIDPanel =
+        new PIDTunerPanel(m_tab, "Rotation PID", 8, 33, kDefaultRotationPIDGains);
+    */
   }
 
   /** Service dashboard tab widgets */
@@ -214,8 +219,8 @@ public class AutoDashboardTab implements IDashboardTab {
     boolean selectedActionChanged = m_secondaryActionChooser.hasChanged();
     boolean balancePositionChanged = m_balancePositionChooser.hasChanged();
     boolean targetWaypointChanged = false; // m_targetWaypointChooser.hasChanged();
-    boolean translationPIDChanged = m_translationPIDPanel.hasChanged();
-    boolean rotationPIDChanged = m_rotationPIDPanel.hasChanged();
+    // boolean translationPIDChanged = m_escapeTranslationPIDPanel.hasChanged();
+    // boolean rotationPIDChanged = m_escapeRotationPIDPanel.hasChanged();
 
     if ((m_lastAlliance != currentAlliance)
         || initialPositionChanged
@@ -223,9 +228,9 @@ public class AutoDashboardTab implements IDashboardTab {
         || routeHasChanged
         || selectedActionChanged
         || balancePositionChanged
-        || targetWaypointChanged
-        || translationPIDChanged
-        || rotationPIDChanged) {
+        || targetWaypointChanged) {
+      // || translationPIDChanged
+      // || rotationPIDChanged) {
 
       System.out.println("<AutoDashboardTab::updateDashboard> processing dashboard value change");
       m_lastAlliance = currentAlliance;
@@ -238,9 +243,8 @@ public class AutoDashboardTab implements IDashboardTab {
           m_routeChooser.getSelected(),
           m_secondaryActionChooser.getSelected(),
           m_balancePositionChooser.getSelected(),
-          m_translationPIDPanel.getGains(),
-          m_rotationPIDPanel.getGains(),
-          false);
+          EscapeStrategy.kDefaultMotionConfig,
+          BalanceStrategy.kDefaultMotionConfig);
 
       // Set all objects on the field to have an empty trajectory
       for (String name : m_fieldTrajectories.keySet()) {

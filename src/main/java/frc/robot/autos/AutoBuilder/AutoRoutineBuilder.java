@@ -58,15 +58,15 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.thirdparty.FRC6328.AllianceFlipUtil;
-import frc.lib.utility.PIDGains;
 import frc.robot.RobotContainer;
+import frc.robot.autos.AutoBuilder.BalanceStrategy.BalanceMotionConfig;
+import frc.robot.autos.AutoBuilder.EscapeStrategy.EscapeMotionConfig;
 import frc.robot.autos.AutoConstants.BotOrientation;
 import frc.robot.autos.AutoConstants.ChargingStation;
 import frc.robot.autos.AutoConstants.EscapeRoute;
 import frc.robot.autos.AutoConstants.Grids;
 import frc.robot.autos.AutoConstants.InitialAction;
 import frc.robot.autos.AutoConstants.SecondaryAction;
-import frc.robot.autos.AutoConstants.Waypoints;
 import frc.robot.autos.BumpScore;
 import frc.robot.commands.Balance;
 import frc.robot.commands.Shooter.Shoot;
@@ -81,40 +81,17 @@ import java.util.List;
 /** A class used to build auto routines */
 public class AutoRoutineBuilder {
 
-  /** Proportional gain used for translation when following trajectories */
-  public static final double kDefaultTranslationkP = 10.0;
-  /** Integral gain used for translation when following trajectories */
-  public static final double kDefaultTranslationkI = 2.0;
-  /** Derivative gain used for translation when following trajectories */
-  public static final double kDefaultTranslationkD = 5.0;
-
-  /** Proportional gain used for rotation when following trajectories */
-  public static final double kDefaultRotationkP = 2.0;
-  /** Integral gain used for rotation when following trajectories */
-  public static final double kDefaultRotationkI = 1.0;
-  /** Derivative gain used for rotation when following trajectories */
-  public static final double kDefaultRotationkD = 1.0;
-
-  /** Maximum velocity of the bot when escaping the community */
-  private static final double kMaxEscapeVelocity = 6.0;
-  /** Maximum acceleration of the bot when escaping the community */
-  private static final double kMaxEscapeAcceleration = 8.0;
-
-  /** What to do after escaping the community */
-  private SecondaryAction m_secondaryAction;
-  /** Waypoint to travel to when escaping the community */
-  private Waypoints.ID m_waypointToMoveTo;
-
-  /** Trajectory followed to execute a seconary action (e.g. balance, acquire cargo) */
-  private List<PathPlannerTrajectory> m_secondaryActionTrajectory;
-
-  /** Trajectory showing the overall path taken by the robot */
+  /** Trajectory showing overall paths taken during the auto */
   private List<PathPlannerTrajectory> m_cumulativeTrajectory;
 
   /** The last command built using build() */
-  Command m_builtCommand = null;
+  Command m_builtCommand;
 
-  public AutoRoutineBuilder(Swerve swerveSubsystem) {}
+  /** Creates an empty AutoRoutineBuilder object */
+  public AutoRoutineBuilder() {
+    m_cumulativeTrajectory = new ArrayList<>();
+    m_builtCommand = null;
+  }
 
   /**
    * Constructs an auto routine
@@ -128,9 +105,8 @@ public class AutoRoutineBuilder {
       EscapeRoute.Route escapeRoute,
       SecondaryAction secondaryAction,
       ChargingStation.BalancePosition balancePosition,
-      PIDGains translationPIDGains,
-      PIDGains rotationPIDGains,
-      boolean doBumpScore) {
+      EscapeMotionConfig escapeMotionConfig,
+      BalanceMotionConfig balanceMotionConfig) {
     m_cumulativeTrajectory = new ArrayList<PathPlannerTrajectory>();
 
     IntakeSubsystem intakeSubsystem = botContainer.intakeSubsystem;
@@ -158,13 +134,7 @@ public class AutoRoutineBuilder {
     // Get commands used to escape the community
     EscapeStrategy escapeStrategy =
         new EscapeStrategy(
-            startingPosition,
-            escapeRoute,
-            botContainer.swerveSubsystem,
-            translationPIDGains,
-            rotationPIDGains,
-            kMaxEscapeVelocity,
-            kMaxEscapeAcceleration);
+            startingPosition, escapeRoute, botContainer.swerveSubsystem, escapeMotionConfig);
     autoCommandGroup.addCommands(escapeStrategy.getCommand());
     m_cumulativeTrajectory.addAll(escapeStrategy.getTrajectories());
 
@@ -179,8 +149,7 @@ public class AutoRoutineBuilder {
                 shootConfig,
                 () -> escapeStrategy.getFinalPose(),
                 botContainer,
-                translationPIDGains,
-                rotationPIDGains);
+                balanceMotionConfig);
         autoCommandGroup.addCommands(balanceStrategy.getCommand());
         m_cumulativeTrajectory.addAll(balanceStrategy.getTrajectories());
         break;

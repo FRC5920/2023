@@ -174,7 +174,7 @@ public class RobotContainer {
     poseEstimatorSubsystem = new PoseEstimatorSubsystem(TagCamera, swerveSubsystem);
     poseEstimatorSubsystem.registerDashboardTab(dashboardSubsystem);
 
-    autoBuilder = new AutoRoutineBuilder(swerveSubsystem);
+    autoBuilder = new AutoRoutineBuilder();
     autoDashboardTab = new AutoDashboardTab(autoBuilder);
     dashboardSubsystem.add(autoDashboardTab);
 

@@ -89,9 +89,32 @@ public class BalanceStrategy extends AutoStrategy {
   /** Maximum velocity when driving to Charging Station */
   public static final double kMaxAcceleration = 8.0;
 
-  // Create a trajectory from the waypoints
-  private static final PathConstraints kDefaultPathConstraints =
-      new PathConstraints(kMaxVelocity, kMaxAcceleration);
+  /** Proportional gain used for translation when following trajectories */
+  public static final double kDefaultTranslationkP = 8.0;
+  /** Integral gain used for translation when following trajectories */
+  public static final double kDefaultTranslationkI = 0.0;
+  /** Derivative gain used for translation when following trajectories */
+  public static final double kDefaultTranslationkD = 0.2;
+
+  /** Default gains used to control translation */
+  public static final PIDGains kDefaultTranslationPIDGains =
+      new PIDGains(kDefaultTranslationkP, kDefaultTranslationkI, kDefaultTranslationkD);
+
+  /** Proportional gain used for rotation when following trajectories */
+  public static final double kDefaultRotationkP = 10.0;
+  /** Integral gain used for rotation when following trajectories */
+  public static final double kDefaultRotationkI = 0.0;
+  /** Derivative gain used for rotation when following trajectories */
+  public static final double kDefaultRotationkD = 0.2;
+
+  /** Default gains used to control rotation */
+  public static final PIDGains kDefaultRotationPIDGains =
+      new PIDGains(kDefaultTranslationkP, kDefaultTranslationkI, kDefaultTranslationkD);
+
+  /** Default motion control configuration */
+  public static final BalanceMotionConfig kDefaultMotionConfig =
+      new BalanceMotionConfig(
+          kDefaultTranslationPIDGains, kDefaultRotationPIDGains, kMaxVelocity, kMaxAcceleration);
 
   /** A list of trajectories followed for the auto (for display) */
   private List<PathPlannerTrajectory> m_trajectories;
@@ -114,10 +137,8 @@ public class BalanceStrategy extends AutoStrategy {
   /** Swerve drive subsystem used to carry out the command */
   private final Swerve m_swerveSubsystem;
 
-  /** PID gains applied to translation when moving the bot */
-  private final PIDGains m_translationPIDGains;
-  /** PID gains applied to rotation when moving the bot */
-  private final PIDGains m_rotationPIDGains;
+  /** PID gains and path constraints applied when moving the robot */
+  private final BalanceMotionConfig m_motionConfig;
 
   /**
    * Creates an instance of the strategy
@@ -134,8 +155,7 @@ public class BalanceStrategy extends AutoStrategy {
       ShootConfig shooterParams,
       Supplier<Pose2d> initialPoseSupplier,
       RobotContainer botContainer,
-      PIDGains translationGains,
-      PIDGains rotationGains) {
+      BalanceMotionConfig motionConfig) {
     super(initialPoseSupplier);
     m_balancePosition = balancePosition;
     m_balanceHeading = balanceHeading;
@@ -143,8 +163,7 @@ public class BalanceStrategy extends AutoStrategy {
     m_shooterPivotSubsystem = botContainer.shooterPivotSubsystem;
     m_intakeSubsystem = botContainer.intakeSubsystem;
     m_swerveSubsystem = botContainer.swerveSubsystem;
-    m_translationPIDGains = translationGains;
-    m_rotationPIDGains = rotationGains;
+    m_motionConfig = motionConfig;
   }
 
   @Override
@@ -174,9 +193,14 @@ public class BalanceStrategy extends AutoStrategy {
             m_swerveSubsystem.getSwerveKinematics(), // SwerveDriveKinematics
             // PID gains to correct for translation error
             new PIDConstants(
-                m_translationPIDGains.kP, m_translationPIDGains.kI, m_translationPIDGains.kD),
+                m_motionConfig.translationPIDGains.kP,
+                m_motionConfig.translationPIDGains.kI,
+                m_motionConfig.translationPIDGains.kD),
             // PID gains to correct for rotation error
-            new PIDConstants(m_rotationPIDGains.kP, m_rotationPIDGains.kI, m_rotationPIDGains.kD),
+            new PIDConstants(
+                m_motionConfig.rotationPIDGains.kP,
+                m_motionConfig.rotationPIDGains.kI,
+                m_motionConfig.rotationPIDGains.kD),
             // Module states consumer used to output to the drive subsystem
             m_swerveSubsystem::setModuleStates,
             eventMap,
@@ -234,8 +258,22 @@ public class BalanceStrategy extends AutoStrategy {
         new PathPointHelper("ChargingStation", new Pose2d(cs, m_balanceHeading), gridFacing);
 
     trajectoryList.add(
-        PathPlanner.generatePath(kDefaultPathConstraints, initialPoint, stageAtY, onCS));
+        PathPlanner.generatePath(m_motionConfig.pathConstraints, initialPoint, stageAtY, onCS));
 
     m_trajectories = trajectoryList;
+  }
+
+  /** Configuration for motion in the Balance strategy */
+  public static class BalanceMotionConfig {
+    public final PIDGains translationPIDGains;
+    public final PIDGains rotationPIDGains;
+    public final PathConstraints pathConstraints;
+
+    public BalanceMotionConfig(
+        PIDGains transGains, PIDGains rotGains, double maxVelocity, double maxAcceleration) {
+      translationPIDGains = transGains;
+      rotationPIDGains = rotGains;
+      pathConstraints = new PathConstraints(maxVelocity, maxAcceleration);
+    }
   }
 }
