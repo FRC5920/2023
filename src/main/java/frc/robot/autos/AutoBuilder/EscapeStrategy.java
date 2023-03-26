@@ -182,14 +182,9 @@ public class EscapeStrategy extends AutoStrategy {
 
     Pose2d initialPose = m_startingPosition.getPose();
     Rotation2d initialHolRot = initialPose.getRotation();
-    Rotation2d populateLater = new Rotation2d(); // Placeholder for value filled in later
+    Rotation2d dummyTheta = new Rotation2d(); // Placeholder for value filled in later
     PathPointHelper initialWaypoint =
-        new PathPointHelper(
-            "Initial position",
-            initialPose.getX(),
-            initialPose.getY(),
-            populateLater, // Heading
-            initialHolRot); // Holonomic rotation
+        new PathPointHelper("Initial position", initialPose, dummyTheta);
 
     // Create a PathPoint for the corner of our escape route.
     final EscapeRoute.Corner corner = EscapeRoute.getCorner(m_escapeRoute);
@@ -197,11 +192,8 @@ public class EscapeStrategy extends AutoStrategy {
     PathPointHelper cornerPoint =
         new PathPointHelper(
             corner.name(),
-            cornerPosition.getX(),
-            cornerPosition.getY(),
-            populateLater, // Heading will get filled in later
-            initialHolRot); // Holonomic Rotation ** Maybe change this to
-    // BotOrientation.kFacingField for earlier rotation **
+            new Pose2d(cornerPosition, initialHolRot),
+            dummyTheta); // Heading will get filled in later
 
     // Generate a waypoint to move into the active lane
     PathPointHelper initialLaneEndpoint =
@@ -209,18 +201,15 @@ public class EscapeStrategy extends AutoStrategy {
             "initialLaneEndpoint",
             cornerPosition.getX(),
             initialWaypoint.getY(),
-            populateLater,
-            BotOrientation.kFacingField);
+            BotOrientation.kFacingField,
+            dummyTheta);
 
     // Create a waypoint for the endpoint of the active escape route
     final EscapeRoute.Endpoint endpoint = EscapeRoute.getEndpoint(m_escapeRoute);
+    Pose2d endPose =
+        new Pose2d(endpoint.getPosition(), AllianceFlipUtil.apply(BotOrientation.kFacingField));
     PathPointHelper endWaypoint =
-        new PathPointHelper(
-            endpoint.name(),
-            endpoint.getPosition().getX(),
-            endpoint.getPosition().getY(),
-            BotOrientation.kFacingField,
-            AllianceFlipUtil.apply(BotOrientation.kFacingField));
+        new PathPointHelper(endpoint.name(), endPose, BotOrientation.kFacingField);
 
     m_waypointList = new ArrayList<>();
     m_waypointList.add(initialWaypoint);
@@ -277,15 +266,15 @@ public class EscapeStrategy extends AutoStrategy {
             start.name,
             start.getX(),
             start.getY(),
-            Rotation2d.fromRadians(theta),
-            start.getHolonomicRotation()));
+            start.getHolonomicRotation(),
+            Rotation2d.fromRadians(theta)));
     alignedPoints.add(
         new PathPointHelper(
             end.name,
             end.getX(),
             end.getY(),
-            Rotation2d.fromRadians(theta),
-            end.getHolonomicRotation()));
+            end.getHolonomicRotation(),
+            Rotation2d.fromRadians(theta)));
     return alignedPoints;
   }
 }

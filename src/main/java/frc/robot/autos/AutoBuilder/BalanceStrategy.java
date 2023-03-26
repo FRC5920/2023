@@ -228,10 +228,10 @@ public class BalanceStrategy extends AutoStrategy {
             "Stage at Y",
             y.getX(),
             m_balancePosition.getBalancePosition().getY(),
-            gridFacing,
-            m_balanceHeading);
+            m_balanceHeading,
+            gridFacing);
     PathPointHelper onCS =
-        new PathPointHelper("ChargingStation", cs.getX(), cs.getY(), gridFacing, m_balanceHeading);
+        new PathPointHelper("ChargingStation", new Pose2d(cs, m_balanceHeading), gridFacing);
 
     trajectoryList.add(
         PathPlanner.generatePath(kDefaultPathConstraints, initialPoint, stageAtY, onCS));

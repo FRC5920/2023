@@ -69,22 +69,8 @@ public class PathPointHelper extends PathPoint {
    * @param theta Trajectory heading at the point
    * @param holRot Holonomic rotation at the point
    */
-  public PathPointHelper(String nameStr, double x, double y, Rotation2d theta, Rotation2d holRot) {
+  public PathPointHelper(String nameStr, double x, double y, Rotation2d holRot, Rotation2d theta) {
     super(new Translation2d(x, y), theta, holRot);
-    name = nameStr;
-  }
-
-  /**
-   * Creates a PathPointHelper object from given parameters
-   *
-   * @param nameStr Friendly name printed during debugging
-   * @param position X,Y position of the point
-   * @param theta Trajectory heading at the point
-   * @param holRot Holonomic rotation at the point
-   */
-  public PathPointHelper(
-      String nameStr, Translation2d position, Rotation2d theta, Rotation2d holRot) {
-    super(position, theta, holRot);
     name = nameStr;
   }
 
