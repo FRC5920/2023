@@ -62,6 +62,7 @@ import frc.lib.SwerveDrive.SwerveModuleIO;
 import frc.robot.autos.AutoBuilder.AutoDashboardTab;
 import frc.robot.autos.AutoBuilder.AutoRoutineBuilder;
 import frc.robot.commands.*;
+import frc.robot.commands.Lighting.ChangeColor;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 import frc.robot.subsystems.Heimdall.*;
@@ -170,6 +171,11 @@ public class RobotContainer {
         new TeleopSwerve(swerveSubsystem, joystickSubsystem, fieldRelative, openLoop));
 
     swerveSubsystem.registerDashboardTab(dashboardSubsystem);
+
+    LEDs LEDsSubsystem = new LEDs();
+
+    LEDsSubsystem.setDefaultCommand(
+      new Lighting.ChangeColor(LEDs.kRed));
 
     poseEstimatorSubsystem = new PoseEstimatorSubsystem(TagCamera, swerveSubsystem);
     poseEstimatorSubsystem.registerDashboardTab(dashboardSubsystem);
