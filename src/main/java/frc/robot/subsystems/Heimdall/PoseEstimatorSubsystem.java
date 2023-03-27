@@ -68,14 +68,13 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.utility.AKitLoggers.Pose3dLoggableInput;
-import frc.lib.utility.AKitLoggers.Transform3dLoggableInput;
 import frc.robot.Constants;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
+import frc.robot.subsystems.Heimdall.Logging.Pose3dLoggableInput;
+import frc.robot.subsystems.Heimdall.Logging.Transform3dLoggableInput;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import java.io.IOException;
 import java.util.Optional;
-import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
@@ -233,11 +232,6 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
     return poseEstimator.getEstimatedPosition();
   }
 
-  @AutoLog
-  private static class SetPoseInput {
-    Pose2d pose;
-  }
-
   /**
    * Resets the current pose to the specified pose. This should ONLY be called when the robot's
    * position on the field is known, like at the beginning of a match.
@@ -245,11 +239,6 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
    * @param newPose new pose
    */
   public void setCurrentPose(Pose2d newPose) {
-    // Log input pose
-    SetPoseInputAutoLogged poseInput = new SetPoseInputAutoLogged();
-    poseInput.pose = newPose;
-    Logger.getInstance().processInputs("Heimdall/setCurrentPoseInput", poseInput);
-
     poseEstimator.resetPosition(
         s_swerveSubsystem.getYaw(), s_swerveSubsystem.getModulePositions(), newPose);
   }
@@ -294,10 +283,8 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
 
     public PhotonTrackedTargetLoggableInputs(String keyPrefix) {
       keyPrefix = keyPrefix;
-      bestCameraToTarget =
-          new Transform3dLoggableInput(keyPrefix + "/bestCameraToTarget", new Transform3d());
-      altCameraToTarget =
-          new Transform3dLoggableInput(keyPrefix + "/alternateCameraToTarget", new Transform3d());
+      bestCameraToTarget = new Transform3dLoggableInput(keyPrefix + "/bestCameraToTarget");
+      altCameraToTarget = new Transform3dLoggableInput(keyPrefix + "/alternateCameraToTarget");
     }
 
     void update(PhotonTrackedTarget target, AprilTagFieldLayout ATfieldLayout) {
