@@ -175,7 +175,7 @@ public class RobotContainer {
     LEDs LEDsSubsystem = new LEDs();
 
     LEDsSubsystem.setDefaultCommand(
-      new Lighting.ChangeColor(LEDs.kRed));
+      new ChangeColor(LEDsSubsystem, LEDs.kRed));
 
     poseEstimatorSubsystem = new PoseEstimatorSubsystem(TagCamera, swerveSubsystem);
     poseEstimatorSubsystem.registerDashboardTab(dashboardSubsystem);
