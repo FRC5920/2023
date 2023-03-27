@@ -90,26 +90,22 @@ public class LinkAndBalanceAutoBuilder {
   /** Max acceleration used when following PathPlanner trajectories */
   private static final double kDefaultMaxAcceleration = 8.0;
 
-  /** PathPlanner trajectory file and configuration used for the trajectory followed to load C1 */
+  /** PathPlanner trajectory file and configuration used to load C1 */
   private static final TrajectoryLoader kAcquireC1Loader =
-      new TrajectoryLoader(
-          "acquireC1Trajectory.path", kDefaultMaxVelocity, kDefaultMaxAcceleration);
-  /** PathPlanner trajectory file and configuration used for the trajectory followed to shoot C1 */
+      new TrajectoryLoader("acquireC1Trajectory", kDefaultMaxVelocity, kDefaultMaxAcceleration);
+  /** PathPlanner trajectory file and constraints used to shoot C1 */
   private static final TrajectoryLoader kShootC1Loader =
-      new TrajectoryLoader("shootC1Trajectory.path", kDefaultMaxVelocity, kDefaultMaxAcceleration);
-  /** PathPlanner trajectory file and configuration used for the trajectory followed to load C2 */
+      new TrajectoryLoader("shootC1Trajectory", kDefaultMaxVelocity, kDefaultMaxAcceleration);
+  /** PathPlanner trajectory file and constraints used to load C2 */
   private static final TrajectoryLoader kAcquireC2Loader =
-      new TrajectoryLoader(
-          "acquireC2Trajectory.path", kDefaultMaxVelocity, kDefaultMaxAcceleration);
-  /** PathPlanner trajectory file and configuration used for the trajectory followed to shoot C2 */
+      new TrajectoryLoader("acquireC2Trajectory", kDefaultMaxVelocity, kDefaultMaxAcceleration);
+  /** PathPlanner trajectory file and constraints used to shoot C2 */
   private static final TrajectoryLoader kShootC2Loader =
-      new TrajectoryLoader("shootC2Trajectory.path", kDefaultMaxVelocity, kDefaultMaxAcceleration);
-  /**
-   * PathPlanner trajectory file and configuration used for the trajectory to mount the charging
-   * station
-   */
+      new TrajectoryLoader("shootC2Trajectory", kDefaultMaxVelocity, kDefaultMaxAcceleration);
+
+  /** PathPlanner trajectory file and constraints used to mount the charging station */
   private static final TrajectoryLoader kMountCSLoader =
-      new TrajectoryLoader("mountCSTrajectory.path", kDefaultMaxVelocity, kDefaultMaxAcceleration);
+      new TrajectoryLoader("mountCSTrajectory", kDefaultMaxVelocity, kDefaultMaxAcceleration);
 
   PathPlannerTrajectory m_acquireC1Trajectory;
   PathPlannerTrajectory m_shootC1Trajectory;
@@ -213,10 +209,13 @@ public class LinkAndBalanceAutoBuilder {
      * @param trajectoryFileName Name of the trajectory file to load
      * @param maxVelocity Max velocity applied to the loaded trajectory
      * @param maxAcceleration Max acceleration applied to the loaded trajectory
-     * @note PathPlanner.loadPath automatically resolves the deploy directory on the target and
-     *     appends the "pathplanner" subdirectory to it. So, trajectoryFileName should only consist
-     *     of the name of the file to load. In the source directory, this file is located under the
-     *     directory src/deploy/pathplanner.
+     * @note In the source directory, PathPlanner (.path) files are located under the directory
+     *     "src\deploy\pathplanner". These files are automatically copied to a corresponding deploy
+     *     directory on the RIO when code is downloaded to the robot. The PathPlanner.loadPath()
+     *     function used to load trajectories from these files automatically resolves the
+     *     deploy/pathplanner directory on the RIO at runtime and appends a ".path" extension to the
+     *     trajectory file name it is passed. The TrajectoryLoader class automatically strips off
+     *     any ".path" file extension present in a file name when calling PathPlanner.loadPath().
      */
     public TrajectoryLoader(String trajectoryFileName, double maxVelocity, double maxAcceleration) {
       m_trajectoryFilePath = trajectoryFileName;
@@ -224,10 +223,29 @@ public class LinkAndBalanceAutoBuilder {
       m_maxAcceleration = maxAcceleration;
     }
 
-    /** Loads a trajectory using the object's file name and configuration */
+    /**
+     * Loads a trajectory using the object's file name and configuration
+     *
+     * @throws LoadTrajectoryException on failure to load the trajectory file
+     */
     public PathPlannerTrajectory loadTrajectory() {
-      return PathPlanner.loadPath(
-          m_trajectoryFilePath, new PathConstraints(m_maxVelocity, m_maxAcceleration));
+      final String dotPath = ".path";
+      String filename = m_trajectoryFilePath;
+
+      // Strip ".path" file name extension if present because PathPlanner always appends it
+      if (filename.endsWith(dotPath)) {
+        filename = filename.substring(0, filename.length() - dotPath.length());
+      }
+
+      PathPlannerTrajectory trajectory =
+          PathPlanner.loadPath(filename, new PathConstraints(m_maxVelocity, m_maxAcceleration));
+
+      if (trajectory == null) {
+        throw new RuntimeException(
+            String.format("Failed to load trajectory file: `%s`", m_trajectoryFilePath));
+      }
+
+      return trajectory;
     }
   }
 }

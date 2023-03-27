@@ -158,7 +158,8 @@
       },
       "/Shuffleboard/Auto Builder/Rotation PID": {
         "window": {
-          "name": "Rotation PID"
+          "name": "Rotation PID",
+          "visible": true
         }
       },
       "/Shuffleboard/Auto Builder/Route": {
@@ -173,7 +174,8 @@
       },
       "/Shuffleboard/Auto Builder/Translation PID": {
         "window": {
-          "name": "Translation PID"
+          "name": "Translation PID",
+          "visible": true
         }
       },
       "/Shuffleboard/Intake/Intake Gamepiece": {
