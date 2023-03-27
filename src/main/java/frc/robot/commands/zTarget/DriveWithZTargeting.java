@@ -54,6 +54,7 @@ package frc.robot.commands.zTarget;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.lib.Joystick.ProcessedXboxController;
@@ -62,8 +63,10 @@ import frc.robot.Constants.GameTarget;
 import frc.robot.RobotContainer;
 import frc.robot.commands.Shooter.Acquire;
 import frc.robot.commands.SimulationPrinter;
+import frc.robot.commands.Lighting.ChangeColor;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.JoystickSubsystem;
+import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import org.photonvision.PhotonCamera;
@@ -75,7 +78,7 @@ public class DriveWithZTargeting extends CommandBase {
   private final Swerve m_swerveSubsystem;
   private final ProcessedXboxController m_controller;
   private final ZTargeter m_zTargeter;
-
+  
   /** Returns a command that drives with Z-targeting and intake engaged */
   public static CommandBase zTargetDriveWithIntake(
       GameTarget gamepieceType,
@@ -85,7 +88,13 @@ public class DriveWithZTargeting extends CommandBase {
       ShooterPivotSubsystem shooterPivot,
       IntakeSubsystem intake,
       boolean fieldRelative,
-      boolean openLoop) {
+      boolean openLoop,
+      LEDs lightingSubsystem) {
+        Color8Bit desiredColor = LEDs.kRed;
+        switch(gamepieceType){
+          case Cube: desiredColor = LEDs.kPurple;
+          case AprilTag2D: desiredColor = LEDs.kWhite;
+        }
     return new SimulationPrinter(String.format("<Trigger> Z-target drive with intake"))
         .andThen(
             Commands.race(
@@ -96,7 +105,8 @@ public class DriveWithZTargeting extends CommandBase {
                     joystickSubsystem,
                     fieldRelative,
                     openLoop),
-                Acquire.acquireAndPark(shooterPivot, intake)));
+                Acquire.acquireAndPark(shooterPivot, intake),
+                new ChangeColor(lightingSubsystem, desiredColor)));
   }
 
   public DriveWithZTargeting(

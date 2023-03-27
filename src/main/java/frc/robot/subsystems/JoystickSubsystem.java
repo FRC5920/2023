@@ -220,7 +220,8 @@ public class JoystickSubsystem extends SubsystemBase {
               shooterPivot,
               intake,
               true,
-              true));
+              true,
+              botContainer.LEDsSubsystem));
 
       driverController.leftBumper.whileTrue(
           new DriveWithZTargeting(
