@@ -28,11 +28,11 @@ public class LEDs extends SubsystemBase {
 
   //private static final Color8Bit kOff = new Color8Bit(0, 0, 0);
   //private static final Color8Bit kGreen = new Color8Bit(0, 255, 0);
-  private static final Color8Bit kRed = new Color8Bit(255, 0, 0);
-  private static final Color8Bit kBlue = new Color8Bit(0, 0, 255);
-  private static final Color8Bit kYellow = new Color8Bit(255, 120, 0);
-  private static final Color8Bit kWhite = new Color8Bit(255, 255, 255);
-  private static final Color8Bit kPurple = new Color8Bit(255, 0, 255);
+  public static final Color8Bit kRed = new Color8Bit(255, 0, 0);
+  public static final Color8Bit kBlue = new Color8Bit(0, 0, 255);
+  public static final Color8Bit kYellow = new Color8Bit(255, 120, 0);
+  public static final Color8Bit kWhite = new Color8Bit(255, 255, 255);
+  public static final Color8Bit kPurple = new Color8Bit(255, 0, 255);
 
   private static AddressableLED m_led;
   private static AddressableLEDBuffer m_ledBuffer;
