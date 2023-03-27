@@ -37,6 +37,18 @@
       "/LiveWindow/Ungrouped/PIDController[8]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[9]": "PIDController",
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
+      "/Shuffleboard/Auto Builder/Auto Builder/Auto Type": "String Chooser",
+      "/Shuffleboard/Auto Builder/Auto Builder/Balance Position": "String Chooser",
+      "/Shuffleboard/Auto Builder/Auto Builder/Initial Action": "String Chooser",
+      "/Shuffleboard/Auto Builder/Auto Builder/Initial Position": "String Chooser",
+      "/Shuffleboard/Auto Builder/Auto Builder/Route": "String Chooser",
+      "/Shuffleboard/Auto Builder/Auto Builder/Secondary Action": "String Chooser",
+      "/Shuffleboard/Auto Builder/Auto Type": "String Chooser",
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Balance Position": "String Chooser",
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Initial Action": "String Chooser",
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Initial Position": "String Chooser",
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Route": "String Chooser",
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Secondary Action": "String Chooser",
       "/Shuffleboard/Auto Builder/Balance Position": "String Chooser",
       "/Shuffleboard/Auto Builder/Field": "Field2d",
       "/Shuffleboard/Auto Builder/Initial Action": "String Chooser",
@@ -65,10 +77,45 @@
       "/Shuffleboard/SwerveDrive/RearRight/Angle/Degrees": "Gyro"
     },
     "windows": {
-      "/Shuffleboard/Auto Builder/Balance Position": {
+      "/Shuffleboard/Auto Builder/Auto Type": {
+        "window": {
+          "name": "Auto Type",
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Balance Position": {
         "window": {
           "name": "Balance Position",
           "visible": true
+        }
+      },
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Initial Action": {
+        "window": {
+          "name": "Initial Action",
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Initial Position": {
+        "window": {
+          "name": "Initial Position",
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Route": {
+        "window": {
+          "name": "Route",
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Secondary Action": {
+        "window": {
+          "name": "Secondary Action",
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Auto Builder/Balance Position": {
+        "window": {
+          "name": "Balance Position"
         }
       },
       "/Shuffleboard/Auto Builder/Field": {
@@ -101,38 +148,32 @@
       },
       "/Shuffleboard/Auto Builder/Initial Action": {
         "window": {
-          "name": "Initial Action",
-          "visible": true
+          "name": "Initial Action"
         }
       },
       "/Shuffleboard/Auto Builder/Initial Position": {
         "window": {
-          "name": "Initial Position",
-          "visible": true
+          "name": "Initial Position"
         }
       },
       "/Shuffleboard/Auto Builder/Rotation PID": {
         "window": {
-          "name": "Rotation PID",
-          "visible": true
+          "name": "Rotation PID"
         }
       },
       "/Shuffleboard/Auto Builder/Route": {
         "window": {
-          "name": "Escape Route",
-          "visible": true
+          "name": "Escape Route"
         }
       },
       "/Shuffleboard/Auto Builder/Secondary Action": {
         "window": {
-          "name": "Secondary Action",
-          "visible": true
+          "name": "Secondary Action"
         }
       },
       "/Shuffleboard/Auto Builder/Translation PID": {
         "window": {
-          "name": "Translation PID",
-          "visible": true
+          "name": "Translation PID"
         }
       },
       "/Shuffleboard/Intake/Intake Gamepiece": {

@@ -51,7 +51,7 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot;
 
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.lib.SwerveDrive.Falcon500SwerveIO;
 import frc.lib.SwerveDrive.GyroIO;
@@ -60,7 +60,6 @@ import frc.lib.SwerveDrive.SimGyroIO;
 import frc.lib.SwerveDrive.SimSwerveModuleIO;
 import frc.lib.SwerveDrive.SwerveModuleIO;
 import frc.robot.autos.AutoBuilder.AutoDashboardTab;
-import frc.robot.autos.AutoBuilder.AutoRoutineBuilder;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
@@ -99,7 +98,8 @@ public class RobotContainer {
   public final PhotonCamera ArmCamera = new PhotonCamera(Constants.VisionConstants.ArmCameraName);
 
   // Create an auto routine builder
-  AutoRoutineBuilder autoBuilder;
+  public CommandBase m_currentAutoRoutine = new InstantCommand();
+
   public final AutoDashboardTab autoDashboardTab;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -174,8 +174,7 @@ public class RobotContainer {
     poseEstimatorSubsystem = new PoseEstimatorSubsystem(TagCamera, swerveSubsystem);
     poseEstimatorSubsystem.registerDashboardTab(dashboardSubsystem);
 
-    autoBuilder = new AutoRoutineBuilder();
-    autoDashboardTab = new AutoDashboardTab(autoBuilder);
+    autoDashboardTab = new AutoDashboardTab();
     dashboardSubsystem.add(autoDashboardTab);
 
     // Set up a default command on the shooter pivot subsystem that automatically parks the shooter
@@ -198,9 +197,8 @@ public class RobotContainer {
    *
    * @return the command to run in autonomous
    */
-  public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
-    Command autoCommand = autoBuilder.getCommand();
+  public CommandBase getAutonomousCommand() {
+    CommandBase autoCommand = autoDashboardTab.getCurrentAutoRoutine();
     return (autoCommand != null) ? autoCommand : new InstantCommand();
   }
 }

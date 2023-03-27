@@ -138,7 +138,7 @@ public class SwerveDashboardTab implements IDashboardTab {
         m_tab
             .getLayout("Chassis Speeds", BuiltInLayouts.kGrid)
             .withProperties(
-                Map.of("Label position", "LEFT", "Number of columns", "1", "Number of rows", "3"))
+                Map.of("Label position", "LEFT", "Number of columns", 1, "Number of rows", 3))
             .withSize(6, 4)
             .withPosition(0, kSwerveModuleLayoutHeight);
     cspeedLayout
@@ -233,7 +233,7 @@ public class SwerveDashboardTab implements IDashboardTab {
       m_layout = tab.getLayout(moduleId.toString(), BuiltInLayouts.kGrid);
       m_layout
           .withProperties(
-              Map.of("Label position", "TOP", "Number of columns", "1", "Number of rows", "2"))
+              Map.of("Label position", "TOP", "Number of columns", 1, "Number of rows", 2))
           .withSize(sizeColumns, sizeRows);
 
       BuiltInWidgets widgetType = BuiltInWidgets.kTextView;
@@ -245,7 +245,7 @@ public class SwerveDashboardTab implements IDashboardTab {
           m_layout
               .getLayout("Angle", BuiltInLayouts.kGrid)
               .withProperties(
-                  Map.of("Label position", "LEFT", "Number of columns", "1", "Number of rows", "5"))
+                  Map.of("Label position", "LEFT", "Number of columns", 1, "Number of rows", 5))
               .withPosition(0, 0);
 
       angleLayout
@@ -288,7 +288,7 @@ public class SwerveDashboardTab implements IDashboardTab {
           m_layout
               .getLayout("Drive", BuiltInLayouts.kGrid)
               .withProperties(
-                  Map.of("Label position", "LEFT", "Number of columns", "1", "Number of rows", "5"))
+                  Map.of("Label position", "LEFT", "Number of columns", 1, "Number of rows", 5))
               .withPosition(0, 1);
 
       driveSpeed =

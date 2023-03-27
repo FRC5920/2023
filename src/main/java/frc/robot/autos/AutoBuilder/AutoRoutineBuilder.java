@@ -85,7 +85,7 @@ public class AutoRoutineBuilder {
   private List<PathPlannerTrajectory> m_cumulativeTrajectory;
 
   /** The last command built using build() */
-  Command m_builtCommand;
+  CommandBase m_builtCommand;
 
   /** Creates an empty AutoRoutineBuilder object */
   public AutoRoutineBuilder() {
@@ -98,7 +98,7 @@ public class AutoRoutineBuilder {
    *
    * @param botContainer Robot container with subsystems
    */
-  public Command build(
+  public CommandBase build(
       RobotContainer botContainer,
       Grids.ScoringPosition startingPosition,
       InitialAction initialAction,

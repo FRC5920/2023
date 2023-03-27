@@ -57,6 +57,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import frc.lib.thirdparty.FRC6328.AllianceFlipUtil;
 import frc.lib.thirdparty.FRC6328.FieldConstants;
+import frc.lib.utility.EnumUtil;
 import java.util.*;
 
 /**
@@ -156,7 +157,7 @@ public class AutoConstants {
       }
 
       public static String[] getNames() {
-        return getEnumNames(ScoringPosition.class);
+        return EnumUtil.getEnumNames(ScoringPosition.class);
       }
     };
   }
@@ -222,7 +223,7 @@ public class AutoConstants {
 
       /** Returns a list of names of enum elements */
       public static String[] getNames() {
-        return getEnumNames(BalancePosition.class);
+        return EnumUtil.getEnumNames(BalancePosition.class);
       }
 
       public Translation2d getBalancePosition() {
@@ -259,7 +260,7 @@ public class AutoConstants {
 
       /** Returns a list of names of enum elements */
       public static String[] getNames() {
-        return getEnumNames(Route.class);
+        return EnumUtil.getEnumNames(Route.class);
       }
     }
 
@@ -387,7 +388,7 @@ public class AutoConstants {
 
       /** Returns a list of names of enum elements */
       public static String[] getNames() {
-        return getEnumNames(ID.class);
+        return EnumUtil.getEnumNames(ID.class);
       }
     }
   }
@@ -416,7 +417,7 @@ public class AutoConstants {
 
     /** Returns a list of names of enum elements */
     public static String[] getNames() {
-      return getEnumNames(CargoLocation.class);
+      return EnumUtil.getEnumNames(CargoLocation.class);
     }
   }
 
@@ -436,7 +437,7 @@ public class AutoConstants {
 
     /** Returns a list of names of enum elements */
     public static String[] getNames() {
-      return getEnumNames(InitialAction.class);
+      return EnumUtil.getEnumNames(InitialAction.class);
     }
   };
 
@@ -449,11 +450,7 @@ public class AutoConstants {
 
     /** Returns a list of names of enum elements */
     public static String[] getNames() {
-      return getEnumNames(SecondaryAction.class);
+      return EnumUtil.getEnumNames(SecondaryAction.class);
     }
   };
-
-  private static String[] getEnumNames(Class<? extends Enum<?>> e) {
-    return Arrays.stream(e.getEnumConstants()).map(Enum::name).toArray(String[]::new);
-  }
 }
