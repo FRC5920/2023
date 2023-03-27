@@ -106,6 +106,25 @@ public class AutoConstants {
     }
   }
 
+  /////////////////////////////////////////////////////////////////////////////
+  /** An enumeration of initial actions to take before escaping the community */
+  public static enum AutoType {
+    AutoBuilder(0), // Generate auto routine using AutoBuilder
+    LinkNBalance(1), // Preset: full link, then balance at end
+    LinkinPark(2); // Preset: full link then park
+
+    public final int id;
+
+    private AutoType(int _id) {
+      id = _id;
+    }
+
+    /** Returns a list of names of enum elements */
+    public static String[] getNames() {
+      return new String[] {"AutoBuilder", "Link + Balance", "Linkin Park"};
+    }
+  };
+
   //////////////////////////////////////////////////////////////////////////////////////////////////
   /** Constants used in conjunction with Grids where cargo is placed */
   public static class Grids {

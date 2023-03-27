@@ -49,32 +49,25 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.subsystems.ShooterPivot;
+package frc.robot.commands.Shooter;
 
-/** Preset pivot angles */
-public enum PivotPresets {
-  /** Angle used to park the intake */
-  Park(0.0),
-  /** Angle used to acquire a game piece */
-  Acquire(195.0),
+import frc.robot.commands.Shooter.Shoot.ShootConfig;
+import frc.robot.subsystems.Intake.IntakePreset;
+import frc.robot.subsystems.ShooterPivot.PivotPresets;
 
-  /** Angle used for a short-range shot to the low grid */
-  CloseShotLow(170),
-  /** Angle used for a short-range shot to the middle grid */
-  CloseShotMid(120),
-  /** Angle used for a short-range shot to the high grid */
-  CloseShotHigh(115),
+/** An enumeration of shooter configurations for different shots */
+public enum ShooterPresets {
+  CloseShotLow(PivotPresets.CloseShotLow.angleDegrees, IntakePreset.CloseShotLow.motorSpeed),
+  CloseShotMid(PivotPresets.CloseShotMid.angleDegrees, IntakePreset.CloseShotMid.motorSpeed),
+  CloseShotHigh(PivotPresets.CloseShotHigh.angleDegrees, IntakePreset.CloseShotHigh.motorSpeed),
 
-  /** Angle used for a long-range shot to the low grid */
-  LongShotLow(170),
-  /** Angle used for a long-range shot to the middle grid */
-  LongShotMid(150),
-  /** Angle used for a long-range shot to the high grid */
-  LongShotHigh(135);
+  HailMaryLow(PivotPresets.CloseShotLow.angleDegrees, IntakePreset.HailMary.motorSpeed),
+  HailMaryMid(PivotPresets.CloseShotMid.angleDegrees, IntakePreset.HailMary.motorSpeed),
+  HailMaryHigh(PivotPresets.CloseShotHigh.angleDegrees, IntakePreset.HailMary.motorSpeed);
 
-  public final double angleDegrees;
+  public final ShootConfig config;
 
-  private PivotPresets(double angle) {
-    angleDegrees = angle;
+  private ShooterPresets(double angleDegrees, double speedPercent) {
+    config = new ShootConfig(angleDegrees, speedPercent);
   }
 }

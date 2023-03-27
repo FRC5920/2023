@@ -51,6 +51,7 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /** A command that prints a message to stdout in simulation mode only */
@@ -63,9 +64,9 @@ public class SimulationPrinter extends CommandBase {
 
   @Override
   public void initialize() {
-    // if (RobotBase.isSimulation()) {
-    System.out.println(m_message);
-    // }
+    if (RobotBase.isSimulation()) {
+      System.out.println(m_message);
+    }
   }
 
   @Override

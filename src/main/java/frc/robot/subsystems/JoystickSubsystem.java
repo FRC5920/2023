@@ -64,10 +64,10 @@ import frc.robot.RobotContainer;
 import frc.robot.commands.Shooter.Acquire;
 import frc.robot.commands.Shooter.AutoZeroPivot;
 import frc.robot.commands.Shooter.Shoot;
+import frc.robot.commands.Shooter.ShooterPresets;
 import frc.robot.commands.SimulationPrinter;
 import frc.robot.commands.SnapToGrid;
 import frc.robot.commands.zTarget.DriveWithZTargeting;
-import frc.robot.subsystems.Intake.IntakePreset;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.ShooterPivot.PivotPresets;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
@@ -171,28 +171,25 @@ public class JoystickSubsystem extends SubsystemBase {
 
     // Create shoot commands that are active when left trigger is off
     CommandBase closeShotLow =
-        Shoot.pivotAndShoot(
-                shooterPivot, intake, PivotPresets.CloseShotLow, IntakePreset.CloseShotLow)
+        new Shoot(ShooterPresets.CloseShotLow, shooterPivot, intake)
             .unless(() -> driverController.leftTriggerAsButton.getAsBoolean());
     CommandBase closeShotMid =
-        Shoot.pivotAndShoot(
-                shooterPivot, intake, PivotPresets.CloseShotMid, IntakePreset.CloseShotMid)
+        new Shoot(ShooterPresets.CloseShotMid, shooterPivot, intake)
             .unless(() -> driverController.leftTriggerAsButton.getAsBoolean());
     CommandBase closeShotHigh =
-        Shoot.pivotAndShoot(
-                shooterPivot, intake, PivotPresets.CloseShotHigh, IntakePreset.CloseShotHigh)
+        new Shoot(ShooterPresets.CloseShotHigh, shooterPivot, intake)
             .unless(() -> driverController.leftTriggerAsButton.getAsBoolean());
 
     // --------------------
     // Create shift-keyed shoot commands that are active when left trigger is pulled
     CommandBase hailMaryShotLow =
-        Shoot.pivotAndShoot(shooterPivot, intake, PivotPresets.CloseShotLow, IntakePreset.HailMary)
+        new Shoot(ShooterPresets.HailMaryLow, shooterPivot, intake)
             .unless(() -> !driverController.leftTriggerAsButton.getAsBoolean());
     CommandBase hailMaryShotMid =
-        Shoot.pivotAndShoot(shooterPivot, intake, PivotPresets.CloseShotMid, IntakePreset.HailMary)
+        new Shoot(ShooterPresets.HailMaryMid, shooterPivot, intake)
             .unless(() -> !driverController.leftTriggerAsButton.getAsBoolean());
     CommandBase hailMaryShotHigh =
-        Shoot.pivotAndShoot(shooterPivot, intake, PivotPresets.CloseShotHigh, IntakePreset.HailMary)
+        new Shoot(ShooterPresets.HailMaryHigh, shooterPivot, intake)
             .unless(() -> !driverController.leftTriggerAsButton.getAsBoolean());
 
     if (kDriverControllerIsEnabled) {
@@ -254,15 +251,9 @@ public class JoystickSubsystem extends SubsystemBase {
 
     if (kOperatorControllerIsEnabled) {
       // Map buttons on operator controller
-      operatorController.A.onTrue(
-          Shoot.pivotAndShoot(
-              shooterPivot, intake, PivotPresets.CloseShotLow, IntakePreset.CloseShotLow));
-      operatorController.B.onTrue(
-          Shoot.pivotAndShoot(
-              shooterPivot, intake, PivotPresets.CloseShotMid, IntakePreset.CloseShotMid));
-      operatorController.Y.onTrue(
-          Shoot.pivotAndShoot(
-              shooterPivot, intake, PivotPresets.CloseShotHigh, IntakePreset.CloseShotHigh));
+      operatorController.A.onTrue(new Shoot(ShooterPresets.CloseShotLow, shooterPivot, intake));
+      operatorController.B.onTrue(new Shoot(ShooterPresets.CloseShotMid, shooterPivot, intake));
+      operatorController.Y.onTrue(new Shoot(ShooterPresets.CloseShotHigh, shooterPivot, intake));
 
       operatorController.leftBumper.whileTrue(
           Acquire.acquireAndPark(botContainer.shooterPivotSubsystem, botContainer.intakeSubsystem));

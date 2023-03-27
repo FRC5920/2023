@@ -63,35 +63,18 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.lib.dashboard.WidgetsWithChangeDetection.ChooserWithChangeDetection;
 import frc.robot.RobotContainer;
+import frc.robot.autos.AutoConstants.AutoType;
 import frc.robot.autos.AutoConstants.ChargingStation;
 import frc.robot.autos.AutoConstants.EscapeRoute;
 import frc.robot.autos.AutoConstants.Grids;
 import frc.robot.autos.AutoConstants.InitialAction;
 import frc.robot.autos.AutoConstants.SecondaryAction;
+import frc.robot.autos.Preset.LinkAndBalanceAutoBuilder;
 import frc.robot.subsystems.Dashboard.IDashboardTab;
 import java.util.*;
 
 /** A class supplying a Shuffleboard tab for configuring drive train parameters */
 public class AutoDashboardTab implements IDashboardTab {
-
-  /////////////////////////////////////////////////////////////////////////////
-  /** An enumeration of initial actions to take before escaping the community */
-  public static enum AutoType {
-    AutoBuilder(0), // Generate auto routine using AutoBuilder
-    LinkNBalance(1), // Preset: full link, then balance at end
-    LinkinPark(2); // Preset: full link then park
-
-    public final int id;
-
-    private AutoType(int _id) {
-      id = _id;
-    }
-
-    /** Returns a list of names of enum elements */
-    public static String[] getNames() {
-      return new String[] {"AutoBuilder", "Link + Balance", "Linkin Park"};
-    }
-  };
 
   /** Title displayed in the dashboard tab */
   static final String kTabTitle = "Auto Builder";
@@ -110,6 +93,9 @@ public class AutoDashboardTab implements IDashboardTab {
 
   /** Builder used to generate Auto commands */
   private AutoRoutineBuilder m_autoBuilder;
+
+  /** Builder used to generate Link+Balance auto commands */
+  private LinkAndBalanceAutoBuilder m_linkAndBalanceBuilder;
 
   /** The current selected auto command */
   private CommandBase m_currentAutoRoutine;
@@ -149,6 +135,7 @@ public class AutoDashboardTab implements IDashboardTab {
   /** Creates an instance of the tab */
   public AutoDashboardTab() {
     m_autoBuilder = new AutoRoutineBuilder();
+    m_linkAndBalanceBuilder = new LinkAndBalanceAutoBuilder();
     m_field2d = new Field2d();
   }
 
@@ -263,22 +250,34 @@ public class AutoDashboardTab implements IDashboardTab {
       List<PathPlannerTrajectory> trajectories = null;
 
       // Set up the new auto routine
-      if (m_autoTypeChooser.getSelected() == AutoType.AutoBuilder) {
-        // Rebuild the auto routine
-        m_currentAutoRoutine =
-            m_autoBuilder.build(
-                botContainer,
-                m_initialPositionChooser.getSelected(),
-                m_initialActionChooser.getSelected(),
-                m_routeChooser.getSelected(),
-                m_secondaryActionChooser.getSelected(),
-                m_balancePositionChooser.getSelected(),
-                EscapeStrategy.kDefaultMotionConfig,
-                BalanceStrategy.kDefaultMotionConfig);
+      switch (m_autoTypeChooser.getSelected()) {
+        case AutoBuilder:
+          {
+            // Rebuild the auto routine
+            m_currentAutoRoutine =
+                m_autoBuilder.build(
+                    botContainer,
+                    m_initialPositionChooser.getSelected(),
+                    m_initialActionChooser.getSelected(),
+                    m_routeChooser.getSelected(),
+                    m_secondaryActionChooser.getSelected(),
+                    m_balancePositionChooser.getSelected(),
+                    EscapeStrategy.kDefaultMotionConfig,
+                    BalanceStrategy.kDefaultMotionConfig);
 
-        // Get trajectories for the active auto
-        trajectories = m_autoBuilder.getTrajectories();
-        initialPose = m_initialPositionChooser.getSelected().getPose();
+            // Get trajectories for the active auto
+            trajectories = m_autoBuilder.getTrajectories();
+            initialPose = m_initialPositionChooser.getSelected().getPose();
+            break;
+          }
+
+        case LinkNBalance:
+          {
+            trajectories = m_linkAndBalanceBuilder.getTrajectories();
+            initialPose = m_linkAndBalanceBuilder.getInitialPose();
+            m_currentAutoRoutine =
+                m_linkAndBalanceBuilder.getCommand(AutoType.LinkNBalance, botContainer);
+          }
       }
 
       // Add trajectories to the map of field objects

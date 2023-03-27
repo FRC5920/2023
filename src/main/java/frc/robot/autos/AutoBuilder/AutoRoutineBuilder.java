@@ -67,9 +67,7 @@ import frc.robot.autos.AutoConstants.EscapeRoute;
 import frc.robot.autos.AutoConstants.Grids;
 import frc.robot.autos.AutoConstants.InitialAction;
 import frc.robot.autos.AutoConstants.SecondaryAction;
-import frc.robot.autos.BumpScore;
 import frc.robot.commands.Balance;
-import frc.robot.commands.Shooter.Shoot;
 import frc.robot.commands.Shooter.Shoot.ShootConfig;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
@@ -169,35 +167,5 @@ public class AutoRoutineBuilder {
   /** Returns the last command built using build() */
   public Command getCommand() {
     return m_builtCommand;
-  }
-
-  static CommandBase getInitialActionCommands(
-      RobotContainer botContainer,
-      InitialAction initialAction,
-      Grids.ScoringPosition startingPosition) {
-    ShooterPivotSubsystem shooterPivot = botContainer.shooterPivotSubsystem;
-    IntakeSubsystem intake = botContainer.intakeSubsystem;
-
-    CommandBase actionCommand = null;
-
-    switch (initialAction) {
-      case BumpScore:
-        actionCommand = new BumpScore(startingPosition, botContainer.swerveSubsystem);
-        break;
-
-      case ShootLow:
-        actionCommand = Shoot.pivotAndShootLow(shooterPivot, intake);
-        break;
-
-      case ShootMid:
-        actionCommand = Shoot.pivotAndShootMid(shooterPivot, intake);
-        break;
-
-      case ShootHigh:
-        actionCommand = Shoot.pivotAndShootHigh(shooterPivot, intake);
-        break;
-    }
-
-    return actionCommand;
   }
 }

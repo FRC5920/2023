@@ -58,6 +58,7 @@ import frc.robot.autos.AutoConstants.Grids;
 import frc.robot.autos.AutoConstants.InitialAction;
 import frc.robot.autos.BumpScore;
 import frc.robot.commands.Shooter.Shoot;
+import frc.robot.commands.Shooter.ShooterPresets;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
@@ -103,15 +104,18 @@ public class InitialActionStrategy extends AutoStrategy {
         break;
 
       case ShootLow:
-        actionCommand = Shoot.pivotAndShootLow(m_shooterPivotSubsystem, m_intakeSubsystem);
+        actionCommand =
+            new Shoot(ShooterPresets.CloseShotLow, m_shooterPivotSubsystem, m_intakeSubsystem);
         break;
 
       case ShootMid:
-        actionCommand = Shoot.pivotAndShootMid(m_shooterPivotSubsystem, m_intakeSubsystem);
+        actionCommand =
+            new Shoot(ShooterPresets.CloseShotMid, m_shooterPivotSubsystem, m_intakeSubsystem);
         break;
 
       case ShootHigh:
-        actionCommand = Shoot.pivotAndShootHigh(m_shooterPivotSubsystem, m_intakeSubsystem);
+        actionCommand =
+            new Shoot(ShooterPresets.CloseShotHigh, m_shooterPivotSubsystem, m_intakeSubsystem);
         break;
     }
 
