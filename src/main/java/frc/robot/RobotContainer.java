@@ -90,10 +90,8 @@ public class RobotContainer {
   public final Swerve swerveSubsystem;
   public final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   public final ShooterPivotSubsystem shooterPivotSubsystem = new ShooterPivotSubsystem();
-  LEDs LEDsSubsystem = new LEDs();
-
-  LEDsSubsystem.setDefaultCommand(
-    new ChangeColor(LEDsSubsystem, LEDs.kRed));
+  public final LEDs LEDsSubsystem = new LEDs();
+  LEDsSubsystem.setDefaultCommand(new ChangeColor(LEDsSubsystem, LEDs.kRed));
 
   // public static final Pneumatics s_Pneumatics = new Pneumatics();
 
