@@ -90,6 +90,10 @@ public class RobotContainer {
   public final Swerve swerveSubsystem;
   public final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   public final ShooterPivotSubsystem shooterPivotSubsystem = new ShooterPivotSubsystem();
+  LEDs LEDsSubsystem = new LEDs();
+
+  LEDsSubsystem.setDefaultCommand(
+    new ChangeColor(LEDsSubsystem, LEDs.kRed));
 
   // public static final Pneumatics s_Pneumatics = new Pneumatics();
 
@@ -171,11 +175,6 @@ public class RobotContainer {
         new TeleopSwerve(swerveSubsystem, joystickSubsystem, fieldRelative, openLoop));
 
     swerveSubsystem.registerDashboardTab(dashboardSubsystem);
-
-    LEDs LEDsSubsystem = new LEDs();
-
-    LEDsSubsystem.setDefaultCommand(
-      new ChangeColor(LEDsSubsystem, LEDs.kRed));
 
     poseEstimatorSubsystem = new PoseEstimatorSubsystem(TagCamera, swerveSubsystem);
     poseEstimatorSubsystem.registerDashboardTab(dashboardSubsystem);
