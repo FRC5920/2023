@@ -68,12 +68,19 @@ public class ZTargeter {
   // Set this constant to true to send values to the dashboard for debugging
   public static final boolean kEnableDashboardDebug = true;
 
+  /** Default angle tolerance to control for in radians */
+  public static final double kDefaultAngleToleranceRad = Units.degreesToRadians(2);
+
   /** Default proportional gain used for the rotation PID controller */
   public static final double kDefault_kP = 0.9;
   /** Default integral gain used for the rotation PID controller */
   public static final double kDefault_kI = 0.0;
   /** Default derivative gain used for the rotation PID controller */
   public static final double kDefault_kD = 0.1;
+
+  /** Default PID gains used for controlling rotation */
+  public static final PIDGains kDefaultPIDGains =
+      new PIDGains(kDefault_kP, kDefault_kI, kDefault_kD);
 
   /** Camera used to target the gamepiece */
   private final PhotonCamera m_camera;
@@ -96,7 +103,7 @@ public class ZTargeter {
    * @param gains PID gains to use for converging on the target
    */
   public ZTargeter(GameTarget TargetWhat, PhotonCamera camera) {
-    this(TargetWhat, camera, new PIDGains(kDefault_kP, kDefault_kI, kDefault_kD));
+    this(TargetWhat, camera, kDefaultPIDGains, kDefaultAngleToleranceRad);
   }
 
   /**
@@ -106,13 +113,15 @@ public class ZTargeter {
    * @param TargetWhat The type of gamepiece to target
    * @param camera Camera used to locate and target the gamepiece
    * @param gains PID gains to use for converging on the target
+   * @param angleToleranceRad Error tolerance to control to in radians
    */
-  public ZTargeter(GameTarget TargetWhat, PhotonCamera camera, PIDGains gains) {
+  public ZTargeter(
+      GameTarget TargetWhat, PhotonCamera camera, PIDGains gains, double angleToleranceRad) {
     m_camera = camera;
     m_gamepieceType = TargetWhat;
 
     omegaController = new PIDController(gains.kP, gains.kI, gains.kD);
-    omegaController.setTolerance(Units.degreesToRadians(2));
+    omegaController.setTolerance(angleToleranceRad);
     omegaController.enableContinuousInput(-Math.PI, Math.PI);
     omegaController.setSetpoint(0);
   }
@@ -158,5 +167,10 @@ public class ZTargeter {
     }
 
     return result;
+  }
+
+  /** Returns true if the rotation to the target is within the configured angle tolerance */
+  public boolean targetIsAligned() {
+    return omegaController.atSetpoint();
   }
 }

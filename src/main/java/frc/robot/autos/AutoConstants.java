@@ -106,6 +106,15 @@ public class AutoConstants {
     }
   }
 
+  public static class FieldCoordinates {
+    public static final double yMax = FieldConstants.fieldWidth;
+    public static final double yMin = 0.0;
+
+    public static final double xMin = 0.0;
+    public static final double xMax = FieldConstants.fieldLength;
+    public static final double xCenterline = (xMax / 2.0);
+  }
+
   /////////////////////////////////////////////////////////////////////////////
   /** An enumeration of initial actions to take before escaping the community */
   public static enum AutoType {
@@ -426,12 +435,17 @@ public class AutoConstants {
     C4(3); // South of the charging station
 
     /** Coordinates on the field */
-    public final Translation2d coordinates;
+    private final Translation2d location;
 
     private CargoLocation(int id) {
       double x = FieldConstants.StagingLocations.translations[id].getX();
       double y = FieldConstants.StagingLocations.translations[id].getY();
-      coordinates = new Translation2d(x, y);
+      location = new Translation2d(x, y);
+    }
+
+    /** Returns the location of the gamepiece translated for the current alliance */
+    public Translation2d getLocation() {
+      return AllianceFlipUtil.apply(location);
     }
 
     /** Returns a list of names of enum elements */
