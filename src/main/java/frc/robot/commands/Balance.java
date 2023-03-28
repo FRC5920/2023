@@ -119,7 +119,7 @@ public class Balance extends CommandBase {
     drivetrainSubsystem.drive(
         new Translation2d(ySpeed, xSpeed).times(Constants.SwerveDrivebaseConstants.maxSpeed * .15),
         omegaSpeed,
-        true,
+        false,
         true);
 
     // https://www.instructables.com/Self-Balancing-Robot-Using-PID-Algorithm-STM-MC/
