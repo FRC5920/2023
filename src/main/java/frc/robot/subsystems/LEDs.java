@@ -1,21 +1,64 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2023 FIRST and other WPILib contributors.
+// http://github.com/FRC5920
+// Open Source Software; you can modify and/or share it under the terms of the
+// license given in WPILib-License.md in the root directory of this project.
+////////////////////////////////////////////////////////////////////////////////
 
+/*-----------------------------------------------------------------------------\
+|                                                                              |
+|                       ================================                       |
+|                       **    TEAM 5920 - Vikotics    **                       |
+|                       ================================                       |
+|                                                                              |
+|                            °        #°                                       |
+|                            *O       °@o                                      |
+|                            O@ °o@@#° o@@                                     |
+|                           #@@@@@@@@@@@@@@                                    |
+|                           @@@@@@@@@@@@@@@                                    |
+|                           @@@@@@@@@@@@@@°                                    |
+|                             #@@@@@@@@@@@@@O....   .                          |
+|                             o@@@@@@@@@@@@@@@@@@@@@o                          |
+|                             O@@@@@@@@@@@@@@@@@@@#°                    *      |
+|                             O@@@@@@@@@@@@@@@@@@@@@#O                O@@    O |
+|                            .@@@@@@@@°@@@@@@@@@@@@@@@@#            °@@@    °@@|
+|                            #@@O°°°°  @@@@@@@@@@@@@@@@@@°          @@@#*   @@@|
+|                         .#@@@@@  o#oo@@@@@@@@@@@@@@@@@@@@@.       O@@@@@@@@@@|
+|                        o@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@°     @@@@@@@@@°|
+|                        @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@   .@@@@@o°   |
+|          °***          @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  @@@@@o     |
+|     o#@@@@@@@@@@@@.   *@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@o@@@@@@      |
+|OOo°@@@@@@@@@@@@O°#@#   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@       |
+|@@@@@@@@@@@@@@@@    o°  .@@@@@@@@@@@@@@@@@@@@@@@@#*@@@@@@@@@@@@@@@@@@@@       |
+|@@@@@@@@@@@@@@@*         O@@@@@@@@@@@@@@@@@@@@@@@   °@@@@@@@@@@@@@@@@@@o      |
+|@@@@#@@@@@@@@@            @@@@@@@@@@@@@@@@@@@@@@       .*@@@@@@@@@@@@@@.      |
+|@@@°      @@@@O           @@@@@@@@@@@@@@@@@@@@o           °@@@@@@@@@@@o       |
+|          @@@@@          .@@@@@@@@@@@@@@@@@@@*               O@@@@@@@*        |
+|           @@@@@        o@@@@@@@@@@@@@@@@@@@@.               #@@@@@O          |
+|           *@@@@@@@*  o@@@@@@@@@@@@@@@@@@@@@@°              o@@@@@            |
+|           @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@.              @@@@@#            |
+|          @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@O             #@@@@@             |
+|          .@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#           .@@@@@°             |
+|           @@@@@@@@@@O*    @@@@@@@@@@@@@@@@@@@@@°         °O@@@°              |
+|            °O@@@@@@       @@@@@@@@@@@@@@@@@@@@@@@                            |
+|              o@@@@@°      @@@@@@@@@@@@@@@@@@@@@@@@                           |
+|               @@@@@@.     @@@@@@@@@@@@@@@@@@@@@@@@@o                         |
+|                @@@@@@*    @@@@@@@@@@@@@@@@@@@@@@@@@@                         |
+|                o@@@@@@.  o@@@@@@@@@@@@@@@@@@@@@@@@@@@                        |
+|                 #@@@@@@  *@@@@@@@@@@@@@@@@@@@@@@@@@@@@                       |
+|                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
+|                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
+\-----------------------------------------------------------------------------*/
 package frc.robot.subsystems;
-
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.RobotContainer;
-import frc.lib.utility.LEDPattern;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.utility.LEDPattern;
 
 public class LEDs extends SubsystemBase {
-   //////////////////////////////////
+  //////////////////////////////////
   /// *** CONSTANTS ***
   //////////////////////////////////
 
@@ -26,8 +69,8 @@ public class LEDs extends SubsystemBase {
   private static final LEDStrip kLowerRightStrip = new LEDStrip(66, 33);
   private static final LEDStrip kUpperRightStrip = new LEDStrip(99, 33);
 
-  //private static final Color8Bit kOff = new Color8Bit(0, 0, 0);
-  //private static final Color8Bit kGreen = new Color8Bit(0, 255, 0);
+  // private static final Color8Bit kOff = new Color8Bit(0, 0, 0);
+  // private static final Color8Bit kGreen = new Color8Bit(0, 255, 0);
   public static final Color8Bit kRed = new Color8Bit(255, 0, 0);
   public static final Color8Bit kBlue = new Color8Bit(0, 0, 255);
   public static final Color8Bit kYellow = new Color8Bit(255, 120, 0);
@@ -39,24 +82,24 @@ public class LEDs extends SubsystemBase {
   private static int m_rainbowFirstPixelHue;
   private static int m_pixeloffset;
 
-  //private static int l_shootColor;
-  //private static int currentColor;
-  static int iPos=0;
+  // private static int l_shootColor;
+  // private static int currentColor;
+  static int iPos = 0;
   private LEDPattern m_lowerLeftSweep;
   private LEDPattern m_upperLeftSweep;
   private LEDPattern m_lowerRightSweep;
   private LEDPattern m_upperRightSweep;
 
-   /////////////////////////////////////////////////////////////////////////////
-  /** Helper class used to store a description of a strip of addressable
-   *  LEDs
-   */
+  /////////////////////////////////////////////////////////////////////////////
+  /** Helper class used to store a description of a strip of addressable LEDs */
   private static class LEDStrip {
     public final int startIndex, numLEDs;
 
-    /** Creates an instance of the object
-     * @param start   Start address (index) of the strip
-     * @param count   Number of LED's in the strip
+    /**
+     * Creates an instance of the object
+     *
+     * @param start Start address (index) of the strip
+     * @param count Number of LED's in the strip
      */
     public LEDStrip(int start, int count) {
       startIndex = start;
@@ -64,24 +107,24 @@ public class LEDs extends SubsystemBase {
     }
   }
 
-
-
   /** Creates a new LEDs. */
   public LEDs() {
     m_led = new AddressableLED(0);
     m_ledBuffer = new AddressableLEDBuffer(132);
     m_lowerLeftSweep = new LEDPattern(kLowerLeftStrip.startIndex, kLowerLeftStrip.numLEDs, kYellow);
     m_upperLeftSweep = new LEDPattern(kUpperLeftStrip.startIndex, kUpperLeftStrip.numLEDs, kYellow);
-    m_lowerRightSweep = new LEDPattern(kLowerRightStrip.startIndex, kLowerRightStrip.numLEDs, kYellow);
-    m_upperRightSweep = new LEDPattern(kUpperRightStrip.startIndex, kUpperRightStrip.numLEDs, kYellow);
+    m_lowerRightSweep =
+        new LEDPattern(kLowerRightStrip.startIndex, kLowerRightStrip.numLEDs, kYellow);
+    m_upperRightSweep =
+        new LEDPattern(kUpperRightStrip.startIndex, kUpperRightStrip.numLEDs, kYellow);
     m_led.setLength(m_ledBuffer.getLength());
     m_led.setData(m_ledBuffer);
     m_led.start();
     m_pixeloffset = 0;
-    //updateAllianceColor();
+    // updateAllianceColor();
   }
 
-    /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////
   /** Updates the active color */
   public void updateColor(Color8Bit desiredColor) {
     m_lowerLeftSweep.setColor(desiredColor);

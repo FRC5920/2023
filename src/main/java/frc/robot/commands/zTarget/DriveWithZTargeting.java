@@ -61,9 +61,9 @@ import frc.lib.Joystick.ProcessedXboxController;
 import frc.lib.utility.ZTargeter;
 import frc.robot.Constants.GameTarget;
 import frc.robot.RobotContainer;
+import frc.robot.commands.Lighting.ChangeColor;
 import frc.robot.commands.Shooter.Acquire;
 import frc.robot.commands.SimulationPrinter;
-import frc.robot.commands.Lighting.ChangeColor;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.JoystickSubsystem;
 import frc.robot.subsystems.LEDs;
@@ -78,7 +78,7 @@ public class DriveWithZTargeting extends CommandBase {
   private final Swerve m_swerveSubsystem;
   private final ProcessedXboxController m_controller;
   private final ZTargeter m_zTargeter;
-  
+
   /** Returns a command that drives with Z-targeting and intake engaged */
   public static CommandBase zTargetDriveWithIntake(
       GameTarget gamepieceType,
@@ -90,11 +90,13 @@ public class DriveWithZTargeting extends CommandBase {
       boolean fieldRelative,
       boolean openLoop,
       LEDs lightingSubsystem) {
-        Color8Bit desiredColor = LEDs.kRed;
-        switch(gamepieceType){
-          case Cube: desiredColor = LEDs.kPurple;
-          case AprilTag2D: desiredColor = LEDs.kWhite;
-        }
+    Color8Bit desiredColor = LEDs.kRed;
+    switch (gamepieceType) {
+      case Cube:
+        desiredColor = LEDs.kPurple;
+      case AprilTag2D:
+        desiredColor = LEDs.kWhite;
+    }
     return new SimulationPrinter(String.format("<Trigger> Z-target drive with intake"))
         .andThen(
             Commands.race(
