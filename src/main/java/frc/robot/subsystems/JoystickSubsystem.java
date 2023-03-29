@@ -51,6 +51,7 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -59,14 +60,19 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.Joystick.AxisProcChain;
 import frc.lib.Joystick.ProcessedXboxController;
+import frc.lib.utility.BotBoundary.Polygon;
+import frc.lib.utility.BotBoundary.PoseLimiter;
+import frc.lib.utility.BotBoundary.PoseLimiter.BoundaryPolicy;
 import frc.robot.Constants.GameTarget;
 import frc.robot.RobotContainer;
+import frc.robot.autos.AutoConstants.FieldCoordinates;
 import frc.robot.commands.Shooter.Acquire;
-import frc.robot.commands.Shooter.AutoZeroPivot;
+import frc.robot.commands.Shooter.SetShooterAngle;
 import frc.robot.commands.Shooter.Shoot;
 import frc.robot.commands.Shooter.ShooterPresets;
 import frc.robot.commands.SimulationPrinter;
 import frc.robot.commands.SnapToGrid;
+import frc.robot.commands.zTarget.AutoIntakeWithZTargeting;
 import frc.robot.commands.zTarget.DriveWithZTargeting;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.ShooterPivot.PivotPresets;
@@ -232,8 +238,23 @@ public class JoystickSubsystem extends SubsystemBase {
       driverController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
       driverController.back.onTrue(
           new InstantCommand(() -> botContainer.swerveSubsystem.zeroGyro())); // left little
+      // driverController.start.whileTrue(
+      //     new AutoZeroPivot(botContainer.shooterPivotSubsystem, 5.0)); // right little
+      Polygon bounds =
+          Polygon.simpleRectangle(
+              new Translation2d(FieldCoordinates.xMin, FieldCoordinates.yMax),
+              new Translation2d(FieldCoordinates.xMax, FieldCoordinates.yMin));
       driverController.start.whileTrue(
-          new AutoZeroPivot(botContainer.shooterPivotSubsystem, 5.0)); // right little
+          Commands.sequence(
+              new SetShooterAngle(botContainer.shooterPivotSubsystem, PivotPresets.Acquire),
+              new AutoIntakeWithZTargeting(
+                  GameTarget.Cube,
+                  botContainer.ArmCamera,
+                  botContainer.swerveSubsystem,
+                  botContainer.shooterPivotSubsystem,
+                  botContainer.intakeSubsystem,
+                  new PoseLimiter(
+                      botContainer.swerveSubsystem::getPose, bounds, BoundaryPolicy.KeepInside))));
 
       driverController.rightTriggerAsButton.whileTrue(
           new SimulationPrinter("Snap-to-grid ON")

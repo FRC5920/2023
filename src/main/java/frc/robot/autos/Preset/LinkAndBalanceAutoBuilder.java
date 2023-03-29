@@ -75,16 +75,16 @@ import frc.robot.autos.AutoConstants.AutoType;
 import frc.robot.autos.AutoConstants.CargoLocation;
 import frc.robot.autos.AutoConstants.FieldCoordinates;
 import frc.robot.commands.Balance;
-import frc.robot.commands.Shooter.Acquire;
+import frc.robot.commands.Shooter.SetShooterAngle;
 import frc.robot.commands.Shooter.Shoot;
 import frc.robot.commands.Shooter.Shoot.ShootConfig;
 import frc.robot.commands.Shooter.ShooterPresets;
 import frc.robot.commands.SimulationPrinter;
 import frc.robot.commands.zTarget.AutoIntakeWithZTargeting;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
+import frc.robot.subsystems.ShooterPivot.PivotPresets;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
-import frc.robot.subsystems.SwerveDrivebase.Swerve.WheelPreset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -109,7 +109,7 @@ public class LinkAndBalanceAutoBuilder {
   private static final double kDefaultMaxVelocity = 5.0;
 
   /** Max acceleration used when following PathPlanner trajectories */
-  private static final double kDefaultMaxAcceleration = 8.0;
+  private static final double kDefaultMaxAcceleration = 5.0;
 
   /** PathPlanner trajectory file and configuration used to load C1 */
   private final TrajectoryLoader m_acquireC1Loader;
@@ -150,8 +150,7 @@ public class LinkAndBalanceAutoBuilder {
 
     HashMap<String, Command> intakeEventMap = new HashMap<>();
     intakeEventMap.put(
-        "activateIntake",
-        Acquire.acquireAndPark(botContainer.shooterPivotSubsystem, botContainer.intakeSubsystem));
+        "deployPivot", new SetShooterAngle(shooterPivotSubsystem, PivotPresets.Acquire));
 
     PoseLimiter c1AcquireBoundary = makeAcquireBoundary(CargoLocation.C1, swerveSubsystem::getPose);
     PoseLimiter c2AcquireBoundary = makeAcquireBoundary(CargoLocation.C2, swerveSubsystem::getPose);
@@ -162,9 +161,10 @@ public class LinkAndBalanceAutoBuilder {
             new SimulationPrinter("Set initial pose"),
             new InstantCommand(
                 () -> {
-                  botContainer.swerveSubsystem.resetOdometry(kInitialPose);
+                  swerveSubsystem.zeroGyro();
+                  swerveSubsystem.resetOdometry(kInitialPose);
                   botContainer.poseEstimatorSubsystem.setCurrentPose(kInitialPose);
-                  botContainer.swerveSubsystem.setWheelPreset(WheelPreset.Forward);
+                  // swerveSubsystem.setWheelPreset(WheelPreset.Forward);
                 }),
             // Shoot pre-loaded cube
             new SimulationPrinter("<Link+Balance> shoot pre-loaded cargo"),
@@ -183,6 +183,7 @@ public class LinkAndBalanceAutoBuilder {
                 GameTarget.Cube,
                 botContainer.ArmCamera,
                 swerveSubsystem,
+                shooterPivotSubsystem,
                 intakeSubsystem,
                 c1AcquireBoundary),
             // Move and shoot C1
@@ -209,6 +210,7 @@ public class LinkAndBalanceAutoBuilder {
                 GameTarget.Cube,
                 botContainer.ArmCamera,
                 swerveSubsystem,
+                shooterPivotSubsystem,
                 intakeSubsystem,
                 c2AcquireBoundary),
             // Move and shoot C2
@@ -284,6 +286,7 @@ public class LinkAndBalanceAutoBuilder {
             rotationGains,
             // Module states consumer used to output to the drive subsystem
             swerveSubsystem::setModuleStates,
+            // Map of event names to Commands
             eventMap,
             // true to automatically mirror the path according to alliance color (doesn't work)
             false,
@@ -293,7 +296,7 @@ public class LinkAndBalanceAutoBuilder {
     return autoBuilder.fullAuto(trajectory);
   }
 
-  private static PoseLimiter makeAcquireBoundary(
+  public static PoseLimiter makeAcquireBoundary(
       CargoLocation gamepiece, Supplier<Pose2d> poseSupplier) {
     // Get the position of the gamepiece (translated to current alliance)
     Translation2d loc = gamepiece.getLocation();
@@ -313,6 +316,8 @@ public class LinkAndBalanceAutoBuilder {
                 new Translation2d(FieldCoordinates.xCenterline + 0.5, FieldCoordinates.yMax),
                 new Translation2d(FieldCoordinates.xMax, loc.getY() - 0.75));
         break;
+      case Invalid:
+        throw new RuntimeException("Invalid alliance selected");
     }
 
     return new PoseLimiter(poseSupplier, boundary, BoundaryPolicy.KeepInside);

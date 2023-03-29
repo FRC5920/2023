@@ -173,4 +173,8 @@ public class ZTargeter {
   public boolean targetIsAligned() {
     return omegaController.atSetpoint();
   }
+
+  public Rotation2d getTargetAlignmentError() {
+    return new Rotation2d(omegaController.getPositionError());
+  }
 }

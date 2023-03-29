@@ -53,17 +53,21 @@ package frc.robot.commands.zTarget;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.utility.BotBoundary.PoseLimiter;
+import frc.lib.utility.PIDGains;
 import frc.lib.utility.ZTargeter;
 import frc.robot.Constants.GameTarget;
 import frc.robot.RobotContainer;
-import frc.robot.commands.Shooter.IntakeGamepiece;
+import frc.robot.commands.Shooter.Acquire;
 import frc.robot.commands.SimulationPrinter;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
+import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import org.photonvision.PhotonCamera;
 
@@ -75,6 +79,7 @@ public class AutoIntakeWithZTargeting extends SequentialCommandGroup {
       GameTarget gamepieceType,
       PhotonCamera camera,
       Swerve swerveSubsystem,
+      ShooterPivotSubsystem shooterPivotSubsystem,
       IntakeSubsystem intakeSubsystem,
       PoseLimiter poseLimits) {
 
@@ -83,11 +88,15 @@ public class AutoIntakeWithZTargeting extends SequentialCommandGroup {
         Commands.race(
             new ZTargetAndDriveToGamepiece(
                 gamepieceType, kApproachSpeedMetersPerSec, camera, swerveSubsystem, poseLimits),
-            new IntakeGamepiece(intakeSubsystem)),
-        new SimulationPrinter(String.format("<AutoIntakeWithZTargeting> engaged")));
+            Acquire.acquireAndPark(shooterPivotSubsystem, intakeSubsystem)),
+        // new IntakeGamepiece(intakeSubsystem)),
+        new SimulationPrinter(String.format("<AutoIntakeWithZTargeting> finished")));
   }
 
   private static class ZTargetAndDriveToGamepiece extends CommandBase {
+    private static final PIDGains kRotationControllerGains = new PIDGains(0.9, 0.0, 0.1);
+    private static final double kRotationControllerToleranceRad = Units.degreesToRadians(5.0);
+
     private final GameTarget m_gamepieceType;
     private final Swerve m_swerveSubsystem;
     private final PoseLimiter m_poseLimits;
@@ -115,7 +124,9 @@ public class AutoIntakeWithZTargeting extends SequentialCommandGroup {
       m_approachSpeedMetersPerSec = approachSpeedMetersPerSec;
       m_swerveSubsystem = swerveSubsystem;
       addRequirements(swerveSubsystem);
-      m_zTargeter = new ZTargeter(gamepieceType, camera);
+      m_zTargeter =
+          new ZTargeter(
+              gamepieceType, camera, kRotationControllerGains, kRotationControllerToleranceRad);
       m_poseLimits = poseLimits;
     }
 
@@ -151,27 +162,35 @@ public class AutoIntakeWithZTargeting extends SequentialCommandGroup {
 
       if (m_targetDetected) {
         // Get the rotation needed to align to bot with the target
-        rotationDelta = zRotation.getRadians() * RobotContainer.MaxRotate;
+        rotationDelta = zRotation.getRadians();
 
         // If the target is aligned and the current pose is not outside the given limits,
         // drive toward the target at the configured speed
-        if (m_zTargeter.targetIsAligned() && !m_poseLimits.shouldLimitPose()) {
-          translationDelta = new Translation2d(m_approachSpeedMetersPerSec, 0.0);
+        SmartDashboard.putNumber(
+            "AutoZTarget/alignError", m_zTargeter.getTargetAlignmentError().getDegrees());
+
+        if (m_zTargeter.targetIsAligned()) {
+          if (m_poseLimits.shouldLimitPose()) {
+            System.out.println(
+                "<AutoZTargetAndDriveToGamepiece> Pose limiter is preventing advance");
+          } else {
+            translationDelta = new Translation2d(-1.0 * m_approachSpeedMetersPerSec, 0.0);
+          }
         }
       }
 
-      if (RobotBase.isSimulation()) {
-        System.out.printf(
-            "<AutoZTargetAndDriveToGamepiece> commanded rotation: %.2f rad\n", rotationDelta);
-      }
-
       // Drive open-loop, bot-relative
+      SmartDashboard.putNumber("AutoZTarget/Rot", rotationDelta);
+      rotationDelta *= RobotContainer.MaxRotate;
+      SmartDashboard.putNumber("AutoZTarget/RotScaled", rotationDelta);
       m_swerveSubsystem.drive(translationDelta, rotationDelta, false, true);
     }
 
     // Called once the command ends or is interrupted.
     @Override
-    public void end(boolean interrupted) {}
+    public void end(boolean interrupted) {
+      System.out.println("<AutoZTargetAndDriveToGamepiece> interrupted");
+    }
 
     // Returns true when the command should end.
     @Override

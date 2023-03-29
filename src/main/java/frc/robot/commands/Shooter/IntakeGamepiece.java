@@ -155,7 +155,7 @@ public class IntakeGamepiece extends SequentialCommandGroup {
     @Override
     public void initialize() {
       System.out.printf(
-          "IntakeGamepiece: set intake speed to %.0f percent\n", m_targetMotorSpeedPercent);
+          "<RampUpIntakeMotors> set intake speed to %.0f percent\n", m_targetMotorSpeedPercent);
       m_intakeSubsystem.setSpeedPercent(m_targetMotorSpeedPercent);
     }
 
@@ -179,7 +179,8 @@ public class IntakeGamepiece extends SequentialCommandGroup {
 
       boolean finished = (delta <= Math.abs(m_targetMotorSpeedPercent * 0.10));
       if (finished) {
-        System.out.printf("IntakeGamepiece: finished with speed at %.0f percent\n", averageSpeed);
+        System.out.printf(
+            "<RampUpIntakeMotors> finished with speed at %.0f percent\n", averageSpeed);
       }
       return finished;
     }
@@ -232,13 +233,25 @@ public class IntakeGamepiece extends SequentialCommandGroup {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
+      System.out.println("<DetectGamepiece> initialized");
       m_currentAverager.reset();
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+      if (interrupted) {
+        System.out.println("<DetectGamepiece> interrupted");
+      }
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-      return m_intakeSubsystem.limitSwitchIsClosed();
+      boolean limitSwitchClosed = m_intakeSubsystem.limitSwitchIsClosed();
+      if (limitSwitchClosed) {
+        System.out.println("<DetectGamepiece> limit switch closed");
+      }
+      return limitSwitchClosed;
       // || detectUsingSpeed(); // || detectUsingCurrent();
     }
 

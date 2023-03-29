@@ -72,7 +72,6 @@ import frc.robot.commands.Shooter.Shoot.ShootConfig;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
-import frc.robot.subsystems.SwerveDrivebase.Swerve.WheelPreset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -120,7 +119,7 @@ public class AutoRoutineBuilder {
             () -> {
               botContainer.swerveSubsystem.resetOdometry(startPosition);
               botContainer.poseEstimatorSubsystem.setCurrentPose(startPosition);
-              botContainer.swerveSubsystem.setWheelPreset(WheelPreset.Forward);
+              // botContainer.swerveSubsystem.setWheelPreset(WheelPreset.Forward);
             }));
 
     // Gather commands used to perform the selected initial action

@@ -64,7 +64,7 @@ public class SimulationPrinter extends CommandBase {
 
   @Override
   public void initialize() {
-    if (RobotBase.isSimulation()) {
+    if (true || RobotBase.isSimulation()) {
       System.out.println(m_message);
     }
   }

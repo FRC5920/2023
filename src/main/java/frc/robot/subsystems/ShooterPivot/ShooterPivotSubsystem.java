@@ -63,7 +63,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.utility.PIDGains;
 import frc.robot.commands.Shooter.AutoZeroPivot;
 import frc.robot.commands.Shooter.SetShooterAngle;
-import frc.robot.commands.SimulationPrinter;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 
 public class ShooterPivotSubsystem extends SubsystemBase {
@@ -136,7 +135,7 @@ public class ShooterPivotSubsystem extends SubsystemBase {
     CommandBase defaultCommand =
         Commands.either(
             Commands.sequence(
-                new SimulationPrinter("<ShooterPivot> default park"),
+                // new SimulationPrinter("<ShooterPivot> default park"),
                 new SetShooterAngle(this, PivotPresets.Park)),
             new ConditionalCommand(
                 new AutoZeroPivot(this, 2.0),

@@ -25,6 +25,12 @@
     },
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Auto Builder/Auto Type": "String Chooser",
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Balance Position": "String Chooser",
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Initial Action": "String Chooser",
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Initial Position": "String Chooser",
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Route": "String Chooser",
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Secondary Action": "String Chooser",
       "/Shuffleboard/Auto Builder/Field": "Field2d",
       "/Shuffleboard/Auto Builder/Initial Position": "String Chooser",
       "/Shuffleboard/Auto Builder/Rotation PID": "PIDController",
@@ -39,30 +45,22 @@
       "/Shuffleboard/Intake/Velocity PID": "PIDController",
       "/Shuffleboard/ShooterPivot/Position PID": "PIDController",
       "/Shuffleboard/ShooterPivot/SetPivot": "Command",
-      "/Shuffleboard/ShooterPivot/TestCommand": "Command"
+      "/Shuffleboard/ShooterPivot/TestCommand": "Command",
+      "/Shuffleboard/SwerveDrive/FrontLeft/Angle/Degrees": "Gyro",
+      "/Shuffleboard/SwerveDrive/FrontRight/Angle/Degrees": "Gyro",
+      "/Shuffleboard/SwerveDrive/RearLeft/Angle/Degrees": "Gyro",
+      "/Shuffleboard/SwerveDrive/RearRight/Angle/Degrees": "Gyro"
     },
     "windows": {
       "/Shuffleboard/Intake/Run Intake (perpetual)": {
         "window": {
-          "name": "IntakePerpetual",
-          "visible": true
-        }
-      },
-      "/Shuffleboard/ShooterPivot/Position PID": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/Shuffleboard/ShooterPivot/SetPivot": {
-        "window": {
-          "visible": true
+          "name": "IntakePerpetual"
         }
       }
     }
   },
   "NetworkTables Settings": {
     "mode": "Client (NT4)",
-    "port4": 5810,
     "serverTeam": "127.0.0.1",
     "visible": false
   },
@@ -75,7 +73,7 @@
               "autoFit": true
             }
           ],
-          "height": 209,
+          "height": 0,
           "series": [
             {
               "color": [
@@ -88,12 +86,15 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     },
     "Plot <1>": {
       "plots": [
         {
-          "height": 513,
+          "height": 0,
           "series": [
             {
               "color": [
@@ -106,7 +107,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     },
     "Plot <2>": {
       "plots": [

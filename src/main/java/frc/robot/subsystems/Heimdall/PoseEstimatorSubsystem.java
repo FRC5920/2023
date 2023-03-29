@@ -122,7 +122,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
       photonPoseEstimator =
           new PhotonPoseEstimator(
               fieldLayout,
-              PoseStrategy.LOWEST_AMBIGUITY,
+              PoseStrategy.MULTI_TAG_PNP,
               photonCamera,
               Constants.VisionConstants.CAMERA_TO_ROBOT);
       photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_LAST_POSE);
@@ -181,7 +181,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
 
             var visionMeasurement = camPose.transformBy(CAMERA_TO_ROBOT);
             if (target.getPoseAmbiguity() <= .05) {
-              visionMeasurementStdDevs = VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(2));
+              visionMeasurementStdDevs = VecBuilder.fill(0.30, 0.3, Units.degreesToRadians(6));
             } else {
               visionMeasurementStdDevs = VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(10));
             }

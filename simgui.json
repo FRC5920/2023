@@ -115,7 +115,8 @@
       },
       "/Shuffleboard/Auto Builder/Balance Position": {
         "window": {
-          "name": "Balance Position"
+          "name": "Balance Position",
+          "visible": true
         }
       },
       "/Shuffleboard/Auto Builder/Field": {
@@ -135,6 +136,10 @@
           "arrows": false,
           "style": "Line"
         },
+        "AutoTrajectory4": {
+          "arrows": false,
+          "style": "Line"
+        },
         "bottom": 544,
         "height": 8.013679504394531,
         "image": "2023-field.png",
@@ -148,12 +153,14 @@
       },
       "/Shuffleboard/Auto Builder/Initial Action": {
         "window": {
-          "name": "Initial Action"
+          "name": "Initial Action",
+          "visible": true
         }
       },
       "/Shuffleboard/Auto Builder/Initial Position": {
         "window": {
-          "name": "Initial Position"
+          "name": "Initial Position",
+          "visible": true
         }
       },
       "/Shuffleboard/Auto Builder/Rotation PID": {
@@ -164,12 +171,14 @@
       },
       "/Shuffleboard/Auto Builder/Route": {
         "window": {
-          "name": "Escape Route"
+          "name": "Escape Route",
+          "visible": true
         }
       },
       "/Shuffleboard/Auto Builder/Secondary Action": {
         "window": {
-          "name": "Secondary Action"
+          "name": "Secondary Action",
+          "visible": true
         }
       },
       "/Shuffleboard/Auto Builder/Translation PID": {

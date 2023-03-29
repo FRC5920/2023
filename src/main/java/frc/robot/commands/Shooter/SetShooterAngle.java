@@ -93,7 +93,7 @@ public class SetShooterAngle extends CommandBase {
   @Override
   public void initialize() {
     m_shooterPivotSubsystem.setAngleDegrees(m_pivotDegrees);
-    System.out.println("Shooter: Pivot to " + String.valueOf(m_pivotDegrees) + " degrees");
+    System.out.println("Shooter: Pivot to " + String.valueOf(m_pivotDegrees) + " degrees\n");
 
     if (RobotBase.isSimulation()) {
       m_simulationTimer.restart();
@@ -119,7 +119,8 @@ public class SetShooterAngle extends CommandBase {
     }
 
     if (finished) {
-      System.out.println("Shooter: pivot reached: " + String.valueOf(m_pivotDegrees) + " degrees");
+      System.out.println(
+          "Shooter: pivot reached: " + String.valueOf(m_pivotDegrees) + " degrees\n");
     }
 
     return finished;
