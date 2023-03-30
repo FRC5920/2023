@@ -57,6 +57,9 @@ public enum IntakePreset {
   CloseShotLow(15.0),
   CloseShotMid(20.0),
   CloseShotHigh(30.0),
+  BackShotLow(20.0),
+  BackShotMid(25.0),
+  BackShotHigh(35.0),
   HailMary(100.0);
 
   /** Motor speed as a percentage of full scale output */

@@ -67,6 +67,13 @@ public enum PivotPresets {
   /** Angle used for a short-range shot to the high grid */
   CloseShotHigh(115),
 
+  /** Angle used for a short-range shot to the low grid */
+  BackShotLow(30),
+  /** Angle used for a short-range shot to the middle grid */
+  BackShotMid(60),
+  /** Angle used for a short-range shot to the high grid */
+  BackhotHigh(70),
+
   /** Angle used for a long-range shot to the low grid */
   LongShotLow(170),
   /** Angle used for a long-range shot to the middle grid */
