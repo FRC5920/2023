@@ -180,13 +180,15 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
             Pose3d camPose = targetPose.transformBy(camToTarget.inverse());
 
             var visionMeasurement = camPose.transformBy(CAMERA_TO_ROBOT);
-            if (target.getPoseAmbiguity() <= .05) {
-              visionMeasurementStdDevs = VecBuilder.fill(0.30, 0.3, Units.degreesToRadians(6));
-            } else {
-              visionMeasurementStdDevs = VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(10));
+            // if (target.getPoseAmbiguity() <= .05) {
+            //   visionMeasurementStdDevs = VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(2));
+            // } else {
+            visionMeasurementStdDevs = VecBuilder.fill(0.8, 0.8, Units.degreesToRadians(25));
+            // }
+            if (visionMeasurement.getX() >= 3.3) {
+              poseEstimator.addVisionMeasurement(
+                  visionMeasurement.toPose2d(), resultTimestamp, visionMeasurementStdDevs);
             }
-            poseEstimator.addVisionMeasurement(
-                visionMeasurement.toPose2d(), resultTimestamp, visionMeasurementStdDevs);
           }
         } else {
           SmartDashboard.putString("HeimdallUpdate", "PoseEstimator sees no tags");
