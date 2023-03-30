@@ -54,7 +54,7 @@ package frc.robot.subsystems.Intake;
 /** Preset speeds for use with the Intake subsystem */
 public enum IntakePreset {
   Acquire(-20.0),
-  CloseShotLow(10.0),
+  CloseShotLow(20.0),
   CloseShotMid(15.0),
   CloseShotHigh(35.0),
   HailMary(65.0);
