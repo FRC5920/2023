@@ -131,7 +131,7 @@ public final class Constants {
 
   public static final class SwerveDrivebaseConstants {
     public static final int pigeonID = 41;
-    public static final boolean invertGyro = false; // Always ensure Gyro is CCW+ CW-
+    public static final boolean invertGyro = true; // Always ensure Gyro is CCW+ CW-
 
     public static final COTSFalconSwerveConstants
         // NOTE: this must be tuned to specific robot
@@ -280,7 +280,7 @@ public final class Constants {
     // TODO: get the actual location of the tag camera to the robot transform
     public static final Transform3d CAMERA_TO_ROBOT =
         new Transform3d(
-            new Translation3d(0.220625, 0.0, 0.1725), new Rotation3d(0, 0, Math.toRadians(180)));
+            new Translation3d(-0.220625, 0.0, 0.1725), new Rotation3d(0, 0, Math.toRadians(0)));
 
     public static final Transform3d ROBOT_TO_CAMERA = CAMERA_TO_ROBOT.inverse();
     static final String TagCameraName = "Heimdall_Tag_Camera";
