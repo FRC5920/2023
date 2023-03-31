@@ -120,7 +120,7 @@ public class AutoConstants {
   public static enum AutoType {
     AutoBuilder(0), // Generate auto routine using AutoBuilder
     LinkNBalance(1), // Preset: full link, then balance at end
-    LinkinPark(2); // Preset: full link then park
+    TuningPreset(2); // Presets for path tuning
 
     public final int id;
 
@@ -130,7 +130,7 @@ public class AutoConstants {
 
     /** Returns a list of names of enum elements */
     public static String[] getNames() {
-      return new String[] {"AutoBuilder", "Link + Balance", "Linkin Park"};
+      return new String[] {"AutoBuilder", "Link + Balance", "Tuning Preset"};
     }
   };
 

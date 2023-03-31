@@ -70,6 +70,7 @@ import frc.robot.autos.AutoConstants.Grids;
 import frc.robot.autos.AutoConstants.InitialAction;
 import frc.robot.autos.AutoConstants.SecondaryAction;
 import frc.robot.autos.Preset.LinkAndBalanceAutoBuilder;
+import frc.robot.autos.Preset.PathTuningPresetBuilder;
 import frc.robot.subsystems.Dashboard.IDashboardTab;
 import java.util.*;
 
@@ -96,6 +97,8 @@ public class AutoDashboardTab implements IDashboardTab {
 
   /** Builder used to generate Link+Balance auto commands */
   private LinkAndBalanceAutoBuilder m_linkAndBalanceBuilder;
+
+  PathTuningPresetBuilder m_pathTuningAutoBuilder;
 
   /** The current selected auto command */
   private CommandBase m_currentAutoRoutine;
@@ -126,6 +129,10 @@ public class AutoDashboardTab implements IDashboardTab {
   private final ChooserWithChangeDetection<ChargingStation.BalancePosition>
       m_balancePositionChooser = new ChooserWithChangeDetection<ChargingStation.BalancePosition>();
 
+  /* Chooser used to select between path tuning auto presets */
+  private final ChooserWithChangeDetection<String> m_tuningPathChooser =
+      new ChooserWithChangeDetection<String>();
+
   /** Used to detect when the present alliance changes */
   private Alliance m_lastAlliance;
 
@@ -136,6 +143,7 @@ public class AutoDashboardTab implements IDashboardTab {
   public AutoDashboardTab() {
     m_autoBuilder = new AutoRoutineBuilder();
     m_linkAndBalanceBuilder = new LinkAndBalanceAutoBuilder();
+    m_pathTuningAutoBuilder = new PathTuningPresetBuilder();
     m_field2d = new Field2d();
   }
 
@@ -215,6 +223,14 @@ public class AutoDashboardTab implements IDashboardTab {
         .add("Balance Position", m_balancePositionChooser)
         .withSize(kChooserWidth, kChooserHeight)
         .withPosition(0, 4);
+
+    // Set up a chooser for tuning paths
+    String[] tuningTrajectoryNames = m_pathTuningAutoBuilder.getTrajectoryNames();
+    m_tuningPathChooser.loadOptions(tuningTrajectoryNames, tuningTrajectoryNames, 0);
+    autoBuilderLayout
+        .add("Tuning Trajectory", m_tuningPathChooser)
+        .withSize(kChooserWidth, kChooserHeight)
+        .withPosition(0, 4);
   }
 
   /** Service dashboard tab widgets */
@@ -228,6 +244,7 @@ public class AutoDashboardTab implements IDashboardTab {
     boolean routeHasChanged = m_routeChooser.hasChanged();
     boolean selectedActionChanged = m_secondaryActionChooser.hasChanged();
     boolean balancePositionChanged = m_balancePositionChooser.hasChanged();
+    boolean tuningPresetChanged = m_tuningPathChooser.hasChanged();
 
     if ((m_lastAlliance != currentAlliance)
         || autoTypeChanged
@@ -235,7 +252,8 @@ public class AutoDashboardTab implements IDashboardTab {
         || initialActionChanged
         || routeHasChanged
         || selectedActionChanged
-        || balancePositionChanged) {
+        || balancePositionChanged
+        || tuningPresetChanged) {
 
       System.out.println("<AutoDashboardTab::updateDashboard> processing dashboard value change");
       m_lastAlliance = currentAlliance;
@@ -277,6 +295,16 @@ public class AutoDashboardTab implements IDashboardTab {
             initialPose = m_linkAndBalanceBuilder.getInitialPose();
             m_currentAutoRoutine =
                 m_linkAndBalanceBuilder.getCommand(AutoType.LinkNBalance, botContainer);
+            break;
+          }
+
+        case TuningPreset:
+          {
+            String trajectoryName = m_tuningPathChooser.getSelected();
+            trajectories = List.of(m_pathTuningAutoBuilder.getTrajectory(trajectoryName));
+            initialPose = m_pathTuningAutoBuilder.getInitialPose(trajectoryName);
+            m_currentAutoRoutine = m_pathTuningAutoBuilder.getCommand(trajectoryName, botContainer);
+            break;
           }
       }
 

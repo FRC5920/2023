@@ -49,6 +49,7 @@
       "/Shuffleboard/Auto Builder/AutoBuilder Config/Initial Position": "String Chooser",
       "/Shuffleboard/Auto Builder/AutoBuilder Config/Route": "String Chooser",
       "/Shuffleboard/Auto Builder/AutoBuilder Config/Secondary Action": "String Chooser",
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Tuning Trajectory": "String Chooser",
       "/Shuffleboard/Auto Builder/Balance Position": "String Chooser",
       "/Shuffleboard/Auto Builder/Field": "Field2d",
       "/Shuffleboard/Auto Builder/Initial Action": "String Chooser",
@@ -113,10 +114,15 @@
           "visible": true
         }
       },
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Tuning Trajectory": {
+        "window": {
+          "name": "Tuning Trajectory",
+          "visible": true
+        }
+      },
       "/Shuffleboard/Auto Builder/Balance Position": {
         "window": {
-          "name": "Balance Position",
-          "visible": true
+          "name": "Balance Position"
         }
       },
       "/Shuffleboard/Auto Builder/Field": {
@@ -153,14 +159,12 @@
       },
       "/Shuffleboard/Auto Builder/Initial Action": {
         "window": {
-          "name": "Initial Action",
-          "visible": true
+          "name": "Initial Action"
         }
       },
       "/Shuffleboard/Auto Builder/Initial Position": {
         "window": {
-          "name": "Initial Position",
-          "visible": true
+          "name": "Initial Position"
         }
       },
       "/Shuffleboard/Auto Builder/Rotation PID": {
@@ -171,14 +175,12 @@
       },
       "/Shuffleboard/Auto Builder/Route": {
         "window": {
-          "name": "Escape Route",
-          "visible": true
+          "name": "Escape Route"
         }
       },
       "/Shuffleboard/Auto Builder/Secondary Action": {
         "window": {
-          "name": "Secondary Action",
-          "visible": true
+          "name": "Secondary Action"
         }
       },
       "/Shuffleboard/Auto Builder/Translation PID": {
