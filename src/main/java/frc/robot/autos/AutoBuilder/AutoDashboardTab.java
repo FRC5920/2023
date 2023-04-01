@@ -69,7 +69,7 @@ import frc.robot.autos.AutoConstants.EscapeRoute;
 import frc.robot.autos.AutoConstants.Grids;
 import frc.robot.autos.AutoConstants.InitialAction;
 import frc.robot.autos.AutoConstants.SecondaryAction;
-import frc.robot.autos.Preset.LinkAndBalanceAutoBuilder;
+import frc.robot.autos.Preset.PresetAutoBuilder;
 import frc.robot.subsystems.Dashboard.IDashboardTab;
 import java.util.*;
 
@@ -94,8 +94,8 @@ public class AutoDashboardTab implements IDashboardTab {
   /** Builder used to generate Auto commands */
   private AutoRoutineBuilder m_autoBuilder;
 
-  /** Builder used to generate Link+Balance auto commands */
-  private LinkAndBalanceAutoBuilder m_linkAndBalanceBuilder;
+  /** Builder used to generate preset auto commands */
+  private PresetAutoBuilder m_presetAutoBuilder;
 
   /** The current selected auto command */
   private CommandBase m_currentAutoRoutine;
@@ -135,7 +135,7 @@ public class AutoDashboardTab implements IDashboardTab {
   /** Creates an instance of the tab */
   public AutoDashboardTab() {
     m_autoBuilder = new AutoRoutineBuilder();
-    m_linkAndBalanceBuilder = new LinkAndBalanceAutoBuilder();
+    m_presetAutoBuilder = new PresetAutoBuilder();
     m_field2d = new Field2d();
   }
 
@@ -271,12 +271,14 @@ public class AutoDashboardTab implements IDashboardTab {
             break;
           }
 
-        case LinkNBalance:
+        case NorthLinkAndBalance:
+        case NorthLinkAndBalanceOverCS:
+        case SouthLinkAndBalance:
           {
-            trajectories = m_linkAndBalanceBuilder.getTrajectories();
-            initialPose = m_linkAndBalanceBuilder.getInitialPose();
-            m_currentAutoRoutine =
-                m_linkAndBalanceBuilder.getCommand(AutoType.LinkNBalance, botContainer);
+            AutoType autoType = m_autoTypeChooser.getSelected();
+            trajectories = m_presetAutoBuilder.getTrajectories(autoType);
+            initialPose = m_presetAutoBuilder.getInitialPose(autoType);
+            m_currentAutoRoutine = m_presetAutoBuilder.getCommand(autoType, botContainer);
           }
       }
 
