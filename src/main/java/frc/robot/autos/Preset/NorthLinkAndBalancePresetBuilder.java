@@ -69,13 +69,13 @@ import frc.lib.utility.BotLog;
 import frc.lib.utility.TrajectoryLoader;
 import frc.robot.Constants.GameTarget;
 import frc.robot.RobotContainer;
+import frc.robot.autos.AutoConstants.BotOrientation;
 import frc.robot.autos.AutoConstants.CargoLocation;
 import frc.robot.autos.AutoConstants.FieldCoordinates;
 import frc.robot.commands.Balance;
 import frc.robot.commands.Shooter.SetShooterAngle;
 import frc.robot.commands.Shooter.Shoot;
 import frc.robot.commands.Shooter.Shoot.ShootConfig;
-import frc.robot.commands.Shooter.ShooterPresets;
 import frc.robot.commands.zTarget.AutoIntakeWithZTargeting;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.ShooterPivot.PivotPresets;
@@ -90,7 +90,11 @@ import java.util.function.Supplier;
 public class NorthLinkAndBalancePresetBuilder {
 
   /** Configuration used to shoot the initial pre-loaded cube at the beginning of the auto */
-  private static final ShootConfig kInitialShotConfig = ShooterPresets.CloseShotLow.config;
+  private static final ShootConfig kInitialShotConfig = new ShootConfig(20, 22.5);
+
+  private static final ShootConfig kCloseShotConfig = new ShootConfig(20, 15);
+
+  private static final ShootConfig kBalanceShotConfig = new ShootConfig(20, 50);
 
   /** Default PID gains applied to translation when following trajectories */
   private static final PIDConstants kDefaultTranslationPIDGains = new PIDConstants(8.0, 0.0, 0.2);
@@ -152,7 +156,7 @@ public class NorthLinkAndBalancePresetBuilder {
             new BotLog.PrintCommand("Set initial pose"),
             new InstantCommand(
                 () -> {
-                  swerveSubsystem.zeroGyro();
+                  swerveSubsystem.resetGyro(BotOrientation.kFacingGrid);
                   swerveSubsystem.resetOdometry(initialPose);
                   botContainer.poseEstimatorSubsystem.setCurrentPose(initialPose);
                 }),
@@ -187,7 +191,7 @@ public class NorthLinkAndBalancePresetBuilder {
                 kDefaultRotationPIDGains,
                 new PathConstraints(kDefaultMaxVelocity, kDefaultMaxAcceleration)),
             new BotLog.PrintCommand("<Link+Balance> shoot C1"),
-            new Shoot(ShooterPresets.CloseShotLow, shooterPivotSubsystem, intakeSubsystem),
+            new Shoot(kCloseShotConfig, shooterPivotSubsystem, intakeSubsystem),
             // Move to and acquire C2
             new BotLog.PrintCommand("<Link+Balance> move to acquire C2"),
             m_northLNBAcquireC2Loader.generateTrajectoryCommand(
@@ -216,7 +220,7 @@ public class NorthLinkAndBalancePresetBuilder {
                 kDefaultRotationPIDGains,
                 new PathConstraints(kDefaultMaxVelocity, kDefaultMaxAcceleration)),
             new BotLog.PrintCommand("<Link+Balance> shoot C2"),
-            new Shoot(ShooterPresets.CloseShotLow, shooterPivotSubsystem, intakeSubsystem),
+            new Shoot(kCloseShotConfig, shooterPivotSubsystem, intakeSubsystem),
             // Mount the Charging Station and balance
             new BotLog.PrintCommand("<Link+Balance> mount Charging Station"),
             m_northLNBMountCSLoader.generateTrajectoryCommand(

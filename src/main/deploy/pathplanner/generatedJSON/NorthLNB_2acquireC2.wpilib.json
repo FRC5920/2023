@@ -627,7 +627,7 @@
     "curvature": -0.06177411336546682,
     "holonomicRotation": 179.5410692777502,
     "angularVelocity": -0.09699540903354707,
-    "holonomicAngularVelocity": -11.588244109968448
+    "holonomicAngularVelocity": -11.588244109965295
   },
   {
     "time": 0.529988587137047,
@@ -643,9 +643,9 @@
     "velocity": 1.5899657614111409,
     "acceleration": 3.0000000000000124,
     "curvature": -0.0613757311651226,
-    "holonomicRotation": 179.4366037212328,
+    "holonomicRotation": 179.43660372123284,
     "angularVelocity": -0.09802327287859122,
-    "holonomicAngularVelocity": -12.01056962721235
+    "holonomicAngularVelocity": -12.010569627215531
   },
   {
     "time": 0.5389218095794279,
@@ -717,7 +717,7 @@
     "curvature": -0.06003754779317042,
     "holonomicRotation": 178.99063780354703,
     "angularVelocity": -0.102218154385113,
-    "holonomicAngularVelocity": -13.71257110652919
+    "holonomicAngularVelocity": -13.712571106525898
   },
   {
     "time": 0.5738993292946168,
@@ -733,9 +733,9 @@
     "velocity": 1.721697987883851,
     "acceleration": 3.000000000000013,
     "curvature": -0.0597618189165533,
-    "holonomicRotation": 178.87220843159693,
+    "holonomicRotation": 178.87220843159696,
     "angularVelocity": -0.10329273273958535,
-    "holonomicAngularVelocity": -14.140642092119192
+    "holonomicAngularVelocity": -14.14064209212251
   },
   {
     "time": 0.5824680901913312,
@@ -789,7 +789,7 @@
     "curvature": -0.059062035799322045,
     "holonomicRotation": 178.50056682596087,
     "angularVelocity": -0.10659233979051744,
-    "holonomicAngularVelocity": -15.429237633696687
+    "holonomicAngularVelocity": -15.42923763370008
   },
   {
     "time": 0.6077889170616577,
@@ -805,9 +805,9 @@
     "velocity": 1.8233667511849736,
     "acceleration": 3.0000000000000133,
     "curvature": -0.05886879150853325,
-    "holonomicRotation": 178.37130033507208,
+    "holonomicRotation": 178.37130033507205,
     "angularVelocity": -0.10772002840162863,
-    "holonomicAngularVelocity": -15.859883762447167
+    "holonomicAngularVelocity": -15.859883762443749
   },
   {
     "time": 0.6161071243532731,
@@ -843,7 +843,7 @@
     "curvature": -0.058538413636526725,
     "holonomicRotation": 178.1048102563033,
     "angularVelocity": -0.11002132904687965,
-    "holonomicAngularVelocity": -16.72225342767145
+    "holonomicAngularVelocity": -16.722253427667987
   },
   {
     "time": 0.6325707322677422,
@@ -859,9 +859,9 @@
     "velocity": 1.8977121968032271,
     "acceleration": 3.000000000000027,
     "curvature": -0.05840012374105024,
-    "holonomicRotation": 177.96762875029597,
+    "holonomicRotation": 177.967628750296,
     "angularVelocity": -0.11119624453827316,
-    "holonomicAngularVelocity": -17.153787680695547
+    "holonomicAngularVelocity": -17.153787680699033
   },
   {
     "time": 0.6407191991868022,

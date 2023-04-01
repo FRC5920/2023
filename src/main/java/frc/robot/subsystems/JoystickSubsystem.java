@@ -273,7 +273,7 @@ public class JoystickSubsystem extends SubsystemBase {
 
     if (kOperatorControllerIsEnabled) {
       double testAngleDeg = 20;
-      double testSpeedPercent = 35;
+      double testSpeedPercent = 32;
 
       // Map buttons on operator controller
       operatorController.A.onTrue(

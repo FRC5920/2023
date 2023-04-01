@@ -169,17 +169,19 @@ public class Balance extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    if (m_balancePerpetually) {
+      return false;
+    }
+
     boolean finished = false;
     if (RobotBase.isReal()) {
       finished =
-          !m_balancePerpetually
-              && xController.atSetpoint()
-              && yController.atSetpoint()
-              && omegaController.atSetpoint();
+          xController.atSetpoint() && yController.atSetpoint() && omegaController.atSetpoint();
     } else {
       // In simulation mode, simulate Balance with a delay
       finished = m_simulationTimer.hasElapsed(1.0);
     }
+
     return finished;
   }
 }
