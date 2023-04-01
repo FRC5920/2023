@@ -52,6 +52,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -65,6 +66,8 @@ public class Balance extends CommandBase {
   private static final double SwerveP = 0.07;
   private static final double SwerveI = 0.00;
   private static final double SwervekD = 0.0;
+
+  private final Rotation2d m_targetRotation;
   private final PIDController xController = new PIDController(SwerveP, SwerveI, SwervekD);
   private final PIDController yController = new PIDController(SwerveP, SwerveI, SwervekD);
   private final PIDController omegaController = new PIDController(SwerveP, SwerveI, SwervekD);
@@ -76,7 +79,18 @@ public class Balance extends CommandBase {
   /** Creates a new Balance. */
   public Balance(Swerve drivetrainSubsystem) {
     this.drivetrainSubsystem = drivetrainSubsystem;
+    this.m_targetRotation = null; // Control to whatever the present yaw is
+    xController.setTolerance(3);
+    yController.setTolerance(3);
+    omegaController.setTolerance(Units.degreesToRadians(3));
+    omegaController.enableContinuousInput(-Math.PI, Math.PI);
+    m_simulationTimer = new Timer();
+    addRequirements(drivetrainSubsystem);
+  }
 
+  public Balance(Swerve drivetrainSubsystem, Rotation2d targetRotation) {
+    this.drivetrainSubsystem = drivetrainSubsystem;
+    m_targetRotation = targetRotation;
     xController.setTolerance(3);
     yController.setTolerance(3);
     omegaController.setTolerance(Units.degreesToRadians(3));
@@ -106,7 +120,12 @@ public class Balance extends CommandBase {
     // drivetrainSubsystem.getRoll();
     xController.setSetpoint(0);
     yController.setSetpoint(0);
-    omegaController.setSetpoint(drivetrainSubsystem.getYaw().getRadians());
+    // If a target rotation was not given in the constructor, just control to
+    // whatever the present yaw is
+    omegaController.setSetpoint(
+        m_targetRotation != null
+            ? m_targetRotation.getRadians()
+            : drivetrainSubsystem.getYaw().getRadians());
 
     // Drive to the target
     var xSpeed = xController.calculate(-drivetrainSubsystem.getPitch().getDegrees());

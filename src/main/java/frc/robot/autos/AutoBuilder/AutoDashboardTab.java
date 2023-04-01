@@ -294,6 +294,7 @@ public class AutoDashboardTab implements IDashboardTab {
           (String name, PathPlannerTrajectory traj) ->
               m_field2d.getObject(name).setTrajectory(traj));
 
+      botContainer.swerveSubsystem.resetGyro(initialPose.getRotation());
       botContainer.swerveSubsystem.resetOdometry(initialPose);
     }
 

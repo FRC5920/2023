@@ -268,9 +268,9 @@ public class Swerve extends SubsystemBase {
   }
 
   /** Zeros the gyro, setting it to a specified angle */
-  private void resetGyro(Rotation2d angle) {
+  public void resetGyro(Rotation2d angle) {
     m_gyroMeasurements.yawRad = angle.getRadians();
-    m_gyroIO.setYaw(kAngleZero);
+    m_gyroIO.setYaw(angle);
   }
 
   /** Returns the yaw measurement */

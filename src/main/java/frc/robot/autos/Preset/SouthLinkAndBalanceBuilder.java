@@ -55,6 +55,7 @@ import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.PIDConstants;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -69,13 +70,13 @@ import frc.lib.utility.BotLog;
 import frc.lib.utility.TrajectoryLoader;
 import frc.robot.Constants.GameTarget;
 import frc.robot.RobotContainer;
+import frc.robot.autos.AutoConstants.BotOrientation;
 import frc.robot.autos.AutoConstants.CargoLocation;
 import frc.robot.autos.AutoConstants.FieldCoordinates;
 import frc.robot.commands.Balance;
 import frc.robot.commands.Shooter.SetShooterAngle;
 import frc.robot.commands.Shooter.Shoot;
 import frc.robot.commands.Shooter.Shoot.ShootConfig;
-import frc.robot.commands.Shooter.ShooterPresets;
 import frc.robot.commands.zTarget.AutoIntakeWithZTargeting;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.ShooterPivot.PivotPresets;
@@ -90,12 +91,17 @@ import java.util.function.Supplier;
 public class SouthLinkAndBalanceBuilder {
 
   /** Configuration used to shoot the initial pre-loaded cube at the beginning of the auto */
-  private static final ShootConfig kInitialShotConfig = ShooterPresets.CloseShotLow.config;
+  private static final ShootConfig kCableProtectorShootConfig = new ShootConfig(20, 60);
+
+  private static final ShootConfig kBalanceShootConfig = new ShootConfig(20, 65);
 
   /** Default PID gains applied to translation when following trajectories */
   private static final PIDConstants kDefaultTranslationPIDGains = new PIDConstants(8.0, 0.0, 0.2);
   /** Default PID gains applied to rotation when following trajectories */
   private static final PIDConstants kDefaultRotationPIDGains = new PIDConstants(10.0, 0.0, 0.2);
+
+  /** Holonomic rotation to use when balancing */
+  private static final Rotation2d kBalanceRotation = Rotation2d.fromDegrees(-169.20);
 
   /** Max velocity used when following PathPlanner trajectories */
   private static final double kDefaultMaxVelocity = 5.0;
@@ -151,13 +157,13 @@ public class SouthLinkAndBalanceBuilder {
             new BotLog.SimulationPrinter("Set initial pose"),
             new InstantCommand(
                 () -> {
-                  swerveSubsystem.zeroGyro();
+                  swerveSubsystem.resetGyro(BotOrientation.kFacingGrid);
                   swerveSubsystem.resetOdometry(initialPose);
                   botContainer.poseEstimatorSubsystem.setCurrentPose(initialPose);
                 }),
             // Shoot pre-loaded cube
             new BotLog.SimulationPrinter(autoName + " shoot pre-loaded cargo"),
-            new Shoot(kInitialShotConfig, shooterPivotSubsystem, intakeSubsystem),
+            new Shoot(kCableProtectorShootConfig, shooterPivotSubsystem, intakeSubsystem),
             // Move to and acquire C1
             new BotLog.SimulationPrinter(autoName + " move to acquire C4"),
             m_acquireC4Loader.generateTrajectoryCommand(
@@ -186,7 +192,7 @@ public class SouthLinkAndBalanceBuilder {
                 kDefaultRotationPIDGains,
                 new PathConstraints(kDefaultMaxVelocity, kDefaultMaxAcceleration)),
             new BotLog.SimulationPrinter(autoName + " shoot C4"),
-            new Shoot(ShooterPresets.CloseShotLow, shooterPivotSubsystem, intakeSubsystem),
+            new Shoot(kCableProtectorShootConfig, shooterPivotSubsystem, intakeSubsystem),
             // Move to and acquire C2
             new BotLog.SimulationPrinter(autoName + " move to acquire C3"),
             m_acquireC3Loader.generateTrajectoryCommand(
@@ -215,9 +221,9 @@ public class SouthLinkAndBalanceBuilder {
                 kDefaultRotationPIDGains,
                 new PathConstraints(kDefaultMaxVelocity, kDefaultMaxAcceleration)),
             new BotLog.SimulationPrinter(autoName + " Balance on Charging Station"),
-            new Balance(swerveSubsystem),
+            new Balance(swerveSubsystem, kBalanceRotation),
             new BotLog.SimulationPrinter(autoName + " shoot C3"),
-            new Shoot(ShooterPresets.CloseShotLow, shooterPivotSubsystem, intakeSubsystem));
+            new Shoot(kBalanceShootConfig, shooterPivotSubsystem, intakeSubsystem));
     return autoCommands;
   }
 
