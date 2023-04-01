@@ -98,7 +98,7 @@ public class NorthLinkOverCSPresetBuilder {
   private static final ShootConfig kBalanceShootConfig = new ShootConfig(20, 50);
 
   /** Holonomic rotation to use when balancing */
-  private static final Rotation2d kBalanceRotation = Rotation2d.fromDegrees(-182.5);
+  private static final Rotation2d kBalanceRotation = Rotation2d.fromDegrees(170.0);
 
   /** Default PID gains applied to translation when following trajectories */
   private static final PIDConstants kDefaultTranslationPIDGains = new PIDConstants(8.0, 0.0, 0.2);
