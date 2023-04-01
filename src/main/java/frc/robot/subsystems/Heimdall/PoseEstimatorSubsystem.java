@@ -185,7 +185,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
             // } else {
             visionMeasurementStdDevs = VecBuilder.fill(0.8, 0.8, Units.degreesToRadians(25));
             // }
-            if (visionMeasurement.getX() >= 3.3) {
+            if (visionMeasurement.getX() >= 3.3) {//TODO: make this work off of swerve pose, not vision pose.
               poseEstimator.addVisionMeasurement(
                   visionMeasurement.toPose2d(), resultTimestamp, visionMeasurementStdDevs);
             }
