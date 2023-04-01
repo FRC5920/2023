@@ -248,7 +248,7 @@ public class IntakeSubsystem extends SubsystemBase {
       // Configure the motors to ramp up to speed.  This eliminates the initial inrush current spike
       // that occurs as the motor starts up and has to overcome the inertia of itself and the
       // rollers
-      motor.configOpenloopRamp(kOpenLoopRampSec);
+      motor.configOpenloopRamp(0);
 
       // Full-scale output for the motor will be scaled to 11 Volts
       motor.configVoltageCompSaturation(kMotorVoltageCompensationFullScale);

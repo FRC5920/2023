@@ -63,7 +63,10 @@ public enum ShooterPresets {
 
   HailMaryLow(PivotPresets.CloseShotLow.angleDegrees, IntakePreset.HailMary.motorSpeed),
   HailMaryMid(PivotPresets.CloseShotMid.angleDegrees, IntakePreset.HailMary.motorSpeed),
-  HailMaryHigh(PivotPresets.CloseShotHigh.angleDegrees, IntakePreset.HailMary.motorSpeed);
+  HailMaryHigh(PivotPresets.CloseShotHigh.angleDegrees, IntakePreset.HailMary.motorSpeed),
+
+  // Shoot in reverse from the cable protector
+  ReverseFromCableProtector(20, 60);
 
   public final ShootConfig config;
 

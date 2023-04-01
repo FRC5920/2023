@@ -69,6 +69,7 @@ import frc.robot.autos.AutoConstants.FieldCoordinates;
 import frc.robot.commands.Shooter.Acquire;
 import frc.robot.commands.Shooter.SetShooterAngle;
 import frc.robot.commands.Shooter.Shoot;
+import frc.robot.commands.Shooter.Shoot.ShootConfig;
 import frc.robot.commands.Shooter.ShooterPresets;
 import frc.robot.commands.SimulationPrinter;
 import frc.robot.commands.SnapToGrid;
@@ -82,7 +83,7 @@ import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 public class JoystickSubsystem extends SubsystemBase {
 
   public static final boolean kDriverControllerIsEnabled = true;
-  public static final boolean kOperatorControllerIsEnabled = false;
+  public static final boolean kOperatorControllerIsEnabled = true;
 
   public enum ControllerId {
     kDriver(0),
@@ -271,8 +272,12 @@ public class JoystickSubsystem extends SubsystemBase {
     }
 
     if (kOperatorControllerIsEnabled) {
+      double testAngleDeg = 20;
+      double testSpeedPercent = 60;
+
       // Map buttons on operator controller
-      operatorController.A.onTrue(new Shoot(ShooterPresets.CloseShotLow, shooterPivot, intake));
+      operatorController.A.onTrue(
+          new Shoot(new ShootConfig(testAngleDeg, testSpeedPercent), shooterPivot, intake));
       operatorController.B.onTrue(new Shoot(ShooterPresets.CloseShotMid, shooterPivot, intake));
       operatorController.Y.onTrue(new Shoot(ShooterPresets.CloseShotHigh, shooterPivot, intake));
 
