@@ -60,7 +60,8 @@ public class BotLog {
   public static BotLog instance = new BotLog();
 
   /** The maximum logging level */
-  public static MessageType verbosity = MessageType.Error;
+  public static MessageType verbosity = MessageType.Debug;
+
   /** Consumer that receives non-error log messages */
   public Consumer<String> logSink = (str) -> System.out.println(str);
   /** Consumer that receives error log messages */

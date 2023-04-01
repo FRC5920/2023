@@ -91,7 +91,7 @@ import java.util.function.Supplier;
 public class SouthLinkAndBalanceBuilder {
 
   /** Configuration used to shoot the initial pre-loaded cube at the beginning of the auto */
-  private static final ShootConfig kCableProtectorShootConfig = new ShootConfig(20, 60);
+  private static final ShootConfig kCableProtectorShootConfig = new ShootConfig(20, 40);
 
   private static final ShootConfig kBalanceShootConfig = new ShootConfig(20, 65);
 
@@ -154,7 +154,7 @@ public class SouthLinkAndBalanceBuilder {
     CommandBase autoCommands =
         Commands.sequence(
             // First, a command to reset the robot pose to the initial position
-            new BotLog.SimulationPrinter("Set initial pose"),
+            new BotLog.PrintCommand("Set initial pose"),
             new InstantCommand(
                 () -> {
                   swerveSubsystem.resetGyro(BotOrientation.kFacingGrid);
@@ -162,10 +162,10 @@ public class SouthLinkAndBalanceBuilder {
                   botContainer.poseEstimatorSubsystem.setCurrentPose(initialPose);
                 }),
             // Shoot pre-loaded cube
-            new BotLog.SimulationPrinter(autoName + " shoot pre-loaded cargo"),
+            new BotLog.PrintCommand(autoName + " shoot pre-loaded cargo"),
             new Shoot(kCableProtectorShootConfig, shooterPivotSubsystem, intakeSubsystem),
             // Move to and acquire C1
-            new BotLog.SimulationPrinter(autoName + " move to acquire C4"),
+            new BotLog.PrintCommand(autoName + " move to acquire C4"),
             m_acquireC4Loader.generateTrajectoryCommand(
                 autoName,
                 intakeEventMap,
@@ -174,7 +174,7 @@ public class SouthLinkAndBalanceBuilder {
                 kDefaultRotationPIDGains,
                 new PathConstraints(kDefaultMaxVelocity, kDefaultMaxAcceleration)),
             // Use vision and Z-targeting to intake C1
-            new BotLog.SimulationPrinter(autoName + " acquire C4"),
+            new BotLog.PrintCommand(autoName + " acquire C4"),
             new AutoIntakeWithZTargeting(
                 GameTarget.Cube,
                 botContainer.ArmCamera,
@@ -183,7 +183,7 @@ public class SouthLinkAndBalanceBuilder {
                 intakeSubsystem,
                 c1AcquireBoundary),
             // Move and shoot C1
-            new BotLog.SimulationPrinter(autoName + " move to shoot C4"),
+            new BotLog.PrintCommand(autoName + " move to shoot C4"),
             m_shootC4Loader.generateTrajectoryCommand(
                 autoName,
                 intakeEventMap,
@@ -191,10 +191,10 @@ public class SouthLinkAndBalanceBuilder {
                 kDefaultTranslationPIDGains,
                 kDefaultRotationPIDGains,
                 new PathConstraints(kDefaultMaxVelocity, kDefaultMaxAcceleration)),
-            new BotLog.SimulationPrinter(autoName + " shoot C4"),
+            new BotLog.PrintCommand(autoName + " shoot C4"),
             new Shoot(kCableProtectorShootConfig, shooterPivotSubsystem, intakeSubsystem),
             // Move to and acquire C2
-            new BotLog.SimulationPrinter(autoName + " move to acquire C3"),
+            new BotLog.PrintCommand(autoName + " move to acquire C3"),
             m_acquireC3Loader.generateTrajectoryCommand(
                 autoName,
                 intakeEventMap,
@@ -203,7 +203,7 @@ public class SouthLinkAndBalanceBuilder {
                 kDefaultRotationPIDGains,
                 new PathConstraints(kDefaultMaxVelocity, kDefaultMaxAcceleration)),
             // Use vision and Z-targeting to intake C2
-            new BotLog.SimulationPrinter(autoName + " acquire C3"),
+            new BotLog.PrintCommand(autoName + " acquire C3"),
             new AutoIntakeWithZTargeting(
                 GameTarget.Cube,
                 botContainer.ArmCamera,
@@ -212,7 +212,7 @@ public class SouthLinkAndBalanceBuilder {
                 intakeSubsystem,
                 c2AcquireBoundary),
             // Move and shoot C2
-            new BotLog.SimulationPrinter(autoName + " mount CS to shoot C3"),
+            new BotLog.PrintCommand(autoName + " mount CS to shoot C3"),
             m_mountCSLoader.generateTrajectoryCommand(
                 autoName,
                 intakeEventMap,
@@ -220,10 +220,12 @@ public class SouthLinkAndBalanceBuilder {
                 kDefaultTranslationPIDGains,
                 kDefaultRotationPIDGains,
                 new PathConstraints(kDefaultMaxVelocity, kDefaultMaxAcceleration)),
-            new BotLog.SimulationPrinter(autoName + " Balance on Charging Station"),
+            new BotLog.PrintCommand(autoName + " Balance on Charging Station"),
             new Balance(swerveSubsystem, kBalanceRotation),
-            new BotLog.SimulationPrinter(autoName + " shoot C3"),
-            new Shoot(kBalanceShootConfig, shooterPivotSubsystem, intakeSubsystem));
+            new BotLog.PrintCommand(autoName + " shoot C3 and balance"),
+            Commands.parallel(
+                new Shoot(kBalanceShootConfig, shooterPivotSubsystem, intakeSubsystem),
+                new Balance(swerveSubsystem)));
     return autoCommands;
   }
 

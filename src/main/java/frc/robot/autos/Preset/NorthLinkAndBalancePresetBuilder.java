@@ -149,7 +149,7 @@ public class NorthLinkAndBalancePresetBuilder {
     CommandBase autoCommands =
         Commands.sequence(
             // First, a command to reset the robot pose to the initial position
-            new BotLog.SimulationPrinter("Set initial pose"),
+            new BotLog.PrintCommand("Set initial pose"),
             new InstantCommand(
                 () -> {
                   swerveSubsystem.zeroGyro();
@@ -157,10 +157,10 @@ public class NorthLinkAndBalancePresetBuilder {
                   botContainer.poseEstimatorSubsystem.setCurrentPose(initialPose);
                 }),
             // Shoot pre-loaded cube
-            new BotLog.SimulationPrinter("<Link+Balance> shoot pre-loaded cargo"),
+            new BotLog.PrintCommand("<Link+Balance> shoot pre-loaded cargo"),
             new Shoot(kInitialShotConfig, shooterPivotSubsystem, intakeSubsystem),
             // Move to and acquire C1
-            new BotLog.SimulationPrinter("<Link+Balance> move to acquire C1"),
+            new BotLog.PrintCommand("<Link+Balance> move to acquire C1"),
             m_northLNBAcquireC1Loader.generateTrajectoryCommand(
                 autoName,
                 intakeEventMap,
@@ -169,7 +169,7 @@ public class NorthLinkAndBalancePresetBuilder {
                 kDefaultRotationPIDGains,
                 new PathConstraints(kDefaultMaxVelocity, kDefaultMaxAcceleration)),
             // Use vision and Z-targeting to intake C1
-            new BotLog.SimulationPrinter("<Link+Balance> acquire C1"),
+            new BotLog.PrintCommand("<Link+Balance> acquire C1"),
             new AutoIntakeWithZTargeting(
                 GameTarget.Cube,
                 botContainer.ArmCamera,
@@ -178,7 +178,7 @@ public class NorthLinkAndBalancePresetBuilder {
                 intakeSubsystem,
                 c1AcquireBoundary),
             // Move and shoot C1
-            new BotLog.SimulationPrinter("<Link+Balance> move to shoot C1"),
+            new BotLog.PrintCommand("<Link+Balance> move to shoot C1"),
             m_northLNBShootC1Loader.generateTrajectoryCommand(
                 autoName,
                 intakeEventMap,
@@ -186,10 +186,10 @@ public class NorthLinkAndBalancePresetBuilder {
                 kDefaultTranslationPIDGains,
                 kDefaultRotationPIDGains,
                 new PathConstraints(kDefaultMaxVelocity, kDefaultMaxAcceleration)),
-            new BotLog.SimulationPrinter("<Link+Balance> shoot C1"),
+            new BotLog.PrintCommand("<Link+Balance> shoot C1"),
             new Shoot(ShooterPresets.CloseShotLow, shooterPivotSubsystem, intakeSubsystem),
             // Move to and acquire C2
-            new BotLog.SimulationPrinter("<Link+Balance> move to acquire C2"),
+            new BotLog.PrintCommand("<Link+Balance> move to acquire C2"),
             m_northLNBAcquireC2Loader.generateTrajectoryCommand(
                 autoName,
                 intakeEventMap,
@@ -198,7 +198,7 @@ public class NorthLinkAndBalancePresetBuilder {
                 kDefaultRotationPIDGains,
                 new PathConstraints(kDefaultMaxVelocity, kDefaultMaxAcceleration)),
             // Use vision and Z-targeting to intake C2
-            new BotLog.SimulationPrinter("<Link+Balance> acquire C2"),
+            new BotLog.PrintCommand("<Link+Balance> acquire C2"),
             new AutoIntakeWithZTargeting(
                 GameTarget.Cube,
                 botContainer.ArmCamera,
@@ -207,7 +207,7 @@ public class NorthLinkAndBalancePresetBuilder {
                 intakeSubsystem,
                 c2AcquireBoundary),
             // Move and shoot C2
-            new BotLog.SimulationPrinter("<Link+Balance> move to shoot C2"),
+            new BotLog.PrintCommand("<Link+Balance> move to shoot C2"),
             m_northLNBShootC2Loader.generateTrajectoryCommand(
                 autoName,
                 intakeEventMap,
@@ -215,10 +215,10 @@ public class NorthLinkAndBalancePresetBuilder {
                 kDefaultTranslationPIDGains,
                 kDefaultRotationPIDGains,
                 new PathConstraints(kDefaultMaxVelocity, kDefaultMaxAcceleration)),
-            new BotLog.SimulationPrinter("<Link+Balance> shoot C2"),
+            new BotLog.PrintCommand("<Link+Balance> shoot C2"),
             new Shoot(ShooterPresets.CloseShotLow, shooterPivotSubsystem, intakeSubsystem),
             // Mount the Charging Station and balance
-            new BotLog.SimulationPrinter("<Link+Balance> mount Charging Station"),
+            new BotLog.PrintCommand("<Link+Balance> mount Charging Station"),
             m_northLNBMountCSLoader.generateTrajectoryCommand(
                 autoName,
                 intakeEventMap,
@@ -226,7 +226,7 @@ public class NorthLinkAndBalancePresetBuilder {
                 kDefaultTranslationPIDGains,
                 kDefaultRotationPIDGains,
                 new PathConstraints(kDefaultMaxVelocity, kDefaultMaxAcceleration)),
-            new BotLog.SimulationPrinter("<Link+Balance> balance on Charging Station"),
+            new BotLog.PrintCommand("<Link+Balance> balance on Charging Station"),
             new Balance(swerveSubsystem));
     return autoCommands;
   }

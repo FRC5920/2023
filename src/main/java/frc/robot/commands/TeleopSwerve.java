@@ -59,7 +59,7 @@ import frc.robot.subsystems.JoystickSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 
 public class TeleopSwerve extends CommandBase {
-  private static final boolean kControlsInverted = false;
+  private static final boolean kControlsInverted = true;
   private double rotation;
   private Translation2d translation;
   private boolean fieldRelative;

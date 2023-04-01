@@ -148,7 +148,7 @@ public class NorthLinkOverCSPresetBuilder {
     CommandBase autoCommands =
         Commands.sequence(
             // First, a command to reset the robot pose to the initial position
-            new BotLog.SimulationPrinter("Set initial pose"),
+            new BotLog.PrintCommand("Set initial pose"),
             new InstantCommand(
                 () -> {
                   swerveSubsystem.zeroGyro();
@@ -156,10 +156,10 @@ public class NorthLinkOverCSPresetBuilder {
                   botContainer.poseEstimatorSubsystem.setCurrentPose(initialPose);
                 }),
             // Shoot pre-loaded cube
-            new BotLog.SimulationPrinter(autoName + " shoot pre-loaded cargo"),
+            new BotLog.PrintCommand(autoName + " shoot pre-loaded cargo"),
             new Shoot(kInitialShotConfig, shooterPivotSubsystem, intakeSubsystem),
             // Move to and acquire C1
-            new BotLog.SimulationPrinter(autoName + " move to acquire C1"),
+            new BotLog.PrintCommand(autoName + " move to acquire C1"),
             m_NorthOverCSAcquireC1Loader.generateTrajectoryCommand(
                 autoName,
                 intakeEventMap,
@@ -168,7 +168,7 @@ public class NorthLinkOverCSPresetBuilder {
                 kDefaultRotationPIDGains,
                 new PathConstraints(kDefaultMaxVelocity, kDefaultMaxAcceleration)),
             // Use vision and Z-targeting to intake C1
-            new BotLog.SimulationPrinter(autoName + " acquire C1"),
+            new BotLog.PrintCommand(autoName + " acquire C1"),
             new AutoIntakeWithZTargeting(
                 GameTarget.Cube,
                 botContainer.ArmCamera,
@@ -177,7 +177,7 @@ public class NorthLinkOverCSPresetBuilder {
                 intakeSubsystem,
                 c1AcquireBoundary),
             // Move and shoot C1
-            new BotLog.SimulationPrinter(autoName + " move to shoot C1"),
+            new BotLog.PrintCommand(autoName + " move to shoot C1"),
             m_NorthOverCSShootC1Loader.generateTrajectoryCommand(
                 autoName,
                 intakeEventMap,
@@ -185,10 +185,10 @@ public class NorthLinkOverCSPresetBuilder {
                 kDefaultTranslationPIDGains,
                 kDefaultRotationPIDGains,
                 new PathConstraints(kDefaultMaxVelocity, kDefaultMaxAcceleration)),
-            new BotLog.SimulationPrinter(autoName + " shoot C1"),
+            new BotLog.PrintCommand(autoName + " shoot C1"),
             new Shoot(ShooterPresets.CloseShotLow, shooterPivotSubsystem, intakeSubsystem),
             // Move to and acquire C2
-            new BotLog.SimulationPrinter(autoName + " move to acquire C2"),
+            new BotLog.PrintCommand(autoName + " move to acquire C2"),
             m_NorthOverCSAcquireC2Loader.generateTrajectoryCommand(
                 autoName,
                 intakeEventMap,
@@ -197,7 +197,7 @@ public class NorthLinkOverCSPresetBuilder {
                 kDefaultRotationPIDGains,
                 new PathConstraints(kDefaultMaxVelocity, kDefaultMaxAcceleration)),
             // Use vision and Z-targeting to intake C2
-            new BotLog.SimulationPrinter(autoName + " acquire C2"),
+            new BotLog.PrintCommand(autoName + " acquire C2"),
             new AutoIntakeWithZTargeting(
                 GameTarget.Cube,
                 botContainer.ArmCamera,
@@ -206,7 +206,7 @@ public class NorthLinkOverCSPresetBuilder {
                 intakeSubsystem,
                 c2AcquireBoundary),
             // Move and shoot C2
-            new BotLog.SimulationPrinter(autoName + " mount CS to shoot C2"),
+            new BotLog.PrintCommand(autoName + " mount CS to shoot C2"),
             m_NorthOverCSMountCSLoader.generateTrajectoryCommand(
                 autoName,
                 intakeEventMap,
@@ -214,9 +214,9 @@ public class NorthLinkOverCSPresetBuilder {
                 kDefaultTranslationPIDGains,
                 kDefaultRotationPIDGains,
                 new PathConstraints(kDefaultMaxVelocity, kDefaultMaxAcceleration)),
-            new BotLog.SimulationPrinter(autoName + " Balance on Charging Station"),
+            new BotLog.PrintCommand(autoName + " Balance on Charging Station"),
             new Balance(swerveSubsystem),
-            new BotLog.SimulationPrinter(autoName + " shoot C2"),
+            new BotLog.PrintCommand(autoName + " shoot C2"),
             new Shoot(ShooterPresets.CloseShotLow, shooterPivotSubsystem, intakeSubsystem));
     return autoCommands;
   }

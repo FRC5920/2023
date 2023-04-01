@@ -72,11 +72,12 @@ public class Balance extends CommandBase {
   private final PIDController yController = new PIDController(SwerveP, SwerveI, SwervekD);
   private final PIDController omegaController = new PIDController(SwerveP, SwerveI, SwervekD);
 
+  private final boolean m_balancePerpetually;
   private final Swerve drivetrainSubsystem;
 
   private final Timer m_simulationTimer;
 
-  /** Creates a new Balance. */
+  /** Creates a command that balances perpetually */
   public Balance(Swerve drivetrainSubsystem) {
     this.drivetrainSubsystem = drivetrainSubsystem;
     this.m_targetRotation = null; // Control to whatever the present yaw is
@@ -85,9 +86,11 @@ public class Balance extends CommandBase {
     omegaController.setTolerance(Units.degreesToRadians(3));
     omegaController.enableContinuousInput(-Math.PI, Math.PI);
     m_simulationTimer = new Timer();
+    m_balancePerpetually = true;
     addRequirements(drivetrainSubsystem);
   }
 
+  /** Creates a command that balances until it has reached a setpoint */
   public Balance(Swerve drivetrainSubsystem, Rotation2d targetRotation) {
     this.drivetrainSubsystem = drivetrainSubsystem;
     m_targetRotation = targetRotation;
@@ -96,6 +99,7 @@ public class Balance extends CommandBase {
     omegaController.setTolerance(Units.degreesToRadians(3));
     omegaController.enableContinuousInput(-Math.PI, Math.PI);
     m_simulationTimer = new Timer();
+    m_balancePerpetually = false;
     addRequirements(drivetrainSubsystem);
   }
 
@@ -168,7 +172,10 @@ public class Balance extends CommandBase {
     boolean finished = false;
     if (RobotBase.isReal()) {
       finished =
-          xController.atSetpoint() && yController.atSetpoint() && omegaController.atSetpoint();
+          !m_balancePerpetually
+              && xController.atSetpoint()
+              && yController.atSetpoint()
+              && omegaController.atSetpoint();
     } else {
       // In simulation mode, simulate Balance with a delay
       finished = m_simulationTimer.hasElapsed(1.0);

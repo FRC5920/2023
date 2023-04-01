@@ -70,7 +70,8 @@ public class Pigeon2GyroIO implements GyroIO {
   }
 
   public void setYaw(Rotation2d angle) {
-    pigeon.setYaw(angle.getDegrees());
+    double degrees = angle.getDegrees();
+    pigeon.setYaw(degrees);
   }
 
   /** Get gyro measurements */
