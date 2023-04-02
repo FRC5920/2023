@@ -66,6 +66,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -109,6 +110,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
   private final Field2d field2d = new Field2d();
 
   private double previousPipelineTimestamp = 0;
+  private boolean addPose = false;
 
   public PoseEstimatorSubsystem(PhotonCamera photonCamera, Swerve s_swerveSubsystem) {
     m_dashboardTab = (kDashboardTabIsEnabled) ? new PoseEstimatorDashboardTab(this) : null;
@@ -154,6 +156,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+
     // Update vision processing if executing on the bot
     if (RobotBase.isReal()) {
 
@@ -185,7 +188,14 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
             // } else {
             visionMeasurementStdDevs = VecBuilder.fill(0.8, 0.8, Units.degreesToRadians(25));
             // }
-            if (visionMeasurement.getX() >= 3.3) {//TODO: make this work off of swerve pose, not vision pose.
+
+            //Blocking mid-field tag additions.
+            if (DriverStation.getAlliance() == Alliance.Red) {
+              if(poseEstimator.getEstimatedPosition().getX()>13.0){addPose=true;}else{addPose=false;}
+            }else{
+              if(poseEstimator.getEstimatedPosition().getX()<3.30){addPose=true;}else{addPose=false;}
+            }
+            if (addPose) { 
               poseEstimator.addVisionMeasurement(
                   visionMeasurement.toPose2d(), resultTimestamp, visionMeasurementStdDevs);
             }
