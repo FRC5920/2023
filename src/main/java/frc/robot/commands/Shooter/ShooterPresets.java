@@ -57,16 +57,20 @@ import frc.robot.subsystems.ShooterPivot.PivotPresets;
 
 /** An enumeration of shooter configurations for different shots */
 public enum ShooterPresets {
-  CloseShotLow(PivotPresets.CloseShotLow.angleDegrees, IntakePreset.CloseShotLow.motorSpeed),
-  CloseShotMid(PivotPresets.CloseShotMid.angleDegrees, IntakePreset.CloseShotMid.motorSpeed),
-  CloseShotHigh(PivotPresets.CloseShotHigh.angleDegrees, IntakePreset.CloseShotHigh.motorSpeed),
+  PivotSideLow(165.0, 15.0),
+  PivotSideMid(110.0, 18.0),
+  PivotSideHigh(112.0, 25.0),
 
-  HailMaryLow(PivotPresets.CloseShotLow.angleDegrees, IntakePreset.HailMary.motorSpeed),
-  HailMaryMid(PivotPresets.CloseShotMid.angleDegrees, IntakePreset.HailMary.motorSpeed),
-  HailMaryHigh(PivotPresets.CloseShotHigh.angleDegrees, IntakePreset.HailMary.motorSpeed),
+  PivotSideHailMaryLow(PivotPresets.CloseShotLow.angleDegrees, IntakePreset.HailMary.motorSpeed),
+  PivotSideHailMaryMid(PivotPresets.CloseShotMid.angleDegrees, IntakePreset.HailMary.motorSpeed),
+  PivotSideHailMaryHigh(PivotPresets.CloseShotHigh.angleDegrees, IntakePreset.HailMary.motorSpeed),
+
+  PivotSideUpAgainstGridLow(110.0, 10.0),
 
   // Shoot in reverse from the cable protector
-  ReverseFromCableProtector(20, 60);
+  RSLSideLow(20, 12),
+  RSLSideMid(40, 20),
+  RSLSideHigh(45, 30);
 
   public final ShootConfig config;
 
