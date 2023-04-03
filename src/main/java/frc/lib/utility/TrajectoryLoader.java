@@ -54,16 +54,23 @@ package frc.lib.utility;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPlannerTrajectory.EventMarker;
+import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.trajectory.Trajectory.State;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.lib.thirdparty.FRC6328.AllianceFlipUtil;
 import frc.lib.utility.BotLog.MessageType;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /** A helper class used to store settings and load a Trajectory file */
 public class TrajectoryLoader {
@@ -74,7 +81,9 @@ public class TrajectoryLoader {
   private final PathConstraints m_pathConstraints;
 
   /** Trajectory loaded from file */
-  private PathPlannerTrajectory m_trajectory;
+  private PathPlannerTrajectory m_trajectoryBlueAlliance;
+  /** Trajectory loaded from file, translated for Red alliance */
+  private PathPlannerTrajectory m_trajectoryRedAlliance;
 
   /**
    * Creates a TrajectoryLoader that will load a given pathplanner file and apply given constraints
@@ -93,16 +102,19 @@ public class TrajectoryLoader {
   public TrajectoryLoader(String trajectoryFileName, double maxVelocity, double maxAcceleration) {
     m_trajectoryFileName = trajectoryFileName;
     m_pathConstraints = new PathConstraints(maxVelocity, maxAcceleration);
-    m_trajectory = loadTrajectory(m_trajectoryFileName, m_pathConstraints);
+    m_trajectoryBlueAlliance = loadTrajectory(m_trajectoryFileName, m_pathConstraints);
+    m_trajectoryRedAlliance = transformTrajectoryForRedAlliance(m_trajectoryBlueAlliance);
   }
 
   /** Returns the initial pose of the object's trajectory */
   public Pose2d getInitialPose() {
-    return AllianceFlipUtil.apply(m_trajectory.getInitialHolonomicPose());
+    return getTrajectory().getInitialHolonomicPose();
   }
 
   public PathPlannerTrajectory getTrajectory() {
-    return m_trajectory;
+    return (DriverStation.getAlliance() == Alliance.Blue)
+        ? m_trajectoryBlueAlliance
+        : m_trajectoryRedAlliance;
   }
 
   /**
@@ -126,7 +138,7 @@ public class TrajectoryLoader {
         new BotLog.PrintCommand(
             MessageType.Debug, autoName + " follow trajectory: " + m_trajectoryFileName),
         buildTrajectoryCommand(
-            m_trajectory,
+            getTrajectory(),
             eventMap,
             swerveSubsystem,
             translationGains,
@@ -188,5 +200,68 @@ public class TrajectoryLoader {
     }
 
     return trajectory;
+  }
+
+  /**
+   * Transforms a given PathPlannerTrajectory to the Red alliance side of the field
+   *
+   * @param sourceTrajectory Trajectory to be translated (assumed to be created on Blue Alliance
+   *     side)
+   * @return A PathPlannerTrajectory corresponding to the given alliance
+   * @remarks This implementation was taken nearly verbatim from the PathPlannerTrajectory class.
+   */
+  private static PathPlannerTrajectory transformTrajectoryForRedAlliance(
+      PathPlannerTrajectory sourceTrajectory) {
+
+    // Transform each state in the trajectory to the Red alliance
+    List<State> transformedStates = new ArrayList<>();
+    for (State s : sourceTrajectory.getStates()) {
+      PathPlannerState state = transformStateForRedAlliance((PathPlannerState) s);
+      transformedStates.add(state);
+    }
+
+    // Transform each event in the trajectory to the Red Alliance
+    List<EventMarker> transformedEventMarkers = new ArrayList<>();
+    for (EventMarker m : sourceTrajectory.getMarkers()) {
+      EventMarker transformedMarker = new EventMarker(m.names, m.waypointRelativePos);
+      transformedMarker.names = m.names;
+      transformedMarker.timeSeconds = m.timeSeconds;
+      transformedMarker.positionMeters = AllianceFlipUtil.apply(m.positionMeters);
+      transformedMarker.waypointRelativePos = m.waypointRelativePos;
+      transformedEventMarkers.add(transformedMarker);
+    }
+
+    return new PathPlannerTrajectory(
+        transformedStates,
+        transformedEventMarkers,
+        sourceTrajectory.getStartStopEvent(),
+        sourceTrajectory.getEndStopEvent(),
+        sourceTrajectory.fromGUI);
+  }
+
+  /**
+   * Translates a PathPlannerTrajectory state for the Red alliance side of the field
+   *
+   * @param state The state to translate (assumed to be created for the Blue Alliance)
+   * @param alliance Alliance to translate the trajectory to
+   * @return A new PathPlannerState object translated for the current alliance
+   * @remarks This implementation was taken nearly verbatim from the PathPlannerTrajectory class,
+   *     but modified to utilize the (awesome!) AllianceFlipUtil function kindly provided by
+   *     FRC6328.
+   */
+  private static PathPlannerState transformStateForRedAlliance(PathPlannerState state) {
+    // Create a new state so that we don't overwrite the original
+    PathPlannerState transformedState = new PathPlannerState();
+
+    transformedState.timeSeconds = state.timeSeconds;
+    transformedState.velocityMetersPerSecond = state.velocityMetersPerSecond;
+    transformedState.accelerationMetersPerSecondSq = state.accelerationMetersPerSecondSq;
+    transformedState.poseMeters = AllianceFlipUtil.apply(state.poseMeters);
+    transformedState.angularVelocityRadPerSec = -state.angularVelocityRadPerSec;
+    transformedState.holonomicRotation = AllianceFlipUtil.apply(state.holonomicRotation);
+    transformedState.holonomicAngularVelocityRadPerSec = -state.holonomicAngularVelocityRadPerSec;
+    transformedState.curvatureRadPerMeter = -state.curvatureRadPerMeter;
+
+    return transformedState;
   }
 }
