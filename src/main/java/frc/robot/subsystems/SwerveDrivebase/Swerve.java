@@ -133,7 +133,7 @@ public class Swerve extends SubsystemBase {
      * See https://github.com/Team364/BaseFalconSwerve/issues/8 for more info.
      */
     Timer.delay(3.0);
-    resetModulesToAbsolute();   
+    resetModulesToAbsolute();
     Timer.delay(3.0);
     resetModulesToAbsolute();
 

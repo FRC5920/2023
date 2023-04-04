@@ -65,8 +65,8 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -189,13 +189,21 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
             visionMeasurementStdDevs = VecBuilder.fill(0.8, 0.8, Units.degreesToRadians(25));
             // }
 
-            //Blocking mid-field tag additions.
+            // Blocking mid-field tag additions.
             if (DriverStation.getAlliance() == Alliance.Red) {
-              if(poseEstimator.getEstimatedPosition().getX()>13.0){addPose=true;}else{addPose=false;}
-            }else{
-              if(poseEstimator.getEstimatedPosition().getX()<3.30){addPose=true;}else{addPose=false;}
+              if (poseEstimator.getEstimatedPosition().getX() > 13.0) {
+                addPose = true;
+              } else {
+                addPose = false;
+              }
+            } else {
+              if (poseEstimator.getEstimatedPosition().getX() < 3.30) {
+                addPose = true;
+              } else {
+                addPose = false;
+              }
             }
-            if (addPose) { 
+            if (addPose) {
               poseEstimator.addVisionMeasurement(
                   visionMeasurement.toPose2d(), resultTimestamp, visionMeasurementStdDevs);
             }
