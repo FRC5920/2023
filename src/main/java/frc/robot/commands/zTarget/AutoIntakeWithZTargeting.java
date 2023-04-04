@@ -55,17 +55,16 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.utility.BotBoundary.PoseLimiter;
+import frc.lib.utility.BotLogger.BotLog;
 import frc.lib.utility.PIDGains;
 import frc.lib.utility.ZTargeter;
 import frc.robot.Constants.GameTarget;
 import frc.robot.RobotContainer;
 import frc.robot.commands.Shooter.Acquire;
-import frc.robot.commands.SimulationPrinter;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
@@ -84,13 +83,13 @@ public class AutoIntakeWithZTargeting extends SequentialCommandGroup {
       PoseLimiter poseLimits) {
 
     addCommands(
-        new SimulationPrinter(String.format("<AutoIntakeWithZTargeting> engaged")),
+        new BotLog.InfoPrintCommand("<AutoIntakeWithZTargeting> engaged"),
         Commands.race(
             new ZTargetAndDriveToGamepiece(
                 gamepieceType, kApproachSpeedMetersPerSec, camera, swerveSubsystem, poseLimits),
             Acquire.acquireAndPark(shooterPivotSubsystem, intakeSubsystem)),
         // new IntakeGamepiece(intakeSubsystem)),
-        new SimulationPrinter(String.format("<AutoIntakeWithZTargeting> finished")));
+        new BotLog.InfoPrintCommand(String.format("<AutoIntakeWithZTargeting> finished")));
   }
 
   private static class ZTargetAndDriveToGamepiece extends CommandBase {
@@ -134,7 +133,7 @@ public class AutoIntakeWithZTargeting extends SequentialCommandGroup {
     @Override
     public void initialize() {
       if (RobotBase.isSimulation()) {
-        System.out.printf(
+        BotLog.Infof(
             "<AutoZTargetAndDriveToGamepiece> engage Z tracking for %s\n", m_gamepieceType.name());
       }
 
@@ -154,7 +153,7 @@ public class AutoIntakeWithZTargeting extends SequentialCommandGroup {
       m_lastTargetDetected = m_targetDetected;
       m_targetDetected = (zRotation != null);
       if (m_targetDetected && !m_lastTargetDetected) {
-        System.out.printf("<AutoZTargetAndDriveToGamepiece> %s detected\n", m_gamepieceType.name());
+        BotLog.Infof("<AutoZTargetAndDriveToGamepiece> %s detected\n", m_gamepieceType.name());
       }
 
       Translation2d translationDelta = new Translation2d();
@@ -166,13 +165,12 @@ public class AutoIntakeWithZTargeting extends SequentialCommandGroup {
 
         // If the target is aligned and the current pose is not outside the given limits,
         // drive toward the target at the configured speed
-        SmartDashboard.putNumber(
-            "AutoZTarget/alignError", m_zTargeter.getTargetAlignmentError().getDegrees());
+        // SmartDashboard.putNumber(
+        //    "AutoZTarget/alignError", m_zTargeter.getTargetAlignmentError().getDegrees());
 
         if (m_zTargeter.targetIsAligned()) {
           if (m_poseLimits.shouldLimitPose()) {
-            System.out.println(
-                "<AutoZTargetAndDriveToGamepiece> Pose limiter is preventing advance");
+            BotLog.Infof("<AutoZTargetAndDriveToGamepiece> Pose limiter is preventing advance");
           } else {
             translationDelta = new Translation2d(-1.0 * m_approachSpeedMetersPerSec, 0.0);
           }
@@ -180,16 +178,16 @@ public class AutoIntakeWithZTargeting extends SequentialCommandGroup {
       }
 
       // Drive open-loop, bot-relative
-      SmartDashboard.putNumber("AutoZTarget/Rot", rotationDelta);
+      // SmartDashboard.putNumber("AutoZTarget/Rot", rotationDelta);
       rotationDelta *= RobotContainer.MaxRotate;
-      SmartDashboard.putNumber("AutoZTarget/RotScaled", rotationDelta);
+      // SmartDashboard.putNumber("AutoZTarget/RotScaled", rotationDelta);
       m_swerveSubsystem.drive(translationDelta, rotationDelta, false, true);
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-      System.out.println("<AutoZTargetAndDriveToGamepiece> interrupted");
+      BotLog.Infof("<AutoZTargetAndDriveToGamepiece> interrupted");
     }
 
     // Returns true when the command should end.

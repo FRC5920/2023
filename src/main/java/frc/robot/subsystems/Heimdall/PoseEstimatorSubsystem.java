@@ -83,6 +83,9 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
   /** Set to true to enable a dashboard tab for the subsystem */
   public static final boolean kDashboardTabIsEnabled = false;
 
+  /** Set to true to enable sending SmartDashboard debug values to the dashboard */
+  private static final boolean kEnableDashboardDebug = false;
+
   private PhotonPoseEstimator photonPoseEstimator;
   private final PhotonCamera photonCamera;
   private final Swerve s_swerveSubsystem;
@@ -171,8 +174,10 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
             ATfieldLayout == null ? Optional.empty() : ATfieldLayout.getTagPose(fiducialId);
 
         if (tagPose.isPresent() && fiducialIsOnCurrentAllianceSide(target.getFiducialId())) {
-          SmartDashboard.putString(
-              "HeimdallUpdate", String.format("PoseEstimator sees fiducial %d", fiducialId));
+          if (kEnableDashboardDebug) {
+            SmartDashboard.putString(
+                "HeimdallUpdate", String.format("PoseEstimator sees fiducial %d", fiducialId));
+          }
 
           if (target.getPoseAmbiguity() <= .2 && fiducialId >= 0 && tagPose.isPresent()) {
             var targetPose = tagPose.get();
@@ -191,7 +196,9 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
             }
           }
         } else {
-          SmartDashboard.putString("HeimdallUpdate", "PoseEstimator sees no tags");
+          if (kEnableDashboardDebug) {
+            SmartDashboard.putString("HeimdallUpdate", "PoseEstimator sees no tags");
+          }
         }
       }
     }

@@ -73,6 +73,9 @@ public class SnapToGrid extends CommandBase {
   /** Set this to true to display grid lines on the dashboard field view */
   private static final boolean kDisplayGridLinesOnField = true;
 
+  /** Set this to true to enable sending values to SmartDashboard network tables entries */
+  private static final boolean kEnableDashboardDebug = false;
+
   /** Y values comprising grid lines */
   public static final double kGridYValues[] =
       new double[] {
@@ -164,16 +167,22 @@ public class SnapToGrid extends CommandBase {
       double snapDeltaY = m_snapPID.calculate(currentY, m_snapValue);
       deltaY = snapDeltaY;
 
-      SmartDashboard.putNumber("S2G-snapValue", m_snapValue);
-      SmartDashboard.putNumber("S2G-snapDeltaY", m_snapValue);
+      if (kEnableDashboardDebug) {
+        SmartDashboard.putNumber("S2G-snapValue", m_snapValue);
+        SmartDashboard.putNumber("S2G-snapDeltaY", m_snapValue);
+      }
     } else {
-      SmartDashboard.putNumber("S2G-snapValue", Double.NaN);
+      if (kEnableDashboardDebug) {
+        SmartDashboard.putNumber("S2G-snapValue", Double.NaN);
+      }
     }
 
-    SmartDashboard.putNumber("S2G-poseX", currentPosition.getX());
-    SmartDashboard.putNumber("S2G-poseY", currentPosition.getY());
-    SmartDashboard.putNumber("S2G-deltaX", deltaX);
-    SmartDashboard.putNumber("S2G-deltaY", deltaY);
+    if (kEnableDashboardDebug) {
+      SmartDashboard.putNumber("S2G-poseX", currentPosition.getX());
+      SmartDashboard.putNumber("S2G-poseY", currentPosition.getY());
+      SmartDashboard.putNumber("S2G-deltaX", deltaX);
+      SmartDashboard.putNumber("S2G-deltaY", deltaY);
+    }
     Translation2d translationSpeeds = new Translation2d(deltaX, deltaY).times(m_maxSpeed);
     double rotationSpeed = deltaRot * m_maxRotation;
 

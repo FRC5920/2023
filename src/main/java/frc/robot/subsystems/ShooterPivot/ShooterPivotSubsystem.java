@@ -134,9 +134,7 @@ public class ShooterPivotSubsystem extends SubsystemBase {
   public CommandBase getDefaultCommand() {
     CommandBase defaultCommand =
         Commands.either(
-            Commands.sequence(
-                // new SimulationPrinter("<ShooterPivot> default park"),
-                new SetShooterAngle(this, PivotPresets.Park)),
+            Commands.sequence(new SetShooterAngle(this, PivotPresets.Park)),
             new ConditionalCommand(
                 new AutoZeroPivot(this, 2.0),
                 new InstantCommand(),

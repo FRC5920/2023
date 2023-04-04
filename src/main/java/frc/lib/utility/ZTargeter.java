@@ -55,6 +55,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.lib.utility.BotLogger.BotLog;
 import frc.robot.Constants.GameTarget;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
@@ -66,7 +67,7 @@ import org.photonvision.targeting.PhotonPipelineResult;
 public class ZTargeter {
 
   // Set this constant to true to send values to the dashboard for debugging
-  public static final boolean kEnableDashboardDebug = true;
+  public static final boolean kEnableDashboardDebug = false;
 
   /** Default angle tolerance to control for in radians */
   public static final double kDefaultAngleToleranceRad = Units.degreesToRadians(2);
@@ -129,7 +130,7 @@ public class ZTargeter {
   /** This method must be called to initialize the camera used by the ZTargeter */
   public void initialize() {
     m_camera.setPipelineIndex(m_gamepieceType.PipelineIndex);
-    System.out.println("<Z-Targeter> targeting " + String.valueOf(m_gamepieceType));
+    BotLog.Debugf("<Z-Targeter> targeting " + String.valueOf(m_gamepieceType));
   }
 
   /**

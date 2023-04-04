@@ -66,7 +66,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.lib.thirdparty.FRC6328.AllianceFlipUtil;
-import frc.lib.utility.BotLog.MessageType;
+import frc.lib.utility.BotLogger.BotLog;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -135,8 +135,7 @@ public class TrajectoryLoader {
       PIDConstants rotationGains,
       PathConstraints pathConstraints) {
     return Commands.sequence(
-        new BotLog.PrintCommand(
-            MessageType.Debug, autoName + " follow trajectory: " + m_trajectoryFileName),
+        new BotLog.SimDebugPrintCommand(autoName + " follow trajectory: " + m_trajectoryFileName),
         buildTrajectoryCommand(
             getTrajectory(),
             eventMap,
@@ -191,7 +190,7 @@ public class TrajectoryLoader {
       filename = filename.substring(0, filename.length() - dotPath.length());
     }
 
-    BotLog.instance.Debug("Load trajectory file: %" + filename);
+    BotLog.Debug("Load trajectory file: %" + filename);
     PathPlannerTrajectory trajectory = PathPlanner.loadPath(filename, pathConstraints);
 
     if (trajectory == null) {

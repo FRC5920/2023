@@ -1,0 +1,83 @@
+{
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Auto Builder/Auto Type": "String Chooser",
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Balance Position": "String Chooser",
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Initial Action": "String Chooser",
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Initial Position": "String Chooser",
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Route": "String Chooser",
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Secondary Action": "String Chooser",
+      "/Shuffleboard/Auto Builder/Field": "Field2d"
+    },
+    "windows": {
+      "/Shuffleboard/Auto Builder/Auto Type": {
+        "window": {
+          "name": "Auto Type",
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Balance Position": {
+        "window": {
+          "name": "Balance Position",
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Initial Action": {
+        "window": {
+          "name": "Initial Action",
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Initial Position": {
+        "window": {
+          "name": "Initial Position",
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Route": {
+        "window": {
+          "name": "Escape Route",
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Secondary Action": {
+        "window": {
+          "name": "Secondary Action",
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Auto Builder/Field": {
+        "AutoTrajectory0": {
+          "arrows": false,
+          "style": "Line"
+        },
+        "AutoTrajectory1": {
+          "arrows": false,
+          "style": "Line"
+        },
+        "Robot": {
+          "color": [
+            255.0,
+            255.0,
+            0.0,
+            255.0
+          ],
+          "length": 0.824999988079071,
+          "width": 0.824999988079071
+        },
+        "bottom": 544,
+        "height": 8.013679504394531,
+        "image": "/home/dave/git/VIKotics/2023/2023-field.png",
+        "left": 46,
+        "right": 1088,
+        "top": 36,
+        "width": 16.541748046875,
+        "window": {
+          "name": "AutoBuilder Field View",
+          "visible": true
+        }
+      }
+    }
+  }
+}

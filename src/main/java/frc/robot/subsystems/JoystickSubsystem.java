@@ -59,13 +59,13 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.Joystick.AxisProcChain;
 import frc.lib.Joystick.ProcessedXboxController;
+import frc.lib.utility.BotLogger.BotLog;
 import frc.robot.Constants.GameTarget;
 import frc.robot.RobotContainer;
 import frc.robot.commands.Balance;
 import frc.robot.commands.Shooter.Acquire;
 import frc.robot.commands.Shooter.Shoot;
 import frc.robot.commands.Shooter.ShooterPresets;
-import frc.robot.commands.SimulationPrinter;
 import frc.robot.commands.SnapToGrid;
 import frc.robot.commands.zTarget.DriveWithZTargeting;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
@@ -232,7 +232,7 @@ public class JoystickSubsystem extends SubsystemBase {
       driverController.start.whileTrue(new Balance(swerveSubsystem)); // right little
 
       driverController.rightTriggerAsButton.whileTrue(
-          new SimulationPrinter("Snap-to-grid ON")
+          new BotLog.SimInfoPrintCommand("Snap-to-grid ON")
               .andThen(
                   new SnapToGrid(
                       swerveSubsystem,
@@ -242,7 +242,9 @@ public class JoystickSubsystem extends SubsystemBase {
                       RobotContainer.MaxSpeed,
                       RobotContainer.MaxRotate,
                       botContainer.autoDashboardTab.getField2d()))
-              .finallyDo((interrupted) -> new SimulationPrinter("Snap-to-grid OFF").initialize()));
+              .finallyDo(
+                  (interrupted) ->
+                      new BotLog.SimInfoPrintCommand("Snap-to-grid OFF").initialize()));
     }
 
     if (kOperatorControllerIsEnabled) {

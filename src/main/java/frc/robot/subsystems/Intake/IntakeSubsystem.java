@@ -60,7 +60,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.SimulationPrinter;
+import frc.lib.utility.BotLogger.BotLog;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 
 /** Subsystem for managing rollers used to pull in and shoot game pieces */
@@ -119,7 +119,7 @@ public class IntakeSubsystem extends SubsystemBase {
     CommandBase defaultCommand =
         Commands.either(
             Commands.sequence(
-                new SimulationPrinter("<IntakeSubsystem> default shutoff"),
+                new BotLog.DebugPrintCommand("<IntakeSubsystem> default shutoff"),
                 new InstantCommand(this::stopIntake)),
             new InstantCommand(),
             () -> this.getSpeedPercent() > 0.0);

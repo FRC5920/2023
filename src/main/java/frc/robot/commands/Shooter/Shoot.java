@@ -54,7 +54,7 @@ package frc.robot.commands.Shooter;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.commands.SimulationPrinter;
+import frc.lib.utility.BotLogger.BotLog;
 import frc.robot.subsystems.Intake.IntakePreset;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.ShooterPivot.PivotPresets;
@@ -140,12 +140,12 @@ public class Shoot extends SequentialCommandGroup {
       IntakeSubsystem intakeSubsystem) {
 
     addCommands(
-        new SimulationPrinter(shootMessage),
+        new BotLog.DebugPrintCommand(shootMessage),
         new SetShooterAngle(shooterPivotSubsystem, config.angleDegrees),
-        new SimulationPrinter(String.format("<Shoot> Take the shot")),
+        new BotLog.DebugPrintCommand(String.format("<Shoot> Take the shot")),
         new RunIntake(intakeSubsystem, config.speedPercent)
             .raceWith(new WaitCommand(kShootDurationSec)),
-        new SimulationPrinter(String.format("<Shoot> Shot complete")));
+        new BotLog.DebugPrintCommand(String.format("<Shoot> Shot complete")));
   }
 
   private static class RunIntake extends CommandBase {

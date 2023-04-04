@@ -58,6 +58,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.lib.utility.BotLogger.BotLog;
 import frc.robot.Constants;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 
@@ -113,8 +114,9 @@ public class Balance extends CommandBase {
     if (RobotBase.isSimulation()) {
       m_simulationTimer.reset();
       m_simulationTimer.start();
-      System.out.println("<Balance> Balacing");
     }
+
+    BotLog.Info("<Balance> Balacing");
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -161,8 +163,7 @@ public class Balance extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    System.out.println(
-        String.format("<Balance> end: %s", (interrupted ? "interrupted" : "finished")));
+    BotLog.Infof("<Balance> end: %s", (interrupted ? "interrupted" : "finished"));
     drivetrainSubsystem.stop();
   }
 

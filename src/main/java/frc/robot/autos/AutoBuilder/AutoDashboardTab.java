@@ -62,6 +62,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.lib.dashboard.WidgetsWithChangeDetection.ChooserWithChangeDetection;
+import frc.lib.utility.BotLogger.BotLog;
 import frc.robot.RobotContainer;
 import frc.robot.autos.AutoConstants.AutoType;
 import frc.robot.autos.AutoConstants.ChargingStation;
@@ -237,7 +238,7 @@ public class AutoDashboardTab implements IDashboardTab {
         || selectedActionChanged
         || balancePositionChanged) {
 
-      System.out.println("<AutoDashboardTab::updateDashboard> processing dashboard value change");
+      BotLog.Infof("<AutoDashboardTab::updateDashboard> processing dashboard value change");
       m_lastAlliance = currentAlliance;
 
       // Clear trajectories displayed on the field by giving all field objects an empty trajectory

@@ -56,8 +56,8 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.lib.utility.BotLogger.BotLog;
 import frc.robot.Constants;
-import frc.robot.commands.SimulationPrinter;
 import frc.robot.subsystems.Intake.IntakePreset;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 
@@ -112,14 +112,14 @@ public class IntakeGamepiece extends SequentialCommandGroup {
     m_speedAverager.reset();
 
     addCommands(
-        new SimulationPrinter("<IntakeGamepiece> ramp up intake motor"),
+        new BotLog.DebugPrintCommand("<IntakeGamepiece> ramp up intake motor"),
         new RampUpIntakeMotors(intakeSubsystem, m_speedAverager, IntakePreset.Acquire.motorSpeed),
-        new SimulationPrinter("<IntakeGamepiece> detect gamepiece"),
+        new BotLog.DebugPrintCommand("<IntakeGamepiece> detect gamepiece"),
         new DetectGamepiece(
             intakeSubsystem, m_speedAverager, kSpeedThresholdPercent, kCurrentThresholdAmps),
-        new SimulationPrinter("<IntakeGamepiece> stop intake"),
+        new BotLog.DebugPrintCommand("<IntakeGamepiece> stop intake"),
         new InstantCommand(() -> intakeSubsystem.stopIntake()),
-        new SimulationPrinter("<IntakeGamepiece> reset average filter"),
+        new BotLog.SimDebugPrintCommand("<IntakeGamepiece> reset average filter"),
         new InstantCommand(() -> m_speedAverager.reset()));
   }
 
@@ -154,17 +154,14 @@ public class IntakeGamepiece extends SequentialCommandGroup {
 
     @Override
     public void initialize() {
-      System.out.printf(
+      BotLog.Debugf(
           "<RampUpIntakeMotors> set intake speed to %.0f percent\n", m_targetMotorSpeedPercent);
       m_intakeSubsystem.setSpeedPercent(m_targetMotorSpeedPercent);
     }
 
     // Called each execution cycle.
     @Override
-    public void execute() {
-      // SmartDashboard.putNumber("RampedSpeed", speed);
-      // m_intakeSubsystem.setSpeedPercent(m_targetMotorSpeedPercent);
-    }
+    public void execute() {}
 
     /** Returns true when the motor speed exceeds 95% of the target speed */
     @Override
@@ -179,8 +176,7 @@ public class IntakeGamepiece extends SequentialCommandGroup {
 
       boolean finished = (delta <= Math.abs(m_targetMotorSpeedPercent * 0.10));
       if (finished) {
-        System.out.printf(
-            "<RampUpIntakeMotors> finished with speed at %.0f percent\n", averageSpeed);
+        BotLog.Debugf("<RampUpIntakeMotors> finished with speed at %.0f percent\n", averageSpeed);
       }
       return finished;
     }
@@ -233,14 +229,14 @@ public class IntakeGamepiece extends SequentialCommandGroup {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-      System.out.println("<DetectGamepiece> initialized");
+      BotLog.Info("<DetectGamepiece> initialized");
       m_currentAverager.reset();
     }
 
     @Override
     public void end(boolean interrupted) {
       if (interrupted) {
-        System.out.println("<DetectGamepiece> interrupted");
+        BotLog.Info("<DetectGamepiece> interrupted");
       }
     }
 
@@ -249,7 +245,7 @@ public class IntakeGamepiece extends SequentialCommandGroup {
     public boolean isFinished() {
       boolean limitSwitchClosed = m_intakeSubsystem.limitSwitchIsClosed();
       if (limitSwitchClosed) {
-        System.out.println("<DetectGamepiece> limit switch closed");
+        BotLog.Info("<DetectGamepiece> limit switch closed");
       }
       return limitSwitchClosed;
       // || detectUsingSpeed(); // || detectUsingCurrent();
