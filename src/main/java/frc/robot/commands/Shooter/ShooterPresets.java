@@ -62,8 +62,8 @@ public enum ShooterPresets {
   PivotSideHigh(112.0, 25.0),
 
   PivotSideHailMaryLow(PivotPresets.CloseShotLow.angleDegrees, IntakePreset.HailMary.motorSpeed),
-  PivotSideHailMaryMid(PivotPresets.CloseShotMid.angleDegrees, IntakePreset.HailMary.motorSpeed),
-  PivotSideHailMaryHigh(PivotPresets.CloseShotHigh.angleDegrees, IntakePreset.HailMary.motorSpeed),
+  PivotSideHailMaryMid(150, 95.0),
+  PivotSideHailMaryHigh(120, 95.0),
 
   PivotSideUpAgainstGridLow(110.0, 10.0),
 
