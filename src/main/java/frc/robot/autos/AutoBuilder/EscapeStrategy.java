@@ -243,15 +243,15 @@ public class EscapeStrategy extends AutoStrategy {
             "initialLaneEndpoint",
             cornerPosition.getX(),
             initialWaypoint.getY(),
-            BotOrientation.kFacingField,
+            BotOrientation.kFacingGrid,
             dummyTheta);
 
     // Create a waypoint for the endpoint of the active escape route
     final EscapeRoute.Endpoint endpoint = EscapeRoute.getEndpoint(m_escapeRoute);
     Pose2d endPose =
-        new Pose2d(endpoint.getPosition(), AllianceFlipUtil.apply(BotOrientation.kFacingField));
+        new Pose2d(endpoint.getPosition(), AllianceFlipUtil.apply(BotOrientation.kFacingGrid));
     PathPointHelper endWaypoint =
-        new PathPointHelper(endpoint.name(), endPose, BotOrientation.kFacingField);
+        new PathPointHelper(endpoint.name(), endPose, BotOrientation.kFacingGrid);
 
     m_waypointList = new ArrayList<>();
     m_waypointList.add(initialWaypoint);

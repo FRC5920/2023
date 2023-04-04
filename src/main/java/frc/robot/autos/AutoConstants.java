@@ -171,16 +171,18 @@ public class AutoConstants {
 
       public final int id;
       private final Translation2d position;
+      private final Pose2d pose;
 
       private ScoringPosition(int idx) {
         id = idx;
         double x = kRobotCenterX;
         double y = kFirstGridCenterY + (kDistanceBetweenGridCenters * id);
         position = new Translation2d(x, y);
+        pose = new Pose2d(position, BotOrientation.kFacingGrid);
       }
 
       public Pose2d getPose() {
-        return AllianceFlipUtil.apply(new Pose2d(position, BotOrientation.facingGrid()));
+        return AllianceFlipUtil.apply(pose);
       }
 
       public Translation2d getPosition() {

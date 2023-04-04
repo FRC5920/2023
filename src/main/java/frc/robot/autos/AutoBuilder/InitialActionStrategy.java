@@ -105,17 +105,17 @@ public class InitialActionStrategy extends AutoStrategy {
 
       case ShootLow:
         actionCommand =
-            new Shoot(ShooterPresets.PivotSideLow, m_shooterPivotSubsystem, m_intakeSubsystem);
+            new Shoot(ShooterPresets.RSLSideLow, m_shooterPivotSubsystem, m_intakeSubsystem);
         break;
 
       case ShootMid:
         actionCommand =
-            new Shoot(ShooterPresets.PivotSideMid, m_shooterPivotSubsystem, m_intakeSubsystem);
+            new Shoot(ShooterPresets.RSLSideMid, m_shooterPivotSubsystem, m_intakeSubsystem);
         break;
 
       case ShootHigh:
         actionCommand =
-            new Shoot(ShooterPresets.PivotSideHigh, m_shooterPivotSubsystem, m_intakeSubsystem);
+            new Shoot(ShooterPresets.RSLSideHigh, m_shooterPivotSubsystem, m_intakeSubsystem);
         break;
     }
 

@@ -51,7 +51,6 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -60,29 +59,25 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.Joystick.AxisProcChain;
 import frc.lib.Joystick.ProcessedXboxController;
-import frc.lib.utility.BotBoundary.Polygon;
-import frc.lib.utility.BotBoundary.PoseLimiter;
-import frc.lib.utility.BotBoundary.PoseLimiter.BoundaryPolicy;
 import frc.robot.Constants.GameTarget;
 import frc.robot.RobotContainer;
-import frc.robot.autos.AutoConstants.FieldCoordinates;
+import frc.robot.commands.Balance;
 import frc.robot.commands.Shooter.Acquire;
-import frc.robot.commands.Shooter.SetShooterAngle;
 import frc.robot.commands.Shooter.Shoot;
 import frc.robot.commands.Shooter.ShooterPresets;
 import frc.robot.commands.SimulationPrinter;
 import frc.robot.commands.SnapToGrid;
-import frc.robot.commands.zTarget.AutoIntakeWithZTargeting;
 import frc.robot.commands.zTarget.DriveWithZTargeting;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.ShooterPivot.PivotPresets;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
+import frc.robot.subsystems.SwerveDrivebase.Swerve;
 
 /** A subsystem providing/managing Xbox controllers for driving the robot manually */
 public class JoystickSubsystem extends SubsystemBase {
 
   public static final boolean kDriverControllerIsEnabled = true;
-  public static final boolean kOperatorControllerIsEnabled = true;
+  public static final boolean kOperatorControllerIsEnabled = false;
 
   public enum ControllerId {
     kDriver(0),
@@ -174,6 +169,7 @@ public class JoystickSubsystem extends SubsystemBase {
   public void configureButtonBindings(RobotContainer botContainer) {
     ShooterPivotSubsystem shooterPivot = botContainer.shooterPivotSubsystem;
     IntakeSubsystem intake = botContainer.intakeSubsystem;
+    Swerve swerveSubsystem = botContainer.swerveSubsystem;
 
     // Create shoot commands that are active when left trigger is off
     CommandBase closeShotLow =
@@ -218,8 +214,8 @@ public class JoystickSubsystem extends SubsystemBase {
           DriveWithZTargeting.zTargetDriveWithIntake(
               GameTarget.Cube,
               botContainer.ArmCamera,
-              botContainer.swerveSubsystem,
-              botContainer.joystickSubsystem,
+              swerveSubsystem,
+              this,
               shooterPivot,
               intake,
               true,
@@ -227,41 +223,20 @@ public class JoystickSubsystem extends SubsystemBase {
 
       driverController.leftBumper.whileTrue(
           new DriveWithZTargeting(
-              GameTarget.AprilTag2D,
-              botContainer.ArmCamera,
-              botContainer.swerveSubsystem,
-              botContainer.joystickSubsystem,
-              true,
-              true));
+              GameTarget.AprilTag2D, botContainer.ArmCamera, swerveSubsystem, this, true, true));
 
       driverController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
       driverController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
       driverController.back.onTrue(
-          new InstantCommand(() -> botContainer.swerveSubsystem.zeroGyro())); // left little
-      // driverController.start.whileTrue(
-      //     new AutoZeroPivot(botContainer.shooterPivotSubsystem, 5.0)); // right little
-      Polygon bounds =
-          Polygon.simpleRectangle(
-              new Translation2d(FieldCoordinates.xMin, FieldCoordinates.yMax),
-              new Translation2d(FieldCoordinates.xMax, FieldCoordinates.yMin));
-      driverController.start.whileTrue(
-          Commands.sequence(
-              new SetShooterAngle(botContainer.shooterPivotSubsystem, PivotPresets.Acquire),
-              new AutoIntakeWithZTargeting(
-                  GameTarget.Cube,
-                  botContainer.ArmCamera,
-                  botContainer.swerveSubsystem,
-                  botContainer.shooterPivotSubsystem,
-                  botContainer.intakeSubsystem,
-                  new PoseLimiter(
-                      botContainer.swerveSubsystem::getPose, bounds, BoundaryPolicy.KeepInside))));
+          new InstantCommand(() -> swerveSubsystem.zeroGyro())); // left little
+      driverController.start.whileTrue(new Balance(swerveSubsystem)); // right little
 
       driverController.rightTriggerAsButton.whileTrue(
           new SimulationPrinter("Snap-to-grid ON")
               .andThen(
                   new SnapToGrid(
-                      botContainer.swerveSubsystem,
-                      botContainer.joystickSubsystem,
+                      swerveSubsystem,
+                      this,
                       true,
                       true,
                       RobotContainer.MaxSpeed,

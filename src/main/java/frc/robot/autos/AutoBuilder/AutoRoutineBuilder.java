@@ -68,6 +68,8 @@ import frc.robot.autos.AutoConstants.Grids;
 import frc.robot.autos.AutoConstants.InitialAction;
 import frc.robot.autos.AutoConstants.SecondaryAction;
 import frc.robot.commands.Shooter.Shoot.ShootConfig;
+import frc.robot.subsystems.Heimdall.PoseEstimatorSubsystem;
+import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -102,6 +104,9 @@ public class AutoRoutineBuilder {
       BalanceMotionConfig balanceMotionConfig) {
     m_cumulativeTrajectory = new ArrayList<PathPlannerTrajectory>();
 
+    Swerve swerveSubsystem = botContainer.swerveSubsystem;
+    PoseEstimatorSubsystem poseEstimatorSubsystem = botContainer.poseEstimatorSubsystem;
+
     SequentialCommandGroup autoCommandGroup = new SequentialCommandGroup();
     Pose2d startPosition = startingPosition.getPose();
 
@@ -109,9 +114,9 @@ public class AutoRoutineBuilder {
         // First, a command to reset the robot pose to the initial position
         new InstantCommand(
             () -> {
-              botContainer.swerveSubsystem.resetOdometry(startPosition);
-              botContainer.poseEstimatorSubsystem.setCurrentPose(startPosition);
-              // botContainer.swerveSubsystem.setWheelPreset(WheelPreset.Forward);
+              swerveSubsystem.resetGyro(startPosition.getRotation());
+              swerveSubsystem.resetOdometry(startPosition);
+              poseEstimatorSubsystem.setCurrentPose(startPosition);
             }));
 
     // Gather commands used to perform the selected initial action
@@ -134,7 +139,7 @@ public class AutoRoutineBuilder {
         BalanceStrategy balanceStrategy =
             new BalanceStrategy(
                 balancePosition,
-                AllianceFlipUtil.apply(BotOrientation.kFacingField),
+                AllianceFlipUtil.apply(BotOrientation.kFacingGrid),
                 shootConfig,
                 () -> escapeStrategy.getFinalPose(),
                 botContainer,
