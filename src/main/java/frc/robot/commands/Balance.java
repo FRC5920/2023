@@ -96,7 +96,7 @@ public class Balance extends CommandBase {
     m_targetRotation = targetRotation;
     xController.setTolerance(3);
     yController.setTolerance(3);
-    omegaController.setTolerance(Units.degreesToRadians(3));
+    omegaController.setTolerance(Units.degreesToRadians(5));
     omegaController.enableContinuousInput(-Math.PI, Math.PI);
     m_simulationTimer = new Timer();
     m_balancePerpetually = false;
