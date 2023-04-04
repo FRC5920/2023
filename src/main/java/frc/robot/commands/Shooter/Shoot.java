@@ -51,6 +51,13 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.commands.Shooter;
 
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -107,7 +114,7 @@ public class Shoot extends SequentialCommandGroup {
       IntakeSubsystem intakeSubsystem) {
 
     this(
-        preset.config,
+        () -> preset.config,
         String.format("<Shoot> preset=%s", preset.name()),
         shooterPivotSubsystem,
         intakeSubsystem);
@@ -126,7 +133,7 @@ public class Shoot extends SequentialCommandGroup {
       IntakeSubsystem intakeSubsystem) {
 
     this(
-        config,
+        () -> config,
         String.format("<Shoot> angle=%s, speed=%s", config.angleDegrees, config.speedPercent),
         shooterPivotSubsystem,
         intakeSubsystem);
@@ -134,35 +141,71 @@ public class Shoot extends SequentialCommandGroup {
 
   /** Private constructor used to implement the Shoot command sequence */
   private Shoot(
-      ShootConfig config,
+      Supplier<ShootConfig> configSupplier,
       String shootMessage,
       ShooterPivotSubsystem shooterPivotSubsystem,
       IntakeSubsystem intakeSubsystem) {
 
     addCommands(
         new SimulationPrinter(shootMessage),
-        new SetShooterAngle(shooterPivotSubsystem, config.angleDegrees),
+        new SetShooterAngle(shooterPivotSubsystem, () -> configSupplier.get().angleDegrees),
         new SimulationPrinter(String.format("<Shoot> Take the shot")),
-        new RunIntake(intakeSubsystem, config.speedPercent)
+        new RunIntake(intakeSubsystem, () -> configSupplier.get().speedPercent)
             .raceWith(new WaitCommand(kShootDurationSec)),
         new SimulationPrinter(String.format("<Shoot> Shot complete")));
   }
 
+  public static enum SmartShotId {
+    Low(ShooterPresets.PivotSideLow, ShooterPresets.RSLSideLow),
+    Mid(ShooterPresets.PivotSideMid, ShooterPresets.RSLSideMid),
+    High(ShooterPresets.PivotSideHigh, ShooterPresets.RSLSideHigh);
+
+    private final ShooterPresets pivotSidePreset;
+    private final ShooterPresets rslSidePreset;
+
+    private SmartShotId(ShooterPresets pivotSidePreset, ShooterPresets rslSidePreset) {
+      this.pivotSidePreset = pivotSidePreset;
+      this.rslSidePreset = rslSidePreset;
+    }
+
+    public ShootConfig getConfig(Pose2d currentPose) {
+      boolean pivotIsFacingGrid = false;
+      double currentRotationRad = MathUtil.angleModulus(currentPose.getRotation().getRadians());
+      double piOver2 = Math.PI / 2.0;
+      double angle = currentRotationRad - (Math.PI/2.0);
+
+      switch (DriverStation.getAlliance()) {
+        case Blue:
+          pivotIsFacingGrid = (angle >= 0.0) && (angle <= piOver2);
+          break;
+
+        case Red:
+          pivotIsFacingGrid = (angle <= 0.0) && (angle > -piOver2);
+          break;
+
+        default:
+          break;
+      }
+
+      return pivotIsFacingGrid ? pivotSidePreset.config : rslSidePreset.config;
+    }
+  }
+
   private static class RunIntake extends CommandBase {
     private final IntakeSubsystem m_intakeSubsystem;
-    private final double m_speedPercent;
+    private final DoubleSupplier m_speedSupplier;
 
     /** Creates a new ShootCube. */
-    private RunIntake(IntakeSubsystem intakeSubsystem, double speedPercent) {
+    private RunIntake(IntakeSubsystem intakeSubsystem, DoubleSupplier speedSupplier) {
       m_intakeSubsystem = intakeSubsystem;
-      m_speedPercent = speedPercent;
+      m_speedSupplier = speedSupplier;
       addRequirements(intakeSubsystem);
     }
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-      m_intakeSubsystem.setSpeedPercent(m_speedPercent);
+      m_intakeSubsystem.setSpeedPercent(m_speedSupplier.getAsDouble());
 
       // System.out.println("Shooter: Firing at " + String.valueOf(m_speedPercent));
     }

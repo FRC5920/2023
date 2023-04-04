@@ -83,7 +83,7 @@ public class Balance extends CommandBase {
     this.m_targetRotation = null; // Control to whatever the present yaw is
     xController.setTolerance(3);
     yController.setTolerance(3);
-    omegaController.setTolerance(Units.degreesToRadians(3));
+    omegaController.setTolerance(Units.degreesToRadians(5));
     omegaController.enableContinuousInput(-Math.PI, Math.PI);
     m_simulationTimer = new Timer();
     m_balancePerpetually = true;

@@ -51,6 +51,8 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.commands.Shooter;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -64,7 +66,8 @@ public class SetShooterAngle extends CommandBase {
   /** Subsystem the command operates on */
   private final ShooterPivotSubsystem m_shooterPivotSubsystem;
 
-  private final double m_pivotDegrees;
+  /** Supplier providing a pivot angle in degrees */
+  private final DoubleSupplier m_pivotDegreesSupplier;
 
   /** Timer used to simulate shot in simulation mode */
   private Timer m_simulationTimer = new Timer();
@@ -75,9 +78,7 @@ public class SetShooterAngle extends CommandBase {
    * @param pivotDegrees Angle to move the shooter pivot to
    */
   public SetShooterAngle(ShooterPivotSubsystem shooterPivotSubsystem, double pivotDegrees) {
-    m_shooterPivotSubsystem = shooterPivotSubsystem;
-    m_pivotDegrees = pivotDegrees;
-    addRequirements(shooterPivotSubsystem);
+    this(shooterPivotSubsystem, () -> pivotDegrees);
   }
 
   /**
@@ -86,14 +87,26 @@ public class SetShooterAngle extends CommandBase {
    * @param pivotDegrees Angle preset to move the shooter pivot to
    */
   public SetShooterAngle(ShooterPivotSubsystem shooterPivotSubsystem, PivotPresets preset) {
-    this(shooterPivotSubsystem, preset.angleDegrees);
+    this(shooterPivotSubsystem, () -> preset.angleDegrees);
+  }
+
+  /**
+   * Creates a new instance of the command that sets the pivot to a specified angle
+   *
+   * @param pivotDegrees Angle to move the shooter pivot to
+   */
+  public SetShooterAngle(ShooterPivotSubsystem shooterPivotSubsystem, DoubleSupplier pivotSupplier) {
+    m_shooterPivotSubsystem = shooterPivotSubsystem;
+    m_pivotDegreesSupplier = pivotSupplier;
+    addRequirements(shooterPivotSubsystem);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_shooterPivotSubsystem.setAngleDegrees(m_pivotDegrees);
-    System.out.println("Shooter: Pivot to " + String.valueOf(m_pivotDegrees) + " degrees\n");
+    double pivotDegrees = m_pivotDegreesSupplier.getAsDouble();
+    m_shooterPivotSubsystem.setAngleDegrees(pivotDegrees);
+    System.out.println("Shooter: Pivot to " + String.valueOf(pivotDegrees) + " degrees\n");
 
     if (RobotBase.isSimulation()) {
       m_simulationTimer.restart();
@@ -104,6 +117,7 @@ public class SetShooterAngle extends CommandBase {
   @Override
   public boolean isFinished() {
     boolean finished = false;
+    double pivotDegrees = m_pivotDegreesSupplier.getAsDouble();
 
     // In simulation mode, we can't actually shoot anything.  Instead, we approximate
     // the time it takes to shoot.
@@ -111,7 +125,7 @@ public class SetShooterAngle extends CommandBase {
       finished = m_simulationTimer.hasElapsed(0.5);
     } else {
       double presentAngleDeg = m_shooterPivotSubsystem.getAngleDegrees();
-      double delta = Math.abs(presentAngleDeg - m_pivotDegrees);
+      double delta = Math.abs(presentAngleDeg - pivotDegrees);
       // SmartDashboard.putNumber("PivotTarget", m_pivotDegrees);
       // SmartDashboard.putNumber("PivotAngle", presentAngleDeg);
       // SmartDashboard.putNumber("PivotDelta", delta);
@@ -120,7 +134,7 @@ public class SetShooterAngle extends CommandBase {
 
     if (finished) {
       System.out.println(
-          "Shooter: pivot reached: " + String.valueOf(m_pivotDegrees) + " degrees\n");
+          "Shooter: pivot reached: " + String.valueOf(pivotDegrees) + " degrees\n");
     }
 
     return finished;

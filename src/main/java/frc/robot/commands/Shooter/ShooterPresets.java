@@ -77,4 +77,5 @@ public enum ShooterPresets {
   private ShooterPresets(double angleDegrees, double speedPercent) {
     config = new ShootConfig(angleDegrees, speedPercent);
   }
+  
 }

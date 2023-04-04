@@ -57,6 +57,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.Joystick.AxisProcChain;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.robot.Constants.GameTarget;
@@ -173,7 +174,8 @@ public class JoystickSubsystem extends SubsystemBase {
 
     // Create shoot commands that are active when left trigger is off
     CommandBase closeShotLow =
-        new Shoot(ShooterPresets.PivotSideLow, shooterPivot, intake)
+        new Shoot(() -> Shoot.SmartShotId.Low.getConfig(swerveSubsystem.getCurrentPose()), 
+        shooterPivot, intake)
             .unless(() -> driverController.leftTriggerAsButton.getAsBoolean());
     CommandBase closeShotMid =
         new Shoot(ShooterPresets.PivotSideMid, shooterPivot, intake)
@@ -198,18 +200,20 @@ public class JoystickSubsystem extends SubsystemBase {
       // Map buttons on driver controller
 
       // Map shift-keyed buttons for shots
-      driverController.A.onTrue(
-          Commands.either(
-              hailMaryShotLow, closeShotLow, driverController.leftTriggerAsButton::getAsBoolean));
-      driverController.B.onTrue(
-          Commands.either(
-              hailMaryShotMid, closeShotMid, driverController.leftTriggerAsButton::getAsBoolean));
-      driverController.Y.onTrue(
-          Commands.either(
-              hailMaryShotHigh, closeShotHigh, driverController.leftTriggerAsButton::getAsBoolean));
+      configureShiftKeyedButton(  // A = low shot   A+leftTrigger = HailMaryLow shot
+          driverController.A, closeShotLow, driverController.leftTriggerAsButton, hailMaryShotLow);
+      configureShiftKeyedButton(  // B = mid shot   B+leftTrigger = HailMaryMid shot
+          driverController.B, closeShotMid, driverController.leftTriggerAsButton, hailMaryShotMid);
+      configureShiftKeyedButton(  // Y = high shot   Y+leftTrigger = HailMaryHigh shot
+          driverController.Y,
+          closeShotHigh,
+          driverController.leftTriggerAsButton,
+          hailMaryShotHigh);
 
+      // X = acquire cube and park
       driverController.X.whileTrue(Acquire.acquireAndPark(shooterPivot, intake));
 
+      // Right bumper = Z-target on cube with intake
       driverController.rightBumper.whileTrue(
           DriveWithZTargeting.zTargetDriveWithIntake(
               GameTarget.Cube,
@@ -268,6 +272,19 @@ public class JoystickSubsystem extends SubsystemBase {
       operatorController.start.onTrue(
           new InstantCommand(() -> botContainer.shooterPivotSubsystem.zeroPivotPositionSensor()));
     }
+  }
+
+  /**
+   * Configures a combo-keyed button mapping
+   *
+   * @param buttonToMap Button to be mapped to commands
+   * @param regularCommand Command to run when button is pressed
+   * @param shiftButton A second button that functions as a shift for buttonToMap
+   * @param shiftCommand Command to run when buttonToMap is pressed while shiftButton is true
+   */
+  private static void configureShiftKeyedButton(
+      Trigger button, CommandBase regularCommand, Trigger shiftButton, CommandBase shiftCommand) {
+    button.onTrue(Commands.either(shiftCommand, regularCommand, shiftButton::getAsBoolean));
   }
 
   @Override
