@@ -61,6 +61,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.lib.thirdparty.FRC6328.AllianceFlipUtil;
 import frc.lib.utility.BotBoundary.Polygon;
 import frc.lib.utility.BotBoundary.PoseLimiter;
 import frc.lib.utility.BotBoundary.PoseLimiter.BoundaryPolicy;
@@ -153,7 +154,7 @@ public class NorthLinkAndBalancePresetBuilder {
             new BotLog.PrintCommand("Set initial pose"),
             new InstantCommand(
                 () -> {
-                  swerveSubsystem.resetGyro(BotOrientation.kFacingGrid);
+                  swerveSubsystem.resetGyro(AllianceFlipUtil.apply(BotOrientation.kFacingGrid));
                   swerveSubsystem.resetOdometry(initialPose);
                   botContainer.poseEstimatorSubsystem.setCurrentPose(initialPose);
                 }),

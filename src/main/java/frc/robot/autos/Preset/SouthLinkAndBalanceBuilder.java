@@ -157,7 +157,7 @@ public class SouthLinkAndBalanceBuilder {
             new BotLog.PrintCommand("Set initial pose"),
             new InstantCommand(
                 () -> {
-                  swerveSubsystem.resetGyro(BotOrientation.kFacingGrid);
+                  swerveSubsystem.resetGyro(AllianceFlipUtil.apply(BotOrientation.kFacingGrid));
                   swerveSubsystem.resetOdometry(initialPose);
                   botContainer.poseEstimatorSubsystem.setCurrentPose(initialPose);
                 }),
