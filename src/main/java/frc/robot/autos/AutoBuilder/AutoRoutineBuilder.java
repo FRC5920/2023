@@ -67,11 +67,7 @@ import frc.robot.autos.AutoConstants.EscapeRoute;
 import frc.robot.autos.AutoConstants.Grids;
 import frc.robot.autos.AutoConstants.InitialAction;
 import frc.robot.autos.AutoConstants.SecondaryAction;
-import frc.robot.commands.Balance;
 import frc.robot.commands.Shooter.Shoot.ShootConfig;
-import frc.robot.subsystems.Intake.IntakeSubsystem;
-import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
-import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -105,10 +101,6 @@ public class AutoRoutineBuilder {
       EscapeMotionConfig escapeMotionConfig,
       BalanceMotionConfig balanceMotionConfig) {
     m_cumulativeTrajectory = new ArrayList<PathPlannerTrajectory>();
-
-    IntakeSubsystem intakeSubsystem = botContainer.intakeSubsystem;
-    ShooterPivotSubsystem shooterPivotSubsystem = botContainer.shooterPivotSubsystem;
-    Swerve swerveSubsystem = botContainer.swerveSubsystem;
 
     SequentialCommandGroup autoCommandGroup = new SequentialCommandGroup();
     Pose2d startPosition = startingPosition.getPose();

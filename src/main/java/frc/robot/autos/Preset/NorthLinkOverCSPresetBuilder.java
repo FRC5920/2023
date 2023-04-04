@@ -58,7 +58,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -237,23 +236,13 @@ public class NorthLinkOverCSPresetBuilder {
 
   /** Returns a list containing trajectories used to illustrate motion in the auto routine */
   public List<PathPlannerTrajectory> getTrajectories() {
-    Alliance alliance = DriverStation.getAlliance();
-
     // Return trajectories for display
     List<PathPlannerTrajectory> trajectories = new ArrayList<>();
     trajectories.clear();
-    trajectories.add(
-        PathPlannerTrajectory.transformTrajectoryForAlliance(
-            m_NorthOverCSAcquireC1Loader.getTrajectory(), alliance));
-    trajectories.add(
-        PathPlannerTrajectory.transformTrajectoryForAlliance(
-            m_NorthOverCSShootC1Loader.getTrajectory(), alliance));
-    trajectories.add(
-        PathPlannerTrajectory.transformTrajectoryForAlliance(
-            m_NorthOverCSAcquireC2Loader.getTrajectory(), alliance));
-    trajectories.add(
-        PathPlannerTrajectory.transformTrajectoryForAlliance(
-            m_NorthOverCSMountCSLoader.getTrajectory(), alliance));
+    trajectories.add(m_NorthOverCSAcquireC1Loader.getTrajectory());
+    trajectories.add(m_NorthOverCSShootC1Loader.getTrajectory());
+    trajectories.add(m_NorthOverCSAcquireC2Loader.getTrajectory());
+    trajectories.add(m_NorthOverCSMountCSLoader.getTrajectory());
 
     return trajectories;
   }

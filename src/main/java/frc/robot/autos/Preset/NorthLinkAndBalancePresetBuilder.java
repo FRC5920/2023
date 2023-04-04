@@ -57,7 +57,6 @@ import com.pathplanner.lib.auto.PIDConstants;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -93,8 +92,6 @@ public class NorthLinkAndBalancePresetBuilder {
   private static final ShootConfig kInitialShotConfig = new ShootConfig(20, 22.5);
 
   private static final ShootConfig kCloseShotConfig = new ShootConfig(20, 15);
-
-  private static final ShootConfig kBalanceShotConfig = new ShootConfig(20, 50);
 
   /** Default PID gains applied to translation when following trajectories */
   private static final PIDConstants kDefaultTranslationPIDGains = new PIDConstants(8.0, 0.0, 0.2);
@@ -241,26 +238,14 @@ public class NorthLinkAndBalancePresetBuilder {
 
   /** Returns a list containing trajectories used to illustrate motion in the auto routine */
   public List<PathPlannerTrajectory> getTrajectories() {
-    Alliance alliance = DriverStation.getAlliance();
-
     // Return trajectories for display
     List<PathPlannerTrajectory> trajectories = new ArrayList<>();
     trajectories.clear();
-    trajectories.add(
-        PathPlannerTrajectory.transformTrajectoryForAlliance(
-            m_northLNBAcquireC1Loader.getTrajectory(), alliance));
-    trajectories.add(
-        PathPlannerTrajectory.transformTrajectoryForAlliance(
-            m_northLNBShootC1Loader.getTrajectory(), alliance));
-    trajectories.add(
-        PathPlannerTrajectory.transformTrajectoryForAlliance(
-            m_northLNBAcquireC2Loader.getTrajectory(), alliance));
-    trajectories.add(
-        PathPlannerTrajectory.transformTrajectoryForAlliance(
-            m_northLNBShootC2Loader.getTrajectory(), alliance));
-    trajectories.add(
-        PathPlannerTrajectory.transformTrajectoryForAlliance(
-            m_northLNBMountCSLoader.getTrajectory(), alliance));
+    trajectories.add(m_northLNBAcquireC1Loader.getTrajectory());
+    trajectories.add(m_northLNBShootC1Loader.getTrajectory());
+    trajectories.add(m_northLNBAcquireC2Loader.getTrajectory());
+    trajectories.add(m_northLNBShootC2Loader.getTrajectory());
+    trajectories.add(m_northLNBMountCSLoader.getTrajectory());
 
     return trajectories;
   }

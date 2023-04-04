@@ -80,8 +80,6 @@ public class IntakeSubsystem extends SubsystemBase {
 
   /** Peak output (%) that intake motors should run */
   private static final double kMaxMotorOutputPercent = 1.0;
-  /** Time required to ramp from neutral to full scale motor output */
-  private static final double kOpenLoopRampSec = 0.5;
 
   /** Voltage that motors will automatically scale full-scale output to */
   private static final double kMotorVoltageCompensationFullScale = 11.0;
