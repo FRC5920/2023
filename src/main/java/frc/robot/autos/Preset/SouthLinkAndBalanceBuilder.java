@@ -62,6 +62,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.lib.thirdparty.FRC6328.AllianceFlipUtil;
 import frc.lib.utility.BotBoundary.Polygon;
 import frc.lib.utility.BotBoundary.PoseLimiter;
 import frc.lib.utility.BotBoundary.PoseLimiter.BoundaryPolicy;
@@ -220,7 +221,7 @@ public class SouthLinkAndBalanceBuilder {
                 kDefaultRotationPIDGains,
                 new PathConstraints(kDefaultMaxVelocity, kDefaultMaxAcceleration)),
             new BotLog.PrintCommand(autoName + " Balance on Charging Station"),
-            new Balance(swerveSubsystem, kBalanceRotation),
+            new Balance(swerveSubsystem, AllianceFlipUtil.apply(kBalanceRotation)),
             new BotLog.PrintCommand(autoName + " shoot C3 and balance"),
             Commands.parallel(
                 new Shoot(kBalanceShootConfig, shooterPivotSubsystem, intakeSubsystem),
