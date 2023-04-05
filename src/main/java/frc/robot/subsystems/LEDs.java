@@ -64,10 +64,10 @@ public class LEDs extends SubsystemBase {
 
   // TODO: The following LEDStrip objects need to be configured with
   //       the correct start index and count
-  private static final LEDStrip kLowerLeftStrip = new LEDStrip(0, 33);
-  private static final LEDStrip kUpperLeftStrip = new LEDStrip(33, 33);
-  private static final LEDStrip kLowerRightStrip = new LEDStrip(66, 33);
-  private static final LEDStrip kUpperRightStrip = new LEDStrip(99, 33);
+  private static final LEDStrip kLowerLeftStrip = new LEDStrip(0, 24);
+  private static final LEDStrip kUpperLeftStrip = new LEDStrip(25, 49);
+  private static final LEDStrip kLowerRightStrip = new LEDStrip(50, 74);
+  private static final LEDStrip kUpperRightStrip = new LEDStrip(75, 99);
 
   // private static final Color8Bit kOff = new Color8Bit(0, 0, 0);
   // private static final Color8Bit kGreen = new Color8Bit(0, 255, 0);
@@ -109,8 +109,8 @@ public class LEDs extends SubsystemBase {
 
   /** Creates a new LEDs. */
   public LEDs() {
-    m_led = new AddressableLED(0);
-    m_ledBuffer = new AddressableLEDBuffer(132);
+    m_led = new AddressableLED(9);
+    m_ledBuffer = new AddressableLEDBuffer(100);
     m_lowerLeftSweep = new LEDPattern(kLowerLeftStrip.startIndex, kLowerLeftStrip.numLEDs, kYellow);
     m_upperLeftSweep = new LEDPattern(kUpperLeftStrip.startIndex, kUpperLeftStrip.numLEDs, kYellow);
     m_lowerRightSweep =
@@ -127,10 +127,13 @@ public class LEDs extends SubsystemBase {
   /////////////////////////////////////////////////////////////////////////////
   /** Updates the active color */
   public void updateColor(Color8Bit desiredColor) {
-    m_lowerLeftSweep.setColor(desiredColor);
-    m_upperLeftSweep.setColor(desiredColor);
-    m_lowerRightSweep.setColor(desiredColor);
-    m_upperRightSweep.setColor(desiredColor);
+    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+      m_ledBuffer.setLED(i, kYellow);
+    }
+    // m_lowerLeftSweep.setColor(desiredColor);
+    // m_upperLeftSweep.setColor(desiredColor);
+    // m_lowerRightSweep.setColor(desiredColor);
+    // m_upperRightSweep.setColor(desiredColor);
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -145,5 +148,39 @@ public class LEDs extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    // All_LEDRainbow();
+    AllWhite();
+
+    // Apply the LED buffer states to the LED strip
+    m_led.setData(m_ledBuffer);
+  }
+
+  private void AllYellow() {
+    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+      m_ledBuffer.setLED(i, kYellow);
+    }
+  }
+
+  private void AllWhite() {
+    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+      m_ledBuffer.setLED(i, kWhite);
+    }
+  }
+  /////////////////////////////////////////////////////////////////////////////
+  /**
+   * Make LED's a rainbow pattern
+   *
+   * @note Unicorns and sprinkles will be added in a future update...
+   */
+  private void All_LEDRainbow() {
+    // --- make a rainbow pattern on LEDs ---//
+    int ShowLEDs = m_ledBuffer.getLength();
+    for (var i = 0; i < ShowLEDs; i++) {
+      final var hue = (m_rainbowFirstPixelHue + (i * 180 / m_ledBuffer.getLength())) % 180;
+      m_ledBuffer.setHSV(i, hue, 255, 128);
+    }
+
+    m_rainbowFirstPixelHue += 3;
+    m_rainbowFirstPixelHue %= 180;
   }
 }
