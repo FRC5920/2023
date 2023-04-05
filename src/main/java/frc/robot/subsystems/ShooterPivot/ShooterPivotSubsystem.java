@@ -136,7 +136,7 @@ public class ShooterPivotSubsystem extends SubsystemBase {
         Commands.either(
             Commands.sequence(new SetShooterAngle(this, PivotPresets.Park)),
             new ConditionalCommand(
-                new AutoZeroPivot(this, 2.0),
+                new AutoZeroPivot(this, -5.0),
                 new InstantCommand(),
                 () -> getPositionTicks() != 0.0),
             () -> this.getAngleDegrees() > PivotPresets.Park.angleDegrees);

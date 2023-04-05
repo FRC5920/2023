@@ -108,12 +108,17 @@ public class IntakeGamepiece extends SequentialCommandGroup {
 
   /** Creates a new IntakeGamepiece. */
   public IntakeGamepiece(IntakeSubsystem intakeSubsystem) {
+    this(intakeSubsystem, IntakePreset.Acquire.motorSpeed);
+  }
+
+  /** Creates a new IntakeGamepiece. */
+  public IntakeGamepiece(IntakeSubsystem intakeSubsystem, double speedPercent) {
     addRequirements(intakeSubsystem);
     m_speedAverager.reset();
 
     addCommands(
         new BotLog.DebugPrintCommand("<IntakeGamepiece> ramp up intake motor"),
-        new RampUpIntakeMotors(intakeSubsystem, m_speedAverager, IntakePreset.Acquire.motorSpeed),
+        new RampUpIntakeMotors(intakeSubsystem, m_speedAverager, speedPercent),
         new BotLog.DebugPrintCommand("<IntakeGamepiece> detect gamepiece"),
         new DetectGamepiece(
             intakeSubsystem, m_speedAverager, kSpeedThresholdPercent, kCurrentThresholdAmps),

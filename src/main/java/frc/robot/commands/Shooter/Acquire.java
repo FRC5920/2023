@@ -57,6 +57,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.lib.utility.BotLogger.BotLog;
+import frc.robot.subsystems.Intake.IntakePreset;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.ShooterPivot.PivotPresets;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
@@ -65,6 +66,13 @@ public class Acquire extends SequentialCommandGroup {
 
   public static CommandBase acquireAndPark(
       ShooterPivotSubsystem shooterPivotSubsystem, IntakeSubsystem intakeSubsystem) {
+    return acquireAndPark(shooterPivotSubsystem, intakeSubsystem, IntakePreset.Acquire.motorSpeed);
+  }
+
+  public static CommandBase acquireAndPark(
+      ShooterPivotSubsystem shooterPivotSubsystem,
+      IntakeSubsystem intakeSubsystem,
+      double intakeSpeedPercent) {
     return Commands.parallel(
             Commands.sequence(
                 new BotLog.InfoPrintCommand("<acquireAndPark> Pivot for shot"),
@@ -73,7 +81,7 @@ public class Acquire extends SequentialCommandGroup {
                 new BotLog.InfoPrintCommand("<acquireAndPark> wait for shooter angle"),
                 new WaitUntilCommand(() -> waitForShooterAngle(shooterPivotSubsystem)),
                 new BotLog.InfoPrintCommand("<acquireAndPark> start intake"),
-                new IntakeGamepiece(intakeSubsystem)))
+                new IntakeGamepiece(intakeSubsystem, intakeSpeedPercent)))
         .finallyDo((interrupted) -> endBehavior(shooterPivotSubsystem, intakeSubsystem));
   }
 

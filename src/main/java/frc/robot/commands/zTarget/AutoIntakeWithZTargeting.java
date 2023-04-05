@@ -72,6 +72,7 @@ import org.photonvision.PhotonCamera;
 
 public class AutoIntakeWithZTargeting extends SequentialCommandGroup {
   private static final double kApproachSpeedMetersPerSec = RobotContainer.MaxSpeed / 2.0;
+  private static final double kIntakeSpeedPercent = -20.0;
 
   /** Returns a command that drives with Z-targeting and intake engaged */
   public AutoIntakeWithZTargeting(
@@ -87,7 +88,7 @@ public class AutoIntakeWithZTargeting extends SequentialCommandGroup {
         Commands.race(
             new ZTargetAndDriveToGamepiece(
                 gamepieceType, kApproachSpeedMetersPerSec, camera, swerveSubsystem, poseLimits),
-            Acquire.acquireAndPark(shooterPivotSubsystem, intakeSubsystem)),
+            Acquire.acquireAndPark(shooterPivotSubsystem, intakeSubsystem, kIntakeSpeedPercent)),
         // new IntakeGamepiece(intakeSubsystem)),
         new BotLog.InfoPrintCommand(String.format("<AutoIntakeWithZTargeting> finished")));
   }
