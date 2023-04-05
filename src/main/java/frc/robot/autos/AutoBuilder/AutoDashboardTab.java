@@ -87,7 +87,7 @@ public class AutoDashboardTab implements IDashboardTab {
   static final int kFieldHeightCells = 11;
 
   /** Width (in cells) of a swerve telemetry module on the dashboard (given a cell size of 32) */
-  static final int kChooserWidth = 9;
+  static final int kChooserWidth = 13;
 
   /** Height (in cells) of a swerve telemetry module on the dashboard (given a cell size of 32) */
   static final int kChooserHeight = 1;
@@ -173,7 +173,7 @@ public class AutoDashboardTab implements IDashboardTab {
     ShuffleboardLayout autoBuilderLayout =
         tab.getLayout("AutoBuilder Config", BuiltInLayouts.kGrid)
             .withSize(kChooserWidth, 5)
-            .withPosition(24, 3)
+            .withPosition(24, 4)
             .withProperties(
                 Map.of("Label position", "LEFT", "Number of columns", 1, "Number of rows", 5));
 

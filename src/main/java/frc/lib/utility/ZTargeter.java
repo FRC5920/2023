@@ -73,7 +73,7 @@ public class ZTargeter {
   public static final double kDefaultAngleToleranceRad = Units.degreesToRadians(2);
 
   /** Default proportional gain used for the rotation PID controller */
-  public static final double kDefault_kP = 0.9;
+  public static final double kDefault_kP = 0.7;
   /** Default integral gain used for the rotation PID controller */
   public static final double kDefault_kI = 0.0;
   /** Default derivative gain used for the rotation PID controller */

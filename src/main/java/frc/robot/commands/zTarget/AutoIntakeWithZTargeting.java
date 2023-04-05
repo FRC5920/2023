@@ -93,7 +93,7 @@ public class AutoIntakeWithZTargeting extends SequentialCommandGroup {
   }
 
   private static class ZTargetAndDriveToGamepiece extends CommandBase {
-    private static final PIDGains kRotationControllerGains = new PIDGains(0.9, 0.0, 0.1);
+    private static final PIDGains kRotationControllerGains = ZTargeter.kDefaultPIDGains;
     private static final double kRotationControllerToleranceRad = Units.degreesToRadians(5.0);
 
     private final GameTarget m_gamepieceType;
