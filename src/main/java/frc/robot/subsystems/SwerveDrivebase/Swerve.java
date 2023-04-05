@@ -205,6 +205,7 @@ public class Swerve extends SubsystemBase {
   }
 
   /** Sets all swerve wheels to a direction relative to the bot */
+  /*
   private void setWheelPreset(WheelPreset preset) {
     SwerveModuleState desiredStates[] = getModuleStates();
     for (int idx = 0; idx < preset.angles.length; ++idx) {
@@ -212,6 +213,7 @@ public class Swerve extends SubsystemBase {
     }
     setModuleStates(desiredStates);
   }
+  */
 
   /** Returns the present pose */
   public Pose2d getPose() {

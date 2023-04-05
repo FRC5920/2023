@@ -59,7 +59,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.thirdparty.FRC6328.AllianceFlipUtil;
 import frc.lib.utility.BotLogger.BotLog;
@@ -124,6 +123,8 @@ public class EscapeStrategy extends AutoStrategy {
           kDefaultMaxAcceleration,
           kDefaultMaxRotVelocity,
           kDefaultMaxRotAcceleration);
+
+  private static final String kAutoName = "<AutoBuilder EscapeStrategy>";
 
   /** Pose where the bot is initially positioned */
   private Grids.ScoringPosition m_startingPosition;
@@ -199,7 +200,7 @@ public class EscapeStrategy extends AutoStrategy {
   public CommandBase getCommand() {
     // Return an empty command for the "Stay Put" option
     if (m_escapeRoute == EscapeRoute.Route.StayPut) {
-      return new BotLog.InfoPrintCommand("Don't escape - stay put");
+      return new BotLog.InfoPrintCommand(kAutoName + " Don't escape - stay put");
     }
 
     SequentialCommandGroup commands = new SequentialCommandGroup();
@@ -207,7 +208,7 @@ public class EscapeStrategy extends AutoStrategy {
     for (int idx = 1; idx < m_waypointList.size(); ++idx) {
       PathPointHelper waypoint = m_waypointList.get(idx);
       commands.addCommands(
-          new PrintCommand(String.format("Drive to waypoint: %s", waypoint.name)),
+          new BotLog.InfoPrintCommand(" %s Drive to waypoint: %s", kAutoName, waypoint.name),
           new DriveToWaypoint(
               m_swerveSubsystem,
               new Pose2d(waypoint.getPosition(), waypoint.getHolonomicRotation()),
@@ -219,7 +220,7 @@ public class EscapeStrategy extends AutoStrategy {
               m_motionConfig.rotationConstraints));
     }
 
-    commands.addCommands(new PrintCommand("My escape is complete"));
+    commands.addCommands(new BotLog.InfoPrintCommand(kAutoName + " My escape is complete"));
     return commands;
   }
 

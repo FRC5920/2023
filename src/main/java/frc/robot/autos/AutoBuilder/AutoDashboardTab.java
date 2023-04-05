@@ -87,7 +87,7 @@ public class AutoDashboardTab implements IDashboardTab {
   static final int kFieldHeightCells = 11;
 
   /** Width (in cells) of a swerve telemetry module on the dashboard (given a cell size of 32) */
-  static final int kChooserWidth = 7;
+  static final int kChooserWidth = 9;
 
   /** Height (in cells) of a swerve telemetry module on the dashboard (given a cell size of 32) */
   static final int kChooserHeight = 1;

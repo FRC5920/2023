@@ -150,13 +150,13 @@ public class NorthLinkOverCSPresetBuilder {
 
     PoseLimiter c1AcquireBoundary = makeAcquireBoundary(CargoLocation.C1, swerveSubsystem::getPose);
     PoseLimiter c2AcquireBoundary = makeAcquireBoundary(CargoLocation.C2, swerveSubsystem::getPose);
-    String autoName = "<Link+Balance over CS>";
+    String autoName = "<North Link+Balance>";
     Pose2d initialPose = getInitialPose();
 
     CommandBase autoCommands =
         Commands.sequence(
             // First, a command to reset the robot pose to the initial position
-            new BotLog.InfoPrintCommand(autoName + "Set initial pose"),
+            new BotLog.InfoPrintCommand(autoName + " Set initial pose"),
             new InstantCommand(
                 () -> {
                   swerveSubsystem.resetGyro(AllianceFlipUtil.apply(BotOrientation.kFacingGrid));

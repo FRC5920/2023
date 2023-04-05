@@ -154,7 +154,7 @@ public class SouthLinkAndBalanceBuilder {
     CommandBase autoCommands =
         Commands.sequence(
             // First, a command to reset the robot pose to the initial position
-            new BotLog.InfoPrintCommand(autoName + "Set initial pose"),
+            new BotLog.InfoPrintCommand(autoName + " Set initial pose"),
             new InstantCommand(
                 () -> {
                   swerveSubsystem.resetGyro(AllianceFlipUtil.apply(BotOrientation.kFacingGrid));

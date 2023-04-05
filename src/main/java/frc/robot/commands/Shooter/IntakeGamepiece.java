@@ -194,15 +194,6 @@ public class IntakeGamepiece extends SequentialCommandGroup {
     /** The Intake subsystem to operate on */
     private final IntakeSubsystem m_intakeSubsystem;
 
-    /** If motor speed falls below this threshold, a gamepiece is loaded */
-    private final double m_motorSpeedThreshold;
-
-    /** If motor current exceeds this threshold, a gamepiece is loaded */
-    private final double m_motorCurrentThreshold;
-
-    /** Filter used to calculate the average intake motor speed */
-    private LinearFilter m_speedAverager;
-
     /** Filter used to calculate the average intake motor current value */
     private LinearFilter m_currentAverager = LinearFilter.movingAverage(kNumFilterTaps);
 
@@ -221,9 +212,6 @@ public class IntakeGamepiece extends SequentialCommandGroup {
         double speedThreshold,
         double currentThreshold) {
       m_intakeSubsystem = intakeSubsystem;
-      m_motorSpeedThreshold = speedThreshold;
-      m_speedAverager = speedFilter;
-      m_motorCurrentThreshold = currentThreshold;
     }
 
     // Called when the command is initially scheduled.
@@ -248,17 +236,6 @@ public class IntakeGamepiece extends SequentialCommandGroup {
         BotLog.Info("<DetectGamepiece> limit switch closed");
       }
       return limitSwitchClosed;
-      // || detectUsingSpeed(); // || detectUsingCurrent();
-    }
-
-    private boolean detectUsingCurrent() {
-      double averageCurrent = m_currentAverager.calculate(m_intakeSubsystem.getMotorCurrentAmps());
-      return averageCurrent >= m_motorCurrentThreshold;
-    }
-
-    private boolean detectUsingSpeed() {
-      double averageSpeed = m_speedAverager.calculate(m_intakeSubsystem.getSpeedPercent());
-      return averageSpeed >= m_motorSpeedThreshold;
     }
   }
 }

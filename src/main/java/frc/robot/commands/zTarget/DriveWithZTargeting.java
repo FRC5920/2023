@@ -68,8 +68,8 @@ import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import org.photonvision.PhotonCamera;
 
 public class DriveWithZTargeting extends CommandBase {
-  private static final double kAcquireApproachSpeedMetersPerSec = RobotContainer.MaxSpeed / 2.0;
-  private static final double kAutoAcquireAngleToleranceDeg = 2.0;
+  // private static final double kAcquireApproachSpeedMetersPerSec = RobotContainer.MaxSpeed / 2.0;
+  // private static final double kAutoAcquireAngleToleranceDeg = 2.0;
   private final boolean m_fieldRelative;
   private final boolean m_openLoop;
   private final Swerve m_swerveSubsystem;

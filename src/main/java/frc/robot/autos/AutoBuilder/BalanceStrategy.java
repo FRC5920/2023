@@ -62,8 +62,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import frc.lib.thirdparty.FRC6328.AllianceFlipUtil;
+import frc.lib.utility.BotLogger.BotLog;
 import frc.lib.utility.PIDGains;
 import frc.robot.RobotContainer;
 import frc.robot.autos.AutoConstants.BotOrientation;
@@ -115,6 +115,8 @@ public class BalanceStrategy extends AutoStrategy {
   public static final BalanceMotionConfig kDefaultMotionConfig =
       new BalanceMotionConfig(
           kDefaultTranslationPIDGains, kDefaultRotationPIDGains, kMaxVelocity, kMaxAcceleration);
+
+  private static final String kAutoName = "<AutoBuilder BalanceStrategy>";
 
   /** A list of trajectories followed for the auto (for display) */
   private List<PathPlannerTrajectory> m_trajectories;
@@ -216,17 +218,17 @@ public class BalanceStrategy extends AutoStrategy {
     CommandBase optionalShootCommand =
         (m_shootConfig != null)
             ? new Shoot(m_shootConfig, m_shooterPivotSubsystem, m_intakeSubsystem)
-            : new PrintCommand("No shot configured with balance");
+            : new BotLog.DebugPrintCommand(kAutoName + " No shot configured with balance");
 
     // Return a command sequence used to execute the strategy
     return Commands.sequence(
         // Print command execution
-        new PrintCommand(String.format("Drive to charging station and balance")),
+        new BotLog.InfoPrintCommand(kAutoName + " Drive to charging station and balance"),
         // Drive to the Charging Station
         autoBuilder.fullAuto(m_trajectories),
         // Balance on the Charging Station
         new Balance(m_swerveSubsystem),
-        new PrintCommand("bot has balanced"),
+        new BotLog.DebugPrintCommand(kAutoName + " bot has balanced"),
         // Add a command to shoot if m_shootConfig is not null
         optionalShootCommand);
   }
