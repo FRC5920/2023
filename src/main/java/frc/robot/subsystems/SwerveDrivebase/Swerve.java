@@ -134,6 +134,8 @@ public class Swerve extends SubsystemBase {
      */
     Timer.delay(3.0);
     resetModulesToAbsolute();
+    Timer.delay(3.0);
+    resetModulesToAbsolute();
 
     swervePoseEstimator =
         new SwerveDrivePoseEstimator(
