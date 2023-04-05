@@ -53,6 +53,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.utility.LEDPattern;
@@ -148,9 +149,16 @@ public class LEDs extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    // All_LEDRainbow();
-    AllWhite();
-
+    if (RobotState.isDisabled()) {
+      All_LEDRainbow();
+    }
+    if (RobotState.isTeleop()) {
+      AllYellow();
+    }
+    if (RobotState.isAutonomous()) {
+      AllWhite();
+    }
+    
     // Apply the LED buffer states to the LED strip
     m_led.setData(m_ledBuffer);
   }
