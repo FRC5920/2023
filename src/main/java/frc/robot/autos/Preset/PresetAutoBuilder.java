@@ -74,9 +74,6 @@ public class PresetAutoBuilder {
     CommandBase autoCommand = null;
 
     switch (autoType) {
-      case NorthLinkAndBalance:
-        autoCommand = m_northLinkAndBalanceBuilder.getCommand(botContainer);
-        break;
       case NorthLinkAndBalanceOverCS:
         autoCommand = m_northLinkOverCSBuilder.getCommand(botContainer);
         break;
@@ -94,9 +91,6 @@ public class PresetAutoBuilder {
     Pose2d pose = null;
 
     switch (autoType) {
-      case NorthLinkAndBalance:
-        pose = m_northLinkAndBalanceBuilder.getInitialPose();
-        break;
       case NorthLinkAndBalanceOverCS:
         pose = m_northLinkOverCSBuilder.getInitialPose();
         break;
@@ -115,9 +109,6 @@ public class PresetAutoBuilder {
     List<PathPlannerTrajectory> trajectories = null;
 
     switch (autoType) {
-      case NorthLinkAndBalance:
-        trajectories = m_northLinkAndBalanceBuilder.getTrajectories();
-        break;
       case NorthLinkAndBalanceOverCS:
         trajectories = m_northLinkOverCSBuilder.getTrajectories();
         break;

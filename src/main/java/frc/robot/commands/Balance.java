@@ -176,8 +176,10 @@ public class Balance extends CommandBase {
 
     boolean finished = false;
     if (RobotBase.isReal()) {
-      finished =
-          xController.atSetpoint() && yController.atSetpoint() && omegaController.atSetpoint();
+      finished = xController.atSetpoint() && yController.atSetpoint();
+      if (m_balancePerpetually) {
+        finished &= omegaController.atSetpoint();
+      }
     } else {
       // In simulation mode, simulate Balance with a delay
       finished = m_simulationTimer.hasElapsed(1.0);

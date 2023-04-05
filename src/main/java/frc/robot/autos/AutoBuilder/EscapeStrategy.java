@@ -62,6 +62,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.thirdparty.FRC6328.AllianceFlipUtil;
+import frc.lib.utility.BotLogger.BotLog;
 import frc.lib.utility.PIDGains;
 import frc.robot.autos.AutoConstants.BotDimensions;
 import frc.robot.autos.AutoConstants.BotOrientation;
@@ -134,7 +135,7 @@ public class EscapeStrategy extends AutoStrategy {
   ArrayList<PathPointHelper> m_waypointList = new ArrayList<PathPointHelper>();
 
   /** A list of trajectories to follow to escape the community */
-  private List<PathPlannerTrajectory> m_escapeTrajectories;
+  private List<PathPlannerTrajectory> m_escapeTrajectories = new ArrayList<>();
 
   /** Swerve subsystem used to carry out commands */
   private final Swerve m_swerveSubsystem;
@@ -167,11 +168,15 @@ public class EscapeStrategy extends AutoStrategy {
     m_swerveSubsystem = swerveSubsystem;
     m_motionConfig = motionConfig;
 
-    // Pre-generate waypoints used to carry out the auto
-    generatePathWaypoints();
+    if (m_escapeRoute != EscapeRoute.Route.StayPut) {
+      // Pre-generate waypoints used to carry out the auto
+      generatePathWaypoints();
 
-    // Generate trajectories used to carry out the auto
-    generateEscapeTrajectories();
+      // Generate trajectories used to carry out the auto
+      generateEscapeTrajectories();
+    } else {
+      m_finalPose = m_startingPosition.getPose();
+    }
   }
 
   /** Returns a list of trajectories used to carry out the auto routine */
@@ -192,6 +197,10 @@ public class EscapeStrategy extends AutoStrategy {
    * @param swerveSubsystem Swerve drive subsystem used to drive
    */
   public CommandBase getCommand() {
+    // Return an empty command for the "Stay Put" option
+    if (m_escapeRoute == EscapeRoute.Route.StayPut) {
+      return new BotLog.InfoPrintCommand("Don't escape - stay put");
+    }
 
     SequentialCommandGroup commands = new SequentialCommandGroup();
 

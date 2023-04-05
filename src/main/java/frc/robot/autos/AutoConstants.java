@@ -119,9 +119,8 @@ public class AutoConstants {
   /** An enumeration of initial actions to take before escaping the community */
   public static enum AutoType {
     AutoBuilder(0), // Generate auto routine using AutoBuilder
-    NorthLinkAndBalance(1), // Preset: two cubes North of CS, end with balance
-    NorthLinkAndBalanceOverCS(2), // Preset: two cubes North of CS, end with balance
-    SouthLinkAndBalance(3); // Preset: two cubes South of CS, end with balance
+    NorthLinkAndBalanceOverCS(1), // Preset: two cubes North of CS, end with balance
+    SouthLinkAndBalance(2); // Preset: two cubes South of CS, end with balance
 
     public final int id;
 
@@ -131,9 +130,7 @@ public class AutoConstants {
 
     /** Returns a list of names of enum elements */
     public static String[] getNames() {
-      return new String[] {
-        "AutoBuilder", "North Link+Balance", "North Link+Bal over CS", "South Link+Balance"
-      };
+      return new String[] {"AutoBuilder", "Preset North 3+Balance", "Preset South 3+Balance"};
     }
   };
 
@@ -256,7 +253,9 @@ public class AutoConstants {
 
       /** Returns a list of names of enum elements */
       public static String[] getNames() {
-        return EnumUtil.getEnumNames(BalancePosition.class);
+        return new String[] {
+          "North of Charge Station", "Center of Charge Station", "South of Charge Station"
+        };
       }
 
       public Translation2d getBalancePosition() {
@@ -289,11 +288,18 @@ public class AutoConstants {
        */
       SouthOfChargingStation,
       /** This route takes the bot through the center of the Charging Station via the OUTER lane */
-      ThroughChargingStation;
+      ThroughChargingStation,
+      /** This is a non-route that causes the bot to do nothing after the initial shot */
+      StayPut;
 
       /** Returns a list of names of enum elements */
       public static String[] getNames() {
-        return EnumUtil.getEnumNames(Route.class);
+        return new String[] {
+          "North of Charging Station",
+          "South of Charging Station",
+          "Over Charging Station",
+          "Nowhere... Fast!"
+        };
       }
     }
 
@@ -475,7 +481,7 @@ public class AutoConstants {
 
     /** Returns a list of names of enum elements */
     public static String[] getNames() {
-      return EnumUtil.getEnumNames(InitialAction.class);
+      return new String[] {"Bump Score", "Shoot Low", "Shoot Mid", "Shoot High"};
     }
   };
 
@@ -483,12 +489,12 @@ public class AutoConstants {
   /** An enumeration of secondary actions to take after escaping the community */
   public static enum SecondaryAction {
     WaitAtLocation, // Go to a location and wait
-    Balance, // Balance on the charging station
-    AcquireCargo; // Acquire a piece of cargo
+    Balance; // Balance on the charging station
+    // AcquireCargo; // Acquire a piece of cargo
 
     /** Returns a list of names of enum elements */
     public static String[] getNames() {
-      return EnumUtil.getEnumNames(SecondaryAction.class);
+      return new String[] {"Sit Still & Chill", "Balance on Charge Station"};
     }
   };
 }

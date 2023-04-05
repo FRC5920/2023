@@ -151,7 +151,8 @@ public class AutoDashboardTab implements IDashboardTab {
     m_lastAlliance = DriverStation.getAlliance();
 
     // Set up the auto type chooser
-    m_autoTypeChooser.loadOptions(AutoType.getNames(), AutoType.values(), AutoType.AutoBuilder.id);
+    m_autoTypeChooser.loadOptions(
+        AutoType.getNames(), AutoType.values(), AutoType.SouthLinkAndBalance.id);
     m_tab
         .add("Auto Type", m_autoTypeChooser)
         .withSize(kChooserWidth, kChooserHeight)
@@ -272,7 +273,6 @@ public class AutoDashboardTab implements IDashboardTab {
             break;
           }
 
-        case NorthLinkAndBalance:
         case NorthLinkAndBalanceOverCS:
         case SouthLinkAndBalance:
           {

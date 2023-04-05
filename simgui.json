@@ -56,6 +56,14 @@
           "arrows": false,
           "style": "Line"
         },
+        "AutoTrajectory2": {
+          "arrows": false,
+          "style": "Line"
+        },
+        "AutoTrajectory3": {
+          "arrows": false,
+          "style": "Line"
+        },
         "Robot": {
           "color": [
             255.0,
