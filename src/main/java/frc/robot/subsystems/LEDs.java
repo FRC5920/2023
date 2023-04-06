@@ -191,5 +191,4 @@ public class LEDs extends SubsystemBase {
     m_rainbowFirstPixelHue += 3;
     m_rainbowFirstPixelHue %= 180;
   }
-
 }

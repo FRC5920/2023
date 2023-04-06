@@ -91,7 +91,6 @@ public class RobotContainer {
   public final ShooterPivotSubsystem shooterPivotSubsystem = new ShooterPivotSubsystem();
   public final LEDs LEDsSubsystem = new LEDs();
 
-
   // public static final Pneumatics s_Pneumatics = new Pneumatics();
 
   public final PoseEstimatorSubsystem poseEstimatorSubsystem;
