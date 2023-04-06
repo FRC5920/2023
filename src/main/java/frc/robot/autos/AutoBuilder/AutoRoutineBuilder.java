@@ -114,7 +114,7 @@ public class AutoRoutineBuilder {
         // First, a command to reset the robot pose to the initial position
         new InstantCommand(
             () -> {
-              swerveSubsystem.resetGyro(startPosition.getRotation());
+              swerveSubsystem.resetGyro(AllianceFlipUtil.apply(BotOrientation.kFacingGrid));
               swerveSubsystem.resetOdometry(startPosition);
               poseEstimatorSubsystem.setCurrentPose(startPosition);
             }));
@@ -150,6 +150,7 @@ public class AutoRoutineBuilder {
       default:
         break;
     }
+
 
     m_builtCommand = autoCommandGroup;
     return m_builtCommand;
