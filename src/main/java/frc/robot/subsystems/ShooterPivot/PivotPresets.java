@@ -56,21 +56,7 @@ public enum PivotPresets {
   /** Angle used to park the intake */
   Park(0.0),
   /** Angle used to acquire a game piece */
-  Acquire(195.0),
-
-  /** Angle used for a short-range shot to the low grid */
-  CloseShotLow(170),
-  /** Angle used for a short-range shot to the middle grid */
-  CloseShotMid(120),
-  /** Angle used for a short-range shot to the high grid */
-  CloseShotHigh(115),
-
-  /** Angle used for a long-range shot to the low grid */
-  LongShotLow(170),
-  /** Angle used for a long-range shot to the middle grid */
-  LongShotMid(150),
-  /** Angle used for a long-range shot to the high grid */
-  LongShotHigh(135);
+  Acquire(195.0);
 
   public final double angleDegrees;
 
