@@ -55,6 +55,7 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -201,6 +202,13 @@ public class AutoDashboardTab implements IDashboardTab {
 
     m_rotationPIDPanel =
         new PIDTunerPanel(m_tab, "Rotation PID", 8, 33, DriveToWaypoint.kDefaultRotationGains);
+
+    m_tab
+        .addBoolean("AprilTags", () -> botContainer.poseEstimatorSubsystem.isReceivingAprilTags())
+        .withSize(4, 2)
+        .withPosition(1, 15)
+        .withWidget(BuiltInWidgets.kBooleanBox)
+        .withProperties(Map.of("Color when true", "green", "Color when false", "red"));
   }
 
   /** Service dashboard tab widgets */

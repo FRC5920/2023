@@ -53,7 +53,6 @@ package frc.robot.subsystems.Heimdall;
 
 import static frc.robot.Constants.VisionConstants.CAMERA_TO_ROBOT;
 
-import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
@@ -67,6 +66,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -83,6 +83,9 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 public class PoseEstimatorSubsystem extends SubsystemBase {
   /** Set to true to enable a dashboard tab for the subsystem */
   public static final boolean kDashboardTabIsEnabled = false;
+
+  /** Maximum time allowed between AprilTag updates before AprilTags are considered offline */
+  public static final double kAprilTagUpdateTimeoutSec = 2.0;
 
   private PhotonPoseEstimator photonPoseEstimator;
   private final PhotonCamera photonCamera;
@@ -111,7 +114,13 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
 
   private double previousPipelineTimestamp = 0;
   private boolean addPose = false;
+  private Timer m_aprilTagUpdateTimer = new Timer();
 
+  /**
+   * Creates an instance of the subsystem
+   *
+   * @param photonCamera PhotonVision camera providing AprilTag tracking
+   */
   public PoseEstimatorSubsystem(PhotonCamera photonCamera, Swerve s_swerveSubsystem) {
     m_dashboardTab = (kDashboardTabIsEnabled) ? new PoseEstimatorDashboardTab(this) : null;
     this.photonCamera = photonCamera;
@@ -145,6 +154,8 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
         new Pose2d(),
         stateStdDevs,
         visionMeasurementStdDevs);*/
+
+    m_aprilTagUpdateTimer.start();
   }
 
   /** Register the subsystem's dashboard tab */
@@ -164,6 +175,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
       var pipelineResult = photonCamera.getLatestResult();
       var resultTimestamp = pipelineResult.getTimestampSeconds();
       if (resultTimestamp != previousPipelineTimestamp && pipelineResult.hasTargets()) {
+        m_aprilTagUpdateTimer.restart(); // Reset the update timeout
         previousPipelineTimestamp = resultTimestamp;
         var target = pipelineResult.getBestTarget();
         var fiducialId = target.getFiducialId();
@@ -264,10 +276,6 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
     setCurrentPose(new Pose2d());
   }
 
-  public void addTrajectory(PathPlannerTrajectory traj) {
-    field2d.getObject("Trajectory").setTrajectory(traj);
-  }
-
   /**
    * @param estimatedRobotPose The current best guess at robot pose
    * @return an EstimatedRobotPose with an estimated pose, the timestamp, and targets used to create
@@ -280,5 +288,9 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
     }
     photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
     return photonPoseEstimator.update();
+  }
+
+  public boolean isReceivingAprilTags() {
+    return !m_aprilTagUpdateTimer.hasElapsed(kAprilTagUpdateTimeoutSec);
   }
 }
