@@ -49,27 +49,32 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.commands;
+package frc.robot.commands.Shooter;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.commands.Shooter.Shoot.ShootConfig;
+import frc.robot.subsystems.Intake.IntakePreset;
+import frc.robot.subsystems.ShooterPivot.PivotPresets;
 
-/** A command that prints a message to stdout in simulation mode only */
-public class SimulationPrinter extends CommandBase {
-  private final String m_message;
+/** An enumeration of shooter configurations for different shots */
+public enum ShooterPresets {
+  PivotSideLow(165.0, 15.0),
+  PivotSideMid(110.0, 18.0),
+  PivotSideHigh(112.0, 25.0),
 
-  public SimulationPrinter(String msg) {
-    m_message = msg;
-  }
+  PivotSideHailMaryLow(PivotPresets.CloseShotLow.angleDegrees, IntakePreset.HailMary.motorSpeed),
+  PivotSideHailMaryMid(150, 95.0),
+  PivotSideHailMaryHigh(120, 95.0),
 
-  @Override
-  public void initialize() {
-    // if (RobotBase.isSimulation()) {
-    System.out.println(m_message);
-    // }
-  }
+  PivotSideUpAgainstGridLow(110.0, 10.0),
 
-  @Override
-  public boolean isFinished() {
-    return true;
+  // Shoot in reverse from the cable protector
+  RSLSideLow(20, 12),
+  RSLSideMid(40, 20),
+  RSLSideHigh(45, 30);
+
+  public final ShootConfig config;
+
+  private ShooterPresets(double angleDegrees, double speedPercent) {
+    config = new ShootConfig(angleDegrees, speedPercent);
   }
 }

@@ -54,6 +54,7 @@ package frc.robot.commands.Shooter;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.lib.utility.BotLogger.BotLog;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 
 public class AutoZeroPivot extends CommandBase {
@@ -72,7 +73,7 @@ public class AutoZeroPivot extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    System.out.printf(String.format("Pivot auto-zeroing: speed=%.0f\n", m_motorSpeedPercent));
+    BotLog.Infof("Pivot auto-zeroing: speed=%.0f\n", m_motorSpeedPercent);
     m_pivotPositionTicks = m_shooterPivotSubsystem.getPositionTicks();
     m_shooterPivotSubsystem.runPivotMotor(m_motorSpeedPercent);
     m_startTimeSec = Timer.getFPGATimestamp();
@@ -92,7 +93,7 @@ public class AutoZeroPivot extends CommandBase {
     m_shooterPivotSubsystem.zeroPivotPositionSensor();
 
     double elapsedSec = Timer.getFPGATimestamp() - m_startTimeSec;
-    System.out.printf(String.format("Pivot auto-zero completed after %.4f seconds\n", elapsedSec));
+    BotLog.Infof("Pivot auto-zero completed after %.4f seconds\n", elapsedSec);
   }
 
   // Returns true when the command should end.

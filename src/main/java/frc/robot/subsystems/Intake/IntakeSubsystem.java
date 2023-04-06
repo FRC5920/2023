@@ -60,7 +60,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.SimulationPrinter;
+import frc.lib.utility.BotLogger.BotLog;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 
 /** Subsystem for managing rollers used to pull in and shoot game pieces */
@@ -80,8 +80,6 @@ public class IntakeSubsystem extends SubsystemBase {
 
   /** Peak output (%) that intake motors should run */
   private static final double kMaxMotorOutputPercent = 1.0;
-  /** Time required to ramp from neutral to full scale motor output */
-  private static final double kOpenLoopRampSec = 0.5;
 
   /** Voltage that motors will automatically scale full-scale output to */
   private static final double kMotorVoltageCompensationFullScale = 11.0;
@@ -121,7 +119,7 @@ public class IntakeSubsystem extends SubsystemBase {
     CommandBase defaultCommand =
         Commands.either(
             Commands.sequence(
-                new SimulationPrinter("<IntakeSubsystem> default shutoff"),
+                new BotLog.DebugPrintCommand("<IntakeSubsystem> default shutoff"),
                 new InstantCommand(this::stopIntake)),
             new InstantCommand(),
             () -> this.getSpeedPercent() > 0.0);
@@ -248,7 +246,7 @@ public class IntakeSubsystem extends SubsystemBase {
       // Configure the motors to ramp up to speed.  This eliminates the initial inrush current spike
       // that occurs as the motor starts up and has to overcome the inertia of itself and the
       // rollers
-      motor.configOpenloopRamp(kOpenLoopRampSec);
+      motor.configOpenloopRamp(0);
 
       // Full-scale output for the motor will be scaled to 11 Volts
       motor.configVoltageCompSaturation(kMotorVoltageCompensationFullScale);

@@ -52,6 +52,7 @@
 package frc.robot.autos.AutoBuilder;
 
 import com.pathplanner.lib.PathPoint;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
@@ -59,8 +60,41 @@ import edu.wpi.first.math.geometry.Translation2d;
 public class PathPointHelper extends PathPoint {
   public final String name;
 
-  public PathPointHelper(String nameStr, double x, double y, Rotation2d theta, Rotation2d holRot) {
+  /**
+   * Creates a PathPointHelper object from given parameters
+   *
+   * @param nameStr Friendly name printed during debugging
+   * @param x X coordinate
+   * @param y Y coordinate
+   * @param theta Trajectory heading at the point
+   * @param holRot Holonomic rotation at the point
+   */
+  public PathPointHelper(String nameStr, double x, double y, Rotation2d holRot, Rotation2d theta) {
     super(new Translation2d(x, y), theta, holRot);
+    name = nameStr;
+  }
+
+  /**
+   * Creates a PathPointHelper object from given parameters
+   *
+   * @param nameStr Friendly name printed during debugging
+   * @param pose X,Y position and holonomic rotation of the point
+   * @param theta Trajectory heading at the point
+   */
+  public PathPointHelper(String nameStr, Pose2d pose, Rotation2d theta) {
+    super(pose.getTranslation(), theta, pose.getRotation());
+    name = nameStr;
+  }
+
+  /**
+   * Creates a PathPointHelper object from given parameters
+   *
+   * @param nameStr Friendly name printed during debugging
+   * @param pose X,Y position and holonomic rotation of the point
+   * @param theta Trajectory heading at the point
+   */
+  public PathPointHelper(String nameStr, PathPoint point) {
+    super(point.position, point.heading, point.holonomicRotation);
     name = nameStr;
   }
 
@@ -96,5 +130,9 @@ public class PathPointHelper extends PathPoint {
 
   public double distance(PathPointHelper other) {
     return position.getDistance(other.position);
+  }
+
+  public PathPointHelper clone(PathPointHelper other) {
+    return new PathPointHelper(other.name, (PathPoint) other);
   }
 }

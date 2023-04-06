@@ -57,6 +57,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.lib.utility.BotLogger.BotLog;
 import frc.lib.utility.PIDGains;
 import frc.robot.autos.AutoConstants.Grids;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
@@ -96,12 +97,12 @@ public class BumpScore extends SequentialCommandGroup {
     double waypointAOffset = 0.5 * (isBlueAlliance ? 1.0 : -1.0);
     double xA = initialX + waypointAOffset;
     Pose2d waypointA = new Pose2d(new Translation2d(xA, initialY), initialRot);
-    System.out.printf("Drive to Waypoint A: x=%.2f y=%.2f\n", xA, initialY);
+    BotLog.Debugf("Drive to Waypoint A: x=%.2f y=%.2f\n", xA, initialY);
 
     double offsetTowardGrid = 0.0 * (isBlueAlliance ? -1.0 : 1.0);
     double xBackup = initialX + offsetTowardGrid;
     Pose2d backupWaypoint = new Pose2d(new Translation2d(xBackup, initialY), initialRot);
-    System.out.printf("Drive back to: x=%.2f y=%.2f\n", xBackup, initialY);
+    BotLog.Debugf("Drive back to: x=%.2f y=%.2f\n", xBackup, initialY);
 
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());

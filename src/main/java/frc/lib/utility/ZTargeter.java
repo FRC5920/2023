@@ -55,6 +55,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.lib.utility.BotLogger.BotLog;
 import frc.robot.Constants.GameTarget;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
@@ -66,14 +67,21 @@ import org.photonvision.targeting.PhotonPipelineResult;
 public class ZTargeter {
 
   // Set this constant to true to send values to the dashboard for debugging
-  public static final boolean kEnableDashboardDebug = true;
+  public static final boolean kEnableDashboardDebug = false;
+
+  /** Default angle tolerance to control for in radians */
+  public static final double kDefaultAngleToleranceRad = Units.degreesToRadians(2);
 
   /** Default proportional gain used for the rotation PID controller */
-  public static final double kDefault_kP = 0.9;
+  public static final double kDefault_kP = 0.7;
   /** Default integral gain used for the rotation PID controller */
   public static final double kDefault_kI = 0.0;
   /** Default derivative gain used for the rotation PID controller */
   public static final double kDefault_kD = 0.1;
+
+  /** Default PID gains used for controlling rotation */
+  public static final PIDGains kDefaultPIDGains =
+      new PIDGains(kDefault_kP, kDefault_kI, kDefault_kD);
 
   /** Camera used to target the gamepiece */
   private final PhotonCamera m_camera;
@@ -96,7 +104,7 @@ public class ZTargeter {
    * @param gains PID gains to use for converging on the target
    */
   public ZTargeter(GameTarget TargetWhat, PhotonCamera camera) {
-    this(TargetWhat, camera, new PIDGains(kDefault_kP, kDefault_kI, kDefault_kD));
+    this(TargetWhat, camera, kDefaultPIDGains, kDefaultAngleToleranceRad);
   }
 
   /**
@@ -106,13 +114,15 @@ public class ZTargeter {
    * @param TargetWhat The type of gamepiece to target
    * @param camera Camera used to locate and target the gamepiece
    * @param gains PID gains to use for converging on the target
+   * @param angleToleranceRad Error tolerance to control to in radians
    */
-  public ZTargeter(GameTarget TargetWhat, PhotonCamera camera, PIDGains gains) {
+  public ZTargeter(
+      GameTarget TargetWhat, PhotonCamera camera, PIDGains gains, double angleToleranceRad) {
     m_camera = camera;
     m_gamepieceType = TargetWhat;
 
     omegaController = new PIDController(gains.kP, gains.kI, gains.kD);
-    omegaController.setTolerance(Units.degreesToRadians(2));
+    omegaController.setTolerance(angleToleranceRad);
     omegaController.enableContinuousInput(-Math.PI, Math.PI);
     omegaController.setSetpoint(0);
   }
@@ -120,7 +130,7 @@ public class ZTargeter {
   /** This method must be called to initialize the camera used by the ZTargeter */
   public void initialize() {
     m_camera.setPipelineIndex(m_gamepieceType.PipelineIndex);
-    System.out.println("<Z-Targeter> targeting " + String.valueOf(m_gamepieceType));
+    BotLog.Debugf("<Z-Targeter> targeting " + String.valueOf(m_gamepieceType));
   }
 
   /**
@@ -158,5 +168,14 @@ public class ZTargeter {
     }
 
     return result;
+  }
+
+  /** Returns true if the rotation to the target is within the configured angle tolerance */
+  public boolean targetIsAligned() {
+    return omegaController.atSetpoint();
+  }
+
+  public Rotation2d getTargetAlignmentError() {
+    return new Rotation2d(omegaController.getPositionError());
   }
 }

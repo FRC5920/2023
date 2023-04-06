@@ -59,6 +59,7 @@ import frc.robot.subsystems.JoystickSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 
 public class TeleopSwerve extends CommandBase {
+  private static final boolean kControlsInverted = true;
   private double rotation;
   private Translation2d translation;
   private boolean fieldRelative;
@@ -83,8 +84,9 @@ public class TeleopSwerve extends CommandBase {
 
   @Override
   public void execute() {
-    double yAxis = -controller.getLeftY();
-    double xAxis = -controller.getLeftX();
+    double inv = kControlsInverted ? -1.0 : 1.0;
+    double yAxis = inv * controller.getLeftY();
+    double xAxis = inv * controller.getLeftX();
     double rAxis = -controller.getRightX();
 
     translation = new Translation2d(yAxis, xAxis).times(RobotContainer.MaxSpeed);

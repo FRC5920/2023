@@ -59,18 +59,19 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.Joystick.AxisProcChain;
 import frc.lib.Joystick.ProcessedXboxController;
+import frc.lib.utility.BotLogger.BotLog;
 import frc.robot.Constants.GameTarget;
 import frc.robot.RobotContainer;
+import frc.robot.commands.Balance;
 import frc.robot.commands.Shooter.Acquire;
-import frc.robot.commands.Shooter.AutoZeroPivot;
 import frc.robot.commands.Shooter.Shoot;
-import frc.robot.commands.SimulationPrinter;
+import frc.robot.commands.Shooter.ShooterPresets;
 import frc.robot.commands.SnapToGrid;
 import frc.robot.commands.zTarget.DriveWithZTargeting;
-import frc.robot.subsystems.Intake.IntakePreset;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.ShooterPivot.PivotPresets;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
+import frc.robot.subsystems.SwerveDrivebase.Swerve;
 
 /** A subsystem providing/managing Xbox controllers for driving the robot manually */
 public class JoystickSubsystem extends SubsystemBase {
@@ -168,31 +169,29 @@ public class JoystickSubsystem extends SubsystemBase {
   public void configureButtonBindings(RobotContainer botContainer) {
     ShooterPivotSubsystem shooterPivot = botContainer.shooterPivotSubsystem;
     IntakeSubsystem intake = botContainer.intakeSubsystem;
+    Swerve swerveSubsystem = botContainer.swerveSubsystem;
 
     // Create shoot commands that are active when left trigger is off
     CommandBase closeShotLow =
-        Shoot.pivotAndShoot(
-                shooterPivot, intake, PivotPresets.CloseShotLow, IntakePreset.CloseShotLow)
+        new Shoot(ShooterPresets.PivotSideLow, shooterPivot, intake)
             .unless(() -> driverController.leftTriggerAsButton.getAsBoolean());
     CommandBase closeShotMid =
-        Shoot.pivotAndShoot(
-                shooterPivot, intake, PivotPresets.CloseShotMid, IntakePreset.CloseShotMid)
+        new Shoot(ShooterPresets.PivotSideMid, shooterPivot, intake)
             .unless(() -> driverController.leftTriggerAsButton.getAsBoolean());
     CommandBase closeShotHigh =
-        Shoot.pivotAndShoot(
-                shooterPivot, intake, PivotPresets.CloseShotHigh, IntakePreset.CloseShotHigh)
+        new Shoot(ShooterPresets.PivotSideHigh, shooterPivot, intake)
             .unless(() -> driverController.leftTriggerAsButton.getAsBoolean());
 
     // --------------------
     // Create shift-keyed shoot commands that are active when left trigger is pulled
     CommandBase hailMaryShotLow =
-        Shoot.pivotAndShoot(shooterPivot, intake, PivotPresets.CloseShotLow, IntakePreset.HailMary)
+        new Shoot(ShooterPresets.PivotSideHailMaryLow, shooterPivot, intake)
             .unless(() -> !driverController.leftTriggerAsButton.getAsBoolean());
     CommandBase hailMaryShotMid =
-        Shoot.pivotAndShoot(shooterPivot, intake, PivotPresets.CloseShotMid, IntakePreset.HailMary)
+        new Shoot(ShooterPresets.PivotSideHailMaryMid, shooterPivot, intake)
             .unless(() -> !driverController.leftTriggerAsButton.getAsBoolean());
     CommandBase hailMaryShotHigh =
-        Shoot.pivotAndShoot(shooterPivot, intake, PivotPresets.CloseShotHigh, IntakePreset.HailMary)
+        new Shoot(ShooterPresets.PivotSideHailMaryHigh, shooterPivot, intake)
             .unless(() -> !driverController.leftTriggerAsButton.getAsBoolean());
 
     if (kDriverControllerIsEnabled) {
@@ -215,8 +214,8 @@ public class JoystickSubsystem extends SubsystemBase {
           DriveWithZTargeting.zTargetDriveWithIntake(
               GameTarget.Cube,
               botContainer.ArmCamera,
-              botContainer.swerveSubsystem,
-              botContainer.joystickSubsystem,
+              swerveSubsystem,
+              this,
               shooterPivot,
               intake,
               true,
@@ -224,45 +223,37 @@ public class JoystickSubsystem extends SubsystemBase {
 
       driverController.leftBumper.whileTrue(
           new DriveWithZTargeting(
-              GameTarget.AprilTag2D,
-              botContainer.ArmCamera,
-              botContainer.swerveSubsystem,
-              botContainer.joystickSubsystem,
-              true,
-              true));
+              GameTarget.AprilTag2D, botContainer.ArmCamera, swerveSubsystem, this, true, true));
 
       driverController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
       driverController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
       driverController.back.onTrue(
-          new InstantCommand(() -> botContainer.swerveSubsystem.zeroGyro())); // left little
-      driverController.start.whileTrue(
-          new AutoZeroPivot(botContainer.shooterPivotSubsystem, 5.0)); // right little
+          new InstantCommand(() -> swerveSubsystem.zeroGyro())); // left little
+      driverController.start.whileTrue(new Balance(swerveSubsystem)); // right little
 
       driverController.rightTriggerAsButton.whileTrue(
-          new SimulationPrinter("Snap-to-grid ON")
+          new BotLog.SimInfoPrintCommand("Snap-to-grid ON")
               .andThen(
                   new SnapToGrid(
-                      botContainer.swerveSubsystem,
-                      botContainer.joystickSubsystem,
+                      swerveSubsystem,
+                      this,
                       true,
                       true,
                       RobotContainer.MaxSpeed,
                       RobotContainer.MaxRotate,
                       botContainer.autoDashboardTab.getField2d()))
-              .finallyDo((interrupted) -> new SimulationPrinter("Snap-to-grid OFF").initialize()));
+              .finallyDo(
+                  (interrupted) ->
+                      new BotLog.SimInfoPrintCommand("Snap-to-grid OFF").initialize()));
     }
 
     if (kOperatorControllerIsEnabled) {
       // Map buttons on operator controller
-      operatorController.A.onTrue(
-          Shoot.pivotAndShoot(
-              shooterPivot, intake, PivotPresets.CloseShotLow, IntakePreset.CloseShotLow));
-      operatorController.B.onTrue(
-          Shoot.pivotAndShoot(
-              shooterPivot, intake, PivotPresets.CloseShotMid, IntakePreset.CloseShotMid));
-      operatorController.Y.onTrue(
-          Shoot.pivotAndShoot(
-              shooterPivot, intake, PivotPresets.CloseShotHigh, IntakePreset.CloseShotHigh));
+      operatorController.A.onTrue(new Shoot(ShooterPresets.RSLSideLow, shooterPivot, intake));
+      operatorController.B.onTrue(new Shoot(ShooterPresets.RSLSideMid, shooterPivot, intake));
+      operatorController.Y.onTrue(new Shoot(ShooterPresets.RSLSideHigh, shooterPivot, intake));
+      operatorController.X.onTrue(
+          new Shoot(ShooterPresets.PivotSideUpAgainstGridLow, shooterPivot, intake));
 
       operatorController.leftBumper.whileTrue(
           Acquire.acquireAndPark(botContainer.shooterPivotSubsystem, botContainer.intakeSubsystem));

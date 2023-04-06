@@ -58,6 +58,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.lib.dashboard.WidgetsWithChangeDetection.PIDTunerPanel;
 import frc.lib.dashboard.WidgetsWithChangeDetection.SliderWithChangeDetection;
+import frc.lib.utility.BotLogger.BotLog;
 import frc.lib.utility.PIDGains;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Dashboard.IDashboardTab;
@@ -152,7 +153,7 @@ public class ShooterPivotDashboardTab implements IDashboardTab {
 
     // Update PID gains if they have changed
     if (m_pidTuner.hasChanged() || m_kffSlider.hasChanged()) {
-      System.out.println("<AutoDashboardTab::updateDashboard> processing PID value change");
+      BotLog.Debugf("<AutoDashboardTab::updateDashboard> processing PID value change");
       PIDGains gains = m_pidTuner.getGains();
       gains.kFF = m_kffSlider.getValue();
       m_shooterSubsystem.setPIDGains(gains);

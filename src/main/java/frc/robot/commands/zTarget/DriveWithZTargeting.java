@@ -53,15 +53,14 @@ package frc.robot.commands.zTarget;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.lib.Joystick.ProcessedXboxController;
+import frc.lib.utility.BotLogger.BotLog;
 import frc.lib.utility.ZTargeter;
 import frc.robot.Constants.GameTarget;
 import frc.robot.RobotContainer;
 import frc.robot.commands.Shooter.Acquire;
-import frc.robot.commands.SimulationPrinter;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.JoystickSubsystem;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
@@ -69,8 +68,8 @@ import frc.robot.subsystems.SwerveDrivebase.Swerve;
 import org.photonvision.PhotonCamera;
 
 public class DriveWithZTargeting extends CommandBase {
-  private static final double kAcquireApproachSpeedMetersPerSec = RobotContainer.MaxSpeed / 2.0;
-  private static final double kAutoAcquireAngleToleranceDeg = 2.0;
+  // private static final double kAcquireApproachSpeedMetersPerSec = RobotContainer.MaxSpeed / 2.0;
+  // private static final double kAutoAcquireAngleToleranceDeg = 2.0;
   private final boolean m_fieldRelative;
   private final boolean m_openLoop;
   private final Swerve m_swerveSubsystem;
@@ -88,7 +87,7 @@ public class DriveWithZTargeting extends CommandBase {
       IntakeSubsystem intake,
       boolean fieldRelative,
       boolean openLoop) {
-    return new SimulationPrinter(String.format("<Trigger> Z-target drive with intake"))
+    return new BotLog.InfoPrintCommand(String.format("<Trigger> Z-target drive with intake"))
         .andThen(
             Commands.race(
                 new DriveWithZTargeting(
@@ -122,6 +121,7 @@ public class DriveWithZTargeting extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    BotLog.Infof("<DriveWithZTargeting> for %s engaged", m_gamepieceType);
     m_zTargeter.initialize(); // Initialize Z-targeting
   }
 
@@ -166,13 +166,16 @@ public class DriveWithZTargeting extends CommandBase {
     }
 
     rotationRad *= RobotContainer.MaxRotate;
-    SmartDashboard.putNumber("zTarget/commandedOutput", rotationRad);
     m_swerveSubsystem.drive(translation, rotationRad, isFieldRelative, m_openLoop);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    BotLog.Infof(
+        "<DriveWithZTargeting> for %s %s",
+        m_gamepieceType, (interrupted ? "interrupted" : "ended"));
+  }
 
   // Returns true when the command should end.
   @Override

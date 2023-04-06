@@ -72,7 +72,7 @@ import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 
 public class Swerve extends SubsystemBase {
   /** Set to true to enable a dashboard tab for the Swerve subsystem */
-  public static final boolean kDashboardTabIsEnabled = true;
+  public static final boolean kDashboardTabIsEnabled = false;
 
   private static final Rotation2d kAngleZero = new Rotation2d(0.0);
   private static final Rotation2d kAngle360 = Rotation2d.fromDegrees(360);
@@ -205,13 +205,15 @@ public class Swerve extends SubsystemBase {
   }
 
   /** Sets all swerve wheels to a direction relative to the bot */
-  public void setWheelPreset(WheelPreset preset) {
+  /*
+  private void setWheelPreset(WheelPreset preset) {
     SwerveModuleState desiredStates[] = getModuleStates();
     for (int idx = 0; idx < preset.angles.length; ++idx) {
       desiredStates[idx].angle = preset.angles[idx];
     }
     setModuleStates(desiredStates);
   }
+  */
 
   /** Returns the present pose */
   public Pose2d getPose() {
@@ -265,8 +267,14 @@ public class Swerve extends SubsystemBase {
 
   /** Zeros the gyro */
   public void zeroGyro() {
-    m_gyroMeasurements.yawRad = kAngleZero.getRadians();
+    resetGyro(kAngleZero);
     m_gyroIO.setYaw(kAngleZero);
+  }
+
+  /** Zeros the gyro, setting it to a specified angle */
+  public void resetGyro(Rotation2d angle) {
+    m_gyroMeasurements.yawRad = angle.getRadians();
+    m_gyroIO.setYaw(angle);
   }
 
   /** Returns the yaw measurement */

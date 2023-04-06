@@ -57,8 +57,6 @@ public enum PivotPresets {
   Park(0.0),
   /** Angle used to acquire a game piece */
   Acquire(195.0),
-  /** Angle used when transporting a game piece */
-  Transport(60),
 
   /** Angle used for a short-range shot to the low grid */
   CloseShotLow(170),

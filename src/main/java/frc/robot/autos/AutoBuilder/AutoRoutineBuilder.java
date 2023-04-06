@@ -53,84 +53,59 @@ package frc.robot.autos.AutoBuilder;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.thirdparty.FRC6328.AllianceFlipUtil;
-import frc.lib.utility.PIDGains;
 import frc.robot.RobotContainer;
+import frc.robot.autos.AutoBuilder.BalanceStrategy.BalanceMotionConfig;
+import frc.robot.autos.AutoBuilder.EscapeStrategy.EscapeMotionConfig;
 import frc.robot.autos.AutoConstants.BotOrientation;
 import frc.robot.autos.AutoConstants.ChargingStation;
 import frc.robot.autos.AutoConstants.EscapeRoute;
 import frc.robot.autos.AutoConstants.Grids;
 import frc.robot.autos.AutoConstants.InitialAction;
 import frc.robot.autos.AutoConstants.SecondaryAction;
-import frc.robot.autos.AutoConstants.Waypoints;
-import frc.robot.autos.BumpScore;
-import frc.robot.commands.Shooter.Shoot;
-import frc.robot.subsystems.Intake.IntakeSubsystem;
-import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
+import frc.robot.commands.Shooter.Shoot.ShootConfig;
+import frc.robot.subsystems.Heimdall.PoseEstimatorSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
-import frc.robot.subsystems.SwerveDrivebase.Swerve.WheelPreset;
 import java.util.ArrayList;
 import java.util.List;
 
 /** A class used to build auto routines */
 public class AutoRoutineBuilder {
 
-  /** Proportional gain used for translation when following trajectories */
-  public static final double kDefaultTranslationkP = 10.0;
-  /** Integral gain used for translation when following trajectories */
-  public static final double kDefaultTranslationkI = 2.0;
-  /** Derivative gain used for translation when following trajectories */
-  public static final double kDefaultTranslationkD = 5.0;
-
-  /** Proportional gain used for rotation when following trajectories */
-  public static final double kDefaultRotationkP = 2.0;
-  /** Integral gain used for rotation when following trajectories */
-  public static final double kDefaultRotationkI = 1.0;
-  /** Derivative gain used for rotation when following trajectories */
-  public static final double kDefaultRotationkD = 1.0;
-
-  /** Maximum velocity of the bot when escaping the community */
-  private static final double kMaxEscapeVelocityMetersPerSec = 4.0;
-  /** Maximum acceleration of the bot when escaping the community */
-  private static final double kMaxEscapeAccelerationMetersPerSec2 = 3.0;
-
-  /** What to do after escaping the community */
-  private SecondaryAction m_secondaryAction;
-  /** Waypoint to travel to when escaping the community */
-  private Waypoints.ID m_waypointToMoveTo;
-
-  /** Trajectory followed to execute a seconary action (e.g. balance, acquire cargo) */
-  private List<PathPlannerTrajectory> m_secondaryActionTrajectory;
-
-  /** Trajectory showing the overall path taken by the robot */
+  /** Trajectory showing overall paths taken during the auto */
   private List<PathPlannerTrajectory> m_cumulativeTrajectory;
 
   /** The last command built using build() */
-  Command m_builtCommand = null;
+  CommandBase m_builtCommand;
 
-  public AutoRoutineBuilder(Swerve swerveSubsystem) {}
+  /** Creates an empty AutoRoutineBuilder object */
+  public AutoRoutineBuilder() {
+    m_cumulativeTrajectory = new ArrayList<>();
+    m_builtCommand = null;
+  }
 
   /**
    * Constructs an auto routine
    *
    * @param botContainer Robot container with subsystems
    */
-  public Command build(
+  public CommandBase build(
       RobotContainer botContainer,
       Grids.ScoringPosition startingPosition,
       InitialAction initialAction,
       EscapeRoute.Route escapeRoute,
       SecondaryAction secondaryAction,
       ChargingStation.BalancePosition balancePosition,
-      PIDGains translationPIDGains,
-      PIDGains rotationPIDGains,
-      boolean doBumpScore) {
+      EscapeMotionConfig escapeMotionConfig,
+      BalanceMotionConfig balanceMotionConfig) {
     m_cumulativeTrajectory = new ArrayList<PathPlannerTrajectory>();
+
+    Swerve swerveSubsystem = botContainer.swerveSubsystem;
+    PoseEstimatorSubsystem poseEstimatorSubsystem = botContainer.poseEstimatorSubsystem;
 
     SequentialCommandGroup autoCommandGroup = new SequentialCommandGroup();
     Pose2d startPosition = startingPosition.getPose();
@@ -139,53 +114,42 @@ public class AutoRoutineBuilder {
         // First, a command to reset the robot pose to the initial position
         new InstantCommand(
             () -> {
-              botContainer.swerveSubsystem.resetOdometry(startPosition);
-              botContainer.poseEstimatorSubsystem.setCurrentPose(startPosition);
-              botContainer.swerveSubsystem.setWheelPreset(WheelPreset.Forward);
+              swerveSubsystem.resetGyro(AllianceFlipUtil.apply(BotOrientation.kFacingGrid));
+              swerveSubsystem.resetOdometry(startPosition);
+              poseEstimatorSubsystem.setCurrentPose(startPosition);
             }));
 
-    // Add a command to implement the initial action
-    autoCommandGroup.addCommands(
-        getInitialActionCommands(botContainer, initialAction, startingPosition));
+    // Gather commands used to perform the selected initial action
+    AutoStrategy initialActionStrategy =
+        new InitialActionStrategy(initialAction, startingPosition, botContainer);
+    autoCommandGroup.addCommands(initialActionStrategy.getCommand());
+    m_cumulativeTrajectory.addAll(initialActionStrategy.getTrajectories());
 
+    // Get commands used to escape the community
     EscapeStrategy escapeStrategy =
         new EscapeStrategy(
-            startingPosition,
-            escapeRoute,
-            translationPIDGains,
-            rotationPIDGains,
-            kMaxEscapeVelocityMetersPerSec,
-            kMaxEscapeAccelerationMetersPerSec2);
-
-    // Generate an escape trajectory for the given auto parameters
-    // Command escapeCommand = escapeStrategy.buildTrajectoryCommand(botContainer.swerveSubsystem);
-    autoCommandGroup.addCommands(
-        escapeStrategy.buildWaypointCommandSequence(
-            botContainer.swerveSubsystem, translationPIDGains, rotationPIDGains));
+            startingPosition, escapeRoute, botContainer.swerveSubsystem, escapeMotionConfig);
+    autoCommandGroup.addCommands(escapeStrategy.getCommand());
     m_cumulativeTrajectory.addAll(escapeStrategy.getTrajectories());
 
-    // Generate command and trajectory for the secondary action
+    // Get commands used to implement post-escape actions
     switch (secondaryAction) {
       case Balance:
-        Translation2d endpoint = EscapeRoute.getEndpoint(escapeRoute).getPosition();
-        PathPointHelper balanceStart =
-            new PathPointHelper(
-                "BalanceStart",
-                endpoint.getX(),
-                endpoint.getY(),
-                AllianceFlipUtil.apply(BotOrientation.kFacingField),
-                AllianceFlipUtil.apply(BotOrientation.kFacingField));
-        BalanceStrategy balanceStrategy = new BalanceStrategy(balanceStart, balancePosition);
-        autoCommandGroup.addCommands(
-            balanceStrategy.generateCommand(
-                botContainer.swerveSubsystem, translationPIDGains, rotationPIDGains));
+        ShootConfig shootConfig = null; // Set null for no shot while balancing
+        BalanceStrategy balanceStrategy =
+            new BalanceStrategy(
+                balancePosition,
+                AllianceFlipUtil.apply(BotOrientation.kFacingGrid),
+                shootConfig,
+                () -> escapeStrategy.getFinalPose(),
+                botContainer,
+                balanceMotionConfig);
+        autoCommandGroup.addCommands(balanceStrategy.getCommand());
         m_cumulativeTrajectory.addAll(balanceStrategy.getTrajectories());
         break;
       default:
         break;
     }
-
-    // TODO: concatenate trajectories from all strategies together
 
     m_builtCommand = autoCommandGroup;
     return m_builtCommand;
@@ -199,35 +163,5 @@ public class AutoRoutineBuilder {
   /** Returns the last command built using build() */
   public Command getCommand() {
     return m_builtCommand;
-  }
-
-  static CommandBase getInitialActionCommands(
-      RobotContainer botContainer,
-      InitialAction initialAction,
-      Grids.ScoringPosition startingPosition) {
-    ShooterPivotSubsystem shooterPivot = botContainer.shooterPivotSubsystem;
-    IntakeSubsystem intake = botContainer.intakeSubsystem;
-
-    CommandBase actionCommand = null;
-
-    switch (initialAction) {
-      case BumpScore:
-        actionCommand = new BumpScore(startingPosition, botContainer.swerveSubsystem);
-        break;
-
-      case ShootLow:
-        actionCommand = Shoot.pivotAndShootLow(shooterPivot, intake);
-        break;
-
-      case ShootMid:
-        actionCommand = Shoot.pivotAndShootMid(shooterPivot, intake);
-        break;
-
-      case ShootHigh:
-        actionCommand = Shoot.pivotAndShootHigh(shooterPivot, intake);
-        break;
-    }
-
-    return actionCommand;
   }
 }

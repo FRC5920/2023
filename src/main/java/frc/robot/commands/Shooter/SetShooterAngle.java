@@ -54,6 +54,7 @@ package frc.robot.commands.Shooter;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.lib.utility.BotLogger.BotLog;
 import frc.robot.subsystems.ShooterPivot.PivotPresets;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 
@@ -93,7 +94,7 @@ public class SetShooterAngle extends CommandBase {
   @Override
   public void initialize() {
     m_shooterPivotSubsystem.setAngleDegrees(m_pivotDegrees);
-    System.out.println("Shooter: Pivot to " + String.valueOf(m_pivotDegrees) + " degrees");
+    BotLog.Infof("Shooter: Pivot to %.2f degrees", m_pivotDegrees);
 
     if (RobotBase.isSimulation()) {
       m_simulationTimer.restart();
@@ -112,14 +113,11 @@ public class SetShooterAngle extends CommandBase {
     } else {
       double presentAngleDeg = m_shooterPivotSubsystem.getAngleDegrees();
       double delta = Math.abs(presentAngleDeg - m_pivotDegrees);
-      // SmartDashboard.putNumber("PivotTarget", m_pivotDegrees);
-      // SmartDashboard.putNumber("PivotAngle", presentAngleDeg);
-      // SmartDashboard.putNumber("PivotDelta", delta);
       finished = delta < kAngleToleranceDeg;
     }
 
     if (finished) {
-      System.out.println("Shooter: pivot reached: " + String.valueOf(m_pivotDegrees) + " degrees");
+      BotLog.Infof("Shooter: pivot reached %.2f degrees", m_pivotDegrees);
     }
 
     return finished;

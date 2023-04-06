@@ -53,14 +53,18 @@
       "/LiveWindow/Ungrouped/Talon FX [31]": "Motor Controller",
       "/LiveWindow/Ungrouped/Talon FX [40]": "Motor Controller",
       "/LiveWindow/Ungrouped/Talon FX [41]": "Motor Controller",
+      "/Shuffleboard/Auto Builder/Auto Type": "String Chooser",
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Balance Position": "String Chooser",
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Initial Action": "String Chooser",
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Initial Position": "String Chooser",
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Route": "String Chooser",
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Secondary Action": "String Chooser",
       "/Shuffleboard/Auto Builder/Balance Position": "String Chooser",
       "/Shuffleboard/Auto Builder/Field": "Field2d",
       "/Shuffleboard/Auto Builder/Initial Action": "String Chooser",
       "/Shuffleboard/Auto Builder/Initial Position": "String Chooser",
-      "/Shuffleboard/Auto Builder/Rotation PID": "PIDController",
       "/Shuffleboard/Auto Builder/Route": "String Chooser",
       "/Shuffleboard/Auto Builder/Secondary Action": "String Chooser",
-      "/Shuffleboard/Auto Builder/Translation PID": "PIDController",
       "/Shuffleboard/Auto Builder/Waypoint": "String Chooser",
       "/Shuffleboard/Intake Subsystem/Speed PID": "PIDController",
       "/Shuffleboard/Intake/Intake Gamepiece": "Command",
@@ -126,12 +130,6 @@
           "visible": true
         }
       },
-      "/Shuffleboard/Auto Builder/Rotation PID": {
-        "window": {
-          "name": "Rotation PID",
-          "visible": true
-        }
-      },
       "/Shuffleboard/Auto Builder/Route": {
         "window": {
           "name": "Escape Route",
@@ -141,12 +139,6 @@
       "/Shuffleboard/Auto Builder/Secondary Action": {
         "window": {
           "name": "Secondary Action",
-          "visible": true
-        }
-      },
-      "/Shuffleboard/Auto Builder/Translation PID": {
-        "window": {
-          "name": "Translation PID",
           "visible": true
         }
       },
