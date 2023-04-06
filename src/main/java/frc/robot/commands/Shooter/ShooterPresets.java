@@ -52,8 +52,6 @@
 package frc.robot.commands.Shooter;
 
 import frc.robot.commands.Shooter.Shoot.ShootConfig;
-import frc.robot.subsystems.Intake.IntakePreset;
-import frc.robot.subsystems.ShooterPivot.PivotPresets;
 
 /** An enumeration of shooter configurations for different shots */
 public enum ShooterPresets {
