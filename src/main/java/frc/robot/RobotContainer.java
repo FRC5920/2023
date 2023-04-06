@@ -88,6 +88,7 @@ public class RobotContainer {
   public final Swerve swerveSubsystem;
   public final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   public final ShooterPivotSubsystem shooterPivotSubsystem = new ShooterPivotSubsystem();
+  public final LEDs LEDsSubsystem = new LEDs();
 
   // public static final Pneumatics s_Pneumatics = new Pneumatics();
 
