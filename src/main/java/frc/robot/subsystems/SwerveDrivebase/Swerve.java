@@ -67,6 +67,7 @@ import frc.lib.SwerveDrive.GyroIO;
 import frc.lib.SwerveDrive.GyroInputsAutoLogged;
 import frc.lib.SwerveDrive.SwerveModule;
 import frc.lib.SwerveDrive.SwerveModuleIO;
+import frc.lib.utility.BotLogger.BotLog;
 import frc.robot.Constants;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 
@@ -275,6 +276,7 @@ public class Swerve extends SubsystemBase {
   public void resetGyro(Rotation2d angle) {
     m_gyroMeasurements.yawRad = angle.getRadians();
     m_gyroIO.setYaw(angle);
+    BotLog.Infof("Reset gyro to %.2f deg", angle.getDegrees());
   }
 
   /** Returns the yaw measurement */
