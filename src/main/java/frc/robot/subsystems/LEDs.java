@@ -156,9 +156,9 @@ public class LEDs extends SubsystemBase {
       AllYellow();
     }
     if (RobotState.isAutonomous()) {
-      AllWhite();
+      AllYellow();
     }
-    
+
     // Apply the LED buffer states to the LED strip
     m_led.setData(m_ledBuffer);
   }
