@@ -269,7 +269,7 @@ public class AutoDashboardTab implements IDashboardTab {
 
             // Get trajectories for the active auto
             trajectories = m_autoBuilder.getTrajectories();
-            initialPose = m_initialPositionChooser.getSelected().getPose();
+            initialPose = m_autoBuilder.getInitialPose();
             break;
           }
 

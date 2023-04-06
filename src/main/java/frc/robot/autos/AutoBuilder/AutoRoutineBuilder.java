@@ -58,6 +58,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.thirdparty.FRC6328.AllianceFlipUtil;
+import frc.lib.utility.BotLogger.BotLog;
 import frc.robot.RobotContainer;
 import frc.robot.autos.AutoBuilder.BalanceStrategy.BalanceMotionConfig;
 import frc.robot.autos.AutoBuilder.EscapeStrategy.EscapeMotionConfig;
@@ -78,6 +79,8 @@ public class AutoRoutineBuilder {
 
   /** Trajectory showing overall paths taken during the auto */
   private List<PathPlannerTrajectory> m_cumulativeTrajectory;
+
+  private Pose2d m_initialPose = new Pose2d();
 
   /** The last command built using build() */
   CommandBase m_builtCommand;
@@ -108,15 +111,16 @@ public class AutoRoutineBuilder {
     PoseEstimatorSubsystem poseEstimatorSubsystem = botContainer.poseEstimatorSubsystem;
 
     SequentialCommandGroup autoCommandGroup = new SequentialCommandGroup();
-    Pose2d startPosition = startingPosition.getPose();
+    m_initialPose = startingPosition.getPose();
 
     autoCommandGroup.addCommands(
+        new BotLog.InfoPrintCommand("<AutoBuilder> Starting autobuilder routine"),
         // First, a command to reset the robot pose to the initial position
         new InstantCommand(
             () -> {
-              swerveSubsystem.resetGyro(AllianceFlipUtil.apply(BotOrientation.kFacingGrid));
-              swerveSubsystem.resetOdometry(startPosition);
-              poseEstimatorSubsystem.setCurrentPose(startPosition);
+              swerveSubsystem.resetGyro(m_initialPose.getRotation());
+              swerveSubsystem.resetOdometry(m_initialPose);
+              poseEstimatorSubsystem.setCurrentPose(m_initialPose);
             }));
 
     // Gather commands used to perform the selected initial action
@@ -153,6 +157,10 @@ public class AutoRoutineBuilder {
 
     m_builtCommand = autoCommandGroup;
     return m_builtCommand;
+  }
+
+  public Pose2d getInitialPose() {
+    return m_initialPose;
   }
 
   /** Returns the overall trajectory of the generated auto routine */

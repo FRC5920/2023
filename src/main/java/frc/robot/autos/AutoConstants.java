@@ -168,7 +168,7 @@ public class AutoConstants {
 
       public final int id;
       private final Translation2d position;
-      private final Pose2d pose;
+      public final Pose2d pose;
 
       private ScoringPosition(int idx) {
         id = idx;

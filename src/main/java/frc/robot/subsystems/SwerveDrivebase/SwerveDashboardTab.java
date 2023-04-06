@@ -51,12 +51,11 @@
 \-----------------------------------------------------------------------------*/
 package frc.robot.subsystems.SwerveDrivebase;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotState;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -64,6 +63,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.lib.SwerveDrive.SwerveModuleIO.SwerveModuleIOTelemetry;
+import frc.lib.dashboard.SimGyroVisualizer;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Dashboard.IDashboardTab;
@@ -93,6 +93,8 @@ public class SwerveDashboardTab implements IDashboardTab {
 
   /** Swerve module telemetry displays */
   private ModuleTelemetryLayout m_moduleTelemetry[];
+
+  private SimGyroVisualizer m_simGyroVisualizer = null;
 
   /** 2d view of the field */
   private Field2d m_field2d;
@@ -179,6 +181,11 @@ public class SwerveDashboardTab implements IDashboardTab {
             .withSize(kSwerveModuleTelemetryWidth * 2, 4)
             .withPosition(kSwerveModuleTelemetryWidth, kSwerveModuleLayoutHeight)
             .getEntry();
+
+    if (RobotBase.isSimulation()) {
+      m_simGyroVisualizer = new SimGyroVisualizer();
+      m_tab.add("Degrees", m_simGyroVisualizer).withPosition(0, 15).withSize(3, 3);
+    }
   }
 
   /** Service dashboard tab widgets */
@@ -201,6 +208,10 @@ public class SwerveDashboardTab implements IDashboardTab {
             Constants.SwerveDrivebaseConstants.maxAngularVelocity * m_maxSpeed.getDouble(0);
       }
     }
+
+    if (RobotBase.isSimulation()) {
+      m_simGyroVisualizer.update(botContainer.swerveSubsystem.getYaw(), new Rotation2d());
+    }
   }
 
   private class ModuleTelemetryLayout {
@@ -217,7 +228,7 @@ public class SwerveDashboardTab implements IDashboardTab {
     private final GenericEntry angleCurrent;
     private final GenericEntry angleTemp;
 
-    private final SwerveModuleVisualizer m_swerveVisualizer;
+    private final SimGyroVisualizer m_swerveVisualizer;
 
     /**
      * Creates a Shuffleboard layout for displaying telemetry of a swerve module
@@ -227,7 +238,7 @@ public class SwerveDashboardTab implements IDashboardTab {
      */
     public ModuleTelemetryLayout(
         ShuffleboardTab tab, ModuleId moduleId, int sizeColumns, int sizeRows) {
-      m_swerveVisualizer = new SwerveModuleVisualizer();
+      m_swerveVisualizer = new SimGyroVisualizer();
 
       // Create a grid layout to add subgrouped widgets to
       m_layout = tab.getLayout(moduleId.toString(), BuiltInLayouts.kGrid);
@@ -342,8 +353,8 @@ public class SwerveDashboardTab implements IDashboardTab {
       driveCurrent.setDouble(telemetry.driveCurrentAmps);
       driveTemp.setDouble(telemetry.driveTempCelcius);
       m_swerveVisualizer.update(
-          Units.radiansToDegrees(telemetry.anglePositionRad),
-          Units.radiansToDegrees(telemetry.angleVelocityRadPerSec));
+          Rotation2d.fromRadians(telemetry.anglePositionRad),
+          Rotation2d.fromRadians(telemetry.angleVelocityRadPerSec));
       angleVel.setDouble(Units.radiansToDegrees(telemetry.angleVelocityRadPerSec));
       angleVolts.setDouble(telemetry.angleAppliedVolts);
       angleCurrent.setDouble(telemetry.angleCurrentAmps);
@@ -353,54 +364,5 @@ public class SwerveDashboardTab implements IDashboardTab {
     ShuffleboardLayout getLayout() {
       return m_layout;
     }
-  }
-
-  private class SwerveModuleVisualizer implements Gyro, Sendable {
-    double m_angle;
-    double m_rate;
-
-    /**
-     * Creates an instance of the object
-     *
-     * @param angleSupplier supplies the angle of the module in degrees
-     * @param rateSupplier supplies the angle rate of change in degrees per second
-     */
-    public SwerveModuleVisualizer() {}
-
-    @Override
-    public void initSendable(SendableBuilder builder) {
-      builder.setSmartDashboardType("Gyro");
-      builder.addDoubleProperty("Value", this::getAngle, null);
-    }
-
-    /** Update the angle and rate */
-    public void update(double angleDegrees, double angleRateDegreesPerSec) {
-      m_angle = angleDegrees;
-      m_rate = angleRateDegreesPerSec;
-    }
-
-    /** Gyro.getAngle returns the angle in degrees */
-    @Override
-    public double getAngle() {
-      return m_angle;
-    }
-
-    /** Gyro.getRate returns the rate of rotation in degrees per second */
-    @Override
-    public double getRate() {
-      return m_rate;
-    }
-
-    /** Gyro.calibrate() does nothing in this implementation */
-    @Override
-    public void calibrate() {}
-
-    /** Gyro.reset() does nothing in this implementation */
-    @Override
-    public void reset() {}
-
-    /** AutoCloseable.close does nothing in this implementation */
-    @Override
-    public void close() {}
   }
 }
