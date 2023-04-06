@@ -61,7 +61,7 @@ public enum ShooterPresets {
   PivotSideMid(110.0, 18.0),
   PivotSideHigh(112.0, 25.0),
 
-  PivotSideHailMaryLow(PivotPresets.CloseShotLow.angleDegrees, IntakePreset.HailMary.motorSpeed),
+  PivotSideHailMaryLow(170.0, 65.0),
   PivotSideHailMaryMid(150, 95.0),
   PivotSideHailMaryHigh(120, 95.0),
 
@@ -70,7 +70,12 @@ public enum ShooterPresets {
   // Shoot in reverse from the cable protector
   RSLSideLow(20, 12),
   RSLSideMid(40, 20),
-  RSLSideHigh(45, 30);
+  RSLSideHigh(45, 30),
+
+  // Shoot in reverse from the cable protector
+  RSLSideHailMaryLow(20, 65.0),
+  RSLSideHailMaryMid(30, 95.0),
+  RSLSideHailMaryHigh(60, 95.0);
 
   public final ShootConfig config;
 

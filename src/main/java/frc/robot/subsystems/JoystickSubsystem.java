@@ -185,13 +185,13 @@ public class JoystickSubsystem extends SubsystemBase {
     // --------------------
     // Create shift-keyed shoot commands that are active when left trigger is pulled
     CommandBase hailMaryShotLow =
-        new Shoot(ShooterPresets.PivotSideHailMaryLow, shooterPivot, intake)
+        new Shoot(ShooterPresets.RSLSideHailMaryLow, shooterPivot, intake)
             .unless(() -> !driverController.leftTriggerAsButton.getAsBoolean());
     CommandBase hailMaryShotMid =
-        new Shoot(ShooterPresets.PivotSideHailMaryMid, shooterPivot, intake)
+        new Shoot(ShooterPresets.RSLSideHailMaryMid, shooterPivot, intake)
             .unless(() -> !driverController.leftTriggerAsButton.getAsBoolean());
     CommandBase hailMaryShotHigh =
-        new Shoot(ShooterPresets.PivotSideHailMaryHigh, shooterPivot, intake)
+        new Shoot(ShooterPresets.RSLSideHailMaryHigh, shooterPivot, intake)
             .unless(() -> !driverController.leftTriggerAsButton.getAsBoolean());
 
     if (kDriverControllerIsEnabled) {
