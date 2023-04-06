@@ -173,13 +173,13 @@ public class JoystickSubsystem extends SubsystemBase {
 
     // Create shoot commands that are active when left trigger is off
     CommandBase closeShotLow =
-        new Shoot(ShooterPresets.PivotSideLow, shooterPivot, intake)
+        new Shoot(ShooterPresets.RSLSideLow, shooterPivot, intake)
             .unless(() -> driverController.leftTriggerAsButton.getAsBoolean());
     CommandBase closeShotMid =
-        new Shoot(ShooterPresets.PivotSideMid, shooterPivot, intake)
+        new Shoot(ShooterPresets.RSLSideMid, shooterPivot, intake)
             .unless(() -> driverController.leftTriggerAsButton.getAsBoolean());
     CommandBase closeShotHigh =
-        new Shoot(ShooterPresets.PivotSideHigh, shooterPivot, intake)
+        new Shoot(ShooterPresets.RSLSideHigh, shooterPivot, intake)
             .unless(() -> driverController.leftTriggerAsButton.getAsBoolean());
 
     // --------------------
