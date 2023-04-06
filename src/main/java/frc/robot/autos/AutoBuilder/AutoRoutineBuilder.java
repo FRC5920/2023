@@ -151,7 +151,6 @@ public class AutoRoutineBuilder {
         break;
     }
 
-
     m_builtCommand = autoCommandGroup;
     return m_builtCommand;
   }
