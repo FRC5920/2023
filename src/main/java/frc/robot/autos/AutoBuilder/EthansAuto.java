@@ -59,6 +59,8 @@ public class EthansAuto extends CommandBase {
   /** Creates a new EthansAuto. */
   int Five = 0;
 
+  private Timer counter_timer = new Timer();
+
   int amount;
   double samount;
   double Time;
@@ -72,16 +74,17 @@ public class EthansAuto extends CommandBase {
   @Override
   public void initialize() {
     Time = Timer.getFPGATimestamp();
+    counter_timer.restart();
     amount = 0;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (Time + 1 == Timer.getFPGATimestamp()) {
+    if (counter_timer.hasElapsed(1)) {
       Five++;
       System.out.println("Amogus " + Timer.getFPGATimestamp());
-      Time = Timer.getFPGATimestamp();
+      counter_timer.restart();
     }
   }
 
