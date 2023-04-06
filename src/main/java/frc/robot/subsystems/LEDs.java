@@ -128,13 +128,13 @@ public class LEDs extends SubsystemBase {
   /////////////////////////////////////////////////////////////////////////////
   /** Updates the active color */
   public void updateColor(Color8Bit desiredColor) {
-    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
-      m_ledBuffer.setLED(i, kYellow);
-    }
-    // m_lowerLeftSweep.setColor(desiredColor);
-    // m_upperLeftSweep.setColor(desiredColor);
-    // m_lowerRightSweep.setColor(desiredColor);
-    // m_upperRightSweep.setColor(desiredColor);
+    // for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+    //   m_ledBuffer.setLED(i, kYellow);
+    // }
+    m_lowerLeftSweep.setColor(desiredColor);
+    m_upperLeftSweep.setColor(desiredColor);
+    m_lowerRightSweep.setColor(desiredColor);
+    m_upperRightSweep.setColor(desiredColor);
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -191,4 +191,5 @@ public class LEDs extends SubsystemBase {
     m_rainbowFirstPixelHue += 3;
     m_rainbowFirstPixelHue %= 180;
   }
+
 }
