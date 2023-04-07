@@ -194,6 +194,20 @@ public class JoystickSubsystem extends SubsystemBase {
         new Shoot(ShooterPresets.PivotSideHailMaryHigh, shooterPivot, intake)
             .unless(() -> !driverController.leftTriggerAsButton.getAsBoolean());
 
+    CommandBase snap2GridCommand =
+        new BotLog.SimInfoPrintCommand("Snap-to-grid ON")
+            .andThen(
+                new SnapToGrid(
+                    swerveSubsystem,
+                    this,
+                    true,
+                    true,
+                    RobotContainer.MaxSpeed,
+                    RobotContainer.MaxRotate,
+                    botContainer.autoDashboardTab.getField2d()))
+            .finallyDo(
+                (interrupted) -> new BotLog.SimInfoPrintCommand("Snap-to-grid OFF").initialize());
+
     if (kDriverControllerIsEnabled) {
       // Map buttons on driver controller
 
@@ -232,19 +246,7 @@ public class JoystickSubsystem extends SubsystemBase {
       driverController.start.whileTrue(new Balance(swerveSubsystem)); // right little
 
       driverController.rightTriggerAsButton.whileTrue(
-          new BotLog.SimInfoPrintCommand("Snap-to-grid ON")
-              .andThen(
-                  new SnapToGrid(
-                      swerveSubsystem,
-                      this,
-                      true,
-                      true,
-                      RobotContainer.MaxSpeed,
-                      RobotContainer.MaxRotate,
-                      botContainer.autoDashboardTab.getField2d()))
-              .finallyDo(
-                  (interrupted) ->
-                      new BotLog.SimInfoPrintCommand("Snap-to-grid OFF").initialize()));
+          Acquire.acquireAndPark(botContainer.shooterPivotSubsystem, botContainer.intakeSubsystem));
     }
 
     if (kOperatorControllerIsEnabled) {
