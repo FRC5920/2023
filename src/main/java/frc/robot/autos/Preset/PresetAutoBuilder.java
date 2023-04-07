@@ -63,11 +63,13 @@ public class PresetAutoBuilder {
   NorthLinkAndBalancePresetBuilder m_northLinkAndBalanceBuilder;
   NorthLinkOverCSPresetBuilder m_northLinkOverCSBuilder;
   SouthLinkAndBalanceBuilder m_southLinkAndBalanceBuilder;
+  SouthLinkAndChillBuilder m_southLinkAndChillBuilder;
 
   public PresetAutoBuilder() {
     m_northLinkAndBalanceBuilder = new NorthLinkAndBalancePresetBuilder();
     m_northLinkOverCSBuilder = new NorthLinkOverCSPresetBuilder();
     m_southLinkAndBalanceBuilder = new SouthLinkAndBalanceBuilder();
+    m_southLinkAndChillBuilder = new SouthLinkAndChillBuilder();
   }
 
   public CommandBase getCommand(AutoType autoType, RobotContainer botContainer) {
@@ -80,6 +82,8 @@ public class PresetAutoBuilder {
       case SouthLinkAndBalance:
         autoCommand = m_southLinkAndBalanceBuilder.getCommand(botContainer);
         break;
+      case SouthLinkAndChill:
+        autoCommand = m_southLinkAndChillBuilder.getCommand(botContainer);
       default:
         break; // Return null for unsupported type
     }
@@ -96,6 +100,9 @@ public class PresetAutoBuilder {
         break;
       case SouthLinkAndBalance:
         pose = m_southLinkAndBalanceBuilder.getInitialPose();
+        break;
+      case SouthLinkAndChill:
+        pose = m_southLinkAndChillBuilder.getInitialPose();
         break;
       default:
         break; // Return null for unsupported auto type
@@ -114,6 +121,9 @@ public class PresetAutoBuilder {
         break;
       case SouthLinkAndBalance:
         trajectories = m_southLinkAndBalanceBuilder.getTrajectories();
+        break;
+      case SouthLinkAndChill:
+        trajectories = m_southLinkAndChillBuilder.getTrajectories();
         break;
       default:
         break; // Return null for unsupported auto type

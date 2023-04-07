@@ -275,6 +275,7 @@ public class AutoDashboardTab implements IDashboardTab {
 
         case NorthLinkAndBalanceOverCS:
         case SouthLinkAndBalance:
+        case SouthLinkAndChill:
           {
             AutoType autoType = m_autoTypeChooser.getSelected();
             trajectories = m_presetAutoBuilder.getTrajectories(autoType);
