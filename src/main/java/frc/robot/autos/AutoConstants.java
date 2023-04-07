@@ -120,8 +120,9 @@ public class AutoConstants {
   public static enum AutoType {
     AutoBuilder(0), // Generate auto routine using AutoBuilder
     NorthLinkAndBalanceOverCS(1), // Preset: two cubes North of CS, end with balance
-    SouthLinkAndBalance(2), // Preset: two cubes South of CS, end with balance
-    SouthLinkAndChill(3); // Preset: two cubes south of CS, end with sit still
+    NorthLinkAndChill(2), // Preset two cubes North of CS, end with sit still
+    SouthLinkAndBalance(3), // Preset: two cubes South of CS, end with balance
+    SouthLinkAndChill(4); // Preset: two cubes south of CS, end with sit still
     public final int id;
 
     private AutoType(int _id) {
@@ -131,7 +132,11 @@ public class AutoConstants {
     /** Returns a list of names of enum elements */
     public static String[] getNames() {
       return new String[] {
-        "AutoBuilder", "Preset North 3+Balance", "Preset South 3+Balance", "Preset South 3+chill"
+        "AutoBuilder",
+        "Preset North 3+Balance",
+        "Preset North 3+chill",
+        "Preset South 3+Balance",
+        "Preset South 3+chill"
       };
     }
   };

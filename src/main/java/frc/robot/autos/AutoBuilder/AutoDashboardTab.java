@@ -274,6 +274,7 @@ public class AutoDashboardTab implements IDashboardTab {
           }
 
         case NorthLinkAndBalanceOverCS:
+        case NorthLinkAndChill:
         case SouthLinkAndBalance:
         case SouthLinkAndChill:
           {

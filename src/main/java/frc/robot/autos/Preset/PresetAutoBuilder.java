@@ -62,12 +62,14 @@ import java.util.List;
 public class PresetAutoBuilder {
   NorthLinkAndBalancePresetBuilder m_northLinkAndBalanceBuilder;
   NorthLinkOverCSPresetBuilder m_northLinkOverCSBuilder;
+  NorthLinkAndChillBuilder m_northLinkAndChillBuilder;
   SouthLinkAndBalanceBuilder m_southLinkAndBalanceBuilder;
   SouthLinkAndChillBuilder m_southLinkAndChillBuilder;
 
   public PresetAutoBuilder() {
     m_northLinkAndBalanceBuilder = new NorthLinkAndBalancePresetBuilder();
     m_northLinkOverCSBuilder = new NorthLinkOverCSPresetBuilder();
+    m_northLinkAndChillBuilder = new NorthLinkAndChillBuilder();
     m_southLinkAndBalanceBuilder = new SouthLinkAndBalanceBuilder();
     m_southLinkAndChillBuilder = new SouthLinkAndChillBuilder();
   }
@@ -78,6 +80,9 @@ public class PresetAutoBuilder {
     switch (autoType) {
       case NorthLinkAndBalanceOverCS:
         autoCommand = m_northLinkOverCSBuilder.getCommand(botContainer);
+        break;
+      case NorthLinkAndChill:
+        autoCommand = m_northLinkAndChillBuilder.getCommand(botContainer);
         break;
       case SouthLinkAndBalance:
         autoCommand = m_southLinkAndBalanceBuilder.getCommand(botContainer);
@@ -97,6 +102,9 @@ public class PresetAutoBuilder {
     switch (autoType) {
       case NorthLinkAndBalanceOverCS:
         pose = m_northLinkOverCSBuilder.getInitialPose();
+        break;
+      case NorthLinkAndChill:
+        pose = m_northLinkAndChillBuilder.getInitialPose();
         break;
       case SouthLinkAndBalance:
         pose = m_southLinkAndBalanceBuilder.getInitialPose();
@@ -118,6 +126,9 @@ public class PresetAutoBuilder {
     switch (autoType) {
       case NorthLinkAndBalanceOverCS:
         trajectories = m_northLinkOverCSBuilder.getTrajectories();
+        break;
+      case NorthLinkAndChill:
+        trajectories = m_northLinkAndChillBuilder.getTrajectories();
         break;
       case SouthLinkAndBalance:
         trajectories = m_southLinkAndBalanceBuilder.getTrajectories();
