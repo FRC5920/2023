@@ -116,13 +116,14 @@ public class IntakeSubsystem extends SubsystemBase {
 
   /** Returns the default command for the subsystem */
   public CommandBase getDefaultCommand() {
+    CommandBase stopIntakeCommand =
+        Commands.sequence(
+            new BotLog.DebugPrintCommand("<IntakeSubsystem> default shutoff"),
+            new InstantCommand(this::stopIntake));
+
     CommandBase defaultCommand =
         Commands.either(
-            Commands.sequence(
-                new BotLog.DebugPrintCommand("<IntakeSubsystem> default shutoff"),
-                new InstantCommand(this::stopIntake)),
-            new InstantCommand(),
-            () -> this.getSpeedPercent() > 0.0);
+            stopIntakeCommand, new InstantCommand(), () -> Math.abs(this.getSpeedPercent()) > 0.0);
 
     defaultCommand.addRequirements(this);
     return defaultCommand;

@@ -55,13 +55,14 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.utility.BotLogger.BotLog;
 import frc.lib.utility.PIDGains;
-import frc.robot.commands.Shooter.AutoZeroPivot;
 import frc.robot.commands.Shooter.SetShooterAngle;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 
@@ -119,6 +120,12 @@ public class ShooterPivotSubsystem extends SubsystemBase {
   private final WPI_TalonFX m_masterMotor = m_motors[0];
   private final WPI_TalonFX m_slaveMotor = m_motors[1];
 
+  /** Set to the last requested pivot angle in degrees */
+  private double m_requestedPivotAngleDeg = 0.0;
+
+  /** Flag set to indicate that the pivot position should be auto-zeroed */
+  private boolean m_pivotZeroIsNeeded = true;
+
   /** Dashboard tab for the shooter pivot subsystem */
   final ShooterPivotDashboardTab m_dashboardTab;
 
@@ -134,12 +141,9 @@ public class ShooterPivotSubsystem extends SubsystemBase {
   public CommandBase getDefaultCommand() {
     CommandBase defaultCommand =
         Commands.either(
-            Commands.sequence(new SetShooterAngle(this, PivotPresets.Park)),
-            new ConditionalCommand(
-                new AutoZeroPivot(this, -5.0),
-                new InstantCommand(),
-                () -> getPositionTicks() != 0.0),
-            () -> this.getAngleDegrees() > PivotPresets.Park.angleDegrees);
+            new SetShooterAngle(this, PivotPresets.Park),
+            new AutoZeroPivot(this).unless(() -> !m_pivotZeroIsNeeded),
+            () -> m_requestedPivotAngleDeg > PivotPresets.Park.angleDegrees);
 
     defaultCommand.addRequirements(this);
     return defaultCommand;
@@ -152,6 +156,9 @@ public class ShooterPivotSubsystem extends SubsystemBase {
    */
   public void setAngleDegrees(double degrees) {
     m_masterMotor.set(TalonFXControlMode.MotionMagic, degreesToFalconTicks(degrees));
+    m_requestedPivotAngleDeg = degrees;
+    // Auto-zero after every pivot command
+    m_pivotZeroIsNeeded = true;
   }
 
   /**
@@ -168,32 +175,9 @@ public class ShooterPivotSubsystem extends SubsystemBase {
     setAngleDegrees(PivotPresets.Park.angleDegrees);
   }
 
-  /**
-   * Returns true if the present pivot position is at a given angle
-   *
-   * @param angleDeg Position to check for
-   * @param toleranceDeg Maximum distance (degrees) in either direction from angleDeg that is
-   *     tolerated as being "close enough"
-   */
+  /** Returns the measured pivot angle in degrees */
   public double getAngleDegrees() {
     return falconTicksToDegrees(m_masterMotor.getSelectedSensorPosition());
-  }
-
-  /** Returns the raw sensor position in ticks from the pivot motor */
-  public double getPositionTicks() {
-    return m_masterMotor.getSelectedSensorPosition();
-  }
-
-  /** Resets the encoder count in pivot motors */
-  public void zeroPivotPositionSensor() {
-    for (WPI_TalonFX motor : m_motors) {
-      motor.setSelectedSensorPosition(0);
-    }
-  }
-
-  /** Runs the pivot motor directly at a given speed */
-  public void runPivotMotor(double speedPercent) {
-    m_masterMotor.set(speedPercent / 100.0);
   }
 
   /** Returns the subsystem's dashboard tab */
@@ -343,5 +327,120 @@ public class ShooterPivotSubsystem extends SubsystemBase {
    */
   static double falconTicksToDegrees(double falconTicks) {
     return falconTicks * kPivotGearRatio * kDegreesPerFalconTick;
+  }
+
+  /** Returns the raw sensor position in ticks from the pivot motor */
+  private double getPositionTicks() {
+    return m_masterMotor.getSelectedSensorPosition();
+  }
+
+  /** Returns the pivot speed in ticks per 100 ms from the pivot motor */
+  private double getPivotMotorVelocityTicks() {
+    return m_masterMotor.getSelectedSensorVelocity();
+  }
+
+  /** Resets the encoder count in pivot motors */
+  private void zeroPivotPositionSensor() {
+    for (WPI_TalonFX motor : m_motors) {
+      motor.setSelectedSensorPosition(0);
+    }
+  }
+
+  /** Runs the pivot motor directly at a given speed */
+  private void runPivotMotor(double speedPercent) {
+    m_masterMotor.set(speedPercent / 100.0);
+  }
+
+  private void resetPivotZeroNeeded() {
+    m_pivotZeroIsNeeded = false;
+  }
+
+  /**
+   * Internal command used to auto-zero the pivot sensor position.
+   *
+   * @remarks Auto-zero assumes that the pivot has been returned to somewhere close to its start
+   *     position. It functions by running the pivot motor in open-loop mode in reverse at a low
+   *     speed while measuring the average speed of the motor over a short window of time. When the
+   *     pivot reaches its park position, it is physically unable to move any further and the
+   *     average speed of the pivot motors drops to zero (or very nearly zero). At that point, the
+   *     command disengages the pivot motor, zeroes the sensor position, and disengates the pivot
+   *     motor.
+   */
+  private static class AutoZeroPivot extends CommandBase {
+    private static final double kAutoZeroSpeedThreshold = 10;
+
+    /** Speed to run the pivot motor at when auto-zeroing */
+    private static final double kAutoZeroMotorSpeedPercent = -2.0;
+
+    /** Set to true to enable logging auto-zero start and end */
+    private static final boolean kEnableLogging = true;
+
+    /** Pivot subsystem to operate on */
+    private final ShooterPivotSubsystem m_shooterPivotSubsystem;
+
+    /** Timer used to time auto-zero operations */
+    private Timer m_timer = new Timer();
+
+    /** A filter used to average pivot motor speed over time */
+    private final LinearFilter m_speedAverager = LinearFilter.movingAverage(5);
+
+    /** Creates a new autoZeroPivot. */
+    public AutoZeroPivot(ShooterPivotSubsystem shooterPivotSubsystem) {
+      m_shooterPivotSubsystem = shooterPivotSubsystem;
+      addRequirements(shooterPivotSubsystem);
+    }
+
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {
+      if (kEnableLogging) {
+        BotLog.Infof(
+            "<AutoZeroPivot> starting.  Ticks=%.1f", m_shooterPivotSubsystem.getPositionTicks());
+      }
+
+      // Run the motor
+      m_shooterPivotSubsystem.runPivotMotor(kAutoZeroMotorSpeedPercent);
+      m_speedAverager.reset();
+      m_timer.restart(); // Start auto-zero timer
+    }
+
+    // Called every time the scheduler runs while the command is scheduled.
+    @Override
+    public void execute() {}
+
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+      // Get the speed of the motor in ticks/sec
+      double pivotSpeedTicksPerSec = m_shooterPivotSubsystem.getPivotMotorVelocityTicks();
+      // Calculate the average speed of the pivot motor
+      double averageSpeedTicksPerSec = m_speedAverager.calculate(pivotSpeedTicksPerSec);
+
+      // The command is finished when the motor is running, but its measured speed is zero
+      return RobotBase.isSimulation() || (averageSpeedTicksPerSec < kAutoZeroSpeedThreshold);
+    }
+
+    // Called when the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {
+
+      // Disengage the pivot motor when the command is interrupted or ends
+      m_shooterPivotSubsystem.runPivotMotor(0.0);
+
+      if (!interrupted) {
+        // If auto-zeroing is complete, zero the pivot position sensor
+        m_shooterPivotSubsystem.zeroPivotPositionSensor();
+        m_shooterPivotSubsystem.resetPivotZeroNeeded();
+
+        if (kEnableLogging) {
+          BotLog.Debugf("Pivot auto-zero completed after %.3f seconds", m_timer.get());
+        }
+      } else {
+        if (kEnableLogging) {
+          m_speedAverager.reset(); // Reset speed averaging when interrupted
+          BotLog.Debug("Pivot auto-zero interrupted");
+        }
+      }
+    }
   }
 }
