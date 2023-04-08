@@ -55,13 +55,13 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.utility.BotLogger.BotLog;
 import frc.lib.utility.PIDGains;
-import frc.robot.commands.Shooter.AutoZeroPivot;
 import frc.robot.commands.Shooter.SetShooterAngle;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 
@@ -122,6 +122,12 @@ public class ShooterPivotSubsystem extends SubsystemBase {
   /** Dashboard tab for the shooter pivot subsystem */
   final ShooterPivotDashboardTab m_dashboardTab;
 
+  /** The last requested pivot position in degrees */
+  private double m_requestedPivotDegrees = 0.0;
+
+  /** True when a pivot auto-zero is needed */
+  private boolean m_pivotZeroIsNeeded = true;
+
   /** Creates a new ShooterPivot. */
   public ShooterPivotSubsystem() {
     m_dashboardTab = (kEnableDashboardTab) ? new ShooterPivotDashboardTab(this) : null;
@@ -134,12 +140,9 @@ public class ShooterPivotSubsystem extends SubsystemBase {
   public CommandBase getDefaultCommand() {
     CommandBase defaultCommand =
         Commands.either(
-            Commands.sequence(new SetShooterAngle(this, PivotPresets.Park)),
-            new ConditionalCommand(
-                new AutoZeroPivot(this, -5.0),
-                new InstantCommand(),
-                () -> getPositionTicks() != 0.0),
-            () -> this.getAngleDegrees() > PivotPresets.Park.angleDegrees);
+            new SetShooterAngle(this, PivotPresets.Park),
+            new AutoZeroPivot(this).unless(() -> !m_pivotZeroIsNeeded),
+            () -> m_requestedPivotDegrees > PivotPresets.Park.angleDegrees);
 
     defaultCommand.addRequirements(this);
     return defaultCommand;
@@ -152,6 +155,8 @@ public class ShooterPivotSubsystem extends SubsystemBase {
    */
   public void setAngleDegrees(double degrees) {
     m_masterMotor.set(TalonFXControlMode.MotionMagic, degreesToFalconTicks(degrees));
+    m_requestedPivotDegrees = degrees;
+    m_pivotZeroIsNeeded = true;
   }
 
   /**
@@ -180,19 +185,19 @@ public class ShooterPivotSubsystem extends SubsystemBase {
   }
 
   /** Returns the raw sensor position in ticks from the pivot motor */
-  public double getPositionTicks() {
+  private double getPositionTicks() {
     return m_masterMotor.getSelectedSensorPosition();
   }
 
   /** Resets the encoder count in pivot motors */
-  public void zeroPivotPositionSensor() {
+  private void zeroPivotPositionSensor() {
     for (WPI_TalonFX motor : m_motors) {
       motor.setSelectedSensorPosition(0);
     }
   }
 
   /** Runs the pivot motor directly at a given speed */
-  public void runPivotMotor(double speedPercent) {
+  private void runPivotMotor(double speedPercent) {
     m_masterMotor.set(speedPercent / 100.0);
   }
 
@@ -343,5 +348,88 @@ public class ShooterPivotSubsystem extends SubsystemBase {
    */
   static double falconTicksToDegrees(double falconTicks) {
     return falconTicks * kPivotGearRatio * kDegreesPerFalconTick;
+  }
+
+  private void resetPivotZeroIsNeeded() {
+    m_pivotZeroIsNeeded = false;
+  }
+
+  /** Private command used to automatically zero the pivot sensor */
+  private static class AutoZeroPivot extends CommandBase {
+    private static final double kMotorSpeedPercent = 5.0;
+
+    private static final boolean kEnableLogging = true;
+
+    private static final double kPositionThresholdTicks = 5.0;
+
+    private boolean m_isInitialRun = true;
+    private double m_pivotPositionTicks = 0;
+    private final ShooterPivotSubsystem m_shooterPivotSubsystem;
+    private final Timer m_timer = new Timer();
+
+    /** Creates a new autoZeroPivot. */
+    public AutoZeroPivot(ShooterPivotSubsystem shooterPivotSubsystem) {
+      m_shooterPivotSubsystem = shooterPivotSubsystem;
+      addRequirements(shooterPivotSubsystem);
+    }
+
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {
+      if (kEnableLogging) {
+        BotLog.Debugf(
+            "<AutoZeroPivot> starting with ticks=%.1f\n",
+            m_shooterPivotSubsystem.getPositionTicks());
+      }
+      m_isInitialRun = true;
+      m_pivotPositionTicks = m_shooterPivotSubsystem.getPositionTicks();
+      m_shooterPivotSubsystem.runPivotMotor(kMotorSpeedPercent);
+      m_timer.restart();
+    }
+
+    // Called every time the scheduler runs while the command is scheduled.
+    @Override
+    public void execute() {}
+
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+      // Don't evaluate end conditions the first cycle the command is run.  Otherwise, the motor may
+      // not have had time to start moving.
+      if (m_isInitialRun) {
+        m_isInitialRun = false;
+      }
+
+      // Get the current pivot angle
+      double currentPivotTicks = m_shooterPivotSubsystem.getPositionTicks();
+      double lastPivotTicks = m_pivotPositionTicks;
+      m_pivotPositionTicks = currentPivotTicks;
+
+      // The command is finished when the motor is running and no change has
+      // occurred in the pivot angle
+      return RobotBase.isSimulation()
+          || (Math.abs(lastPivotTicks - currentPivotTicks) < kPositionThresholdTicks);
+    }
+
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {
+      // Turn off the pivot motor when the command finishes
+      m_shooterPivotSubsystem.runPivotMotor(0.0);
+
+      if (!interrupted) {
+        // Zero the pivot position sensor
+        m_shooterPivotSubsystem.zeroPivotPositionSensor();
+        m_shooterPivotSubsystem.resetPivotZeroIsNeeded();
+
+        if (kEnableLogging) {
+          BotLog.Infof("<AutoZeroPivot> finished after %.3f seconds", m_timer.get());
+        }
+      } else {
+        if (kEnableLogging) {
+          BotLog.Infof("<AutoZeroPivot> interrupted", m_timer.get());
+        }
+      }
+    }
   }
 }

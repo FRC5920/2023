@@ -269,8 +269,7 @@ public class JoystickSubsystem extends SubsystemBase {
       operatorController.back.onTrue(
           new InstantCommand(
               () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.Park)));
-      operatorController.start.onTrue(
-          new InstantCommand(() -> botContainer.shooterPivotSubsystem.zeroPivotPositionSensor()));
+      operatorController.start.onTrue(new InstantCommand());
     }
   }
 
