@@ -123,7 +123,7 @@ public class ShooterPivotSubsystem extends SubsystemBase {
   final ShooterPivotDashboardTab m_dashboardTab;
 
   /** The last requested pivot position in degrees */
-  private double m_requestedPivotDegrees = 0.0;
+  private double m_requestedPivotDegrees = PivotPresets.Park.angleDegrees;
 
   /** True when a pivot auto-zero is needed */
   private boolean m_pivotZeroIsNeeded = true;
@@ -430,6 +430,37 @@ public class ShooterPivotSubsystem extends SubsystemBase {
           BotLog.Infof("<AutoZeroPivot> interrupted", m_timer.get());
         }
       }
+    }
+  }
+
+  public static class EmergencyPark extends CommandBase {
+    private static final double kMotorSpeedPercent = 25.0;
+
+    private final ShooterPivotSubsystem m_shooterPivotSubsystem;
+
+    public EmergencyPark(ShooterPivotSubsystem shooterPivotSubsystem) {
+      m_shooterPivotSubsystem = shooterPivotSubsystem;
+    }
+
+    @Override
+    public void initialize() {
+      m_shooterPivotSubsystem.runPivotMotor(kMotorSpeedPercent);
+    }
+
+    // Called every time the scheduler runs while the command is scheduled.
+    @Override
+    public void execute() {}
+
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+      return false;
+    }
+
+    // Called when the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {
+      m_shooterPivotSubsystem.runPivotMotor(0.0);
     }
   }
 }

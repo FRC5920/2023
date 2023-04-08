@@ -208,6 +208,10 @@ public class JoystickSubsystem extends SubsystemBase {
             .finallyDo(
                 (interrupted) -> new BotLog.SimInfoPrintCommand("Snap-to-grid OFF").initialize());
 
+    CommandBase acquireAndParkCommand =
+        Acquire.acquireAndPark(shooterPivot, intake)
+            .unless(() -> !driverController.X.getAsBoolean());
+
     if (kDriverControllerIsEnabled) {
       // Map buttons on driver controller
 
@@ -222,7 +226,14 @@ public class JoystickSubsystem extends SubsystemBase {
           Commands.either(
               hailMaryShotHigh, closeShotHigh, driverController.leftTriggerAsButton::getAsBoolean));
 
-      driverController.X.whileTrue(Acquire.acquireAndPark(shooterPivot, intake));
+      // Map X button:
+      //   X (alone) = acquireAndPark
+      //   X+leftTrigger = emergency park
+      driverController.X.whileTrue(
+          Commands.either(
+              acquireAndParkCommand,
+              new ShooterPivotSubsystem.EmergencyPark(botContainer.shooterPivotSubsystem),
+              driverController.X::getAsBoolean));
 
       driverController.rightBumper.whileTrue(
           DriveWithZTargeting.zTargetDriveWithIntake(
