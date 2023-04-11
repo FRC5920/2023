@@ -60,6 +60,7 @@
       "/Shuffleboard/Auto Builder/AutoBuilder Config/Route": "String Chooser",
       "/Shuffleboard/Auto Builder/AutoBuilder Config/Secondary Action": "String Chooser",
       "/Shuffleboard/Auto Builder/Balance Position": "String Chooser",
+      "/Shuffleboard/Auto Builder/Degrees": "Gyro",
       "/Shuffleboard/Auto Builder/Field": "Field2d",
       "/Shuffleboard/Auto Builder/Initial Action": "String Chooser",
       "/Shuffleboard/Auto Builder/Initial Position": "String Chooser",
@@ -85,9 +86,38 @@
       "/Shuffleboard/SwerveDrive/RearRight/Angle/Degrees": "Gyro"
     },
     "windows": {
-      "/Shuffleboard/Auto Builder/Balance Position": {
+      "/Shuffleboard/Auto Builder/Auto Type": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Balance Position": {
         "window": {
           "name": "Balance Position",
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Initial Action": {
+        "window": {
+          "name": "Initial Action",
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Initial Position": {
+        "window": {
+          "name": "Initial Position",
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Route": {
+        "window": {
+          "name": "Route",
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Auto Builder/AutoBuilder Config/Secondary Action": {
+        "window": {
+          "name": "Secondary Action",
           "visible": true
         }
       },
@@ -108,6 +138,10 @@
           "arrows": false,
           "style": "Line"
         },
+        "AutoTrajectory4": {
+          "arrows": false,
+          "style": "Line"
+        },
         "bottom": 544,
         "height": 8.013679504394531,
         "image": "2023-field.png",
@@ -116,35 +150,6 @@
         "top": 36,
         "width": 16.541748046875,
         "window": {
-          "visible": true
-        }
-      },
-      "/Shuffleboard/Auto Builder/Initial Action": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/Shuffleboard/Auto Builder/Initial Position": {
-        "window": {
-          "name": "Initial Position",
-          "visible": true
-        }
-      },
-      "/Shuffleboard/Auto Builder/Route": {
-        "window": {
-          "name": "Escape Route",
-          "visible": true
-        }
-      },
-      "/Shuffleboard/Auto Builder/Secondary Action": {
-        "window": {
-          "name": "Secondary Action",
-          "visible": true
-        }
-      },
-      "/Shuffleboard/Intake/Intake Gamepiece": {
-        "window": {
-          "name": "Intake and stop",
           "visible": true
         }
       }

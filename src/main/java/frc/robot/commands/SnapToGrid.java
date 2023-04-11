@@ -59,6 +59,8 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -144,10 +146,12 @@ public class SnapToGrid extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // Get values requested by the operator
-    double deltaY = -m_controller.getLeftX();
-    double deltaX = -m_controller.getLeftY();
-    double deltaRot = -m_controller.getRightX();
+    double allianceInvert = (DriverStation.getAlliance() == Alliance.Blue) ? -1.0 : 1.0;
+
+    // Get values requested by the operator.  Invert based on alliance.
+    double deltaY = allianceInvert * m_controller.getLeftX();
+    double deltaX = allianceInvert * m_controller.getLeftY();
+    double deltaRot = allianceInvert * m_controller.getRightX();
 
     // Get the current Y coordinate
     Translation2d currentPosition = m_swerveSubsystem.getPose().getTranslation();

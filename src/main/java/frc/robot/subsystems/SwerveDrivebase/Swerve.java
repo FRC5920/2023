@@ -67,6 +67,7 @@ import frc.lib.SwerveDrive.GyroIO;
 import frc.lib.SwerveDrive.GyroInputsAutoLogged;
 import frc.lib.SwerveDrive.SwerveModule;
 import frc.lib.SwerveDrive.SwerveModuleIO;
+import frc.lib.utility.BotLogger.BotLog;
 import frc.robot.Constants;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 
@@ -231,9 +232,14 @@ public class Swerve extends SubsystemBase {
 
   /** Resets odometry */
   public void resetOdometry(Pose2d pose) {
+    BotLog.Infof(
+        "Reset odometry: x=%.2fm, y=%.2fm, rot=%.2f deg",
+        pose.getTranslation().getX(),
+        pose.getTranslation().getY(),
+        pose.getRotation().getDegrees());
     swervePoseEstimator.resetPosition(getYaw(), getModulePositions(), pose);
     if (RobotBase.isSimulation()) {
-      simOdometryPose = pose;
+      simOdometryPose = new Pose2d(pose.getTranslation(), simOdometryPose.getRotation());
     }
   }
 
@@ -273,8 +279,14 @@ public class Swerve extends SubsystemBase {
 
   /** Zeros the gyro, setting it to a specified angle */
   public void resetGyro(Rotation2d angle) {
-    m_gyroMeasurements.yawRad = angle.getRadians();
-    m_gyroIO.setYaw(angle);
+    BotLog.Infof("Reset Gyro to %.2f deg", angle.getDegrees());
+
+    if (RobotBase.isReal()) {
+      m_gyroMeasurements.yawRad = angle.getRadians();
+      m_gyroIO.setYaw(angle);
+    } else {
+      simOdometryPose = new Pose2d(simOdometryPose.getTranslation(), angle);
+    }
   }
 
   /** Returns the yaw measurement */

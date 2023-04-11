@@ -49,49 +49,58 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.commands;
+package frc.lib.dashboard;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.lib.Joystick.ProcessedXboxController;
-import frc.robot.RobotContainer;
-import frc.robot.subsystems.JoystickSubsystem;
-import frc.robot.subsystems.SwerveDrivebase.Swerve;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 
-public class TeleopSwerve extends CommandBase {
-  private double rotation;
-  private Translation2d translation;
-  private boolean fieldRelative;
-  private boolean openLoop;
+public class SimGyroVisualizer implements Gyro, Sendable {
+  double m_angle;
+  double m_rate;
 
-  private Swerve s_Swerve;
-  private ProcessedXboxController controller;
-
-  /** Driver control */
-  public TeleopSwerve(
-      Swerve s_Swerve,
-      JoystickSubsystem joystickSubsystem,
-      boolean fieldRelative,
-      boolean openLoop) {
-    this.s_Swerve = s_Swerve;
-    addRequirements(s_Swerve);
-
-    this.controller = joystickSubsystem.driverController;
-    this.fieldRelative = fieldRelative;
-    this.openLoop = openLoop;
-  }
+  /**
+   * Creates an instance of the object
+   *
+   * @param angleSupplier supplies the angle of the module in degrees
+   * @param rateSupplier supplies the angle rate of change in degrees per second
+   */
+  public SimGyroVisualizer() {}
 
   @Override
-  public void execute() {
-    double allianceInvert = (DriverStation.getAlliance() == Alliance.Blue) ? -1.0 : 1.0;
-    double yAxis = allianceInvert * controller.getLeftY();
-    double xAxis = allianceInvert * controller.getLeftX();
-    double rAxis = -controller.getRightX();
-
-    translation = new Translation2d(yAxis, xAxis).times(RobotContainer.MaxSpeed);
-    rotation = rAxis * RobotContainer.MaxRotate;
-    s_Swerve.drive(translation, rotation, fieldRelative, openLoop);
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Gyro");
+    builder.addDoubleProperty("Value", this::getAngle, null);
   }
+
+  /** Update the angle and rate */
+  public void update(Rotation2d angle, Rotation2d angleRate) {
+    m_angle = angle.getDegrees();
+    m_rate = angleRate.getDegrees();
+  }
+
+  /** Gyro.getAngle returns the angle in degrees */
+  @Override
+  public double getAngle() {
+    return m_angle;
+  }
+
+  /** Gyro.getRate returns the rate of rotation in degrees per second */
+  @Override
+  public double getRate() {
+    return m_rate;
+  }
+
+  /** Gyro.calibrate() does nothing in this implementation */
+  @Override
+  public void calibrate() {}
+
+  /** Gyro.reset() does nothing in this implementation */
+  @Override
+  public void reset() {}
+
+  /** AutoCloseable.close does nothing in this implementation */
+  @Override
+  public void close() {}
 }
