@@ -206,7 +206,7 @@ public class JoystickSubsystem extends SubsystemBase {
                     RobotContainer.MaxRotate,
                     botContainer.autoDashboardTab.getField2d()))
             .finallyDo(
-                (interrupted) -> new BotLog.SimInfoPrintCommand("Snap-to-grid OFF").initialize());
+                (interrupted) -> BotLog.SimInfo("Snap-to-grid OFF"));
 
     CommandBase acquireAndParkCommand =
         Acquire.acquireAndPark(shooterPivot, intake)
@@ -256,8 +256,8 @@ public class JoystickSubsystem extends SubsystemBase {
           new InstantCommand(() -> swerveSubsystem.zeroGyro())); // left little
       driverController.start.whileTrue(new Balance(swerveSubsystem)); // right little
 
-      driverController.rightTriggerAsButton.whileTrue(
-          Acquire.acquireAndPark(botContainer.shooterPivotSubsystem, botContainer.intakeSubsystem));
+      
+      driverController.rightTriggerAsButton.whileTrue(snap2GridCommand);
     }
 
     if (kOperatorControllerIsEnabled) {
