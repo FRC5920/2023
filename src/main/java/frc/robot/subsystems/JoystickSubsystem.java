@@ -205,8 +205,11 @@ public class JoystickSubsystem extends SubsystemBase {
                     RobotContainer.MaxSpeed,
                     RobotContainer.MaxRotate,
                     botContainer.autoDashboardTab.getField2d()))
-            .finallyDo(
-                (interrupted) -> new BotLog.SimInfoPrintCommand("Snap-to-grid OFF").initialize());
+            .finallyDo((interrupted) -> BotLog.SimInfo("Snap-to-grid OFF"));
+
+    CommandBase acquireAndParkCommand =
+        Acquire.acquireAndPark(shooterPivot, intake)
+            .unless(() -> !driverController.X.getAsBoolean());
 
     if (kDriverControllerIsEnabled) {
       // Map buttons on driver controller
@@ -222,7 +225,14 @@ public class JoystickSubsystem extends SubsystemBase {
           Commands.either(
               hailMaryShotHigh, closeShotHigh, driverController.leftTriggerAsButton::getAsBoolean));
 
-      driverController.X.whileTrue(Acquire.acquireAndPark(shooterPivot, intake));
+      // Map X button:
+      //   X (alone) = acquireAndPark
+      //   X+leftTrigger = emergency park
+      driverController.X.whileTrue(
+          Commands.either(
+              acquireAndParkCommand,
+              new ShooterPivotSubsystem.EmergencyPark(botContainer.shooterPivotSubsystem),
+              driverController.X::getAsBoolean));
 
       driverController.rightBumper.whileTrue(
           DriveWithZTargeting.zTargetDriveWithIntake(
@@ -245,8 +255,7 @@ public class JoystickSubsystem extends SubsystemBase {
           new InstantCommand(() -> swerveSubsystem.zeroGyro())); // left little
       driverController.start.whileTrue(new Balance(swerveSubsystem)); // right little
 
-      driverController.rightTriggerAsButton.whileTrue(
-          Acquire.acquireAndPark(botContainer.shooterPivotSubsystem, botContainer.intakeSubsystem));
+      driverController.rightTriggerAsButton.whileTrue(snap2GridCommand);
     }
 
     if (kOperatorControllerIsEnabled) {
@@ -269,8 +278,7 @@ public class JoystickSubsystem extends SubsystemBase {
       operatorController.back.onTrue(
           new InstantCommand(
               () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.Park)));
-      operatorController.start.onTrue(
-          new InstantCommand(() -> botContainer.shooterPivotSubsystem.zeroPivotPositionSensor()));
+      operatorController.start.onTrue(new InstantCommand());
     }
   }
 

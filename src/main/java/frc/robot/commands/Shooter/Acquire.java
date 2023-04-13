@@ -87,7 +87,7 @@ public class Acquire extends SequentialCommandGroup {
 
   private static void endBehavior(
       ShooterPivotSubsystem shooterPivotSubsystem, IntakeSubsystem intakeSubsystem) {
-    shooterPivotSubsystem.park();
+    // shooterPivotSubsystem.park();
     intakeSubsystem.stopIntake();
   }
 
