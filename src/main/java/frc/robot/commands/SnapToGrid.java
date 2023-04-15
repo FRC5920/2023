@@ -127,7 +127,7 @@ public class SnapToGrid extends CommandBase {
     addRequirements(swerveSubsystem);
     m_maxSpeed = maxSpeed;
     m_maxRotation = maxRotation;
-    m_controller = joystickSubsystem.driverController;
+    m_controller = joystickSubsystem.getDriverController();
     m_fieldRelative = fieldRelative;
     m_openLoop = openLoop;
     m_snapPID.setTolerance(kErrorTolerance);

@@ -54,10 +54,8 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.Joystick.AxisProcChain;
+import frc.lib.Joystick.JoystickSubsystemBase;
 import frc.lib.Joystick.ProcessedXboxController;
 import frc.lib.utility.BotLogger.BotLog;
 import frc.robot.Constants.GameTarget;
@@ -69,93 +67,21 @@ import frc.robot.commands.Shooter.ShooterPresets;
 import frc.robot.commands.SnapToGrid;
 import frc.robot.commands.zTarget.DriveWithZTargeting;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
-import frc.robot.subsystems.ShooterPivot.PivotPresets;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 
 /** A subsystem providing/managing Xbox controllers for driving the robot manually */
-public class JoystickSubsystem extends SubsystemBase {
+public class JoystickSubsystem extends JoystickSubsystemBase {
 
-  public static final boolean kDriverControllerIsEnabled = true;
+  /** true to enable the operator controller */
   public static final boolean kOperatorControllerIsEnabled = false;
 
-  public enum ControllerId {
-    kDriver(0),
-    kOperator(1);
+  /** A placeholder command used for button bindings */
+  public static final InstantCommand kDoNothing = new InstantCommand();
 
-    public final int port;
-
-    ControllerId(int portNum) {
-      this.port = portNum;
-    }
-  }
-
-  // ---------- Joystick Processing Constants -----------------
-  public static final double kDriverLeftStickSensitivity = 0.5;
-  public static final double kDriverLeftStickDeadbands[] = {0.1, 0.95};
-  public static final double kDriverRightStickSensitivity = 0.5;
-  public static final double kDriverRightStickDeadbands[] = {0.1, 0.95};
-  public static final double kDriverTriggerSensitivity = 1.0;
-  public static final double kDriverTriggerDeadbands[] = {0.1, 0.95};
-
-  public static final double kOperatorLeftStickSensitivity = 0.3;
-  public static final double kOperatorLeftStickDeadbands[] = {0.1, 0.95};
-  public static final double kOperatorRightStickSensitivity = 0.3;
-  public static final double kOperatorRightStickDeadbands[] = {0.1, 0.95};
-  public static final double kOperatorTriggerSensitivity = 1.0;
-  public static final double kOperatorTriggerDeadbands[] = {0.1, 0.95};
-
-  /** Xbox controller used by the robot driver */
-  public ProcessedXboxController driverController;
-
-  /** Xbox controller used by the robot operator */
-  public ProcessedXboxController operatorController;
-
-  /** Button */
-  /** Creates a new JoystickSubsystem */
+  /** Creates an instance of the subsystem */
   public JoystickSubsystem() {
-
-    if (kDriverControllerIsEnabled) {
-      // Configure driver controller stick and trigger processing
-      driverController = new ProcessedXboxController(ControllerId.kDriver.port);
-      AxisProcChain.Config stickConfig =
-          new AxisProcChain.Config(kDriverLeftStickSensitivity, kDriverLeftStickDeadbands);
-      driverController.getStickProcessing(XboxController.Axis.kLeftX).configure(stickConfig);
-      driverController.getStickProcessing(XboxController.Axis.kLeftY).configure(stickConfig);
-      stickConfig =
-          new AxisProcChain.Config(kDriverRightStickSensitivity, kDriverRightStickDeadbands);
-      driverController.getStickProcessing(XboxController.Axis.kRightX).configure(stickConfig);
-      driverController.getStickProcessing(XboxController.Axis.kRightY).configure(stickConfig);
-      AxisProcChain.Config triggerConfig =
-          new AxisProcChain.Config(kDriverTriggerSensitivity, kDriverTriggerDeadbands);
-      driverController
-          .getTriggerProcessing(XboxController.Axis.kLeftTrigger)
-          .configure(triggerConfig);
-      driverController
-          .getTriggerProcessing(XboxController.Axis.kRightTrigger)
-          .configure(triggerConfig);
-    }
-
-    if (kOperatorControllerIsEnabled) {
-      // Configure operator controller stick and trigger processing
-      operatorController = new ProcessedXboxController(ControllerId.kOperator.port);
-      AxisProcChain.Config stickConfig =
-          new AxisProcChain.Config(kOperatorLeftStickSensitivity, kOperatorLeftStickDeadbands);
-      driverController.getStickProcessing(XboxController.Axis.kLeftX).configure(stickConfig);
-      driverController.getStickProcessing(XboxController.Axis.kLeftY).configure(stickConfig);
-      stickConfig =
-          new AxisProcChain.Config(kOperatorRightStickSensitivity, kOperatorRightStickDeadbands);
-      driverController.getStickProcessing(XboxController.Axis.kRightX).configure(stickConfig);
-      driverController.getStickProcessing(XboxController.Axis.kRightY).configure(stickConfig);
-      AxisProcChain.Config triggerConfig =
-          new AxisProcChain.Config(kOperatorTriggerSensitivity, kOperatorTriggerDeadbands);
-      driverController
-          .getTriggerProcessing(XboxController.Axis.kLeftTrigger)
-          .configure(triggerConfig);
-      driverController
-          .getTriggerProcessing(XboxController.Axis.kRightTrigger)
-          .configure(triggerConfig);
-    }
+    super(true, kOperatorControllerIsEnabled);
   }
 
   /**
@@ -166,6 +92,7 @@ public class JoystickSubsystem extends SubsystemBase {
    *
    * @param botContainer Object providing access to robot subsystems
    */
+  @Override
   public void configureButtonBindings(RobotContainer botContainer) {
     ShooterPivotSubsystem shooterPivot = botContainer.shooterPivotSubsystem;
     IntakeSubsystem intake = botContainer.intakeSubsystem;
@@ -173,28 +100,81 @@ public class JoystickSubsystem extends SubsystemBase {
 
     // Create shoot commands that are active when left trigger is off
     CommandBase closeShotLow =
-        new Shoot(ShooterPresets.PivotSideLow, shooterPivot, intake)
-            .unless(() -> driverController.leftTriggerAsButton.getAsBoolean());
+        new BotLog.DebugPrintCommand("<Shoot Low>")
+            .andThen(new Shoot(ShooterPresets.PivotSideLow, shooterPivot, intake));
     CommandBase closeShotMid =
-        new Shoot(ShooterPresets.PivotSideMid, shooterPivot, intake)
-            .unless(() -> driverController.leftTriggerAsButton.getAsBoolean());
+        new BotLog.DebugPrintCommand("<Shoot Mid>")
+            .andThen(new Shoot(ShooterPresets.PivotSideMid, shooterPivot, intake));
     CommandBase closeShotHigh =
-        new Shoot(ShooterPresets.PivotSideHigh, shooterPivot, intake)
-            .unless(() -> driverController.leftTriggerAsButton.getAsBoolean());
+        new BotLog.DebugPrintCommand("<Shoot High>")
+            .andThen(new Shoot(ShooterPresets.PivotSideHigh, shooterPivot, intake));
 
     // --------------------
     // Create shift-keyed shoot commands that are active when left trigger is pulled
     CommandBase hailMaryShotLow =
-        new Shoot(ShooterPresets.PivotSideHailMaryLow, shooterPivot, intake)
-            .unless(() -> !driverController.leftTriggerAsButton.getAsBoolean());
+        new BotLog.DebugPrintCommand("<HailMary Low>")
+            .andThen(new Shoot(ShooterPresets.PivotSideHailMaryLow, shooterPivot, intake));
     CommandBase hailMaryShotMid =
-        new Shoot(ShooterPresets.PivotSideHailMaryMid, shooterPivot, intake)
-            .unless(() -> !driverController.leftTriggerAsButton.getAsBoolean());
+        new BotLog.DebugPrintCommand("<HailMary Mid>")
+            .andThen(new Shoot(ShooterPresets.PivotSideHailMaryMid, shooterPivot, intake));
     CommandBase hailMaryShotHigh =
-        new Shoot(ShooterPresets.PivotSideHailMaryHigh, shooterPivot, intake)
-            .unless(() -> !driverController.leftTriggerAsButton.getAsBoolean());
+        new BotLog.DebugPrintCommand("<HailMary High>")
+            .andThen(new Shoot(ShooterPresets.PivotSideHailMaryHigh, shooterPivot, intake));
 
-    CommandBase snap2GridCommand =
+    // Map buttons on driver controller
+    ProcessedXboxController driverController = getDriverController();
+
+    // Map buttons and button combos for shots
+    setupButtonCombo(
+        driverController.A, driverController.leftTriggerAsButton, closeShotLow, hailMaryShotLow);
+    setupButtonCombo(
+        driverController.B, driverController.leftTriggerAsButton, closeShotMid, hailMaryShotMid);
+    setupButtonCombo(
+        driverController.Y, driverController.leftTriggerAsButton, closeShotHigh, hailMaryShotHigh);
+
+    CommandBase acquireAndParkCommand =
+        new BotLog.DebugPrintCommand("<Acquire and park>")
+            .andThen(Acquire.acquireAndPark(shooterPivot, intake));
+    CommandBase emergencyParkCommand =
+        new BotLog.DebugPrintCommand("<Acquire and park>")
+            .andThen(new ShooterPivotSubsystem.EmergencyPark(botContainer.shooterPivotSubsystem));
+
+    // Map button and button combos for intake
+    setupButtonCombo(
+        driverController.X,
+        driverController.leftTriggerAsButton,
+        acquireAndParkCommand,
+        emergencyParkCommand);
+
+    // Map right bumper
+    driverController.rightBumper.whileTrue(
+        DriveWithZTargeting.zTargetDriveWithIntake(
+            GameTarget.Cube,
+            botContainer.ArmCamera,
+            swerveSubsystem,
+            this,
+            shooterPivot,
+            intake,
+            true,
+            true));
+
+    // Map left bumper
+    driverController.leftBumper.whileTrue(
+        new DriveWithZTargeting(
+            GameTarget.AprilTag2D, botContainer.ArmCamera, swerveSubsystem, this, true, true));
+
+    // Map stick press buttons
+    driverController.leftStickPress.onTrue(kDoNothing);
+    driverController.rightStickPress.onTrue(kDoNothing);
+
+    // Map BACK button (small button on the left in the middle of the controller)
+    driverController.back.onTrue(new InstantCommand(() -> swerveSubsystem.zeroGyro()));
+
+    // Map BACK button (small button on the right in the middle of the controller)
+    driverController.start.whileTrue(new Balance(swerveSubsystem));
+
+    // Map right trigger to snap-to-grid
+    driverController.rightTriggerAsButton.whileTrue(
         new BotLog.SimInfoPrintCommand("Snap-to-grid ON")
             .andThen(
                 new SnapToGrid(
@@ -205,61 +185,12 @@ public class JoystickSubsystem extends SubsystemBase {
                     RobotContainer.MaxSpeed,
                     RobotContainer.MaxRotate,
                     botContainer.autoDashboardTab.getField2d()))
-            .finallyDo((interrupted) -> BotLog.SimInfo("Snap-to-grid OFF"));
+            .finallyDo((interrupted) -> BotLog.SimInfo("Snap-to-grid OFF")));
 
-    CommandBase acquireAndParkCommand =
-        Acquire.acquireAndPark(shooterPivot, intake)
-            .unless(() -> !driverController.X.getAsBoolean());
-
-    if (kDriverControllerIsEnabled) {
-      // Map buttons on driver controller
-
-      // Map shift-keyed buttons for shots
-      driverController.A.onTrue(
-          Commands.either(
-              hailMaryShotLow, closeShotLow, driverController.leftTriggerAsButton::getAsBoolean));
-      driverController.B.onTrue(
-          Commands.either(
-              hailMaryShotMid, closeShotMid, driverController.leftTriggerAsButton::getAsBoolean));
-      driverController.Y.onTrue(
-          Commands.either(
-              hailMaryShotHigh, closeShotHigh, driverController.leftTriggerAsButton::getAsBoolean));
-
-      // Map X button:
-      //   X (alone) = acquireAndPark
-      //   X+leftTrigger = emergency park
-      driverController.X.whileTrue(
-          Commands.either(
-              acquireAndParkCommand,
-              new ShooterPivotSubsystem.EmergencyPark(botContainer.shooterPivotSubsystem),
-              driverController.X::getAsBoolean));
-
-      driverController.rightBumper.whileTrue(
-          DriveWithZTargeting.zTargetDriveWithIntake(
-              GameTarget.Cube,
-              botContainer.ArmCamera,
-              swerveSubsystem,
-              this,
-              shooterPivot,
-              intake,
-              true,
-              true));
-
-      driverController.leftBumper.whileTrue(
-          new DriveWithZTargeting(
-              GameTarget.AprilTag2D, botContainer.ArmCamera, swerveSubsystem, this, true, true));
-
-      driverController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
-      driverController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
-      driverController.back.onTrue(
-          new InstantCommand(() -> swerveSubsystem.zeroGyro())); // left little
-      driverController.start.whileTrue(new Balance(swerveSubsystem)); // right little
-
-      driverController.rightTriggerAsButton.whileTrue(snap2GridCommand);
-    }
-
+    // Map buttons on operator controller
     if (kOperatorControllerIsEnabled) {
-      // Map buttons on operator controller
+      ProcessedXboxController operatorController = getOperatorController();
+
       operatorController.A.onTrue(new Shoot(ShooterPresets.RSLSideLow, shooterPivot, intake));
       operatorController.B.onTrue(new Shoot(ShooterPresets.RSLSideMid, shooterPivot, intake));
       operatorController.Y.onTrue(new Shoot(ShooterPresets.RSLSideHigh, shooterPivot, intake));
@@ -273,21 +204,10 @@ public class JoystickSubsystem extends SubsystemBase {
       operatorController.leftTriggerAsButton.whileTrue(
           Acquire.acquireAndPark(shooterPivot, intake));
 
-      operatorController.leftStickPress.onTrue(new InstantCommand(this::doNothing, this));
-      operatorController.rightStickPress.onTrue(new InstantCommand(this::doNothing, this));
-      operatorController.back.onTrue(
-          new InstantCommand(
-              () -> botContainer.shooterPivotSubsystem.setAnglePreset(PivotPresets.Park)));
-      operatorController.start.onTrue(new InstantCommand());
+      operatorController.leftStickPress.onTrue(kDoNothing);
+      operatorController.rightStickPress.onTrue(kDoNothing);
+      operatorController.back.onTrue(kDoNothing);
+      operatorController.start.onTrue(kDoNothing);
     }
   }
-
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-
-  }
-
-  /** Placeholder used for empty commands mapped to joystick */
-  public void doNothing() {}
 }

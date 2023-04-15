@@ -78,7 +78,7 @@ public class TeleopSwerve extends CommandBase {
     this.s_Swerve = s_Swerve;
     addRequirements(s_Swerve);
 
-    this.controller = joystickSubsystem.driverController;
+    this.controller = joystickSubsystem.getDriverController();
     this.fieldRelative = fieldRelative;
     this.openLoop = openLoop;
   }
