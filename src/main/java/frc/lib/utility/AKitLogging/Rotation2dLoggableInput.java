@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2023-6328 FIRST and other WPILib contributors.
+// Copyright (c) 2023 FIRST and other WPILib contributors.
 // http://github.com/FRC5920
 // Open Source Software; you can modify and/or share it under the terms of the
 // license given in WPILib-License.md in the root directory of this project.
@@ -49,47 +49,35 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.lib.SwerveDrive;
+package frc.lib.utility.AKitLogging;
 
-import com.ctre.phoenix.ErrorCode;
-import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.geometry.Rotation2d;
+import org.littletonrobotics.junction.LogTable;
+import org.littletonrobotics.junction.inputs.LoggableInputs;
 
-/** IO implementation for Pigeon2 */
-public class Pigeon2GyroIO implements GyroIO {
-  private final WPI_Pigeon2 pigeon;
+/** LoggableInput implementation for a Rotation3d object */
+public class Rotation2dLoggableInput implements LoggableInputs {
+  public final String logPrefix;
+  public Rotation2d value;
 
-  public Pigeon2GyroIO(int canID, String canBus) {
-    pigeon = new WPI_Pigeon2(canID, canBus);
-    pigeon.configFactoryDefault();
-    pigeon.zeroGyroBiasNow();
-    pigeon.setYaw(0.0);
+  public Rotation2dLoggableInput(String prefix) {
+    logPrefix = prefix + "/Rotation2d";
+    value = new Rotation2d();
   }
 
-  public void setYaw(Rotation2d angle) {
-    double degrees = angle.getDegrees();
-    pigeon.setYaw(degrees);
-  }
-
-  private static final int kYawIndex = 0;
-  private static final int kPitchIndex = 1;
-  private static final int kRollIndex = 2;
-  private static final int kXAxisIndex = 0;
-  private static final int kYAxisIndex = 1;
-  private static final int kZAxisIndex = 2;
-  /** Obtain measurements from the Pigeon2 */
   @Override
-  public void updateInputs(GyroInputs OUTmeasurements) {
-    double[] yprDegrees = new double[3];
-    double[] xyzDegreesPerSec = new double[3];
-    pigeon.getYawPitchRoll(yprDegrees);
-    pigeon.getRawGyro(xyzDegreesPerSec);
-    OUTmeasurements.isConnected = pigeon.getLastError().equals(ErrorCode.OK);
-    OUTmeasurements.roll = Rotation2d.fromDegrees(yprDegrees[kPitchIndex]);
-    OUTmeasurements.pitch = Rotation2d.fromDegrees(-yprDegrees[kRollIndex]);
-    OUTmeasurements.yaw = Rotation2d.fromDegrees(yprDegrees[kYawIndex]);
-    OUTmeasurements.rollVelocity = Rotation2d.fromDegrees(xyzDegreesPerSec[kXAxisIndex]);
-    OUTmeasurements.pitchVelocity = Rotation2d.fromDegrees(-xyzDegreesPerSec[kYAxisIndex]);
-    OUTmeasurements.yawVelocity = Rotation2d.fromDegrees(xyzDegreesPerSec[kZAxisIndex]);
+  public void toLog(LogTable table) {
+    table.put((logPrefix + "/rad"), value.getRadians());
+  }
+
+  @Override
+  public void fromLog(LogTable table) {
+    value = Rotation2d.fromRadians(table.getDouble((logPrefix + "/rad"), 0.0));
+  }
+
+  public Rotation2dLoggableInput clone() {
+    Rotation2dLoggableInput copy = new Rotation2dLoggableInput(this.logPrefix);
+    copy.value = new Rotation2d(value.getRadians());
+    return copy;
   }
 }
