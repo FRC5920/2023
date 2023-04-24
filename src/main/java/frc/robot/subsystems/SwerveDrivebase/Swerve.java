@@ -55,7 +55,6 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -64,7 +63,8 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.SwerveDrive.GyroIO;
-import frc.lib.SwerveDrive.GyroInputsAutoLogged;
+import frc.lib.SwerveDrive.GyroIO.GyroInputs;
+import frc.lib.SwerveDrive.SimGyroIO;
 import frc.lib.SwerveDrive.SwerveModule;
 import frc.lib.SwerveDrive.SwerveModuleIO;
 import frc.lib.utility.BotLogger.BotLog;
@@ -83,12 +83,9 @@ public class Swerve extends SubsystemBase {
   private final SwerveDriveKinematics swerveKinematics;
   public final SwerveDrivePoseEstimator swervePoseEstimator;
   private final SwerveModule[] mSwerveMods;
-  private final GyroInputsAutoLogged m_gyroMeasurements;
+  private final GyroInputs m_gyroMeasurements;
   private final GyroIO m_gyroIO;
   private ChassisSpeeds m_ChassisSpeeds;
-
-  /** Pose used during simulation */
-  private Pose2d simOdometryPose = new Pose2d();
 
   /** Dashboard tab displayed in Shuffleboard */
   private final SwerveDashboardTab m_dashboardTab;
@@ -125,7 +122,7 @@ public class Swerve extends SubsystemBase {
           new SwerveModule(ModuleId.kRearRight.value, rearRightIO)
         };
 
-    m_gyroMeasurements = new GyroInputsAutoLogged();
+    m_gyroMeasurements = new GyroInputs("Swerve/GyroInputs/");
 
     m_gyroIO = gyroIO;
     zeroGyro();
@@ -140,7 +137,7 @@ public class Swerve extends SubsystemBase {
 
     swervePoseEstimator =
         new SwerveDrivePoseEstimator(
-            swerveKinematics, getYaw(), getModulePositions(), simOdometryPose);
+            swerveKinematics, getYaw(), getModulePositions(), new Pose2d());
 
     m_ChassisSpeeds = new ChassisSpeeds();
   }
@@ -224,8 +221,7 @@ public class Swerve extends SubsystemBase {
     } else {
       pose =
           new Pose2d(
-              swervePoseEstimator.getEstimatedPosition().getTranslation(),
-              simOdometryPose.getRotation());
+              swervePoseEstimator.getEstimatedPosition().getTranslation(), m_gyroMeasurements.yaw);
     }
     return pose;
   }
@@ -238,9 +234,6 @@ public class Swerve extends SubsystemBase {
         pose.getTranslation().getY(),
         pose.getRotation().getDegrees());
     swervePoseEstimator.resetPosition(getYaw(), getModulePositions(), pose);
-    if (RobotBase.isSimulation()) {
-      simOdometryPose = new Pose2d(pose.getTranslation(), simOdometryPose.getRotation());
-    }
   }
 
   /** Returns swerve module states */
@@ -281,32 +274,24 @@ public class Swerve extends SubsystemBase {
   public void resetGyro(Rotation2d angle) {
     BotLog.Infof("Reset Gyro to %.2f deg", angle.getDegrees());
 
-    if (RobotBase.isReal()) {
-      m_gyroMeasurements.yawRad = angle.getRadians();
-      m_gyroIO.setYaw(angle);
-    } else {
-      simOdometryPose = new Pose2d(simOdometryPose.getTranslation(), angle);
-    }
+    m_gyroMeasurements.yaw = angle;
+    m_gyroIO.setYaw(angle);
   }
 
   /** Returns the yaw measurement */
   public Rotation2d getYaw() {
-    if (RobotBase.isSimulation()) {
-      return simOdometryPose.getRotation();
-    } else {
-      Rotation2d yaw = Rotation2d.fromRadians(m_gyroMeasurements.yawRad);
-      return (Constants.SwerveDrivebaseConstants.invertGyro) ? yaw.minus(kAngle360) : yaw;
-    }
+    Rotation2d yaw = m_gyroMeasurements.yaw;
+    return (Constants.SwerveDrivebaseConstants.invertGyro) ? yaw.minus(kAngle360) : yaw;
   }
 
   /** Returns the roll measurement */
   public Rotation2d getRoll() {
-    return Rotation2d.fromRadians(m_gyroMeasurements.rollRad);
+    return m_gyroMeasurements.roll;
   }
 
   /** Returns the pitch measurement */
   public Rotation2d getPitch() {
-    return Rotation2d.fromRadians(m_gyroMeasurements.pitchRad);
+    return m_gyroMeasurements.pitch;
   }
 
   /** Resets swerve module angles */
@@ -320,15 +305,10 @@ public class Swerve extends SubsystemBase {
   @Override
   public void periodic() {
 
-    m_gyroIO.updateInputs(m_gyroMeasurements);
-    // Logger.getInstance().processInputs("Drive/Gyro", m_gyroMeasurements);
-    for (SwerveModule module : mSwerveMods) {
-      module.updateLoggedInputs();
-    }
-
-    swervePoseEstimator.update(getYaw(), getModulePositions());
-
+    // If running in simulation mode, recalculate the simulated gyro from swerve
+    // module states
     if (RobotBase.isSimulation()) {
+      // Calculate the simulated Gyro angle
       SwerveModuleState[] measuredStates =
           new SwerveModuleState[] {
             mSwerveMods[ModuleId.kFrontLeft.value].getState(),
@@ -337,13 +317,21 @@ public class Swerve extends SubsystemBase {
             mSwerveMods[ModuleId.kFrontLeft.value].getState()
           };
       ChassisSpeeds speeds = swerveKinematics.toChassisSpeeds(measuredStates);
-      simOdometryPose =
-          simOdometryPose.exp(
-              new Twist2d(
-                  speeds.vxMetersPerSecond * .02,
-                  speeds.vyMetersPerSecond * .02,
-                  speeds.omegaRadiansPerSecond * .02));
+      ((SimGyroIO) m_gyroIO)
+          .calculate(
+              speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond);
     }
+
+    // Update Gyro measurements
+    m_gyroIO.updateInputs(m_gyroMeasurements);
+
+    // Update swerve module measurements
+    // Logger.getInstance().processInputs("Drive/Gyro", m_gyroMeasurements);
+    for (SwerveModule module : mSwerveMods) {
+      module.updateLoggedInputs();
+    }
+
+    swervePoseEstimator.update(getYaw(), getModulePositions());
   }
 
   public SwerveModuleIO.SwerveModuleIOTelemetry getIOTelemetry(ModuleId module) {
