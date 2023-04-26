@@ -70,7 +70,8 @@ import frc.robot.autos.AutoConstants.EscapeRoute;
 import frc.robot.autos.AutoConstants.Grids;
 import frc.robot.autos.AutoConstants.InitialAction;
 import frc.robot.autos.AutoConstants.SecondaryAction;
-import frc.robot.autos.Preset.PresetAutoBuilder;
+import frc.robot.autos.Preset.PresetAutoFactory;
+import frc.robot.autos.Preset.PresetBuilder;
 import frc.robot.subsystems.Dashboard.IDashboardTab;
 import java.util.*;
 
@@ -96,7 +97,7 @@ public class AutoDashboardTab implements IDashboardTab {
   private AutoRoutineBuilder m_autoBuilder;
 
   /** Builder used to generate preset auto commands */
-  private PresetAutoBuilder m_presetAutoBuilder;
+  private PresetAutoFactory m_presetAutoFactory;
 
   /** The current selected auto command */
   private CommandBase m_currentAutoRoutine;
@@ -136,7 +137,7 @@ public class AutoDashboardTab implements IDashboardTab {
   /** Creates an instance of the tab */
   public AutoDashboardTab() {
     m_autoBuilder = new AutoRoutineBuilder();
-    m_presetAutoBuilder = new PresetAutoBuilder();
+    m_presetAutoFactory = new PresetAutoFactory();
     m_field2d = new Field2d();
   }
 
@@ -152,7 +153,7 @@ public class AutoDashboardTab implements IDashboardTab {
 
     // Set up the auto type chooser
     m_autoTypeChooser.loadOptions(
-        AutoType.getNames(), AutoType.values(), AutoType.SouthLinkAndBalance.id);
+        AutoType.getNames(), AutoType.values(), AutoType.South3PlusBalance.id);
     m_tab
         .add("Auto Type", m_autoTypeChooser)
         .withSize(kChooserWidth, kChooserHeight)
@@ -273,15 +274,16 @@ public class AutoDashboardTab implements IDashboardTab {
             break;
           }
 
-        case NorthLinkAndBalanceOverCS:
-        case NorthLinkAndChill:
-        case SouthLinkAndBalance:
-        case SouthLinkAndChill:
+        case North3PlusBalance:
+        case North3PlusChill:
+        case South3PlusBalance:
+        case South3PlusChill:
           {
             AutoType autoType = m_autoTypeChooser.getSelected();
-            trajectories = m_presetAutoBuilder.getTrajectories(autoType);
-            initialPose = m_presetAutoBuilder.getInitialPose(autoType);
-            m_currentAutoRoutine = m_presetAutoBuilder.getCommand(autoType, botContainer);
+            PresetBuilder presetBuilder = m_presetAutoFactory.getAutoBuilder(autoType);
+            trajectories = presetBuilder.getTrajectories();
+            initialPose = presetBuilder.getInitialPose();
+            m_currentAutoRoutine = presetBuilder.getCommand(botContainer);
           }
       }
 

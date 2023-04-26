@@ -88,7 +88,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 /** Add your docs here. */
-public class NorthLinkOverCSPresetBuilder {
+public class North3PlusBalanceAutoBuilder implements PresetBuilder {
 
   /** Configuration used to shoot the initial pre-loaded cube at the beginning of the auto */
   private static final ShootConfig kInitialShotConfig = new ShootConfig(20, 22.5);
@@ -121,7 +121,7 @@ public class NorthLinkOverCSPresetBuilder {
   private final TrajectoryLoader m_NorthOverCSMountCSLoader;
 
   /** Creates an instance of the builder and loads trajectory files */
-  public NorthLinkOverCSPresetBuilder() {
+  public North3PlusBalanceAutoBuilder() {
     // Load PathPlanner trajectory files
     m_NorthOverCSAcquireC1Loader =
         new TrajectoryLoader("NorthLOCS_0acquireC1", kDefaultMaxVelocity, kDefaultMaxAcceleration);
@@ -139,6 +139,7 @@ public class NorthLinkOverCSPresetBuilder {
    * @param autoType The type of preset auto to build
    * @param botContainer Container used to access robot subsystems
    */
+  @Override
   public CommandBase getCommand(RobotContainer botContainer) {
     ShooterPivotSubsystem shooterPivotSubsystem = botContainer.shooterPivotSubsystem;
     IntakeSubsystem intakeSubsystem = botContainer.intakeSubsystem;
@@ -231,11 +232,13 @@ public class NorthLinkOverCSPresetBuilder {
     return autoCommands;
   }
 
+  @Override
   public Pose2d getInitialPose() {
     return m_NorthOverCSAcquireC1Loader.getInitialPose();
   }
 
   /** Returns a list containing trajectories used to illustrate motion in the auto routine */
+  @Override
   public List<PathPlannerTrajectory> getTrajectories() {
     // Return trajectories for display
     List<PathPlannerTrajectory> trajectories = new ArrayList<>();

@@ -72,7 +72,6 @@ import frc.robot.RobotContainer;
 import frc.robot.autos.AutoConstants.BotOrientation;
 import frc.robot.autos.AutoConstants.CargoLocation;
 import frc.robot.autos.AutoConstants.FieldCoordinates;
-import frc.robot.commands.Balance;
 import frc.robot.commands.Shooter.SetShooterAngle;
 import frc.robot.commands.Shooter.Shoot;
 import frc.robot.commands.Shooter.Shoot.ShootConfig;
@@ -86,13 +85,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Supplier;
 
-/** Add your docs here. */
-public class NorthLinkAndBalancePresetBuilder {
+/**
+ * South3PlusChillAutoBuilder is an object used to build a command that will carry out the `South
+ * 3+chill` autonomous routine
+ */
+public class South3PlusChillAutoBuilder implements PresetBuilder {
 
   /** Configuration used to shoot the initial pre-loaded cube at the beginning of the auto */
-  private static final ShootConfig kInitialShotConfig = new ShootConfig(20, 22.5);
+  private static final ShootConfig kCableProtectorShootConfig = new ShootConfig(20, 40);
 
-  private static final ShootConfig kCloseShotConfig = new ShootConfig(20, 15);
+  private static final ShootConfig kShootC3Config = new ShootConfig(20, 65);
 
   /** Default PID gains applied to translation when following trajectories */
   private static final PIDConstants kDefaultTranslationPIDGains = new PIDConstants(8.0, 0.0, 0.2);
@@ -105,26 +107,26 @@ public class NorthLinkAndBalancePresetBuilder {
   /** Max acceleration used when following PathPlanner trajectories */
   private static final double kDefaultMaxAcceleration = 5.0;
 
-  // Trajectory loaders for North Link and Balance trajectories
-  private final TrajectoryLoader m_northLNBAcquireC1Loader;
-  private final TrajectoryLoader m_northLNBShootC1Loader;
-  private final TrajectoryLoader m_northLNBAcquireC2Loader;
-  private final TrajectoryLoader m_northLNBShootC2Loader;
-  private final TrajectoryLoader m_northLNBMountCSLoader;
+  /** PathPlanner trajectory file and configuration used to load C4 */
+  private final TrajectoryLoader m_acquireC4Loader;
+  /** PathPlanner trajectory file and constraints used to shoot C4 */
+  private final TrajectoryLoader m_shootC4Loader;
+  /** PathPlanner trajectory file and constraints used to load C3 */
+  private final TrajectoryLoader m_acquireC3Loader;
+  /** PathPlanner trajectory file and constraints used to shoot C3 */
+  private final TrajectoryLoader m_shootC3Loader;
 
   /** Creates an instance of the builder and loads trajectory files */
-  public NorthLinkAndBalancePresetBuilder() {
+  public South3PlusChillAutoBuilder() {
     // Load PathPlanner trajectory files
-    m_northLNBAcquireC1Loader =
-        new TrajectoryLoader("NorthLNB_0acquireC1", kDefaultMaxVelocity, kDefaultMaxAcceleration);
-    m_northLNBShootC1Loader =
-        new TrajectoryLoader("NorthLNB_1shootC1", kDefaultMaxVelocity, kDefaultMaxAcceleration);
-    m_northLNBAcquireC2Loader =
-        new TrajectoryLoader("NorthLNB_2acquireC2", kDefaultMaxVelocity, kDefaultMaxAcceleration);
-    m_northLNBShootC2Loader =
-        new TrajectoryLoader("NorthLNB_3shootC2", kDefaultMaxVelocity, kDefaultMaxAcceleration);
-    m_northLNBMountCSLoader =
-        new TrajectoryLoader("NorthLNB_4mountCS", kDefaultMaxVelocity, kDefaultMaxAcceleration);
+    m_acquireC4Loader =
+        new TrajectoryLoader("SouthLNB_0acquireC4", kDefaultMaxVelocity, kDefaultMaxAcceleration);
+    m_shootC4Loader =
+        new TrajectoryLoader("SouthLNB_1shootC4", kDefaultMaxVelocity, kDefaultMaxAcceleration);
+    m_acquireC3Loader =
+        new TrajectoryLoader("SouthLNB_2acquireC3", kDefaultMaxVelocity, kDefaultMaxAcceleration);
+    m_shootC3Loader =
+        new TrajectoryLoader("SouthLNChill_3shootC3", kDefaultMaxVelocity, kDefaultMaxAcceleration);
   }
 
   /**
@@ -133,8 +135,8 @@ public class NorthLinkAndBalancePresetBuilder {
    * @param autoType The type of preset auto to build
    * @param botContainer Container used to access robot subsystems
    */
+  @Override
   public CommandBase getCommand(RobotContainer botContainer) {
-
     ShooterPivotSubsystem shooterPivotSubsystem = botContainer.shooterPivotSubsystem;
     IntakeSubsystem intakeSubsystem = botContainer.intakeSubsystem;
     Swerve swerveSubsystem = botContainer.swerveSubsystem;
@@ -145,7 +147,7 @@ public class NorthLinkAndBalancePresetBuilder {
 
     PoseLimiter c1AcquireBoundary = makeAcquireBoundary(CargoLocation.C1, swerveSubsystem::getPose);
     PoseLimiter c2AcquireBoundary = makeAcquireBoundary(CargoLocation.C2, swerveSubsystem::getPose);
-    String autoName = "<North Link+Balance>";
+    String autoName = "<South Link+Chill>";
     Pose2d initialPose = getInitialPose();
 
     CommandBase autoCommands =
@@ -160,10 +162,10 @@ public class NorthLinkAndBalancePresetBuilder {
                 }),
             // Shoot pre-loaded cube
             new BotLog.InfoPrintCommand(autoName + " shoot pre-loaded cargo"),
-            new Shoot(kInitialShotConfig, shooterPivotSubsystem, intakeSubsystem),
+            new Shoot(kCableProtectorShootConfig, shooterPivotSubsystem, intakeSubsystem),
             // Move to and acquire C1
-            new BotLog.InfoPrintCommand(autoName + " move to acquire C1"),
-            m_northLNBAcquireC1Loader.generateTrajectoryCommand(
+            new BotLog.InfoPrintCommand(autoName + " move to acquire C4"),
+            m_acquireC4Loader.generateTrajectoryCommand(
                 autoName,
                 intakeEventMap,
                 swerveSubsystem,
@@ -171,7 +173,7 @@ public class NorthLinkAndBalancePresetBuilder {
                 kDefaultRotationPIDGains,
                 new PathConstraints(kDefaultMaxVelocity, kDefaultMaxAcceleration)),
             // Use vision and Z-targeting to intake C1
-            new BotLog.InfoPrintCommand(autoName + " acquire C1"),
+            new BotLog.InfoPrintCommand(autoName + " acquire C4"),
             new AutoIntakeWithZTargeting(
                 GameTarget.Cube,
                 botContainer.ArmCamera,
@@ -180,19 +182,19 @@ public class NorthLinkAndBalancePresetBuilder {
                 intakeSubsystem,
                 c1AcquireBoundary),
             // Move and shoot C1
-            new BotLog.InfoPrintCommand(autoName + " move to shoot C1"),
-            m_northLNBShootC1Loader.generateTrajectoryCommand(
+            new BotLog.InfoPrintCommand(autoName + " move to shoot C4"),
+            m_shootC4Loader.generateTrajectoryCommand(
                 autoName,
                 intakeEventMap,
                 swerveSubsystem,
                 kDefaultTranslationPIDGains,
                 kDefaultRotationPIDGains,
                 new PathConstraints(kDefaultMaxVelocity, kDefaultMaxAcceleration)),
-            new BotLog.InfoPrintCommand(autoName + " shoot C1"),
-            new Shoot(kCloseShotConfig, shooterPivotSubsystem, intakeSubsystem),
+            new BotLog.InfoPrintCommand(autoName + " shoot C4"),
+            new Shoot(kCableProtectorShootConfig, shooterPivotSubsystem, intakeSubsystem),
             // Move to and acquire C2
-            new BotLog.InfoPrintCommand(autoName + " move to acquire C2"),
-            m_northLNBAcquireC2Loader.generateTrajectoryCommand(
+            new BotLog.InfoPrintCommand(autoName + " move to acquire C3"),
+            m_acquireC3Loader.generateTrajectoryCommand(
                 autoName,
                 intakeEventMap,
                 swerveSubsystem,
@@ -200,7 +202,7 @@ public class NorthLinkAndBalancePresetBuilder {
                 kDefaultRotationPIDGains,
                 new PathConstraints(kDefaultMaxVelocity, kDefaultMaxAcceleration)),
             // Use vision and Z-targeting to intake C2
-            new BotLog.InfoPrintCommand(autoName + " acquire C2"),
+            new BotLog.InfoPrintCommand(autoName + " acquire C3"),
             new AutoIntakeWithZTargeting(
                 GameTarget.Cube,
                 botContainer.ArmCamera,
@@ -209,44 +211,35 @@ public class NorthLinkAndBalancePresetBuilder {
                 intakeSubsystem,
                 c2AcquireBoundary),
             // Move and shoot C2
-            new BotLog.InfoPrintCommand(autoName + " move to shoot C2"),
-            m_northLNBShootC2Loader.generateTrajectoryCommand(
+            new BotLog.InfoPrintCommand(autoName + " move to shoot C3"),
+            m_shootC3Loader.generateTrajectoryCommand(
                 autoName,
                 intakeEventMap,
                 swerveSubsystem,
                 kDefaultTranslationPIDGains,
                 kDefaultRotationPIDGains,
                 new PathConstraints(kDefaultMaxVelocity, kDefaultMaxAcceleration)),
-            new BotLog.InfoPrintCommand(autoName + " shoot C2"),
-            new Shoot(kCloseShotConfig, shooterPivotSubsystem, intakeSubsystem),
-            // Mount the Charging Station and balance
-            new BotLog.InfoPrintCommand(autoName + " mount Charging Station"),
-            m_northLNBMountCSLoader.generateTrajectoryCommand(
-                autoName,
-                intakeEventMap,
-                swerveSubsystem,
-                kDefaultTranslationPIDGains,
-                kDefaultRotationPIDGains,
-                new PathConstraints(kDefaultMaxVelocity, kDefaultMaxAcceleration)),
-            new BotLog.InfoPrintCommand(autoName + " balance on Charging Station"),
-            new Balance(swerveSubsystem));
+            new BotLog.InfoPrintCommand(autoName + " Shoot C3"),
+            new Shoot(kShootC3Config, shooterPivotSubsystem, intakeSubsystem));
     return autoCommands;
   }
 
+  @Override
   public Pose2d getInitialPose() {
-    return m_northLNBAcquireC1Loader.getInitialPose();
+    return m_acquireC4Loader.getInitialPose();
   }
 
   /** Returns a list containing trajectories used to illustrate motion in the auto routine */
+  @Override
   public List<PathPlannerTrajectory> getTrajectories() {
+
     // Return trajectories for display
     List<PathPlannerTrajectory> trajectories = new ArrayList<>();
     trajectories.clear();
-    trajectories.add(m_northLNBAcquireC1Loader.getTrajectory());
-    trajectories.add(m_northLNBShootC1Loader.getTrajectory());
-    trajectories.add(m_northLNBAcquireC2Loader.getTrajectory());
-    trajectories.add(m_northLNBShootC2Loader.getTrajectory());
-    trajectories.add(m_northLNBMountCSLoader.getTrajectory());
+    trajectories.add(m_acquireC4Loader.getTrajectory());
+    trajectories.add(m_shootC4Loader.getTrajectory());
+    trajectories.add(m_acquireC3Loader.getTrajectory());
+    trajectories.add(m_shootC3Loader.getTrajectory());
 
     return trajectories;
   }

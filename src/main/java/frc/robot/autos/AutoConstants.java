@@ -119,10 +119,11 @@ public class AutoConstants {
   /** An enumeration of initial actions to take before escaping the community */
   public static enum AutoType {
     AutoBuilder(0), // Generate auto routine using AutoBuilder
-    NorthLinkAndBalanceOverCS(1), // Preset: two cubes North of CS, end with balance
-    NorthLinkAndChill(2), // Preset two cubes North of CS, end with sit still
-    SouthLinkAndBalance(3), // Preset: two cubes South of CS, end with balance
-    SouthLinkAndChill(4); // Preset: two cubes south of CS, end with sit still
+    North3PlusBalance(1), // Preset: two cubes North of CS, end with balance
+    North3PlusChill(2), // Preset two cubes North of CS, end with sit still
+    South3PlusBalance(3), // Preset: two cubes South of CS, end with balance
+    South3PlusChill(4); // Preset: two cubes south of CS, end with sit still
+
     public final int id;
 
     private AutoType(int _id) {
