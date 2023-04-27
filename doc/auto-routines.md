@@ -46,9 +46,11 @@ position North of the Charging Station (`North 3+chill`).
 1. Shoot `C2` into the low grid at position `G`.
 
 **North 3+Balance Auto Routine Trajectories**
+
 ![North 3+Balance Trajectories](./_auto-routines/north-3plus-balance.jpg "North 3+Balance trajectories")
 
 **North 3+chill Auto Routine Trajectories**
+
 ![North 3+chill Trajectories](./_auto-routines/north-3plus-chill.jpg "North 3+chill trajectories")
 
 ### South Presets
@@ -73,9 +75,11 @@ position South of the Charging Station (`South 3+chill`).
 1. Shoot `C3` into the low grid at position `C`.
 
 **South 3+Balance Auto Routine Trajectories**
+
 ![South 3+Balance Trajectories](./_auto-routines/south-3plus-balance.jpg "South 3+Balance trajectories")
 
 **South 3+chill Auto Routine Trajectories**
+
 ![South 3+chill Trajectories](./_auto-routines/south-3plus-chill.jpg "South 3+chill trajectories")
 
 
@@ -92,7 +96,7 @@ Preset auto routines are each created using a corresponding builder class:
 
 The preset auto builder classes each implement a common
 [`PresetBuilder` interface](../src/main/java/frc/robot/autos/Preset/PresetBuilder.java) that
-provides methods used to obtain the auto routine's initial robot pose and trajectories (for 
+provides methods used to obtain the auto routine's initial robot pose and trajectories (for
 display on dashboard software).  Additionally, a `getCommand()` method returns a `Command`
 that carries out all of the steps and logic in the auto routine.  The factory class,
 `PresetAutoFactory` is used to obtain the `AutoBuilder` implementation for a corresponding member of

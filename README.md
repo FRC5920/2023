@@ -5,6 +5,8 @@ for the 2023 "Charged Up!" FRC competition.
 
 ## Repo Organization
 
+![Repo File Tree](./doc/_toplevel-README/repo-file-tree.svg "Repository file tree")
+
 Source Code is located in the following subdirectories of [src/main/java/frc/](./src/main/java/frc):
 
 - [lib/](./src/main/java/frc/lib): third-party sources and common classes shared across robot
@@ -19,7 +21,7 @@ The primary robot code is centered on a small group of modules located under the
 - [Main.java](./src/main/java/frc/robot/Main.java) - primary code (mostly
 boilerplate) serving as an execution entry point
 - [Robot.java](./src/main/java/frc/robot/Robot.java) - top-level routines used
-to initialize the robot and execute periodic functions for teleop, autonomous, 
+to initialize the robot and execute periodic functions for teleop, autonomous,
 test, and simulation.
 - [RobotContainer.java](./src/main/java/frc/robot/RobotContainer.java) - a class
 that contains the instances of all robot subsystems.
@@ -31,6 +33,10 @@ Supplemental supporting code is organized under the following subdirectories:
 | autos        | Classes used to implement autonomous routines and an associated dashboard tab |
 | commands     | Command classes used to carry out robot functions (e.g. Shooter, Z-targeting, etc.) |
 | subsystems   | Classes that implement
+
+## Additional Documentation
+
+* [Autonomous Routines](./doc/auto-routines.md)
 
 ## Useful Links
 
