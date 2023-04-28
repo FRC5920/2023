@@ -49,49 +49,35 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.commands;
+package frc.lib.utility.AKitLogging;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.lib.Joystick.ProcessedXboxController;
-import frc.robot.RobotContainer;
-import frc.robot.subsystems.JoystickSubsystem;
-import frc.robot.subsystems.SwerveDrivebase.Swerve;
+import edu.wpi.first.math.geometry.Rotation2d;
+import org.littletonrobotics.junction.LogTable;
+import org.littletonrobotics.junction.inputs.LoggableInputs;
 
-public class TeleopSwerve extends CommandBase {
-  private double rotation;
-  private Translation2d translation;
-  private boolean fieldRelative;
-  private boolean openLoop;
+/** LoggableInput implementation for a Rotation3d object */
+public class Rotation2dLoggableInput implements LoggableInputs {
+  public final String logPrefix;
+  public Rotation2d value;
 
-  private Swerve s_Swerve;
-  private ProcessedXboxController controller;
-
-  /** Driver control */
-  public TeleopSwerve(
-      Swerve s_Swerve,
-      JoystickSubsystem joystickSubsystem,
-      boolean fieldRelative,
-      boolean openLoop) {
-    this.s_Swerve = s_Swerve;
-    addRequirements(s_Swerve);
-
-    this.controller = joystickSubsystem.getDriverController();
-    this.fieldRelative = fieldRelative;
-    this.openLoop = openLoop;
+  public Rotation2dLoggableInput(String prefix) {
+    logPrefix = prefix + "/Rotation2d";
+    value = new Rotation2d();
   }
 
   @Override
-  public void execute() {
-    double allianceInvert = (DriverStation.getAlliance() == Alliance.Blue) ? -1.0 : 1.0;
-    double yAxis = allianceInvert * controller.getLeftY();
-    double xAxis = allianceInvert * controller.getLeftX();
-    double rAxis = -controller.getRightX();
+  public void toLog(LogTable table) {
+    table.put((logPrefix + "/rad"), value.getRadians());
+  }
 
-    translation = new Translation2d(yAxis, xAxis).times(RobotContainer.MaxSpeed);
-    rotation = rAxis * RobotContainer.MaxRotate;
-    s_Swerve.drive(translation, rotation, fieldRelative, openLoop);
+  @Override
+  public void fromLog(LogTable table) {
+    value = Rotation2d.fromRadians(table.getDouble((logPrefix + "/rad"), 0.0));
+  }
+
+  public Rotation2dLoggableInput clone() {
+    Rotation2dLoggableInput copy = new Rotation2dLoggableInput(this.logPrefix);
+    copy.value = new Rotation2d(value.getRadians());
+    return copy;
   }
 }

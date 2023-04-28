@@ -49,49 +49,40 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.commands;
+package frc.lib.utility.AKitLogging;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.lib.Joystick.ProcessedXboxController;
-import frc.robot.RobotContainer;
-import frc.robot.subsystems.JoystickSubsystem;
-import frc.robot.subsystems.SwerveDrivebase.Swerve;
+import edu.wpi.first.math.geometry.Rotation3d;
+import org.littletonrobotics.junction.LogTable;
+import org.littletonrobotics.junction.inputs.LoggableInputs;
 
-public class TeleopSwerve extends CommandBase {
-  private double rotation;
-  private Translation2d translation;
-  private boolean fieldRelative;
-  private boolean openLoop;
+/** LoggableInput implementation for a Rotation3d object */
+public class Rotation3dLoggableInput implements LoggableInputs {
+  public final String logPrefix;
+  private QuaternionLoggableInput quaternionInput;
+  public Rotation3d value;
 
-  private Swerve s_Swerve;
-  private ProcessedXboxController controller;
-
-  /** Driver control */
-  public TeleopSwerve(
-      Swerve s_Swerve,
-      JoystickSubsystem joystickSubsystem,
-      boolean fieldRelative,
-      boolean openLoop) {
-    this.s_Swerve = s_Swerve;
-    addRequirements(s_Swerve);
-
-    this.controller = joystickSubsystem.getDriverController();
-    this.fieldRelative = fieldRelative;
-    this.openLoop = openLoop;
+  public Rotation3dLoggableInput(String prefix) {
+    logPrefix = prefix + "/Rotation3d";
+    quaternionInput = new QuaternionLoggableInput(logPrefix);
+    value = new Rotation3d();
   }
 
   @Override
-  public void execute() {
-    double allianceInvert = (DriverStation.getAlliance() == Alliance.Blue) ? -1.0 : 1.0;
-    double yAxis = allianceInvert * controller.getLeftY();
-    double xAxis = allianceInvert * controller.getLeftX();
-    double rAxis = -controller.getRightX();
+  public void toLog(LogTable table) {
+    quaternionInput.value = value.getQuaternion();
+    quaternionInput.toLog(table);
+  }
 
-    translation = new Translation2d(yAxis, xAxis).times(RobotContainer.MaxSpeed);
-    rotation = rAxis * RobotContainer.MaxRotate;
-    s_Swerve.drive(translation, rotation, fieldRelative, openLoop);
+  @Override
+  public void fromLog(LogTable table) {
+    quaternionInput.fromLog(table);
+    value = new Rotation3d(quaternionInput.value);
+  }
+
+  public Rotation3dLoggableInput clone() {
+    Rotation3dLoggableInput copy = new Rotation3dLoggableInput(this.logPrefix);
+    copy.quaternionInput = quaternionInput.clone();
+    copy.value = new Rotation3d(quaternionInput.value);
+    return copy;
   }
 }

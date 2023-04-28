@@ -49,63 +49,45 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.commands.Shooter;
+package frc.lib.utility.AKitLogging;
 
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.lib.utility.BotLogger.BotLog;
-import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
+import edu.wpi.first.math.geometry.Transform3d;
+import org.littletonrobotics.junction.LogTable;
+import org.littletonrobotics.junction.inputs.LoggableInputs;
 
-public class AutoZeroPivot extends CommandBase {
-  private double m_pivotPositionTicks = 0;
-  private final ShooterPivotSubsystem m_shooterPivotSubsystem;
-  private final double m_motorSpeedPercent;
-  private double m_startTimeSec = 0.0;
+/** LoggableInput implementation for a Transform3d object */
+public class Transform3dLoggableInput implements LoggableInputs {
+  public final String logPrefix;
+  public Translation3dLoggableInput translation3d;
+  public Rotation3dLoggableInput rotation3d;
 
-  /** Creates a new autoZeroPivot. */
-  public AutoZeroPivot(ShooterPivotSubsystem shooterPivotSubsystem, double speedPercent) {
-    m_shooterPivotSubsystem = shooterPivotSubsystem;
-    m_motorSpeedPercent = speedPercent;
-    addRequirements(shooterPivotSubsystem);
+  public Transform3dLoggableInput(String prefix) {
+    logPrefix = prefix + "/Transform3d";
+    translation3d = new Translation3dLoggableInput(logPrefix);
+    rotation3d = new Rotation3dLoggableInput(logPrefix);
   }
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    BotLog.Infof("Pivot auto-zeroing: speed=%.0f\n", m_motorSpeedPercent);
-    m_pivotPositionTicks = m_shooterPivotSubsystem.getPositionTicks();
-    m_shooterPivotSubsystem.runPivotMotor(m_motorSpeedPercent);
-    m_startTimeSec = Timer.getFPGATimestamp();
+  public void update(Transform3d input) {
+    translation3d.value = input.getTranslation();
+    rotation3d.value = input.getRotation();
   }
 
-  // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
-
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    // Turn off the pivot motor when the command finishes
-    m_shooterPivotSubsystem.runPivotMotor(0.0);
-
-    // Zero the pivot position sensor
-    m_shooterPivotSubsystem.zeroPivotPositionSensor();
-
-    double elapsedSec = Timer.getFPGATimestamp() - m_startTimeSec;
-    BotLog.Infof("Pivot auto-zero completed after %.4f seconds\n", elapsedSec);
+  public void toLog(LogTable table) {
+    translation3d.toLog(table);
+    rotation3d.toLog(table);
   }
 
-  // Returns true when the command should end.
   @Override
-  public boolean isFinished() {
-    // Get the current pivot angle
-    double currentPivotTicks = m_shooterPivotSubsystem.getPositionTicks();
-    double lastPivotTicks = m_pivotPositionTicks;
-    m_pivotPositionTicks = currentPivotTicks;
+  public void fromLog(LogTable table) {
+    translation3d.fromLog(table);
+    rotation3d.fromLog(table);
+  }
 
-    // The command is finished when the motor is running and no change has
-    // occurred in the pivot angle
-    return RobotBase.isSimulation() || (0 == Double.compare(lastPivotTicks, currentPivotTicks));
+  public Transform3dLoggableInput clone() {
+    Transform3dLoggableInput copy = new Transform3dLoggableInput(this.logPrefix);
+    copy.rotation3d = this.rotation3d.clone();
+    copy.translation3d = this.translation3d.clone();
+    return copy;
   }
 }

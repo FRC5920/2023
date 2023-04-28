@@ -54,13 +54,10 @@ package frc.lib.SwerveDrive;
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 
 /** IO implementation for Pigeon2 */
 public class Pigeon2GyroIO implements GyroIO {
   private final WPI_Pigeon2 pigeon;
-  private final double[] yprDegrees = new double[3];
-  private final double[] xyzDps = new double[3];
 
   public Pigeon2GyroIO(int canID, String canBus) {
     pigeon = new WPI_Pigeon2(canID, canBus);
@@ -74,17 +71,25 @@ public class Pigeon2GyroIO implements GyroIO {
     pigeon.setYaw(degrees);
   }
 
-  /** Get gyro measurements */
+  private static final int kYawIndex = 0;
+  private static final int kPitchIndex = 1;
+  private static final int kRollIndex = 2;
+  private static final int kXAxisIndex = 0;
+  private static final int kYAxisIndex = 1;
+  private static final int kZAxisIndex = 2;
+  /** Obtain measurements from the Pigeon2 */
   @Override
   public void updateInputs(GyroInputs OUTmeasurements) {
+    double[] yprDegrees = new double[3];
+    double[] xyzDegreesPerSec = new double[3];
     pigeon.getYawPitchRoll(yprDegrees);
-    pigeon.getRawGyro(xyzDps);
+    pigeon.getRawGyro(xyzDegreesPerSec);
     OUTmeasurements.isConnected = pigeon.getLastError().equals(ErrorCode.OK);
-    OUTmeasurements.rollRad = Units.degreesToRadians(yprDegrees[1]);
-    OUTmeasurements.pitchRad = Units.degreesToRadians(-yprDegrees[2]);
-    OUTmeasurements.yawRad = Units.degreesToRadians(yprDegrees[0]);
-    OUTmeasurements.rollVelocityRadPerSec = Units.degreesToRadians(xyzDps[1]);
-    OUTmeasurements.pitchVelocityRadPerSec = Units.degreesToRadians(-xyzDps[0]);
-    OUTmeasurements.yawVelocityRadPerSec = Units.degreesToRadians(xyzDps[2]);
+    OUTmeasurements.roll = Rotation2d.fromDegrees(yprDegrees[kPitchIndex]);
+    OUTmeasurements.pitch = Rotation2d.fromDegrees(-yprDegrees[kRollIndex]);
+    OUTmeasurements.yaw = Rotation2d.fromDegrees(yprDegrees[kYawIndex]);
+    OUTmeasurements.rollVelocity = Rotation2d.fromDegrees(xyzDegreesPerSec[kXAxisIndex]);
+    OUTmeasurements.pitchVelocity = Rotation2d.fromDegrees(-xyzDegreesPerSec[kYAxisIndex]);
+    OUTmeasurements.yawVelocity = Rotation2d.fromDegrees(xyzDegreesPerSec[kZAxisIndex]);
   }
 }

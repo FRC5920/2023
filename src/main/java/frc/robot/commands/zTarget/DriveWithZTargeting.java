@@ -111,7 +111,7 @@ public class DriveWithZTargeting extends CommandBase {
     m_swerveSubsystem = swerveSubsystem;
     addRequirements(swerveSubsystem);
 
-    m_controller = joystickSubsystem.driverController;
+    m_controller = joystickSubsystem.getDriverController();
     m_fieldRelative = fieldRelative;
     m_openLoop = openLoop;
     m_gamepieceType = gamepieceType;

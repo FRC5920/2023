@@ -49,49 +49,43 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.commands;
+package frc.lib.utility.AKitLogging;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.lib.Joystick.ProcessedXboxController;
-import frc.robot.RobotContainer;
-import frc.robot.subsystems.JoystickSubsystem;
-import frc.robot.subsystems.SwerveDrivebase.Swerve;
+import edu.wpi.first.math.geometry.Quaternion;
+import org.littletonrobotics.junction.LogTable;
+import org.littletonrobotics.junction.inputs.LoggableInputs;
 
-public class TeleopSwerve extends CommandBase {
-  private double rotation;
-  private Translation2d translation;
-  private boolean fieldRelative;
-  private boolean openLoop;
+/** LoggableInput implementation for a Quaternion object */
+public class QuaternionLoggableInput implements LoggableInputs {
+  public final String logPrefix;
+  public Quaternion value;
 
-  private Swerve s_Swerve;
-  private ProcessedXboxController controller;
-
-  /** Driver control */
-  public TeleopSwerve(
-      Swerve s_Swerve,
-      JoystickSubsystem joystickSubsystem,
-      boolean fieldRelative,
-      boolean openLoop) {
-    this.s_Swerve = s_Swerve;
-    addRequirements(s_Swerve);
-
-    this.controller = joystickSubsystem.getDriverController();
-    this.fieldRelative = fieldRelative;
-    this.openLoop = openLoop;
+  public QuaternionLoggableInput(String prefix) {
+    logPrefix = prefix + "/Quaternion";
+    value = new Quaternion();
   }
 
   @Override
-  public void execute() {
-    double allianceInvert = (DriverStation.getAlliance() == Alliance.Blue) ? -1.0 : 1.0;
-    double yAxis = allianceInvert * controller.getLeftY();
-    double xAxis = allianceInvert * controller.getLeftX();
-    double rAxis = -controller.getRightX();
+  public void toLog(LogTable table) {
+    table.put((logPrefix + "/W"), value.getW());
+    table.put((logPrefix + "/X"), value.getX());
+    table.put((logPrefix + "/Y"), value.getY());
+    table.put((logPrefix + "/Z"), value.getZ());
+  }
 
-    translation = new Translation2d(yAxis, xAxis).times(RobotContainer.MaxSpeed);
-    rotation = rAxis * RobotContainer.MaxRotate;
-    s_Swerve.drive(translation, rotation, fieldRelative, openLoop);
+  @Override
+  public void fromLog(LogTable table) {
+    value =
+        new Quaternion(
+            table.getDouble((logPrefix + "/W"), 0.0),
+            table.getDouble((logPrefix + "/X"), 0.0),
+            table.getDouble((logPrefix + "/Y"), 0.0),
+            table.getDouble((logPrefix + "/Z"), 0.0));
+  }
+
+  public QuaternionLoggableInput clone() {
+    QuaternionLoggableInput copy = new QuaternionLoggableInput(logPrefix);
+    copy.value = new Quaternion(value.getW(), value.getX(), value.getY(), value.getZ());
+    return copy;
   }
 }

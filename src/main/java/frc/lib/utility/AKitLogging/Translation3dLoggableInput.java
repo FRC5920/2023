@@ -49,49 +49,41 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.commands;
+package frc.lib.utility.AKitLogging;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.lib.Joystick.ProcessedXboxController;
-import frc.robot.RobotContainer;
-import frc.robot.subsystems.JoystickSubsystem;
-import frc.robot.subsystems.SwerveDrivebase.Swerve;
+import edu.wpi.first.math.geometry.Translation3d;
+import org.littletonrobotics.junction.LogTable;
+import org.littletonrobotics.junction.inputs.LoggableInputs;
 
-public class TeleopSwerve extends CommandBase {
-  private double rotation;
-  private Translation2d translation;
-  private boolean fieldRelative;
-  private boolean openLoop;
+/** LoggableInput implementation for a Translation3d object */
+public class Translation3dLoggableInput implements LoggableInputs {
+  private final String logPrefix;
+  public Translation3d value;
 
-  private Swerve s_Swerve;
-  private ProcessedXboxController controller;
-
-  /** Driver control */
-  public TeleopSwerve(
-      Swerve s_Swerve,
-      JoystickSubsystem joystickSubsystem,
-      boolean fieldRelative,
-      boolean openLoop) {
-    this.s_Swerve = s_Swerve;
-    addRequirements(s_Swerve);
-
-    this.controller = joystickSubsystem.getDriverController();
-    this.fieldRelative = fieldRelative;
-    this.openLoop = openLoop;
+  public Translation3dLoggableInput(String prefix) {
+    logPrefix = prefix + "/Translation3d";
+    value = new Translation3d();
   }
 
   @Override
-  public void execute() {
-    double allianceInvert = (DriverStation.getAlliance() == Alliance.Blue) ? -1.0 : 1.0;
-    double yAxis = allianceInvert * controller.getLeftY();
-    double xAxis = allianceInvert * controller.getLeftX();
-    double rAxis = -controller.getRightX();
+  public void toLog(LogTable table) {
+    table.put((logPrefix + "/x"), value.getX());
+    table.put((logPrefix + "/y"), value.getY());
+    table.put((logPrefix + "/z"), value.getZ());
+  }
 
-    translation = new Translation2d(yAxis, xAxis).times(RobotContainer.MaxSpeed);
-    rotation = rAxis * RobotContainer.MaxRotate;
-    s_Swerve.drive(translation, rotation, fieldRelative, openLoop);
+  @Override
+  public void fromLog(LogTable table) {
+    value =
+        new Translation3d(
+            table.getDouble((logPrefix + "/x"), 0.0),
+            table.getDouble((logPrefix + "/y"), 0.0),
+            table.getDouble((logPrefix + "/z"), 0.0));
+  }
+
+  public Translation3dLoggableInput clone() {
+    Translation3dLoggableInput copy = new Translation3dLoggableInput(this.logPrefix);
+    copy.value = new Translation3d(value.getX(), value.getY(), value.getZ());
+    return copy;
   }
 }
