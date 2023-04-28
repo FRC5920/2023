@@ -73,7 +73,7 @@ import frc.robot.subsystems.Dashboard.DashboardSubsystem;
 
 public class Swerve extends SubsystemBase {
   /** Set to true to enable a dashboard tab for the Swerve subsystem */
-  public static final boolean kDashboardTabIsEnabled = false;
+  public static final boolean kDashboardTabIsEnabled = true;
 
   private static final Rotation2d kAngleZero = new Rotation2d(0.0);
   private static final Rotation2d kAngle360 = Rotation2d.fromDegrees(360);
