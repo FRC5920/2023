@@ -1,33 +1,11 @@
-# 2023 Autonomous Routines
+![FRC 5290 - VIKotics](../../../../../../../doc/graphics/5920-vikotics-logo_80x80.png "FRC 5290 - VIKotics")
+**FRC 5290 - VIKotics**
 
-FRC 5290: VIKotics
+---
 
-## Autonomous Routine Conventions
+# Preset Autonomous Routine Descriptions
 
-![Auto Routine Conventions Illustration](./_auto-routines/auto-conventions.svg "Conventions for autonomous routines")
-
-### Directions
-
-No matter which Alliance is active, the following conventions apply:
-
-- North is the direction moving away from the Scoring Table
-- South is the direction moving toward the Scoring Table
-- Gridward is the direction moving toward the Grids of the active alliance
-- Fieldward is the direction moving toward the center of the field
-
-### Grids
-
-- Grids in the the community are assigned designators A-I.
-- Grid A is always the one on the side closest to the scoring table
-
-### Preset Game Pieces
-
-For any given Alliance, game pieces preset on the field are enumerated `C1`
-through `C4` beginning from the Northern-most position and moving South.
-
-## Autonomous Routines
-
-### North Presets
+## North Presets
 
 Two preset auto routines, `North 3+Balance` and `North 3+chill` provide a 3-cube
 auto on the North side of the Charging Station.  Both score a link of cubes
@@ -45,15 +23,15 @@ Charging Station or not.  Steps carried out by these auto routines are:
 position North of the Charging Station (`North 3+chill`).
 1. Shoot `C2` into the low grid at position `G`.
 
-**North 3+Balance Auto Routine Trajectories**
+### North 3+Balance Auto Routine Trajectories
 
-![North 3+Balance Trajectories](./_auto-routines/north-3plus-balance.jpg "North 3+Balance trajectories")
+![North 3+Balance Trajectories](./graphics/north-3plus-balance.jpg "North 3+Balance trajectories")
 
-**North 3+chill Auto Routine Trajectories**
+### North 3+chill Auto Routine Trajectories
 
-![North 3+chill Trajectories](./_auto-routines/north-3plus-chill.jpg "North 3+chill trajectories")
+![North 3+chill Trajectories](./graphics/north-3plus-chill.jpg "North 3+chill trajectories")
 
-### South Presets
+## South Presets
 
 Two preset auto routines, `South 3+Balance` and `South 3+chill` provide a 3-cube
 auto on the South side of the Charging Station.  Both take advantage of the
@@ -74,13 +52,13 @@ by the South auto routines are:
 position South of the Charging Station (`South 3+chill`).
 1. Shoot `C3` into the low grid at position `C`.
 
-**South 3+Balance Auto Routine Trajectories**
+### South 3+Balance Auto Routine Trajectories
 
-![South 3+Balance Trajectories](./_auto-routines/south-3plus-balance.jpg "South 3+Balance trajectories")
+![South 3+Balance Trajectories](./graphics/south-3plus-balance.jpg "South 3+Balance trajectories")
 
-**South 3+chill Auto Routine Trajectories**
+### South 3+chill Auto Routine Trajectories
 
-![South 3+chill Trajectories](./_auto-routines/south-3plus-chill.jpg "South 3+chill trajectories")
+![South 3+chill Trajectories](./graphics/south-3plus-chill.jpg "South 3+chill trajectories")
 
 
 ## Preset Autonomous Routine Implementations
@@ -106,11 +84,3 @@ During robot code initialization, the each preset auto builder class loads traje
 from JSON files located in the [src/main/deploy/pathplanner/generatedJSON/](../src/main/deploy/pathplanner/generatedJSON)
 directory, which are generated from corresponding [`.path`](../src/main/deploy/pathplanner) files
 using [PathPlanner](https://github.com/mjansen4857/pathplanner).
-
-
-## References
-
-- [2023 Layout Marking Diagram](https://firstfrc.blob.core.windows.net/frc2023/FieldAssets/2023LayoutMarkingDiagram.pdf)
-- [FRC 2023 Game animation](https://www.youtube.com/watch?v=0zpflsYc4PA&feature=youtu.be)
-- [Charged Up Arena](https://firstfrc.blob.core.windows.net/frc2023/Manual/Sections/2023FRCGameManual-05.pdf)
-- [Charged Up Match Play](https://firstfrc.blob.core.windows.net/frc2023/Manual/Sections/2023FRCGameManual-06.pdf)

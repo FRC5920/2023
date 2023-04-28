@@ -1,4 +1,9 @@
-# FRC 5920 VIKotics - 2023 Robot Code
+![FRC 5290 - VIKotics](./doc/graphics/5920-vikotics-logo_80x80.png "FRC 5290 - VIKotics")
+**FRC 5290 - VIKotics**
+
+---
+
+# 2023 Robot Code: Lil' Cheese
 
 This repository contains source code for the VIKotics robot Lil' Cheez fielded
 for the 2023 "Charged Up!" FRC competition.
@@ -7,7 +12,7 @@ for the 2023 "Charged Up!" FRC competition.
 
 ![Repo File Tree](./doc/_toplevel-README/repo-file-tree.svg "Repository file tree")
 
-Source Code is located in the following subdirectories of [src/main/java/frc/](./src/main/java/frc):
+Source Code is divided between the following subdirectories of [src/main/java/frc/](./src/main/java/frc):
 
 - [lib/](./src/main/java/frc/lib): third-party sources and common classes shared across robot
 code modules (e.g. Swerve Drive, Joystick, etc.).
@@ -36,7 +41,7 @@ Supplemental supporting code is organized under the following subdirectories:
 
 ## Additional Documentation
 
-* [Autonomous Routines](./doc/auto-routines.md)
+* [Autonomous Routines](./src/main/java/frc/robot/autos/doc/auto-routines.md)
 
 ## Useful Links
 
