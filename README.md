@@ -5,7 +5,7 @@
 
 # 2023 Robot Code: Lil' Cheese
 
-![2023 Lil' Cheez](./doc/graphics/lil-cheez.png "2023 Lil' Cheez")
+<img src="./doc/graphics/lil-cheez.png" alt="2023 Lil Cheez" width="75%"/>
 
 ---
 
