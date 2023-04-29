@@ -58,8 +58,9 @@ import frc.lib.utility.BotLogger.BotLog;
 import frc.robot.subsystems.ShooterPivot.PivotPresets;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 
-/** SetShooterAngle commands the shooter pivot motors to move to a given angle
- * and detects when the mechanism has reached that angle.
+/**
+ * SetShooterAngle commands the shooter pivot motors to move to a given angle and detects when the
+ * mechanism has reached that angle.
  */
 public class SetShooterAngle extends CommandBase {
   /** Tolerance in degrees for the commanded pivot position */
