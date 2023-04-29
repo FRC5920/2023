@@ -6,7 +6,7 @@
 # Autonomous Routine Naming Conventions
 
 The following nomenclature conventions are observed in descriptions of 2023
-autonomous routines.  These conventions supplement but do not override 
+autonomous routines.  These conventions supplement but do not override
 [typical FRC coordinate system conventions](https://docs.wpilib.org/en/stable/docs/software/advanced-controls/geometry/coordinate-systems.html).
 
 ![Auto Routine Conventions Illustration](./graphics/auto-conventions.svg "Conventions for autonomous routines")

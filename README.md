@@ -27,8 +27,12 @@ code modules (e.g. Swerve Drive, Joystick, etc.).
 * [Robot Code](./src/main/java/frc/robot/robot-code.md)
 * [Autonomous Routines](./src/main/java/frc/robot/autos/doc/auto-routines.md)
 
-## Useful Links
+## References
+- [FRC 2023 Game animation](https://www.youtube.com/watch?v=0zpflsYc4PA&feature=youtu.be)
+- [Charged Up Arena](https://firstfrc.blob.core.windows.net/frc2023/Manual/Sections/2023FRCGameManual-05.pdf)
+- [Charged Up Match Play](https://firstfrc.blob.core.windows.net/frc2023/Manual/Sections/2023FRCGameManual-06.pdf)
 
+## Useful Links
 - [Discussion about chase tag](https://www.chiefdelphi.com/t/photonvision-beta-2023-apriltags/415626/156?u=amicus1)
 - [Chase Tag Command](https://github.com/STMARobotics/swerve-test/blob/b11cc5ab3693b698eed8f6fc38a60813d21e2f45/src/main/java/frc/robot/commands/ChaseTagCommand.java)
 - [Mechanical Advantage April Tag Vision](https://github.com/Mechanical-Advantage/RobotCode2023/tree/main/src/main/java/org/littletonrobotics/frc2023/subsystems/apriltagvision)

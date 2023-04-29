@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2023-5920 FIRST and other WPILib contributors.
+// Copyright (c) 2023 FIRST and other WPILib contributors.
 // http://github.com/FRC5920
 // Open Source Software; you can modify and/or share it under the terms of the
 // license given in WPILib-License.md in the root directory of this project.
@@ -49,42 +49,49 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.commands;
+package frc.robot.commands.Shooter;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.ExampleSubsystem;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.lib.utility.BotLogger.BotLog;
+import frc.robot.subsystems.Intake.IntakePreset;
+import frc.robot.subsystems.Intake.IntakeSubsystem;
+import frc.robot.subsystems.ShooterPivot.PivotPresets;
+import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 
-/** An example command that uses an example subsystem. */
-public class ExampleCommand extends CommandBase {
-  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField", "unused"})
-  private final ExampleSubsystem m_subsystem;
+public class AcquireAndPark extends SequentialCommandGroup {
 
-  /**
-   * Creates a new ExampleCommand.
-   *
-   * @param subsystem The subsystem used by this command.
-   */
-  public ExampleCommand(ExampleSubsystem subsystem) {
-    m_subsystem = subsystem;
-    // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(subsystem);
+  public AcquireAndPark(
+      ShooterPivotSubsystem shooterPivotSubsystem, IntakeSubsystem intakeSubsystem) {
+    this(shooterPivotSubsystem, intakeSubsystem, IntakePreset.Acquire.motorSpeed);
   }
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {}
+  public AcquireAndPark(
+      ShooterPivotSubsystem shooterPivotSubsystem,
+      IntakeSubsystem intakeSubsystem,
+      double intakeSpeedPercent) {
+    addCommands(
+        Commands.parallel(
+                Commands.sequence(
+                    new BotLog.InfoPrintCommand("<AcquireAndPark> Pivot for shot"),
+                    new SetShooterAngle(shooterPivotSubsystem, PivotPresets.Acquire)),
+                Commands.sequence(
+                    new BotLog.InfoPrintCommand("<AcquireAndPark> wait for shooter angle"),
+                    new WaitUntilCommand(() -> waitForShooterAngle(shooterPivotSubsystem)),
+                    new BotLog.InfoPrintCommand("<AcquireAndPark> start intake"),
+                    new IntakeGamepiece(intakeSubsystem, intakeSpeedPercent)))
+            .finallyDo((interrupted) -> endBehavior(shooterPivotSubsystem, intakeSubsystem)));
+  }
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {}
+  private static void endBehavior(
+      ShooterPivotSubsystem shooterPivotSubsystem, IntakeSubsystem intakeSubsystem) {
+    // shooterPivotSubsystem.park();
+    intakeSubsystem.stopIntake();
+  }
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {}
-
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return false;
+  private static boolean waitForShooterAngle(ShooterPivotSubsystem subsystem) {
+    return RobotBase.isSimulation() || (subsystem.getAngleDegrees() > 45.0);
   }
 }

@@ -61,7 +61,7 @@ import frc.lib.utility.BotLogger.BotLog;
 import frc.robot.Constants.GameTarget;
 import frc.robot.RobotContainer;
 import frc.robot.commands.Balance;
-import frc.robot.commands.Shooter.Acquire;
+import frc.robot.commands.Shooter.AcquireAndPark;
 import frc.robot.commands.Shooter.Shoot;
 import frc.robot.commands.Shooter.ShooterPresets;
 import frc.robot.commands.SnapToGrid;
@@ -134,7 +134,7 @@ public class JoystickSubsystem extends JoystickSubsystemBase {
 
     CommandBase acquireAndParkCommand =
         new BotLog.DebugPrintCommand("<Acquire and park>")
-            .andThen(Acquire.acquireAndPark(shooterPivot, intake));
+            .andThen(new AcquireAndPark(shooterPivot, intake));
     CommandBase emergencyParkCommand =
         new BotLog.DebugPrintCommand("<Acquire and park>")
             .andThen(new ShooterPivotSubsystem.EmergencyPark(botContainer.shooterPivotSubsystem));
@@ -198,11 +198,10 @@ public class JoystickSubsystem extends JoystickSubsystemBase {
           new Shoot(ShooterPresets.PivotSideUpAgainstGridLow, shooterPivot, intake));
 
       operatorController.leftBumper.whileTrue(
-          Acquire.acquireAndPark(botContainer.shooterPivotSubsystem, botContainer.intakeSubsystem));
+          new AcquireAndPark(botContainer.shooterPivotSubsystem, botContainer.intakeSubsystem));
       operatorController.rightBumper.whileTrue(new InstantCommand());
 
-      operatorController.leftTriggerAsButton.whileTrue(
-          Acquire.acquireAndPark(shooterPivot, intake));
+      operatorController.leftTriggerAsButton.whileTrue(new AcquireAndPark(shooterPivot, intake));
 
       operatorController.leftStickPress.onTrue(kDoNothing);
       operatorController.rightStickPress.onTrue(kDoNothing);

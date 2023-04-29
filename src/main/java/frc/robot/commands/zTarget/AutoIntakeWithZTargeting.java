@@ -64,7 +64,7 @@ import frc.lib.utility.PIDGains;
 import frc.lib.utility.ZTargeter;
 import frc.robot.Constants.GameTarget;
 import frc.robot.RobotContainer;
-import frc.robot.commands.Shooter.Acquire;
+import frc.robot.commands.Shooter.AcquireAndPark;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
@@ -88,7 +88,7 @@ public class AutoIntakeWithZTargeting extends SequentialCommandGroup {
         Commands.race(
             new ZTargetAndDriveToGamepiece(
                 gamepieceType, kApproachSpeedMetersPerSec, camera, swerveSubsystem, poseLimits),
-            Acquire.acquireAndPark(shooterPivotSubsystem, intakeSubsystem, kIntakeSpeedPercent)),
+            new AcquireAndPark(shooterPivotSubsystem, intakeSubsystem, kIntakeSpeedPercent)),
         // new IntakeGamepiece(intakeSubsystem)),
         new BotLog.InfoPrintCommand(String.format("<AutoIntakeWithZTargeting> finished")));
   }

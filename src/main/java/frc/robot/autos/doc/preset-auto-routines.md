@@ -3,7 +3,12 @@
 
 ---
 
-# Preset Autonomous Routine Descriptions
+# Preset Autonomous Routines
+
+At runtime, one of several 3-cube preset auto routines may be selected from the "Auto Type" chooser
+in the [AutoBuilder dashboard tab](../AutoDashboardTab.java).  Unlike auto routines created using
+the AutoBuilder, preset auto routines do not allow their start position, trajectory, or end behavior
+to be modified.
 
 ## North Presets
 
@@ -61,7 +66,7 @@ position South of the Charging Station (`South 3+chill`).
 ![South 3+chill Trajectories](./graphics/south-3plus-chill.jpg "South 3+chill trajectories")
 
 
-## Preset Autonomous Routine Implementations
+## Preset Autonomous Routine Code
 
 Preset auto routines are each created using a corresponding builder class:
 

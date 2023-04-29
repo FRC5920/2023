@@ -49,7 +49,7 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.autos.AutoBuilder;
+package frc.robot.autos;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -64,6 +64,9 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.lib.dashboard.WidgetsWithChangeDetection.ChooserWithChangeDetection;
 import frc.lib.utility.BotLogger.BotLog;
 import frc.robot.RobotContainer;
+import frc.robot.autos.AutoBuilder.AutoRoutineBuilder;
+import frc.robot.autos.AutoBuilder.BalanceStrategy;
+import frc.robot.autos.AutoBuilder.EscapeStrategy;
 import frc.robot.autos.AutoConstants.AutoType;
 import frc.robot.autos.AutoConstants.ChargingStation;
 import frc.robot.autos.AutoConstants.EscapeRoute;
@@ -75,7 +78,10 @@ import frc.robot.autos.Preset.PresetBuilder;
 import frc.robot.subsystems.Dashboard.IDashboardTab;
 import java.util.*;
 
-/** A class supplying a Shuffleboard tab for configuring drive train parameters */
+/**
+ * A class supplying a Shuffleboard tab that provides user interface elements for selecting and/or
+ * configuring the active autonomous routine.
+ */
 public class AutoDashboardTab implements IDashboardTab {
 
   /** Title displayed in the dashboard tab */

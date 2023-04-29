@@ -60,7 +60,7 @@ import frc.lib.utility.BotLogger.BotLog;
 import frc.lib.utility.ZTargeter;
 import frc.robot.Constants.GameTarget;
 import frc.robot.RobotContainer;
-import frc.robot.commands.Shooter.Acquire;
+import frc.robot.commands.Shooter.AcquireAndPark;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.JoystickSubsystem;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
@@ -97,7 +97,7 @@ public class DriveWithZTargeting extends CommandBase {
                     joystickSubsystem,
                     fieldRelative,
                     openLoop),
-                Acquire.acquireAndPark(shooterPivot, intake)));
+                new AcquireAndPark(shooterPivot, intake)));
   }
 
   public DriveWithZTargeting(
