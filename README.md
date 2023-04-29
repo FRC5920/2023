@@ -5,42 +5,26 @@
 
 # 2023 Robot Code: Lil' Cheese
 
+<img src="./doc/graphics/lil-cheez-photo.jpg" alt="2023 Lil Cheez" width="200" style="padding-right: 20px"/>
+<img src="./doc/graphics/lil-cheez-photo2.jpg" alt="2023 Lil Cheez" width="430"/>
+
+---
+
 This repository contains source code for the VIKotics robot Lil' Cheez fielded
 for the 2023 "Charged Up!" FRC competition.
 
 ## Repo Organization
 
-![Repo File Tree](./doc/_toplevel-README/repo-file-tree.svg "Repository file tree")
+![Repo File Tree](./doc/graphics/repo-file-tree.svg "Repository file tree")
 
-Source Code is divided between the following subdirectories of [src/main/java/frc/](./src/main/java/frc):
+Source Code is organized under [src/main/java/frc/](./src/main/java/frc) in the following subdirectories:
 
 - [lib/](./src/main/java/frc/lib): third-party sources and common classes shared across robot
 code modules (e.g. Swerve Drive, Joystick, etc.).
 - [robot/](./src/main/java/frc/robot): sources that directly implement robot subsystems and runtime routines.
 
-### Robot Code
-
-The primary robot code is centered on a small group of modules located under the
-[src/main/java/frc/robot/](./src/main/java/frc/robot) directory:
-
-- [Main.java](./src/main/java/frc/robot/Main.java) - primary code (mostly
-boilerplate) serving as an execution entry point
-- [Robot.java](./src/main/java/frc/robot/Robot.java) - top-level routines used
-to initialize the robot and execute periodic functions for teleop, autonomous,
-test, and simulation.
-- [RobotContainer.java](./src/main/java/frc/robot/RobotContainer.java) - a class
-that contains the instances of all robot subsystems.
-
-Supplemental supporting code is organized under the following subdirectories:
-
-| Subdirectory | Description |
-| :----------- | :---------- |
-| autos        | Classes used to implement autonomous routines and an associated dashboard tab |
-| commands     | Command classes used to carry out robot functions (e.g. Shooter, Z-targeting, etc.) |
-| subsystems   | Classes that implement
-
-## Additional Documentation
-
+## Documentation
+* [Robot Code](./src/main/java/frc/robot/robot-code.md)
 * [Autonomous Routines](./src/main/java/frc/robot/autos/doc/auto-routines.md)
 
 ## Useful Links
