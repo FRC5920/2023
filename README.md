@@ -5,8 +5,7 @@
 
 # 2023 Robot Code: Lil' Cheese
 
-<img src="./doc/graphics/lil-cheez-photo.jpg" alt="2023 Lil Cheez" width="200" style="padding-right: 20px"/>
-<img src="./doc/graphics/lil-cheez-photo2.jpg" alt="2023 Lil Cheez" width="430"/>
+<img src="./doc/graphics/lil-cheez.png" alt="2023 Lil Cheez" width="75%"/>
 
 ---
 
