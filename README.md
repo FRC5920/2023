@@ -24,7 +24,9 @@ code modules (e.g. Swerve Drive, Joystick, etc.).
 
 ## Documentation
 * [Robot Code](./src/main/java/frc/robot/robot-code.md)
+* [Subsystem Code](./src/main/java/frc/robot/subsystems/subsystems.md)
 * [Autonomous Routines](./src/main/java/frc/robot/autos/doc/auto-routines.md)
+* [Support Library](./src/main/java/frc/lib/support-library.md)
 * [Useful Links](./doc/useful-links.md)
 
 ## References

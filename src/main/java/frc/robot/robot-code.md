@@ -9,16 +9,16 @@ The primary robot code is centered on a small group of modules located under the
 [src/main/java/frc/robot/](./) directory:
 
 - [Constants.java](./Constants.java) - common constants shared by robot code modules.
-- [Main.java](./Main.java) - primary code (mostly
-boilerplate) serving as an execution entry point
+- [Main.java](./Main.java) - execution entry point for the robot (minimal boilerplate code)
 - [Robot.java](./Robot.java) - top-level routines used
 to initialize the robot and execute periodic functions for teleop, autonomous,
 test, and simulation.
 - [RobotContainer.java](./RobotContainer.java) - a class
 that contains the instances of all robot subsystems.
 
-These modules are supplemented and supported by [code modules under the /lib](../lib/lib-code.md)
-directory and modules in the following subdirectories:
+These modules are supplemented and aided by
+[support library (/lib)](../lib/support-library.md) classes and packages and
+modules organized under the following subdirectories:
 
 | Subdirectory | Description |
 | :----------- | :---------- |
