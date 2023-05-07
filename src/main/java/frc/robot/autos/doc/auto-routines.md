@@ -5,7 +5,8 @@
 
 # 2023 Autonomous Routine Documentation
 
-- [Autonomous Routine Naming Conventions](./auto-conventions.md)
+- [Naming Conventions Used With Autonomous Routines](./auto-conventions.md)
+- [Auto-Builder (Generated) Autonomous Routines](./autobuilder.md)
 - [Preset Autonomous Routines](./preset-auto-routines.md)
 
 

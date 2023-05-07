@@ -80,6 +80,7 @@
       "/Shuffleboard/ShooterPivot/Position PID": "PIDController",
       "/Shuffleboard/ShooterPivot/SetPivot": "Command",
       "/Shuffleboard/ShooterPivot/TestCommand": "Command",
+      "/Shuffleboard/SwerveDrive/Degrees": "Gyro",
       "/Shuffleboard/SwerveDrive/FrontLeft/Angle/Degrees": "Gyro",
       "/Shuffleboard/SwerveDrive/FrontRight/Angle/Degrees": "Gyro",
       "/Shuffleboard/SwerveDrive/RearLeft/Angle/Degrees": "Gyro",

@@ -56,7 +56,7 @@ means of measuring the pivot angle is by using the internal sensor of the CTRE
 Falcon 2 pivot motors.  Though this sensor offers good resolution for measuring
 pivot angle, it accumulates error over time due to small variances and slop
 in the pivot mechanism's mechanical linkages.  Consequently, the internal sensor
-must be re-zeroed periodically when the pivot is set to its zero degree or 
+must be re-zeroed periodically when the pivot is set to its zero degree or
 'parked' position.
 
 Re-zeroing of the sensor is performed by an `AutoZeroPivot` internal command
@@ -76,7 +76,7 @@ zero.
 ## [Swerve Drivebase Subsystem](./SwerveDrivebase/)
 
 A [`Swerve`](./SwerveDrivebase/Swerve.java) class provides a subsystem that
-interfaces with motors and encoders used in four 
+interfaces with motors and encoders used in four
 [Swerve Drive Specialties SDS Mk4i](https://www.swervedrivespecialties.com/products/mk4i-swerve-module)
 swerve drive modules.  Each swerve module includes:
 
@@ -100,13 +100,13 @@ deviating slightly from their ideal position.  During the build phase and
 periodically between uses, it is necessary to measure these deviations by
 physically moving swerve wheels into parallel alignment and measuring the angle
 offset using the CANCoder modules and internal Falcon sensors.  To facilitate
-this, the `kDashboardTabIsEnabled` boolean constant in the 
+this, the `kDashboardTabIsEnabled` boolean constant in the
 [`Swerve`](./SwerveDrivebase/Swerve.java) class can optionally be set to `true`
 to enable a [dashboard tab](SwerveDrivebase/SwerveDashboardTab.java) that
 displays sensor readings from the motors and CANCoders.  Displaying this
 dashboard tab tends to add processing overhead and can result in poor performace
 in some dashboard software.  So, it is typically disabled when not performing
-swerve module calibration. 
+swerve module calibration.
 
 ## [Joystick Subsystem](./JoystickSubsystem.java)
 
@@ -124,7 +124,7 @@ drivers and operators with older, well-used controllers.
 ## [LED Subsystem](./LEDs.java)
 
 The LED subsystem manages a strip of addressable LEDs attached to the robot and
-supplies methods for setting their color or displaying a changing pattern. 
+supplies methods for setting their color or displaying a changing pattern.
 
 ## Pneumatics Subsystem
 
