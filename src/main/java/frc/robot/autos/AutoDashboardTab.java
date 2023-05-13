@@ -119,8 +119,8 @@ public class AutoDashboardTab implements IDashboardTab {
       new ChooserWithChangeDetection<AutoType>();
 
   /** Initial position chooser */
-  private final ChooserWithChangeDetection<Grids.ScoringPosition> m_initialPositionChooser =
-      new ChooserWithChangeDetection<Grids.ScoringPosition>();
+  private final ChooserWithChangeDetection<Grids.GridPosition> m_initialPositionChooser =
+      new ChooserWithChangeDetection<Grids.GridPosition>();
   /** Initial action chooser */
   private final ChooserWithChangeDetection<InitialAction> m_initialActionChooser =
       new ChooserWithChangeDetection<InitialAction>();
@@ -186,9 +186,7 @@ public class AutoDashboardTab implements IDashboardTab {
 
     // Set up the initial position chooser
     m_initialPositionChooser.loadOptions(
-        Grids.ScoringPosition.getNames(),
-        Grids.ScoringPosition.values(),
-        Grids.ScoringPosition.H.id);
+        Grids.GridPosition.getNames(), Grids.GridPosition.values(), Grids.GridPosition.H.id);
     autoBuilderLayout
         .add("Initial Position", m_initialPositionChooser)
         .withSize(kChooserWidth, kChooserHeight)

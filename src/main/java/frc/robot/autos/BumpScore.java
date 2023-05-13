@@ -87,7 +87,7 @@ public class BumpScore extends SequentialCommandGroup {
       new TrapezoidProfile.Constraints(kMaxVelocity, kMaxAcceleration);
 
   /** Creates a new BumpScore. */
-  public BumpScore(Grids.ScoringPosition scoringPosition, Swerve swerveSubsystem) {
+  public BumpScore(Grids.GridPosition scoringPosition, Swerve swerveSubsystem) {
     Pose2d initialPose = scoringPosition.getPose();
     double initialX = initialPose.getTranslation().getX();
     double initialY = initialPose.getTranslation().getY();

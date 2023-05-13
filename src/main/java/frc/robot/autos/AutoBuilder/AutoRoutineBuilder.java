@@ -98,7 +98,7 @@ public class AutoRoutineBuilder {
    */
   public CommandBase build(
       RobotContainer botContainer,
-      Grids.ScoringPosition startingPosition,
+      Grids.GridPosition startingPosition,
       InitialAction initialAction,
       EscapeRoute.Route escapeRoute,
       SecondaryAction secondaryAction,

@@ -81,9 +81,9 @@ public class SnapToGrid extends CommandBase {
   /** Y values comprising grid lines */
   public static final double kGridYValues[] =
       new double[] {
-        Grids.ScoringPosition.B.getPosition().getY(),
-        Grids.ScoringPosition.E.getPosition().getY(),
-        Grids.ScoringPosition.H.getPosition().getY(),
+        Grids.GridPosition.B.getPosition().getY(),
+        Grids.GridPosition.E.getPosition().getY(),
+        Grids.GridPosition.H.getPosition().getY(),
       };
 
   /** Distance from a grid line to capture */
