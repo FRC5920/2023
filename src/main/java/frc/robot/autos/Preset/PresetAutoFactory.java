@@ -49,81 +49,26 @@
 |                  °***    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@O                      |
 |                         .OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                      |
 \-----------------------------------------------------------------------------*/
-package frc.robot.commands.Shooter;
+package frc.robot.autos.Preset;
 
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.lib.utility.BotLogger.BotLog;
-import frc.robot.subsystems.ShooterPivot.PivotPresets;
-import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
+import frc.robot.autos.AutoConstants.AutoType;
+import java.util.HashMap;
+import java.util.Map;
 
-/**
- * SetShooterAngle commands the shooter pivot motors to move to a given angle and detects when the
- * mechanism has reached that angle.
- */
-public class SetShooterAngle extends CommandBase {
-  /** Tolerance in degrees for the commanded pivot position */
-  private static final double kAngleToleranceDeg = 3.0;
+/** PresetAutoBuilder serves as a factory for objects that build preset auto routines */
+public class PresetAutoFactory {
+  /** Map used to connect an auto type to its corresponding builder object */
+  private Map<AutoType, PresetBuilder> m_factoryMap = new HashMap<AutoType, PresetBuilder>();
 
-  /** Subsystem the command operates on */
-  private final ShooterPivotSubsystem m_shooterPivotSubsystem;
-
-  private final double m_pivotDegrees;
-
-  /** Timer used to simulate shot in simulation mode */
-  private Timer m_simulationTimer = new Timer();
-
-  /**
-   * Creates a new instance of the command that sets the pivot to a specified angle
-   *
-   * @param pivotDegrees Angle to move the shooter pivot to
-   */
-  public SetShooterAngle(ShooterPivotSubsystem shooterPivotSubsystem, double pivotDegrees) {
-    m_shooterPivotSubsystem = shooterPivotSubsystem;
-    m_pivotDegrees = pivotDegrees;
-    addRequirements(shooterPivotSubsystem);
+  public PresetAutoFactory() {
+    // Populate the factory
+    m_factoryMap.put(AutoType.North3PlusBalance, new North3PlusBalanceAutoBuilder());
+    m_factoryMap.put(AutoType.North3PlusChill, new North3PlusChillAutoBuilder());
+    m_factoryMap.put(AutoType.South3PlusBalance, new South3PlusBalanceAutoBuilder());
+    m_factoryMap.put(AutoType.South3PlusChill, new South3PlusChillAutoBuilder());
   }
 
-  /**
-   * Creates a new instance of the command that sets the pivot to a specified angle preset
-   *
-   * @param pivotDegrees Angle preset to move the shooter pivot to
-   */
-  public SetShooterAngle(ShooterPivotSubsystem shooterPivotSubsystem, PivotPresets preset) {
-    this(shooterPivotSubsystem, preset.angleDegrees);
-  }
-
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    m_shooterPivotSubsystem.setAngleDegrees(m_pivotDegrees);
-    BotLog.Infof("Shooter: Pivot to %.2f degrees", m_pivotDegrees);
-
-    if (RobotBase.isSimulation()) {
-      m_simulationTimer.restart();
-    }
-  }
-
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    boolean finished = false;
-
-    // In simulation mode, we can't actually shoot anything.  Instead, we approximate
-    // the time it takes to shoot.
-    if (RobotBase.isSimulation()) {
-      finished = m_simulationTimer.hasElapsed(0.5);
-    } else {
-      double presentAngleDeg = m_shooterPivotSubsystem.getAngleDegrees();
-      double delta = Math.abs(presentAngleDeg - m_pivotDegrees);
-      finished = delta < kAngleToleranceDeg;
-    }
-
-    if (finished) {
-      BotLog.Infof("Shooter: pivot reached %.2f degrees", m_pivotDegrees);
-    }
-
-    return finished;
+  public PresetBuilder getAutoBuilder(AutoType autoType) {
+    return m_factoryMap.get(autoType);
   }
 }

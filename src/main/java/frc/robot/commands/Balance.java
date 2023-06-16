@@ -62,55 +62,86 @@ import frc.lib.utility.BotLogger.BotLog;
 import frc.robot.Constants;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 
+/**
+ * Balance is a command that adjusts the robot's position on the Charge Station such that it is
+ * balanced.
+ */
 public class Balance extends CommandBase {
+  // Gains applied to translation and rotation PID controllers
+  private static final double kP = 0.07;
+  private static final double kI = 0.00;
+  private static final double kD = 0.0;
 
-  private static final double SwerveP = 0.07;
-  private static final double SwerveI = 0.00;
-  private static final double SwervekD = 0.0;
+  /** Tolerance in degrees allowed when controlling robot pitch */
+  private static final double kPitchToleranceDeg = 3.0;
+  /** Tolerance in degrees allowed when controlling robot roll */
+  private static final double kRollToleranceDeg = 3.0;
 
+  /** Maximum speed in meters/sec to move when balancing */
+  private static final double kMaxSpeed = Constants.SwerveDrivebaseConstants.maxSpeed * 0.15;
+
+  /** Target angle of rotation to control for or null to control for no angle change */
   private final Rotation2d m_targetRotation;
-  private final PIDController xController = new PIDController(SwerveP, SwerveI, SwervekD);
-  private final PIDController yController = new PIDController(SwerveP, SwerveI, SwervekD);
-  private final PIDController omegaController = new PIDController(SwerveP, SwerveI, SwervekD);
+  /** PID controller used to bring the robot's pitch (rotation about Y-axis) to zero */
+  private final PIDController m_pitchController = new PIDController(kP, kI, kD);
+  /** PID controller used to bring the robot's roll (rotation about X-axis) to zero */
+  private final PIDController m_rollController = new PIDController(kP, kI, kD);
+  /** PID controller used to control the robot's yaw/heading */
+  private final PIDController m_yawController = new PIDController(kP, kI, kD);
 
+  /** true if the command should not complete; else false to end when a balance has been reached */
   private final boolean m_balancePerpetually;
-  private final Swerve drivetrainSubsystem;
+  /** Swerve drivebase subsystem to operate on */
+  private final Swerve m_drivetrainSubsystem;
 
-  private final Timer m_simulationTimer;
+  /**
+   * During simulation mode, balancing is represented by a timer that runs for a preset amount of
+   * time
+   */
+  private final Timer m_simulationTimer = new Timer();
 
-  /** Creates a command that balances perpetually */
+  /**
+   * Creates a command that balances perpetually
+   *
+   * @param driveTrainSubsystem Subsystem used to move the robot
+   */
   public Balance(Swerve drivetrainSubsystem) {
-    this.drivetrainSubsystem = drivetrainSubsystem;
-    this.m_targetRotation = null; // Control to whatever the present yaw is
-    xController.setTolerance(3);
-    yController.setTolerance(3);
-    omegaController.setTolerance(Units.degreesToRadians(3));
-    omegaController.enableContinuousInput(-Math.PI, Math.PI);
-    m_simulationTimer = new Timer();
-    m_balancePerpetually = true;
-    addRequirements(drivetrainSubsystem);
+    this(drivetrainSubsystem, null, 3.0, true);
   }
 
-  /** Creates a command that balances until it has reached a setpoint */
-  public Balance(Swerve drivetrainSubsystem, Rotation2d targetRotation) {
-    this.drivetrainSubsystem = drivetrainSubsystem;
-    m_targetRotation = targetRotation;
-    xController.setTolerance(3);
-    yController.setTolerance(3);
-    omegaController.setTolerance(Units.degreesToRadians(5));
-    omegaController.enableContinuousInput(-Math.PI, Math.PI);
-    m_simulationTimer = new Timer();
-    m_balancePerpetually = false;
+  /**
+   * Creates a command that balances until it has reached a setpoint
+   *
+   * @param driveTrainSubsystem Subsystem used to move the robot
+   * @param targetYaw Desired robot yaw to maintain for
+   */
+  public Balance(Swerve drivetrainSubsystem, Rotation2d targetYaw) {
+    this(drivetrainSubsystem, targetYaw, 5.0, false);
+  }
+
+  /**
+   * Constructs an instance of the command
+   *
+   * @param driveTrainSubsystem Subsystem used to move the robot
+   * @param targetYaw Desired robot yaw to maintain for or null to maintain current yaw
+   * @param yawToleranceDeg Tolerance in degrees to use when controlling yaw
+   * @param perpetual true to balance forever (command doesn't end); else false to end when balanced
+   */
+  private Balance(
+      Swerve drivetrainSubsystem, Rotation2d targetYaw, double yawToleranceDeg, boolean perpetual) {
+    this.m_drivetrainSubsystem = drivetrainSubsystem;
+    m_targetRotation = targetYaw;
+    m_pitchController.setTolerance(kPitchToleranceDeg);
+    m_rollController.setTolerance(kRollToleranceDeg);
+    m_yawController.setTolerance(Units.degreesToRadians(yawToleranceDeg));
+    m_yawController.enableContinuousInput(-Math.PI, Math.PI);
+    m_balancePerpetually = perpetual;
     addRequirements(drivetrainSubsystem);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    // omegaController.reset(drivetrainSubsystem.getYaw().getRadians());
-    // xController.reset(drivetrainSubsystem.getRoll());
-    // yController.reset(drivetrainSubsystem.getPitch());
-
     if (RobotBase.isSimulation()) {
       m_simulationTimer.reset();
       m_simulationTimer.start();
@@ -122,38 +153,38 @@ public class Balance extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // drivetrainSubsystem.getPitch();
-    // drivetrainSubsystem.getRoll();
-    xController.setSetpoint(0);
-    yController.setSetpoint(0);
+    m_pitchController.setSetpoint(0);
+    m_rollController.setSetpoint(0);
     // If a target rotation was not given in the constructor, just control to
     // whatever the present yaw is
-    omegaController.setSetpoint(
+    m_yawController.setSetpoint(
         m_targetRotation != null
             ? m_targetRotation.getRadians()
-            : drivetrainSubsystem.getYaw().getRadians());
+            : m_drivetrainSubsystem.getYaw().getRadians());
+
+    double pitchDegrees = m_drivetrainSubsystem.getPitch().getDegrees();
+    double rollDegrees = m_drivetrainSubsystem.getRoll().getDegrees();
+    double yawRad = m_drivetrainSubsystem.getYaw().getRadians();
 
     // Drive to the target
-    var xSpeed = xController.calculate(-drivetrainSubsystem.getPitch().getDegrees());
-    if (xController.atSetpoint()) {
+    var xSpeed = m_pitchController.calculate(-pitchDegrees);
+    if (m_pitchController.atSetpoint()) {
       xSpeed = 0;
     }
 
-    var ySpeed = yController.calculate(-drivetrainSubsystem.getRoll().getDegrees());
-    if (yController.atSetpoint()) {
+    var ySpeed = m_rollController.calculate(-rollDegrees);
+    if (m_rollController.atSetpoint()) {
       ySpeed = 0;
     }
 
-    var omegaSpeed = omegaController.calculate(drivetrainSubsystem.getYaw().getRadians());
-    if (omegaController.atSetpoint()) {
+    var omegaSpeed = m_yawController.calculate(yawRad);
+    if (m_yawController.atSetpoint()) {
       omegaSpeed = 0;
     }
+
     // https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/intro-and-chassis-speeds.html
-    drivetrainSubsystem.drive(
-        new Translation2d(ySpeed, xSpeed).times(Constants.SwerveDrivebaseConstants.maxSpeed * .15),
-        omegaSpeed,
-        false,
-        true);
+    m_drivetrainSubsystem.drive(
+        new Translation2d(ySpeed, xSpeed).times(kMaxSpeed), omegaSpeed, false, true);
 
     // https://www.instructables.com/Self-Balancing-Robot-Using-PID-Algorithm-STM-MC/
     // https://docs.wpilib.org/en/stable/docs/software/advanced-controls/controllers/pidcontroller.html
@@ -164,7 +195,7 @@ public class Balance extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     BotLog.Infof("<Balance> end: %s", (interrupted ? "interrupted" : "finished"));
-    drivetrainSubsystem.stop();
+    m_drivetrainSubsystem.stop();
   }
 
   // Returns true when the command should end.
@@ -174,11 +205,15 @@ public class Balance extends CommandBase {
       return false;
     }
 
+    // FUTURE:
+    //   Detection of a balanced state could be improved if all applicable
+    //   controllers must be balanced for some non-trivial amount of time (e.g.
+    //   half a second)
     boolean finished = false;
     if (RobotBase.isReal()) {
-      finished = xController.atSetpoint() && yController.atSetpoint();
+      finished = m_pitchController.atSetpoint() && m_rollController.atSetpoint();
       if (m_balancePerpetually) {
-        finished &= omegaController.atSetpoint();
+        finished &= m_yawController.atSetpoint();
       }
     } else {
       // In simulation mode, simulate Balance with a delay

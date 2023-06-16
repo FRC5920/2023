@@ -119,10 +119,11 @@ public class AutoConstants {
   /** An enumeration of initial actions to take before escaping the community */
   public static enum AutoType {
     AutoBuilder(0), // Generate auto routine using AutoBuilder
-    NorthLinkAndBalanceOverCS(1), // Preset: two cubes North of CS, end with balance
-    NorthLinkAndChill(2), // Preset two cubes North of CS, end with sit still
-    SouthLinkAndBalance(3), // Preset: two cubes South of CS, end with balance
-    SouthLinkAndChill(4); // Preset: two cubes south of CS, end with sit still
+    North3PlusBalance(1), // Preset: two cubes North of CS, end with balance
+    North3PlusChill(2), // Preset two cubes North of CS, end with sit still
+    South3PlusBalance(3), // Preset: two cubes South of CS, end with balance
+    South3PlusChill(4); // Preset: two cubes south of CS, end with sit still
+
     public final int id;
 
     private AutoType(int _id) {
@@ -162,7 +163,7 @@ public class AutoConstants {
      * @remarks Individual Grid positions are enumerated using letters A-I, with A being closest to
      *     the scoring table.
      */
-    public static enum ScoringPosition {
+    public static enum GridPosition {
       A(0),
       B(1),
       C(2),
@@ -177,7 +178,7 @@ public class AutoConstants {
       private final Translation2d position;
       public final Pose2d pose;
 
-      private ScoringPosition(int idx) {
+      private GridPosition(int idx) {
         id = idx;
         double x = kRobotCenterX;
         double y = kFirstGridCenterY + (kDistanceBetweenGridCenters * id);
@@ -194,7 +195,7 @@ public class AutoConstants {
       }
 
       public static String[] getNames() {
-        return EnumUtil.getEnumNames(ScoringPosition.class);
+        return EnumUtil.getEnumNames(GridPosition.class);
       }
     };
   }
@@ -390,15 +391,13 @@ public class AutoConstants {
 
       /** Y coordinate of the center of the North lane furthest away from the scoring table */
       public static double kNorthLaneCenterY =
-          Grids.ScoringPosition.H.position.getY()
-              + (Grids.ScoringPosition.I.position.getY() - Grids.ScoringPosition.H.position.getY())
-                  / 2.0;
+          Grids.GridPosition.H.position.getY()
+              + (Grids.GridPosition.I.position.getY() - Grids.GridPosition.H.position.getY()) / 2.0;
 
       /** Y coordinate of the center of the South lane closest to the scoring table */
       public static double kSouthLaneCenterY =
-          Grids.ScoringPosition.A.position.getY()
-              + (Grids.ScoringPosition.B.position.getY() - Grids.ScoringPosition.A.position.getY())
-                  / 2.0;
+          Grids.GridPosition.A.position.getY()
+              + (Grids.GridPosition.B.position.getY() - Grids.GridPosition.A.position.getY()) / 2.0;
     }
   }
 

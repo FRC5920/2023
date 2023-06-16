@@ -127,7 +127,7 @@ public class EscapeStrategy extends AutoStrategy {
   private static final String kAutoName = "<AutoBuilder EscapeStrategy>";
 
   /** Pose where the bot is initially positioned */
-  private Grids.ScoringPosition m_startingPosition;
+  private Grids.GridPosition m_startingPosition;
 
   /** Route the bot will follow to escape from the Community */
   private EscapeRoute.Route m_escapeRoute;
@@ -156,7 +156,7 @@ public class EscapeStrategy extends AutoStrategy {
    * @param rotationPIDGains PID gains used for rotation when following trajectories
    */
   public EscapeStrategy(
-      Grids.ScoringPosition startingPosition,
+      Grids.GridPosition startingPosition,
       EscapeRoute.Route escapeRoute,
       Swerve swerveSubsystem,
       EscapeMotionConfig motionConfig) {

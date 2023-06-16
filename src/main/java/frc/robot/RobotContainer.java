@@ -59,7 +59,7 @@ import frc.lib.SwerveDrive.Pigeon2GyroIO;
 import frc.lib.SwerveDrive.SimGyroIO;
 import frc.lib.SwerveDrive.SimSwerveModuleIO;
 import frc.lib.SwerveDrive.SwerveModuleIO;
-import frc.robot.autos.AutoBuilder.AutoDashboardTab;
+import frc.robot.autos.AutoDashboardTab;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Dashboard.DashboardSubsystem;

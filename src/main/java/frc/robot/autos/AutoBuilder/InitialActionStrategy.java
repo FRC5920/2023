@@ -68,7 +68,7 @@ public class InitialActionStrategy extends AutoStrategy {
   /** The action to take */
   private final InitialAction m_action;
   /** Initial position of the bot when the auto starts */
-  private final Grids.ScoringPosition m_initialPosition;
+  private final Grids.GridPosition m_initialPosition;
   /** Subsystem used to access the drive base */
   private final Swerve m_swerveSubsystem;
   /** Subsystem used to access the shooter */
@@ -85,7 +85,7 @@ public class InitialActionStrategy extends AutoStrategy {
    * @param intakeSubsystem The IntakeSubsystem to use
    */
   public InitialActionStrategy(
-      InitialAction action, Grids.ScoringPosition startingPosition, RobotContainer botContainer) {
+      InitialAction action, Grids.GridPosition startingPosition, RobotContainer botContainer) {
     super(() -> startingPosition.getPose());
     m_action = action;
     m_initialPosition = startingPosition;
