@@ -156,7 +156,7 @@ public class DriveWithZTargeting extends CommandBase {
           && ((Math.abs(m_controller.getRightY()) > 0.1)
               || (Math.abs(m_controller.getRightX()) > 0.1))) {
         translation =
-            new Translation2d(m_controller.getRightY(), m_controller.getRightX())
+            new Translation2d(-m_controller.getRightY(), m_controller.getRightX())
                 .times(RobotContainer.MaxSpeed);
         isFieldRelative = false;
       } else {
