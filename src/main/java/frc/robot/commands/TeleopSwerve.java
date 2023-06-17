@@ -88,7 +88,7 @@ public class TeleopSwerve extends CommandBase {
     double allianceInvert = (DriverStation.getAlliance() == Alliance.Blue) ? -1.0 : 1.0;
     double yAxis = allianceInvert * controller.getLeftY();
     double xAxis = allianceInvert * controller.getLeftX();
-    double rAxis = -controller.getRightX();
+    double rAxis = controller.getRightX();
 
     translation = new Translation2d(yAxis, xAxis).times(RobotContainer.MaxSpeed);
     rotation = rAxis * RobotContainer.MaxRotate;
