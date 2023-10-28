@@ -67,6 +67,7 @@ import frc.robot.commands.Shooter.ShooterPresets;
 import frc.robot.commands.SnapToGrid;
 import frc.robot.commands.zTarget.DriveWithZTargeting;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
+import frc.robot.subsystems.ShooterPivot.PivotPresets;
 import frc.robot.subsystems.ShooterPivot.ShooterPivotSubsystem;
 import frc.robot.subsystems.SwerveDrivebase.Swerve;
 
@@ -140,11 +141,13 @@ public class JoystickSubsystem extends JoystickSubsystemBase {
             .andThen(new ShooterPivotSubsystem.EmergencyPark(botContainer.shooterPivotSubsystem));
 
     // Map button and button combos for intake
-    setupButtonCombo(
-        driverController.X,
-        driverController.leftTriggerAsButton,
-        acquireAndParkCommand,
-        emergencyParkCommand);
+    // setupButtonCombo(
+    //     driverController.X,
+    //     driverController.leftTriggerAsButton,
+    //     acquireAndParkCommand,
+    //     emergencyParkCommand);
+    driverController.X.onTrue(
+        new InstantCommand(() -> shooterPivot.setAnglePreset(PivotPresets.Park)));
 
     // Map right bumper
     driverController.rightBumper.whileTrue(
@@ -170,7 +173,7 @@ public class JoystickSubsystem extends JoystickSubsystemBase {
     // Map BACK button (small button on the left in the middle of the controller)
     driverController.back.onTrue(new InstantCommand(() -> swerveSubsystem.zeroGyro()));
 
-    // Map BACK button (small button on the right in the middle of the controller)
+    // Map START button (small button on the right in the middle of the controller)
     driverController.start.whileTrue(new Balance(swerveSubsystem));
 
     // Map right trigger to snap-to-grid
